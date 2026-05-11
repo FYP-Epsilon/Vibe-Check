@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  spec-engine:
+    build:
+      context: ./module_01_spec
+    container_name: spec-engine
+
+  extract-engine:
+    build:
+      context: ./module_02_extract
+    container_name: extract-engine
+
+  equiv-engine:
+    build:
+      context: ./module_03_equiv
+    container_name: equiv-engine
