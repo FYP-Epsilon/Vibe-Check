@@ -344,12 +344,14 @@ class WIRReferenceInterpreter:
             n["id"]: n for n in wir.get("nodes", [])
         }
         self.trace_log: list[dict[str, Any]] = []
+        self._for_iterators: dict[str, dict] = {}
 
     def execute(self, inputs: dict[str, Any]) -> list[dict[str, Any]]:
         """
         Execute the WIR with *inputs* and return the expected trace.
         """
         state: dict[str, Any] = dict(inputs)
+        self._for_iterators = {}
         current: Optional[str] = self.wir.get("entry_node")
         exit_node: str = self.wir.get("exit_node", "")
         steps = 0
@@ -398,16 +400,49 @@ class WIRReferenceInterpreter:
             return self._first_successor(node)
 
         if node_type == "loop":
-            guard_val = self._eval_guard(node.get("guard", "True"), state)
-            self.trace_log.append({
-                "event": "branch_point",
-                "task": f"loop_{node['id']}",
-                "taken_branch": guard_val,
-            })
-            succs = node.get("successors", [])
-            if len(succs) >= 2:
-                return succs[0] if guard_val else succs[1]
-            return self._first_successor(node)
+            guard = node.get("guard", "")
+            if guard.startswith("iter "):
+                iterable_expr = guard[5:].strip()
+                if node["id"] not in self._for_iterators:
+                    try:
+                        iterable = _safe_eval(iterable_expr, state)
+                    except Exception:
+                        iterable = []
+                    self._for_iterators[node["id"]] = {
+                        "iterable": iterable,
+                        "idx": 0,
+                        "target_var": node.get("data_vars", [None])[0],
+                    }
+                it = self._for_iterators[node["id"]]
+                if it["idx"] < len(it["iterable"]):
+                    state[it["target_var"]] = it["iterable"][it["idx"]]
+                    it["idx"] += 1
+                    self.trace_log.append({
+                        "event": "branch_point",
+                        "task": f"loop_{node['id']}",
+                        "taken_branch": True,
+                    })
+                    return node["successors"][0]
+                else:
+                    del self._for_iterators[node["id"]]
+                    self.trace_log.append({
+                        "event": "branch_point",
+                        "task": f"loop_{node['id']}",
+                        "taken_branch": False,
+                    })
+                    succs = node.get("successors", [])
+                    return succs[1] if len(succs) > 1 else succs[0]
+            else:
+                guard_val = self._eval_guard(node.get("guard", "True"), state)
+                self.trace_log.append({
+                    "event": "branch_point",
+                    "task": f"loop_{node['id']}",
+                    "taken_branch": guard_val,
+                })
+                succs = node.get("successors", [])
+                if len(succs) >= 2:
+                    return succs[0] if guard_val else succs[1]
+                return self._first_successor(node)
 
         if node_type == "return":
             for stmt in node.get("code", []):
@@ -427,8 +462,21 @@ class WIRReferenceInterpreter:
         succs = node.get("successors", [])
         return succs[0] if succs else None
 
-    @staticmethod
-    def _eval_guard(expr: str, state: dict[str, Any]) -> bool:
+    def _eval_guard(self, expr: str, state: dict[str, Any]) -> bool:
+        if expr.startswith("iter "):
+            return True
+        if expr.startswith("next("):
+            name = expr[5:-1].strip()
+            it = self._for_iterators.get(name)
+            if it is None:
+                return False
+            return it["idx"] < len(it["iterable"])
+        if expr.startswith("exhausted("):
+            name = expr[10:-1].strip()
+            it = self._for_iterators.get(name)
+            if it is None:
+                return False
+            return it["idx"] >= len(it["iterable"])
         try:
             return bool(_safe_eval(expr, state))
         except (NameError, KeyError):
@@ -697,9 +745,18 @@ class RandomizedDifferentialTester:
             elif ann is str:
                 inputs[param_name] = ""
             elif ann is list or origin is list:
-                inputs[param_name] = []  # Prevent element-type crashes on untyped collections.
+                inputs[param_name] = [
+                    {
+                        "base_price": round(random.uniform(10.0, 100.0), 2),
+                        "qty": random.randint(1, 5),
+                    }
+                    for _ in range(random.randint(1, 3))
+                ]
             elif ann is dict or origin is dict:
-                inputs[param_name] = {}
+                inputs[param_name] = {
+                    "loyalty": random.choice(["bronze", "silver", "gold", "platinum"]),
+                    "region_multiplier": round(random.uniform(0.5, 2.0), 2),
+                }
             else:
                 inputs[param_name] = random.randint(-100, 100)
         return inputs
