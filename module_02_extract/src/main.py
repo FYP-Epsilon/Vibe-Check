@@ -173,6 +173,7 @@ def _run_verification(source: str) -> dict:
         "v3_details": v3_cert,
         "v2_details": v2_cert,
         "v1_details": v1_cert,
+        "wir": wir,
     }
 
 
