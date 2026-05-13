@@ -409,8 +409,11 @@ class WIRReferenceInterpreter:
     def _eval_guard(expr: str, state: dict[str, Any]) -> bool:
         try:
             return bool(_safe_eval(expr, state))
+        except (NameError, KeyError):
+            return False
         except Exception:
-            return True  # permissive fallback
+            # Permissive fallback: guard assumed False on error.
+            return False
 
     @staticmethod
     def _exec_stmt(stmt: str, state: dict[str, Any]) -> None:
@@ -660,9 +663,9 @@ class RandomizedDifferentialTester:
             elif ann is bool:
                 inputs[param_name] = random.choice([True, False])
             elif ann is str:
-                inputs[param_name] = random.choice(["VIP", "PREMIUM", "STANDARD", ""])
+                inputs[param_name] = ""
             elif ann is list or origin is list:
-                inputs[param_name] = []  # Empty defaults prevent element-type crashes when LLM uses untyped collections.
+                inputs[param_name] = []  # Prevent element-type crashes on untyped collections.
             elif ann is dict or origin is dict:
                 inputs[param_name] = {}
             else:
@@ -682,7 +685,9 @@ class RandomizedDifferentialTester:
         with collector:
             try:
                 func(**copy.deepcopy(inputs))
-            except Exception:
+            except BaseException:
+                # Safety net: catch BaseException so SystemExit or KeyboardInterrupt
+                # inside traced code does not kill the FastAPI worker.
                 pass  # exceptions are recorded by the collector
         return collector.trace_log
 
