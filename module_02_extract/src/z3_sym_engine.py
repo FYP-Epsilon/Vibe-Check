@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import ast
 import copy
+import sys
 import time
 from dataclasses import dataclass, field
 from typing import Any, Optional
@@ -829,7 +830,27 @@ class BoundedConcolicEngine:
 
     def _execute_concrete(self, inputs: dict[str, Any]) -> Any:
         func = self._compiled_ns[self.function_name]
-        return func(**copy.deepcopy(inputs))
+        max_concrete_steps = 2000
+        concrete_step_count = 0
+        target_file = "<string>"
+
+        def concrete_guard(frame, event, arg):
+            nonlocal concrete_step_count
+            if event == "line" and frame.f_code.co_filename == target_file:
+                concrete_step_count += 1
+                if concrete_step_count > max_concrete_steps:
+                    raise RuntimeError(
+                        f"Concrete execution exceeded {max_concrete_steps} steps — possible infinite loop."
+                    )
+            return concrete_guard
+
+        old_trace = sys.gettrace()
+        sys.settrace(concrete_guard)
+        try:
+            result = func(**copy.deepcopy(inputs))
+        finally:
+            sys.settrace(old_trace)
+        return result
 
     # -- path manipulation -----------------------------------------------
 
