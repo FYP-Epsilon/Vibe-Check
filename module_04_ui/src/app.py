@@ -1,3 +1,4 @@
+import json
 import time
 
 import requests
@@ -91,3 +92,17 @@ if st.button("Run Verification Pipeline", type="primary"):
                 st.json(v1)
             else:
                 st.info("No V1 telemetry available.")
+
+        st.divider()
+        st.subheader("📦 Compiled WIR Output")
+
+        wir = data.get("wir", {})
+        with st.expander("View Raw JSON WIR"):
+            st.json(wir)
+
+        st.download_button(
+            label="📥 Download WIR JSON",
+            data=json.dumps(wir, indent=2),
+            file_name="wir_output.json",
+            mime="application/json",
+        )
