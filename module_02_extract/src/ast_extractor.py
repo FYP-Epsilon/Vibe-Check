@@ -23,10 +23,29 @@ from __future__ import annotations
 import ast
 import copy
 import itertools
+import json
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Optional
 
+import jsonschema
 import networkx as nx
+
+
+# ----------------------------------------------------------------------
+# JSON Schema loading (graceful fallback if file missing)
+# ----------------------------------------------------------------------
+
+_CANDIDATE_SCHEMA_PATHS = [
+    Path(__file__).resolve().parent.parent.parent / "shared_schemas" / "wir_schema.json",
+    Path(__file__).resolve().parent.parent / "shared_schemas" / "wir_schema.json",
+    Path("/app/shared_schemas/wir_schema.json"),
+]
+_WIR_SCHEMA = None
+for p in _CANDIDATE_SCHEMA_PATHS:
+    if p.exists():
+        _WIR_SCHEMA = json.loads(p.read_text())
+        break
 
 
 # ----------------------------------------------------------------------
@@ -1300,5 +1319,20 @@ def run_v3_pipeline(source: str) -> dict[str, Any]:
     # --- P1.5 ----------------------------------------------------------
     cert = V3Certificate(source, wir, guard_results).generate()
     wir["certificate"] = cert
+
+    # --- Schema validation -----------------------------------------------
+    if _WIR_SCHEMA is not None:
+        try:
+            jsonschema.validate(instance=wir, schema=_WIR_SCHEMA)
+        except jsonschema.ValidationError as e:
+            raise ValueError(f"WIR schema validation failed: {e.message} at {list(e.path)}")
+
+        for func_name, func_wir in wir.get("functions", {}).items():
+            try:
+                jsonschema.validate(instance=func_wir, schema=_WIR_SCHEMA)
+            except jsonschema.ValidationError as e:
+                raise ValueError(
+                    f"WIR schema validation failed for function '{func_name}': {e.message} at {list(e.path)}"
+                )
 
     return wir

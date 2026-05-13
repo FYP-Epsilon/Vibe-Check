@@ -15,11 +15,20 @@ from __future__ import annotations
 
 import ast
 import copy
+import sys
 import time
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
 import z3
+
+SAFE_BUILTINS = {
+    "len": len, "range": range, "enumerate": enumerate, "zip": zip,
+    "map": map, "filter": filter, "abs": abs, "min": min, "max": max,
+    "sum": sum, "round": round, "str": str, "int": int, "float": float,
+    "bool": bool, "list": list, "dict": dict, "tuple": tuple, "set": set,
+    "type": type, "isinstance": isinstance, "hasattr": hasattr, "getattr": getattr,
+}
 
 try:
     from .ast_extractor import CFGExtractor, _unparse
@@ -539,16 +548,23 @@ class WIRSymbolicTracer:
     def _eval_concrete(self, expr: str) -> Any:
         try:
             return _safe_eval(expr, self.concrete_state)
+        except (NameError, KeyError):
+            return False
         except Exception:
-            return True  # safe fallback for unparseable guards
+            # Concrete guard fallback: False on error to prevent fake path coverage.
+            return False
 
     def _eval_symbolic(self, expr: str) -> z3.ExprRef:
         try:
             tree = ast.parse(expr, mode="eval")
             ev = SymbolicEvaluator(self.registry, self.symbolic_state)
             return ev.eval(tree.body)
+        except (NotImplementedError, SyntaxError):
+            # Symbolic guard fallback: False on error to prevent fake path coverage.
+            return z3.BoolVal(False)
         except Exception:
-            return z3.BoolVal(True)
+            # Symbolic guard fallback: False on error to prevent fake path coverage.
+            return z3.BoolVal(False)
 
     # -- statement execution ---------------------------------------------
 
@@ -702,7 +718,7 @@ class BoundedConcolicEngine:
         if compiled_ns is not None:
             self._compiled_ns = compiled_ns
         else:
-            self._compiled_ns: dict[str, Any] = {"__builtins__": __builtins__}
+            self._compiled_ns: dict[str, Any] = {"__builtins__": SAFE_BUILTINS}
             exec(compile(self.source, "<string>", "exec"), self._compiled_ns)
 
         # Pre-extract the WIR (Phase 1) for symbolic tracing.
@@ -733,6 +749,7 @@ class BoundedConcolicEngine:
         self.timeouts = 0
         self.solver_successes = 0
         self.iteration = 0
+        self.input_mismatch_count = 0
 
     # -- public API ------------------------------------------------------
 
@@ -772,7 +789,11 @@ class BoundedConcolicEngine:
         concrete execution -> symbolic trace -> solver query -> new inputs.
         """
         # 1. Concrete execution.
-        concrete_result = self._execute_concrete(inputs)
+        try:
+            concrete_result = self._execute_concrete(inputs)
+        except (TypeError, KeyError, IndexError, AttributeError, ZeroDivisionError):
+            self.input_mismatch_count += 1
+            return None
 
         # 2. Symbolic trace (reuses the engine's persistent registry).
         tracer = WIRSymbolicTracer(
@@ -809,7 +830,27 @@ class BoundedConcolicEngine:
 
     def _execute_concrete(self, inputs: dict[str, Any]) -> Any:
         func = self._compiled_ns[self.function_name]
-        return func(**copy.deepcopy(inputs))
+        max_concrete_steps = 2000
+        concrete_step_count = 0
+        target_file = "<string>"
+
+        def concrete_guard(frame, event, arg):
+            nonlocal concrete_step_count
+            if event == "line" and frame.f_code.co_filename == target_file:
+                concrete_step_count += 1
+                if concrete_step_count > max_concrete_steps:
+                    raise RuntimeError(
+                        f"Concrete execution exceeded {max_concrete_steps} steps — possible infinite loop."
+                    )
+            return concrete_guard
+
+        old_trace = sys.gettrace()
+        sys.settrace(concrete_guard)
+        try:
+            result = func(**copy.deepcopy(inputs))
+        finally:
+            sys.settrace(old_trace)
+        return result
 
     # -- path manipulation -----------------------------------------------
 
@@ -858,6 +899,7 @@ class BoundedConcolicEngine:
         """
         solver = z3.Solver()
         solver.set("timeout", self.timeout_ms)
+        solver.reset()  # Reset solver state to prevent constraint accumulation across iterations.
         solver.add(path_condition)
 
         # Also add constraints that we haven't seen this exact PC before.
@@ -894,6 +936,7 @@ class BoundedConcolicEngine:
             val = self._z3_to_python(z3_expr, type(original_value))
             new_inputs[key] = val
 
+        solver.reset()  # Reset solver state to prevent constraint accumulation across iterations.
         return new_inputs
 
     @staticmethod
@@ -1004,6 +1047,35 @@ class BoundedConcolicEngine:
 
         confidence = (feasible / total) * (1 - timeout_rate) * solver_rate
 
+        # Branch diversity check
+        total_gateways = sum(
+            1 for n in self._node_map.values() if n.get("type") == "gateway"
+        )
+        diverse_gateways = 0
+        for node_id, n in self._node_map.items():
+            if n.get("type") == "gateway":
+                has_true = (node_id, "True") in self.covered_edges
+                has_false = (node_id, "False") in self.covered_edges
+                if has_true and has_false:
+                    diverse_gateways += 1
+
+        branch_diversity_score = (
+            diverse_gateways / total_gateways if total_gateways > 0 else 1.0
+        )
+
+        if total_gateways > 0 and branch_diversity_score < 0.5:
+            confidence = min(confidence, 0.80)
+            message = "V2 symbolic refinement in progress: insufficient branch diversity."
+        elif confidence >= 0.95:
+            message = "V2 symbolic refinement complete."
+        else:
+            message = "V2 symbolic refinement in progress or stalled."
+
+        total_branches_explored = len(self.covered_edges)
+        if total_branches_explored < 2 and confidence > 0.80:
+            confidence = min(confidence, 0.75)
+            message = "V2 symbolic refinement incomplete: fewer than 2 branches explored."
+
         return {
             "version": "V2",
             "confidence": confidence,
@@ -1013,12 +1085,11 @@ class BoundedConcolicEngine:
             "timeout_rate": timeout_rate,
             "solver_success_rate": solver_rate,
             "covered_edges": len(self.covered_edges),
+            "branch_diversity_score": branch_diversity_score,
+            "total_branches_explored": total_branches_explored,
+            "input_mismatch_count": self.input_mismatch_count,
             "trigger_v1": False,
-            "message": (
-                "V2 symbolic refinement complete."
-                if confidence >= 0.95
-                else "V2 symbolic refinement in progress or stalled."
-            ),
+            "message": message,
         }
 
 
