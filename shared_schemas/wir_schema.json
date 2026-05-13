@@ -1,1 +1,148 @@
-{}
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Workflow Intermediate Representation (WIR)",
+  "description": "JSON Schema for the WIR dict produced by CFGExtractor in module_02_extract/src/ast_extractor.py",
+  "definitions": {
+    "wir": {
+      "type": "object",
+      "required": ["entry_node", "exit_node", "nodes", "edges"],
+      "properties": {
+        "entry_node": {
+          "type": "string"
+        },
+        "exit_node": {
+          "type": "string"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "type", "successors", "predecessors", "control_vars", "data_vars"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "entry",
+                  "exit",
+                  "block",
+                  "gateway",
+                  "loop",
+                  "task",
+                  "break",
+                  "continue",
+                  "return",
+                  "except",
+                  "finally",
+                  "match"
+                ]
+              },
+              "ast_type": {
+                "type": "string"
+              },
+              "line": {
+                "type": "integer"
+              },
+              "code": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "successors": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "predecessors": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "guard": {
+                "type": ["string", "null"]
+              },
+              "exception_type": {
+                "type": ["string", "null"]
+              },
+              "control_vars": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "data_vars": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source", "target", "guard", "exception_type"],
+            "properties": {
+              "source": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "guard": {
+                "type": ["string", "null"]
+              },
+              "exception_type": {
+                "type": ["string", "null"]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "unsupported_constructs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/definitions/wir"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "control_variables": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data_variables": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "functions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/wir"
+          }
+        }
+      }
+    }
+  ]
+}

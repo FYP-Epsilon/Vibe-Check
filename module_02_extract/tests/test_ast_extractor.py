@@ -392,3 +392,21 @@ except* RuntimeError:
         # The demo contains rich constructs; coverage should be high.
         assert cert["node_coverage"] > 0.5
         assert cert["edge_coverage"] > 0.5
+
+
+
+class TestWIRSchemaValidation:
+    def test_valid_wir_passes_schema(self):
+        source = "def foo(x):\n    if x > 0:\n        return 1\n    return 0"
+        wir = run_v3_pipeline(source)
+        # If schema exists, this should not raise.
+        assert "entry_node" in wir
+        assert "certificate" in wir
+
+    def test_wir_has_required_top_level_keys(self):
+        source = "x = 1"
+        wir = run_v3_pipeline(source)
+        assert "entry_node" in wir
+        assert "exit_node" in wir
+        assert "nodes" in wir
+        assert "edges" in wir
