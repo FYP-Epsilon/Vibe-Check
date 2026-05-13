@@ -418,7 +418,7 @@ class WIRReferenceInterpreter:
     @staticmethod
     def _exec_stmt(stmt: str, state: dict[str, Any]) -> None:
         try:
-            exec(stmt, {"__builtins__": __builtins__}, state)
+            exec(stmt, {"__builtins__": {}}, state)
         except Exception:
             pass
 
@@ -467,7 +467,17 @@ class DifferentialComparator:
         max_len = max(len(actual_seq), len(expected_seq))
         similarity = lcs_len / max_len if max_len > 0 else 1.0
 
-        # 4. Divergence points.
+        # 4. Empty-trace handling.
+        if not actual_seq and not expected_seq:
+            similarity = 1.0
+            passed = True
+            # Only pass if no mutation warnings exist in the actual trace.
+            if any(e.get("mutation_warning") for e in self.actual_raw):
+                passed = False
+        else:
+            passed = similarity >= 0.95
+
+        # 5. Divergence points.
         divergences = self._find_divergence_points(actual_seq, expected_seq)
 
         return {
@@ -476,7 +486,7 @@ class DifferentialComparator:
             "actual_length": len(actual_seq),
             "expected_length": len(expected_seq),
             "divergence_points": divergences,
-            "passed": similarity >= 0.95,
+            "passed": passed,
         }
 
     # -- internal helpers ------------------------------------------------
