@@ -1004,6 +1004,30 @@ class BoundedConcolicEngine:
 
         confidence = (feasible / total) * (1 - timeout_rate) * solver_rate
 
+        # Branch diversity check
+        total_gateways = sum(
+            1 for n in self._node_map.values() if n.get("type") == "gateway"
+        )
+        diverse_gateways = 0
+        for node_id, n in self._node_map.items():
+            if n.get("type") == "gateway":
+                has_true = (node_id, "True") in self.covered_edges
+                has_false = (node_id, "False") in self.covered_edges
+                if has_true and has_false:
+                    diverse_gateways += 1
+
+        branch_diversity_score = (
+            diverse_gateways / total_gateways if total_gateways > 0 else 1.0
+        )
+
+        if total_gateways > 0 and branch_diversity_score < 0.5:
+            confidence = min(confidence, 0.80)
+            message = "V2 symbolic refinement in progress: insufficient branch diversity."
+        elif confidence >= 0.95:
+            message = "V2 symbolic refinement complete."
+        else:
+            message = "V2 symbolic refinement in progress or stalled."
+
         return {
             "version": "V2",
             "confidence": confidence,
@@ -1013,12 +1037,9 @@ class BoundedConcolicEngine:
             "timeout_rate": timeout_rate,
             "solver_success_rate": solver_rate,
             "covered_edges": len(self.covered_edges),
+            "branch_diversity_score": branch_diversity_score,
             "trigger_v1": False,
-            "message": (
-                "V2 symbolic refinement complete."
-                if confidence >= 0.95
-                else "V2 symbolic refinement in progress or stalled."
-            ),
+            "message": message,
         }
 
 

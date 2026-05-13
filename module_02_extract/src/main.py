@@ -130,12 +130,15 @@ def _run_verification(source: str) -> dict:
     # ------------------------------------------------------------------
     # Phase 2  --  Symbolic Refinement with Z3 (V2)
     # ------------------------------------------------------------------
+    # Production evaluation targets: V2_QUERY_BUDGET=500, V1_RUNS=100 per execution plan.
+    query_budget = int(os.getenv("V2_QUERY_BUDGET", "20"))
+    n_runs = int(os.getenv("V1_RUNS", "10"))
     v2_result = run_v2_pipeline(
         source=source,
         function_name=function_name,
         initial_inputs=initial_inputs,
         max_k=3,
-        query_budget=20,
+        query_budget=query_budget,
         compiled_ns=local_env,
     )
     v2_cert = v2_result["certificate"]
@@ -151,7 +154,7 @@ def _run_verification(source: str) -> dict:
         branch_lines=v1_params["branch_lines"],
         control_variables=v1_params["control_variables"],
         state_variables=v1_params["state_variables"] or None,
-        n_runs=10,
+        n_runs=n_runs,
         seed=42,
         compiled_ns=local_env,
     )
