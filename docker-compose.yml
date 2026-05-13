@@ -15,3 +15,10 @@ services:
     build:
       context: ./module_03_equiv
     container_name: equiv-engine
+
+  ui-engine:
+    build:
+      context: ./module_04_ui
+    container_name: ui-engine
+    ports:
+      - "8501:8501"
