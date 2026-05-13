@@ -733,6 +733,7 @@ class BoundedConcolicEngine:
         self.timeouts = 0
         self.solver_successes = 0
         self.iteration = 0
+        self.input_mismatch_count = 0
 
     # -- public API ------------------------------------------------------
 
@@ -772,7 +773,11 @@ class BoundedConcolicEngine:
         concrete execution -> symbolic trace -> solver query -> new inputs.
         """
         # 1. Concrete execution.
-        concrete_result = self._execute_concrete(inputs)
+        try:
+            concrete_result = self._execute_concrete(inputs)
+        except (TypeError, KeyError, IndexError, AttributeError):
+            self.input_mismatch_count += 1
+            return None
 
         # 2. Symbolic trace (reuses the engine's persistent registry).
         tracer = WIRSymbolicTracer(
@@ -1038,6 +1043,7 @@ class BoundedConcolicEngine:
             "solver_success_rate": solver_rate,
             "covered_edges": len(self.covered_edges),
             "branch_diversity_score": branch_diversity_score,
+            "input_mismatch_count": self.input_mismatch_count,
             "trigger_v1": False,
             "message": message,
         }

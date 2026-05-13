@@ -662,7 +662,7 @@ class RandomizedDifferentialTester:
             elif ann is str:
                 inputs[param_name] = random.choice(["VIP", "PREMIUM", "STANDARD", ""])
             elif ann is list or origin is list:
-                inputs[param_name] = [random.randint(-100, 100) for _ in range(random.randint(3, 5))]
+                inputs[param_name] = []  # Empty defaults prevent element-type crashes when LLM uses untyped collections.
             elif ann is dict or origin is dict:
                 inputs[param_name] = {}
             else:
