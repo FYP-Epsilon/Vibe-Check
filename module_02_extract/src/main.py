@@ -8,6 +8,7 @@ runs the complete V3 → V2 → V1 pipeline, and returns a multi-modal
 certificate as JSON.
 """
 
+import ast
 import inspect
 import os
 import time
@@ -76,6 +77,14 @@ def _run_verification(source: str) -> dict:
     aggregated certificate dictionary.
     """
     # ------------------------------------------------------------------
+    # Syntax pre-check
+    # ------------------------------------------------------------------
+    try:
+        ast.parse(source)
+    except SyntaxError:
+        raise ValueError("Source code is not valid Python syntax.")
+
+    # ------------------------------------------------------------------
     # Phase 1  --  Hardened Static AST Extraction (V3)
     # ------------------------------------------------------------------
     wir = run_v3_pipeline(source)
@@ -121,7 +130,7 @@ def _run_verification(source: str) -> dict:
         elif ann is str:
             initial_inputs[param_name] = ""
         elif ann is list or origin is list:
-            initial_inputs[param_name] = []  # Empty defaults prevent element-type crashes when LLM uses untyped collections.
+            initial_inputs[param_name] = []  # Prevent element-type crashes on untyped collections.
         elif ann is dict or origin is dict:
             initial_inputs[param_name] = {}
         else:
@@ -186,7 +195,21 @@ def verify(payload: CodePayload) -> dict:
     Accept Python workflow source code, run the full extraction / verification
     pipeline, and return the certificate JSON.
     """
-    result = _run_verification(payload.source_code)
+    try:
+        result = _run_verification(payload.source_code)
+    except (ValueError, SyntaxError, TypeError, KeyError, RuntimeError, Exception) as e:
+        return {
+            "passed": False,
+            "message": f"Verification aborted: {str(e)}",
+            "v3_coverage": 0.0,
+            "v2_confidence": 0.0,
+            "v1_confidence": 0.0,
+            "combined_confidence": 0.0,
+            "v3_details": {},
+            "v2_details": {},
+            "v1_details": {},
+            "wir": {},
+        }
     return result
 
 

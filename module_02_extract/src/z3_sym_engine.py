@@ -775,7 +775,7 @@ class BoundedConcolicEngine:
         # 1. Concrete execution.
         try:
             concrete_result = self._execute_concrete(inputs)
-        except (TypeError, KeyError, IndexError, AttributeError):
+        except (TypeError, KeyError, IndexError, AttributeError, ZeroDivisionError):
             self.input_mismatch_count += 1
             return None
 
