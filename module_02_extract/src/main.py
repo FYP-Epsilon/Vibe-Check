@@ -121,7 +121,7 @@ def _run_verification(source: str) -> dict:
         elif ann is str:
             initial_inputs[param_name] = ""
         elif ann is list or origin is list:
-            initial_inputs[param_name] = [10, 5, 20]
+            initial_inputs[param_name] = []  # Empty defaults prevent element-type crashes when LLM uses untyped collections.
         elif ann is dict or origin is dict:
             initial_inputs[param_name] = {}
         else:
