@@ -35,6 +35,15 @@ except ImportError:
     )
 
 
+SAFE_BUILTINS = {
+    "len": len, "range": range, "enumerate": enumerate, "zip": zip,
+    "map": map, "filter": filter, "abs": abs, "min": min, "max": max,
+    "sum": sum, "round": round, "str": str, "int": int, "float": float,
+    "bool": bool, "list": list, "dict": dict, "tuple": tuple, "set": set,
+    "type": type, "isinstance": isinstance, "hasattr": hasattr, "getattr": getattr,
+}
+
+
 class CodePayload(BaseModel):
     source_code: str
 
@@ -77,12 +86,21 @@ def _run_verification(source: str) -> dict:
     aggregated certificate dictionary.
     """
     # ------------------------------------------------------------------
-    # Syntax pre-check
+    # Normalize literal escapes and enforce size / complexity limits
     # ------------------------------------------------------------------
+    source = source.replace('\\n', '\n').replace('\\t', '\t')
+
+    if len(source) > 50000:
+        raise ValueError("Source code exceeds maximum length of 50,000 characters.")
+
     try:
-        ast.parse(source)
+        tree = ast.parse(source)
     except SyntaxError:
         raise ValueError("Source code is not valid Python syntax.")
+
+    ast_node_count = len(list(ast.walk(tree)))
+    if ast_node_count > 5000:
+        raise ValueError("AST complexity exceeds maximum of 5,000 nodes.")
 
     # ------------------------------------------------------------------
     # Phase 1  --  Hardened Static AST Extraction (V3)
@@ -104,7 +122,7 @@ def _run_verification(source: str) -> dict:
     # ------------------------------------------------------------------
     # Compile source once and share the namespace with V2 and V1
     # ------------------------------------------------------------------
-    local_env: dict[str, Any] = {"__builtins__": __builtins__}
+    local_env: dict[str, Any] = {"__builtins__": SAFE_BUILTINS}
     exec(compile(source, "<string>", "exec"), local_env)
     func_obj = local_env[function_name]
 
@@ -142,12 +160,16 @@ def _run_verification(source: str) -> dict:
     # Production evaluation targets: V2_QUERY_BUDGET=500, V1_RUNS=100 per execution plan.
     query_budget = int(os.getenv("V2_QUERY_BUDGET", "20"))
     n_runs = int(os.getenv("V1_RUNS", "10"))
+
+    dynamic_query_budget = min(query_budget, max(10, 500 - ast_node_count // 10))
+    dynamic_n_runs = min(n_runs, max(5, 100 - ast_node_count // 50))
+
     v2_result = run_v2_pipeline(
         source=source,
         function_name=function_name,
         initial_inputs=initial_inputs,
         max_k=3,
-        query_budget=query_budget,
+        query_budget=dynamic_query_budget,
         compiled_ns=local_env,
     )
     v2_cert = v2_result["certificate"]
@@ -163,7 +185,7 @@ def _run_verification(source: str) -> dict:
         branch_lines=v1_params["branch_lines"],
         control_variables=v1_params["control_variables"],
         state_variables=v1_params["state_variables"] or None,
-        n_runs=n_runs,
+        n_runs=dynamic_n_runs,
         seed=42,
         compiled_ns=local_env,
     )

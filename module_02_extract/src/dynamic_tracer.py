@@ -32,6 +32,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Optional, get_type_hints
 
+SAFE_BUILTINS = {
+    "len": len, "range": range, "enumerate": enumerate, "zip": zip,
+    "map": map, "filter": filter, "abs": abs, "min": min, "max": max,
+    "sum": sum, "round": round, "str": str, "int": int, "float": float,
+    "bool": bool, "list": list, "dict": dict, "tuple": tuple, "set": set,
+    "type": type, "isinstance": isinstance, "hasattr": hasattr, "getattr": getattr,
+}
+
 try:
     from .ast_extractor import CFGExtractor, _collect_vars
 except ImportError:
@@ -347,6 +355,11 @@ class WIRReferenceInterpreter:
             nxt = self._step(node, state)
             current = nxt
 
+        if steps >= max_steps:
+            self.trace_log.append(
+                {"event": "_warning", "message": "Step limit exceeded — possible infinite loop."}
+            )
+
         return self.trace_log
 
     def _step(self, node: dict[str, Any], state: dict[str, Any]) -> Optional[str]:
@@ -639,7 +652,7 @@ class RandomizedDifferentialTester:
         if compiled_ns is not None:
             self._compiled_ns = compiled_ns
         else:
-            self._compiled_ns: dict[str, Any] = {"__builtins__": __builtins__}
+            self._compiled_ns: dict[str, Any] = {"__builtins__": SAFE_BUILTINS}
             exec(compile(self.source, "<string>", "exec"), self._compiled_ns)
 
         # Extract argument names from the AST so we know what to generate.
