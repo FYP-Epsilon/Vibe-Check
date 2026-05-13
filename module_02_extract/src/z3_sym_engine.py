@@ -21,6 +21,14 @@ from typing import Any, Optional
 
 import z3
 
+SAFE_BUILTINS = {
+    "len": len, "range": range, "enumerate": enumerate, "zip": zip,
+    "map": map, "filter": filter, "abs": abs, "min": min, "max": max,
+    "sum": sum, "round": round, "str": str, "int": int, "float": float,
+    "bool": bool, "list": list, "dict": dict, "tuple": tuple, "set": set,
+    "type": type, "isinstance": isinstance, "hasattr": hasattr, "getattr": getattr,
+}
+
 try:
     from .ast_extractor import CFGExtractor, _unparse
 except ImportError:
@@ -709,7 +717,7 @@ class BoundedConcolicEngine:
         if compiled_ns is not None:
             self._compiled_ns = compiled_ns
         else:
-            self._compiled_ns: dict[str, Any] = {"__builtins__": __builtins__}
+            self._compiled_ns: dict[str, Any] = {"__builtins__": SAFE_BUILTINS}
             exec(compile(self.source, "<string>", "exec"), self._compiled_ns)
 
         # Pre-extract the WIR (Phase 1) for symbolic tracing.
