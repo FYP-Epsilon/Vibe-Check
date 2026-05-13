@@ -81,3 +81,27 @@ class TestFullPipeline:
         assert final["combined_confidence"] > 0.0
         assert v3_cert["node_coverage"] > 0.5
         assert isinstance(final["passed"], bool)
+
+
+    def test_infinite_loop_rejected(self):
+        source = "def f():\n    while True:\n        pass"
+        from ast_extractor import run_v3_pipeline
+        from z3_sym_engine import BoundedConcolicEngine
+
+        wir = run_v3_pipeline(source)
+        functions = wir.get("functions", {})
+        assert "f" in functions
+
+        local_env = {"__builtins__": {}}
+        exec(compile(source, "<string>", "exec"), local_env)
+
+        engine = BoundedConcolicEngine(
+            source=source,
+            function_name="f",
+            max_k=3,
+            query_budget=10,
+            compiled_ns=local_env,
+        )
+        import pytest
+        with pytest.raises(RuntimeError, match="exceeded.*steps"):
+            engine.run({})

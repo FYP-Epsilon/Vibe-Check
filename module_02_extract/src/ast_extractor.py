@@ -36,11 +36,16 @@ import networkx as nx
 # JSON Schema loading (graceful fallback if file missing)
 # ----------------------------------------------------------------------
 
-_SCHEMA_PATH = Path(__file__).resolve().parent.parent.parent / "shared_schemas" / "wir_schema.json"
-if _SCHEMA_PATH.exists():
-    _WIR_SCHEMA = json.loads(_SCHEMA_PATH.read_text())
-else:
-    _WIR_SCHEMA = None  # WARNING: shared_schemas/wir_schema.json not found — WIR validation skipped.
+_CANDIDATE_SCHEMA_PATHS = [
+    Path(__file__).resolve().parent.parent.parent / "shared_schemas" / "wir_schema.json",
+    Path(__file__).resolve().parent.parent / "shared_schemas" / "wir_schema.json",
+    Path("/app/shared_schemas/wir_schema.json"),
+]
+_WIR_SCHEMA = None
+for p in _CANDIDATE_SCHEMA_PATHS:
+    if p.exists():
+        _WIR_SCHEMA = json.loads(p.read_text())
+        break
 
 
 # ----------------------------------------------------------------------

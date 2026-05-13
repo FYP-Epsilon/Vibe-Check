@@ -8,3 +8,7 @@ venv/
 *.o
 *.out
 build/
+
+# pytest
+.pytest_cache/
+**/.pytest_cache/

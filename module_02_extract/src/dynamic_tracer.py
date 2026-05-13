@@ -102,6 +102,8 @@ class WIRTraceCollector:
         self.control_variables = set(control_variables)
         self.state_variables = set(state_variables or [])
         self.for_loop_lines = for_loop_lines or set()
+        self.max_trace_steps = 2000
+        self.trace_step_count = 0
 
         # Trace storage
         self.trace_log: list[dict[str, Any]] = []
@@ -141,6 +143,13 @@ class WIRTraceCollector:
         arg: Any,
     ) -> Optional[Callable]:
         """Main ``sys.settrace`` hook."""
+        if event == "line":
+            self.trace_step_count += 1
+            if self.trace_step_count > self.max_trace_steps:
+                raise RuntimeError(
+                    f"Trace collection exceeded {self.max_trace_steps} steps — possible infinite loop."
+                )
+
         # Tier-1 filter: drop everything that does not belong to the target file.
         if not self._is_target_frame(frame):
             return None
