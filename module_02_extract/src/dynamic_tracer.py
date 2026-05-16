@@ -408,6 +408,8 @@ class WIRReferenceInterpreter:
                         iterable = _safe_eval(iterable_expr, state)
                     except Exception:
                         iterable = []
+                    if not isinstance(iterable, (list, tuple)):
+                        iterable = list(iterable)
                     self._for_iterators[node["id"]] = {
                         "iterable": iterable,
                         "idx": 0,
@@ -415,7 +417,15 @@ class WIRReferenceInterpreter:
                     }
                 it = self._for_iterators[node["id"]]
                 if it["idx"] < len(it["iterable"]):
-                    state[it["target_var"]] = it["iterable"][it["idx"]]
+                    target_vars = node.get("data_vars", [])
+                    item = it["iterable"][it["idx"]]
+                    if len(target_vars) == 1:
+                        state[target_vars[0]] = item
+                    elif len(target_vars) > 1 and isinstance(item, (list, tuple)):
+                        for i, var in enumerate(target_vars):
+                            state[var] = item[i] if i < len(item) else None
+                    else:
+                        state[target_vars[0]] = item
                     it["idx"] += 1
                     self.trace_log.append({
                         "event": "branch_point",
@@ -744,19 +754,16 @@ class RandomizedDifferentialTester:
                 inputs[param_name] = random.choice([True, False])
             elif ann is str:
                 inputs[param_name] = ""
-            elif ann is list or origin is list:
-                inputs[param_name] = [
-                    {
-                        "base_price": round(random.uniform(10.0, 100.0), 2),
-                        "qty": random.randint(1, 5),
-                    }
-                    for _ in range(random.randint(1, 3))
-                ]
             elif ann is dict or origin is dict:
                 inputs[param_name] = {
-                    "loyalty": random.choice(["bronze", "silver", "gold", "platinum"]),
-                    "region_multiplier": round(random.uniform(0.5, 2.0), 2),
+                    f"role_{i}": random.randint(1, 5)
+                    for i in range(random.randint(1, 3))
                 }
+            elif ann is list or origin is list:
+                inputs[param_name] = [
+                    f"action_{random.randint(1, 5)}"
+                    for _ in range(random.randint(1, 3))
+                ]
             else:
                 inputs[param_name] = random.randint(-100, 100)
         return inputs
