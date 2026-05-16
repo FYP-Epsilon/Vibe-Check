@@ -462,7 +462,14 @@ class CFGExtractor:
         iter_text = _unparse(node.iter)
         header.guard = f"iter {iter_text}"
         header.control_vars.extend(_collect_vars(node.iter))
-        header.data_vars.extend(_collect_vars(node.target))
+        if isinstance(node.target, (ast.Tuple, ast.List)):
+            header.data_vars = [
+                elt.id for elt in node.target.elts
+                if isinstance(elt, ast.Name)
+            ]
+        else:
+            t = _extract_name(node.target)
+            header.data_vars = [t] if t else []
 
         exit_block = self._make_block(node)
 
