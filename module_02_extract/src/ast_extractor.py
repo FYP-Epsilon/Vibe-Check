@@ -462,7 +462,14 @@ class CFGExtractor:
         iter_text = _unparse(node.iter)
         header.guard = f"iter {iter_text}"
         header.control_vars.extend(_collect_vars(node.iter))
-        header.data_vars.extend(_collect_vars(node.target))
+        if isinstance(node.target, (ast.Tuple, ast.List)):
+            header.data_vars = [
+                elt.id for elt in node.target.elts
+                if isinstance(elt, ast.Name)
+            ]
+        else:
+            t = _extract_name(node.target)
+            header.data_vars = [t] if t else []
 
         exit_block = self._make_block(node)
 
@@ -1176,6 +1183,7 @@ class V3Certificate:
             "guard_success_rate": guard_rate,
             "unsupported_constructs": unsupported,
             "abort": abort,
+            "confidence": 1.0 if not abort and node_cov >= 0.95 else node_cov,
             "message": (
                 "ABORT: node coverage below 0.95 threshold — manual review required."
                 if abort else "V3 structural extraction passed quality gate."

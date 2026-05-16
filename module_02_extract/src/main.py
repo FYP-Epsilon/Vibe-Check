@@ -63,11 +63,11 @@ def _derive_v1_params(func_wir: dict) -> dict:
     state_variables: set[str] = set()
 
     for node in func_wir.get("nodes", []):
-        if node["type"] == "gateway":
+        if node["type"] in ("gateway", "loop"):
             if node.get("line"):
                 branch_lines.add(node["line"])
-            control_variables.update(node.get("control_vars", []))
-        elif node["type"] == "block":
+        control_variables.update(node.get("control_vars", []))
+        if node["type"] == "block":
             state_variables.update(node.get("data_vars", []))
 
     # Remove any control variables that leaked into state
