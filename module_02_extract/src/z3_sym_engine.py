@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import ast
 import copy
+import inspect
 import sys
 import time
 from dataclasses import dataclass, field
@@ -424,6 +425,7 @@ class WIRSymbolicTracer:
         self.path_condition: z3.BoolRef = z3.BoolVal(True)
         self.branches: list[BranchRecord] = []
         self.loop_counters: dict[str, int] = {}
+        self._for_iterators: dict[str, dict] = {}
 
         # Select the node map (function-level or module-level).
         if function_name and function_name in wir.get("functions", {}):
@@ -500,6 +502,44 @@ class WIRSymbolicTracer:
 
     def _handle_loop(self, node: dict[str, Any]) -> Optional[str]:
         loop_id = node["id"]
+
+        if node.get("guard", "").startswith("iter "):
+            iterable_expr = node["guard"][5:].strip()
+            if loop_id not in self._for_iterators:
+                try:
+                    iterable = _safe_eval(iterable_expr, self.concrete_state)
+                except Exception:
+                    iterable = []
+                if not isinstance(iterable, (list, tuple)):
+                    iterable = list(iterable)
+                target_var = node.get("data_vars", [None])[0]
+                self._for_iterators[loop_id] = {"iterable": iterable, "idx": 0, "target_var": target_var}
+            it = self._for_iterators[loop_id]
+            if it["idx"] < len(it["iterable"]):
+                self.concrete_state[it["target_var"]] = it["iterable"][it["idx"]]
+                self.symbolic_state[it["target_var"]] = self.registry.declare(it["target_var"], it["iterable"][it["idx"]])
+                it["idx"] += 1
+                self.branches.append(
+                    BranchRecord(
+                        node_id=loop_id,
+                        guard_str=f"next({iterable_expr})",
+                        taken=True,
+                        symbolic_guard=z3.BoolVal(True),
+                    )
+                )
+                return node["successors"][0]
+            else:
+                del self._for_iterators[loop_id]
+                self.branches.append(
+                    BranchRecord(
+                        node_id=loop_id,
+                        guard_str=f"next({iterable_expr})",
+                        taken=False,
+                        symbolic_guard=z3.BoolVal(False),
+                    )
+                )
+                return node["successors"][1] if len(node.get("successors", [])) > 1 else node["successors"][0]
+
         iteration = self.loop_counters.get(loop_id, 0)
 
         if iteration >= self.max_k:
@@ -546,6 +586,8 @@ class WIRSymbolicTracer:
     # -- concrete / symbolic evaluation ----------------------------------
 
     def _eval_concrete(self, expr: str) -> Any:
+        if expr.startswith("iter "):
+            return True
         try:
             return _safe_eval(expr, self.concrete_state)
         except (NameError, KeyError):
@@ -779,7 +821,22 @@ class BoundedConcolicEngine:
                 cert["trigger_v1"] = True
                 return cert
 
-        return self._emit_certificate()
+        cert = self._emit_certificate()
+        if self.iteration == 0 and self.input_mismatch_count > 0:
+            func = self._compiled_ns[self.function_name]
+            sig = inspect.signature(func)
+            has_container = False
+            for param in sig.parameters.values():
+                ann = param.annotation
+                origin = getattr(ann, "__origin__", None)
+                if ann is list or ann is dict or origin is list or origin is dict:
+                    has_container = True
+                    break
+            if has_container:
+                cert["confidence"] = 0.0
+                cert["trigger_v1"] = True
+                cert["message"] = "V2 skipped: uninterpreted container types"
+        return cert
 
     def _concolic_iteration(
         self, inputs: dict[str, Any]
@@ -1063,7 +1120,7 @@ class BoundedConcolicEngine:
             diverse_gateways / total_gateways if total_gateways > 0 else 1.0
         )
 
-        if total_gateways > 0 and branch_diversity_score < 0.5:
+        if confidence > 0 and total_gateways > 0 and branch_diversity_score < 0.5:
             confidence = min(confidence, 0.80)
             message = "V2 symbolic refinement in progress: insufficient branch diversity."
         elif confidence >= 0.95:
