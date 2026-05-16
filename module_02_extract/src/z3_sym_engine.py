@@ -510,6 +510,8 @@ class WIRSymbolicTracer:
                     iterable = _safe_eval(iterable_expr, self.concrete_state)
                 except Exception:
                     iterable = []
+                if not isinstance(iterable, (list, tuple)):
+                    iterable = list(iterable)
                 target_var = node.get("data_vars", [None])[0]
                 self._for_iterators[loop_id] = {"iterable": iterable, "idx": 0, "target_var": target_var}
             it = self._for_iterators[loop_id]
