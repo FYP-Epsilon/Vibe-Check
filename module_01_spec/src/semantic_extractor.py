@@ -122,10 +122,20 @@ class SemanticExtractionEngine:
                 source = flow.get('sourceRef')
                 target = flow.get('targetRef')
                 if source and target:
-                    self.edges.append({
+                    # Extract condition expression if present
+                    condition = None
+                    cond_node = flow.find('bpmn:conditionExpression', self.NS)
+                    if cond_node is not None:
+                        condition = cond_node.text
+
+                    edge = {
                         "source_id": source,
                         "target_id": target
-                    })
+                    }
+                    if condition:
+                        edge["condition"] = condition
+                    
+                    self.edges.append(edge)
                     self.mapped_edges_count += 1
 
     def _layer_v1_certify(self) -> Dict[str, Any]:
