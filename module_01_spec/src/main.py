@@ -32,10 +32,10 @@ def main():
         result = run_module_01_pipeline(bpmn_xml)
         
         if result["status"] == "PASS":
-            print("\n[Phase 1: Semantic Extraction Certificate]")
+            print("\n[Semantic Extraction Certificate]")
             print(json.dumps(result["phase_1"]["phase_1_certificate"], indent=2))
             
-            print("\n[Phase 2: LTLf Synthesis Certificate]")
+            print("\n[LTLf Synthesis Certificate]")
             print(json.dumps(result["phase_2"]["phase_2_certificate"], indent=2))
             
             print("\n[Inferred Implicit Guards]")
