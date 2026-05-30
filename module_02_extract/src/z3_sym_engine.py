@@ -785,6 +785,14 @@ class BoundedConcolicEngine:
         self.covered_edges: set[tuple[str, str]] = set()
         self.state_pool: dict[str, list[tuple[dict[str, Any], dict[str, z3.ExprRef]]]] = {}
 
+        # Persistent solver for incremental solving.  Blocking clauses
+        # (Not(explored_pc)) are monotonic across iterations, so we assert them
+        # once on a reused solver instead of rebuilding the whole constraint set
+        # every solve.  See _solve_for_inputs.
+        self._solver = z3.Solver()
+        self._solver.set("timeout", self.timeout_ms)
+        self._blocked_count = 0
+
         # Statistics for P2.4 confidence.
         self.feasible_paths = 0
         self.total_paths = 0
@@ -888,10 +896,65 @@ class BoundedConcolicEngine:
     def _execute_concrete(self, inputs: dict[str, Any]) -> Any:
         func = self._compiled_ns[self.function_name]
         max_concrete_steps = 2000
-        concrete_step_count = 0
         target_file = "<string>"
+        step_count = 0
 
-        def concrete_guard(frame, event, arg):
+        def _on_line(code: Any, line_number: int) -> Any:
+            nonlocal step_count
+            if code.co_filename == target_file:
+                step_count += 1
+                if step_count > max_concrete_steps:
+                    raise RuntimeError(
+                        f"Concrete execution exceeded {max_concrete_steps} steps — possible infinite loop."
+                    )
+            # Never return DISABLE: every execution of every line must be counted
+            # so runaway loops are still detected.
+            return None
+
+        # PEP 669 sys.monitoring is ~orders of magnitude cheaper than settrace
+        # for this counter (no per-line frame materialisation).  Fall back to
+        # settrace on Python < 3.12 or if all monitoring tool ids are taken.
+        mon = getattr(sys, "monitoring", None)
+        tool_id = self._acquire_monitoring_tool_id(mon) if mon is not None else None
+        if tool_id is None:
+            return self._execute_concrete_settrace(
+                func, inputs, target_file, max_concrete_steps
+            )
+
+        try:
+            mon.register_callback(tool_id, mon.events.LINE, _on_line)
+            mon.set_events(tool_id, mon.events.LINE)
+            try:
+                return func(**copy.deepcopy(inputs))
+            finally:
+                mon.set_events(tool_id, mon.events.NO_EVENTS)
+                mon.register_callback(tool_id, mon.events.LINE, None)
+        finally:
+            mon.free_tool_id(tool_id)
+
+    @staticmethod
+    def _acquire_monitoring_tool_id(mon: Any) -> Optional[int]:
+        """Reserve a free ``sys.monitoring`` tool id (0–5), or None if none free."""
+        for tid in range(6):
+            if mon.get_tool(tid) is None:
+                try:
+                    mon.use_tool_id(tid, "vibecheck.concrete_guard")
+                    return tid
+                except ValueError:
+                    continue
+        return None
+
+    def _execute_concrete_settrace(
+        self,
+        func: Any,
+        inputs: dict[str, Any],
+        target_file: str,
+        max_concrete_steps: int,
+    ) -> Any:
+        """``sys.settrace`` fallback step-counter (Python < 3.12 / tool ids busy)."""
+        concrete_step_count = 0
+
+        def concrete_guard(frame: Any, event: str, arg: Any) -> Any:
             nonlocal concrete_step_count
             if event == "line" and frame.f_code.co_filename == target_file:
                 concrete_step_count += 1
@@ -904,10 +967,9 @@ class BoundedConcolicEngine:
         old_trace = sys.gettrace()
         sys.settrace(concrete_guard)
         try:
-            result = func(**copy.deepcopy(inputs))
+            return func(**copy.deepcopy(inputs))
         finally:
             sys.settrace(old_trace)
-        return result
 
     # -- path manipulation -----------------------------------------------
 
@@ -954,47 +1016,53 @@ class BoundedConcolicEngine:
 
         Extract concrete values for every key in *template*.
         """
-        solver = z3.Solver()
-        solver.set("timeout", self.timeout_ms)
-        solver.reset()  # Reset solver state to prevent constraint accumulation across iterations.
-        solver.add(path_condition)
+        solver = self._solver
 
-        # Also add constraints that we haven't seen this exact PC before.
-        for pc in self.explored_path_conditions:
-            solver.add(z3.Not(pc))
+        # Blocking clauses Not(explored_pc) are monotonic across iterations, so
+        # assert only the ones discovered since the previous solve and keep them
+        # permanently.  This makes the run O(n) in total assertions rather than
+        # rebuilding all n blocking clauses on every iteration (O(n^2)).
+        explored = self.explored_path_conditions
+        while self._blocked_count < len(explored):
+            solver.add(z3.Not(explored[self._blocked_count]))
+            self._blocked_count += 1
 
-        start = time.time()
-        result = solver.check()
-        elapsed = (time.time() - start) * 1000
+        # The query for this iteration (path_condition) is transient: assert it
+        # inside a push/pop scope so it does not pollute subsequent solves.
+        solver.push()
+        try:
+            solver.add(path_condition)
+            result = solver.check()
 
-        if result == z3.unknown:
-            self.timeouts += 1
-            return None
-        if result == z3.unsat:
-            return None
+            if result == z3.unknown:
+                self.timeouts += 1
+                return None
+            if result == z3.unsat:
+                return None
 
-        model = solver.model()
-        new_inputs: dict[str, Any] = {}
+            model = solver.model()
+            new_inputs: dict[str, Any] = {}
 
-        for key, original_value in template.items():
-            z3_expr = None
-            # Try to find the variable in the model by name.
-            for decl in model.decls():
-                if decl.name() == key:
-                    z3_expr = model[decl]
-                    break
+            for key, original_value in template.items():
+                z3_expr = None
+                # Try to find the variable in the model by name.
+                for decl in model.decls():
+                    if decl.name() == key:
+                        z3_expr = model[decl]
+                        break
 
-            if z3_expr is None:
-                # Variable was unconstrained -- keep original.
-                new_inputs[key] = original_value
-                continue
+                if z3_expr is None:
+                    # Variable was unconstrained -- keep original.
+                    new_inputs[key] = original_value
+                    continue
 
-            # Convert Z3 value back to Python.
-            val = self._z3_to_python(z3_expr, type(original_value))
-            new_inputs[key] = val
+                # Convert Z3 value back to Python.
+                val = self._z3_to_python(z3_expr, type(original_value))
+                new_inputs[key] = val
 
-        solver.reset()  # Reset solver state to prevent constraint accumulation across iterations.
-        return new_inputs
+            return new_inputs
+        finally:
+            solver.pop()
 
     @staticmethod
     def _z3_to_python(z3_val: Any, py_type: type) -> Any:
