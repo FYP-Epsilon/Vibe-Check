@@ -115,17 +115,67 @@ class WIRTraceCollector:
         self._task_depth = 0
         self._last_locals: dict[str, Any] = {}
         self._loop_counters: dict[int, int] = {}  # line_no -> iteration count
+        self._mon_tool_id: Optional[int] = None
+        self._exc_origin: dict[int, int] = {}  # id(exception) -> id(origin frame)
 
     # -- public API ------------------------------------------------------
 
     def start_tracing(self) -> None:
-        """Install the trace callback, preserving any existing tracer."""
+        """
+        Install the runtime tracer.
+
+        Prefers ``sys.monitoring`` (PEP 669, Python 3.12+); falls back to
+        ``sys.settrace`` on older interpreters or if no monitoring tool id is
+        free.  Both paths populate ``trace_log`` identically (verified by the
+        differential parity suite).  Note: this is behaviour-preserving and
+        does **not** remove the CPython-only dependency — both APIs are
+        CPython-specific.
+        """
+        self._mon_tool_id = None
+        mon = getattr(sys, "monitoring", None)
+        tid = self._acquire_monitoring_tool_id(mon) if mon is not None else None
+        if tid is not None:
+            self._mon_tool_id = tid
+            E = mon.events
+            mon.register_callback(tid, E.PY_START, self._mon_py_start)
+            mon.register_callback(tid, E.PY_RETURN, self._mon_py_return)
+            mon.register_callback(tid, E.PY_UNWIND, self._mon_py_unwind)
+            mon.register_callback(tid, E.RAISE, self._mon_raise)
+            mon.register_callback(tid, E.LINE, self._mon_line)
+            mon.set_events(
+                tid,
+                E.PY_START | E.PY_RETURN | E.PY_UNWIND | E.RAISE | E.LINE,
+            )
+            return
+        # Fallback: classic sys.settrace path (see trace_callback).
         self._original_trace = sys.gettrace()
         sys.settrace(self.trace_callback)
 
     def stop_tracing(self) -> None:
-        """Restore the previous trace callback."""
+        """Uninstall the tracer, restoring prior interpreter state."""
+        mon = getattr(sys, "monitoring", None)
+        if self._mon_tool_id is not None and mon is not None:
+            tid = self._mon_tool_id
+            E = mon.events
+            mon.set_events(tid, E.NO_EVENTS)
+            for ev in (E.PY_START, E.PY_RETURN, E.PY_UNWIND, E.RAISE, E.LINE):
+                mon.register_callback(tid, ev, None)
+            mon.free_tool_id(tid)
+            self._mon_tool_id = None
+            return
         sys.settrace(self._original_trace)
+
+    @staticmethod
+    def _acquire_monitoring_tool_id(mon: Any) -> Optional[int]:
+        """Reserve a free ``sys.monitoring`` tool id (0–5), or None if none free."""
+        for tid in range(6):
+            if mon.get_tool(tid) is None:
+                try:
+                    mon.use_tool_id(tid, "vibecheck.wir_tracer")
+                    return tid
+                except ValueError:
+                    continue
+        return None
 
     def __enter__(self) -> WIRTraceCollector:
         self.start_tracing()
@@ -215,6 +265,118 @@ class WIRTraceCollector:
 
         # All other events: continue tracing but do not record.
         return self.trace_callback
+
+    # -- sys.monitoring callbacks (PEP 669 runtime path) -----------------
+    #
+    # These mirror trace_callback's recording semantics exactly (verified by
+    # tests/test_dynamic_tracer_parity.py).  Mapping from settrace events:
+    #   'call'+task   -> PY_START      'return'+task (normal) -> PY_RETURN
+    #   'line'        -> LINE          'return'+task (unwind) -> PY_UNWIND
+    #   'exception'   -> RAISE (origin frame) + PY_UNWIND (propagating frames)
+    # Monitoring callbacks receive (code, ...) not a frame, so locals are
+    # recovered from the monitored frame via sys._getframe(1).
+
+    def _mon_py_start(self, code: Any, instruction_offset: int) -> Any:
+        if code.co_filename != self.target_file:
+            return
+        if not any(pat in code.co_name for pat in self.task_patterns):
+            return
+        frame = sys._getframe(1)
+        self._task_depth += 1
+        self.trace_log.append({
+            "event": "task_entry",
+            "function": code.co_name,
+            "line": frame.f_lineno,
+            "observables": self._extract_observables(frame.f_locals),
+        })
+
+    def _mon_py_return(self, code: Any, instruction_offset: int, retval: Any) -> Any:
+        if code.co_filename != self.target_file:
+            return
+        if not any(pat in code.co_name for pat in self.task_patterns):
+            return
+        frame = sys._getframe(1)
+        self.trace_log.append({
+            "event": "task_exit",
+            "function": code.co_name,
+            "line": frame.f_lineno,
+            "return_value": self._serialize_value(retval),
+            "observables": self._extract_observables(frame.f_locals),
+        })
+        self._task_depth = max(0, self._task_depth - 1)
+
+    def _mon_raise(self, code: Any, instruction_offset: int, exception: BaseException) -> Any:
+        if code.co_filename != self.target_file:
+            return
+        frame = sys._getframe(1)
+        # Remember where this exception originated so PY_UNWIND can tell the
+        # origin frame (already recorded here) from propagating ancestors.
+        self._exc_origin[id(exception)] = id(frame)
+        record = {
+            "event": "exception",
+            "line": frame.f_lineno,
+            "function": code.co_name,
+            "exception_type": type(exception).__name__ if exception else None,
+            "exception_msg": str(exception) if exception else None,
+        }
+        self.trace_log.append(record)
+        self.exception_records.append(record)
+
+    def _mon_py_unwind(self, code: Any, instruction_offset: int, exception: BaseException) -> Any:
+        if code.co_filename != self.target_file:
+            return
+        frame = sys._getframe(1)
+        # settrace fires 'exception' in every frame the exception propagates
+        # through; the origin frame already recorded it at RAISE, so emit only
+        # for propagating ancestors here.
+        if self._exc_origin.get(id(exception)) != id(frame):
+            record = {
+                "event": "exception",
+                "line": frame.f_lineno,
+                "function": code.co_name,
+                "exception_type": type(exception).__name__ if exception else None,
+                "exception_msg": str(exception) if exception else None,
+            }
+            self.trace_log.append(record)
+            self.exception_records.append(record)
+        # settrace 'return' also fires on exception exit -> emit task_exit.
+        if any(pat in code.co_name for pat in self.task_patterns):
+            self.trace_log.append({
+                "event": "task_exit",
+                "function": code.co_name,
+                "line": frame.f_lineno,
+                "return_value": self._serialize_value(None),
+                "observables": self._extract_observables(frame.f_locals),
+            })
+            self._task_depth = max(0, self._task_depth - 1)
+
+    def _mon_line(self, code: Any, line_number: int) -> Any:
+        if code.co_filename != self.target_file:
+            return
+        self.trace_step_count += 1
+        if self.trace_step_count > self.max_trace_steps:
+            raise RuntimeError(
+                f"Trace collection exceeded {self.max_trace_steps} steps — possible infinite loop."
+            )
+        frame = sys._getframe(1)
+        locals_dict = frame.f_locals
+        func_name = code.co_name
+
+        # Gotcha 4: mutation audit on every line in the target.
+        self._audit_mutations(locals_dict, line_number, func_name)
+
+        if line_number in self.branch_lines:
+            iteration_info = self._capture_iteration_info(frame, line_number, locals_dict)
+            self.trace_log.append({
+                "event": "branch_point",
+                "line": line_number,
+                "function": func_name,
+                "observables": self._extract_observables(locals_dict),
+                "iteration_info": iteration_info,
+            })
+
+        # Update snapshot AFTER all diff-based logic.
+        self._last_locals = dict(locals_dict)
 
     # -- filtering helpers -----------------------------------------------
 
