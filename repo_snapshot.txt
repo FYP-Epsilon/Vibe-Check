@@ -1,0 +1,509 @@
+Repository content for: \\wsl.localhost\Ubuntu\root\vibecheck_fyp_final\role_c_equivalence
+================================================================================
+
+REPOSITORY STRUCTURE (full)
+--------------------------------------------------------------------------------
+role_c_equivalence/
+├── __pycache__/
+├── m_code_lifter.py
+├── main_role_c.py
+├── test_equivalence.py
+└── verify_determinism.py
+
+================================================================================
+
+FILE CONTENTS (filtered)
+================================================================================
+
+--------------------------------------------------------------------------------
+FILE: m_code_lifter.py
+--------------------------------------------------------------------------------
+
+import json
+import os
+
+class MCodeAutomaton:
+    """
+    Represents the Code-Derived Automaton (M_code) as a Labeled Transition System (LTS).
+    """
+    def __init__(self, uid):
+        self.uid = uid
+        self.states = set()
+        self.transitions = []
+        self.initial_state = "S0"
+
+    def add_transition(self, source, target, guard, label):
+        """
+        Adds a formal transition between states, preserving the symbolic guard.
+        """
+        self.transitions.append({
+            "from": source,
+            "to": target,
+            "guard": guard,
+            "label": label
+        })
+        self.states.update([source, target])
+
+    def display_structure(self):
+        """
+        Prints the formal mathematical structure.
+        Ensures traceability from the IR to the M_code object.
+        """
+        print(f"\n--- Formal Structure for UID {self.uid} ---")
+        print(f"States: {', '.join(sorted(self.states))}")
+        print("Transitions:")
+        for t in self.transitions:
+            print(f"  {t['from']} --({t['label']})--> {t['to']} [Guard: {t['guard']}]")
+
+def lift_ir_to_mcode(json_path):
+    """
+    Deterministically lifts a Validated IR (WIR) from JSON into an MCodeAutomaton object.
+    Properly extracts labels from the 'nodes' array and filters out UNKNOWNs as tau.
+    """
+    with open(json_path, 'r') as f:
+        ir_data = json.load(f)
+    
+    # Handle the UID naming dynamically
+    uid = ir_data.get('uid', os.path.basename(json_path).split('.')[0])
+    automaton = MCodeAutomaton(uid)
+    
+    # 1. Build a dictionary mapping State IDs to their actual business labels
+    node_labels = {}
+    if 'nodes' in ir_data:
+        for node in ir_data['nodes']:
+            node_labels[node['id']] = node.get('label', 'tau')
+            
+    for edge in ir_data['edges']:
+        src = edge.get('src') or edge.get('from')
+        dst = edge.get('dst') or edge.get('to')
+        guard = edge.get('condition') or edge.get('guard', 'true')
+        
+        # 2. Look up the label for the destination state. Default to tau.
+        raw_label = node_labels.get(dst, "tau")
+        
+        # 3. Clean up missing or UNKNOWN labels so the engine ignores them
+        if raw_label == "UNKNOWN" or raw_label == "":
+            label = "tau"
+        else:
+            label = raw_label
+            
+        automaton.add_transition(
+            source=src,
+            target=dst,
+            guard=guard,
+            label=label
+        )
+    
+    return automaton
+
+
+--------------------------------------------------------------------------------
+FILE: main_role_c.py
+--------------------------------------------------------------------------------
+
+# main_role_c.py
+import os
+import json
+from m_code_lifter import lift_ir_to_mcode
+
+if __name__ == "__main__":
+    ir_dir = "/root/vibecheck_fyp/data/processed/irs/"
+    
+    for filename in os.listdir(ir_dir):
+        if filename.endswith(".json"):
+            path = os.path.join(ir_dir, filename)
+            m_code = lift_ir_to_mcode(path)
+            print(f"Lifted UID {m_code.uid}: {len(m_code.states)} states generated.")
+
+# python3 main_role_c.py - command in terminal to generate the MCodeAutomaton for each IR JSON file.
+
+# Following code shows the state table transition in the terminal.
+
+# if os.path.exists(ir_dir):
+#         for filename in sorted(os.listdir(ir_dir)):
+#             if filename.endswith(".json"):
+#                 path = os.path.join(ir_dir, filename)
+#                 m_code = lift_ir_to_mcode(path)
+                
+#                 # This call provides the formal proof of the lifting process.
+#                 m_code.display_structure()
+
+
+
+--------------------------------------------------------------------------------
+FILE: test_equivalence.py
+--------------------------------------------------------------------------------
+
+from verify_determinism import check_stuttering_bisimulation
+from m_code_lifter import lift_ir_to_mcode
+
+print("--- Running Ground-Truth Determinism Test ---")
+
+path1 = "/root/vibecheck_fyp/data/processed/irs/uid_10.json"
+path2 = "/root/vibecheck_fyp/data/processed/irs/uid_9.json"
+
+aut_a = lift_ir_to_mcode(path1)
+aut_b = lift_ir_to_mcode(path2)
+
+is_equiv, pairs = check_stuttering_bisimulation(aut_a, aut_b)
+
+print(f"Are they equivalent? {is_equiv}")
+
+print("\n--- The Equivalence Map (Super-States) ---")
+for state_a, matched_states in pairs.items():
+    print(f"Automaton A State '{state_a}' -> Matches Automaton B States: {matched_states}")
+
+
+--------------------------------------------------------------------------------
+FILE: verify_determinism.py
+--------------------------------------------------------------------------------
+
+import hashlib
+import json
+import os
+from collections import defaultdict, deque
+from typing import Dict, Iterable, List, Set, Tuple
+
+from m_code_lifter import lift_ir_to_mcode, MCodeAutomaton
+
+
+_INTERNAL_LABELS = {
+    "tau",
+    "τ",
+    "silent",
+    "noise",
+    "internal",
+    "internal_noise",
+    "epsilon",
+    "eps",
+    "empty",
+    "noop",
+    "none",
+    "null",
+}
+
+
+def _normalize_label(label) -> str:
+    if label is None:
+        return ""
+    return str(label).strip().lower()
+
+
+def _is_internal_label(label) -> bool:
+    normalized = _normalize_label(label)
+    if not normalized:
+        return True
+    return (
+        normalized in _INTERNAL_LABELS
+        or normalized.startswith("tau")
+        or "noise" in normalized
+        or "silent" in normalized
+        or normalized in {"_", "-"}
+    )
+
+
+def _collect_states(automaton: MCodeAutomaton) -> Set[str]:
+    states = set(automaton.states)
+    for transition in automaton.transitions:
+        states.add(transition["from"])
+        states.add(transition["to"])
+    states.add(automaton.initial_state)
+    return states
+
+
+def _build_adjacency(automaton: MCodeAutomaton):
+    outgoing = defaultdict(list)
+    incoming = defaultdict(list)
+    for transition in automaton.transitions:
+        source = transition["from"]
+        target = transition["to"]
+        label = transition.get("label")
+        outgoing[source].append((target, label))
+        incoming[target].append((source, label))
+    return outgoing, incoming
+
+
+def _state_observable_signature(state: str, outgoing, incoming) -> Tuple[Tuple[str, ...], Tuple[str, ...], int, int]:
+    outgoing_labels = sorted(
+        {
+            _normalize_label(label)
+            for _, label in outgoing.get(state, [])
+            if not _is_internal_label(label)
+        }
+    )
+    incoming_labels = sorted(
+        {
+            _normalize_label(label)
+            for _, label in incoming.get(state, [])
+            if not _is_internal_label(label)
+        }
+    )
+    return (
+        tuple(outgoing_labels),
+        tuple(incoming_labels),
+        len(outgoing.get(state, [])),
+        len(incoming.get(state, [])),
+    )
+
+
+def _compute_silent_graph(states: Set[str], outgoing, state_signature):
+    silent_outgoing = defaultdict(list)
+    silent_incoming = defaultdict(list)
+
+    for source in states:
+        for target, label in outgoing.get(source, []):
+            if _is_internal_label(label) or state_signature[source] == state_signature[target]:
+                silent_outgoing[source].append(target)
+                silent_incoming[target].append(source)
+
+    return silent_outgoing, silent_incoming
+
+
+def _compute_silent_closure(states: Set[str], silent_outgoing):
+    closure = {}
+    for state in states:
+        reachable = {state}
+        queue = deque([state])
+        while queue:
+            current = queue.popleft()
+            for successor in silent_outgoing.get(current, []):
+                if successor not in reachable:
+                    reachable.add(successor)
+                    queue.append(successor)
+        closure[state] = frozenset(reachable)
+    return closure
+
+
+def _compute_divergent_states(states: Set[str], silent_outgoing, silent_incoming):
+    index = 0
+    indices = {}
+    lowlinks = {}
+    stack = []
+    on_stack = set()
+    components = []
+
+    def strongconnect(state):
+        nonlocal index
+        indices[state] = index
+        lowlinks[state] = index
+        index += 1
+        stack.append(state)
+        on_stack.add(state)
+
+        for successor in silent_outgoing.get(state, []):
+            if successor not in indices:
+                strongconnect(successor)
+                lowlinks[state] = min(lowlinks[state], lowlinks[successor])
+            elif successor in on_stack:
+                lowlinks[state] = min(lowlinks[state], indices[successor])
+
+        if lowlinks[state] == indices[state]:
+            component = []
+            while True:
+                member = stack.pop()
+                on_stack.remove(member)
+                component.append(member)
+                if member == state:
+                    break
+            components.append(component)
+
+    for state in states:
+        if state not in indices:
+            strongconnect(state)
+
+    divergent_roots = set()
+    reverse_graph = defaultdict(list)
+    for target, sources in silent_incoming.items():
+        for source in sources:
+            reverse_graph[target].append(source)
+
+    for component in components:
+        if len(component) > 1:
+            divergent_roots.update(component)
+            continue
+        member = component[0]
+        if member in silent_outgoing.get(member, []):
+            divergent_roots.add(member)
+
+    divergent_states = set(divergent_roots)
+    queue = deque(divergent_roots)
+    while queue:
+        current = queue.popleft()
+        for predecessor in reverse_graph.get(current, []):
+            if predecessor not in divergent_states:
+                divergent_states.add(predecessor)
+                queue.append(predecessor)
+
+    return divergent_states
+
+
+def _refine_partition(states: Set[str], outgoing, state_signature, silent_closure, divergent_states):
+    block_by_state = {}
+    partition_changed = True
+
+    for state in states:
+        block_by_state[state] = (
+            state_signature[state],
+            state in divergent_states,
+        )
+
+    while partition_changed:
+        partition_changed = False
+        signature_to_block = {}
+        next_block_by_state = {}
+
+        for state in sorted(states):
+            closure_blocks = tuple(sorted({block_by_state[member] for member in silent_closure[state]}))
+            visible_targets = defaultdict(set)
+
+            for member in silent_closure[state]:
+                for target, label in outgoing.get(member, []):
+                    if _is_internal_label(label) or state_signature[member] == state_signature[target]:
+                        continue
+                    for reachable in silent_closure[target]:
+                        visible_targets[_normalize_label(label)].add(block_by_state[reachable])
+
+            visible_signature = tuple(
+                sorted((label, tuple(sorted(target_blocks))) for label, target_blocks in visible_targets.items())
+            )
+            refined_signature = (
+                state_signature[state],
+                state in divergent_states,
+                closure_blocks,
+                visible_signature,
+            )
+
+            if refined_signature not in signature_to_block:
+                signature_to_block[refined_signature] = len(signature_to_block)
+            next_block_by_state[state] = signature_to_block[refined_signature]
+
+        if any(block_by_state[state] != next_block_by_state[state] for state in states):
+            partition_changed = True
+            block_by_state = next_block_by_state
+
+    return block_by_state
+
+
+def check_stuttering_bisimulation(aut_a: MCodeAutomaton, aut_b: MCodeAutomaton):
+    """Check whether two automata are equivalent under stuttering bisimulation.
+    Returns:
+        (is_equivalent, equivalent_state_pairs)
+
+    The mapping contains states from ``aut_a`` as keys and the sorted list of
+    equivalent states from ``aut_b`` as values.
+    """
+
+    # Namespace states from each automaton to avoid accidental name collisions
+    states_a = _collect_states(aut_a)
+    states_b = _collect_states(aut_b)
+
+    outgoing_a, incoming_a = _build_adjacency(aut_a)
+    outgoing_b, incoming_b = _build_adjacency(aut_b)
+
+    prefix_a = "A|"
+    prefix_b = "B|"
+
+    def _prefixed_outgoing(out_dict, prefix):
+        return {prefix + s: [(prefix + t, lbl) for (t, lbl) in outs] for s, outs in out_dict.items()}
+
+    def _prefixed_incoming(in_dict, prefix):
+        return {prefix + t: [(prefix + s, lbl) for (s, lbl) in ins] for t, ins in in_dict.items()}
+
+    pref_out_a = _prefixed_outgoing(outgoing_a, prefix_a)
+    pref_in_a = _prefixed_incoming(incoming_a, prefix_a)
+    pref_out_b = _prefixed_outgoing(outgoing_b, prefix_b)
+    pref_in_b = _prefixed_incoming(incoming_b, prefix_b)
+
+    # merged adjacency with namespaced states
+    outgoing = defaultdict(list)
+    incoming = defaultdict(list)
+    for s, outs in pref_out_a.items():
+        outgoing[s].extend(outs)
+    for s, outs in pref_out_b.items():
+        outgoing[s].extend(outs)
+    for t, ins in pref_in_a.items():
+        incoming[t].extend(ins)
+    for t, ins in pref_in_b.items():
+        incoming[t].extend(ins)
+
+    all_states = set(outgoing.keys()) | set(incoming.keys())
+
+    state_signature = {
+        state: _state_observable_signature(state, outgoing, incoming)
+        for state in all_states
+    }
+
+    silent_outgoing, silent_incoming = _compute_silent_graph(all_states, outgoing, state_signature)
+    silent_closure = _compute_silent_closure(all_states, silent_outgoing)
+    divergent_states = _compute_divergent_states(all_states, silent_outgoing, silent_incoming)
+    block_by_state = _refine_partition(all_states, outgoing, state_signature, silent_closure, divergent_states)
+
+    initial_equivalent = (
+        block_by_state.get(prefix_a + aut_a.initial_state)
+        == block_by_state.get(prefix_b + aut_b.initial_state)
+    )
+
+    equivalent_pairs = {}
+    for state_a in sorted(states_a):
+        key_a = prefix_a + state_a
+        matched = []
+        for state_b in sorted(states_b):
+            key_b = prefix_b + state_b
+            if block_by_state.get(key_a) == block_by_state.get(key_b):
+                matched.append(state_b)
+        if matched:
+            equivalent_pairs[state_a] = matched
+
+    return initial_equivalent, equivalent_pairs
+
+def get_m_code_hash(uid):
+    ir_path = f"/root/vibecheck_fyp/data/processed/irs/uid_{uid}.json"
+    m_code = lift_ir_to_mcode(ir_path)
+    # Ensuring set objects are converted to sorted lists for stable hashing
+    m_code_str = json.dumps(m_code.__dict__, sort_keys=True, default=lambda x: sorted(list(x)) if isinstance(x, set) else x)
+    return hashlib.sha256(m_code_str.encode()).hexdigest()
+
+def compare_two_uids(uid_a, uid_b):
+    """
+    Helper to compare two different implementations for the same spec.
+    """
+    path_a = f"/root/vibecheck_fyp/data/processed/irs/uid_{uid_a}.json"
+    path_b = f"/root/vibecheck_fyp/data/processed/irs/uid_{uid_b}.json"
+    
+    aut_a = lift_ir_to_mcode(path_a)
+    aut_b = lift_ir_to_mcode(path_b)
+    
+    is_equiv, pairs = check_stuttering_bisimulation(aut_a, aut_b)
+    
+    print(f"\n--- Comparison: UID {uid_a} vs UID {uid_b} ---")
+    print(f"Result: {'EQUIVALENT' if is_equiv else 'NOT EQUIVALENT'}")
+    if is_equiv:
+        print(f"Matched {len(pairs)} equivalent state clusters.")
+    return is_equiv
+
+if __name__ == "__main__":
+    ir_dir = "/root/vibecheck_fyp/data/processed/irs/"
+    all_passed = True
+
+    print("--- Determinism Verification Report ---")
+    for filename in sorted(os.listdir(ir_dir)):
+        if filename.endswith(".json"):
+            uid = filename.split('_')[1].split('.')[0]
+            # Run 10 iterations per UID to verify stability
+            hashes = {get_m_code_hash(uid) for _ in range(10)}
+            
+            if len(hashes) == 1:
+                print(f"UID {uid:3}: PASSED (Hash: {list(hashes)[0][:10]}...)")
+            else:
+                print(f"UID {uid:3}: FAILED (Inconsistent hashes detected)")
+                all_passed = False
+    
+    if all_passed:
+        print("\nCONCLUSION: All M_code lifting is 100% deterministic and repeatable.")
+        
+    print("\n--- Running Sample Equivalence Test ---")
+    # This will now successfully call the function defined above
+    compare_two_uids("10", "10")  # Should be EQUIVALENT
+    compare_two_uids("9", "10")   # Should be NOT EQUIVALENT
+
+

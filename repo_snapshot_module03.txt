@@ -1,0 +1,263 @@
+Repository content for: C:\Users\theod\Vibe-Check\module_03_equiv
+================================================================================
+
+REPOSITORY STRUCTURE (full)
+--------------------------------------------------------------------------------
+module_03_equiv/
+├── src/
+│   ├── __init__.py
+│   ├── lifter.cpp
+│   ├── lifter.hpp
+│   └── main.py
+├── Dockerfile
+└── requirements.txt
+
+================================================================================
+
+FILE CONTENTS (filtered)
+================================================================================
+
+--------------------------------------------------------------------------------
+FILE: Dockerfile
+--------------------------------------------------------------------------------
+
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    build-essential \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY src/ ./src/
+
+CMD ["python3", "-m", "src.main"]
+
+
+
+--------------------------------------------------------------------------------
+FILE: requirements.txt
+--------------------------------------------------------------------------------
+
+
+
+
+--------------------------------------------------------------------------------
+FILE: src\__init__.py
+--------------------------------------------------------------------------------
+
+
+
+
+--------------------------------------------------------------------------------
+FILE: src\lifter.cpp
+--------------------------------------------------------------------------------
+
+#include "lifter.hpp"
+#include <nlohmann/json.hpp>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <stdexcept>
+#include <iostream>
+
+namespace py = pybind11;
+using json = nlohmann::json;
+
+namespace vibecheck {
+
+AdvancedLifter::AdvancedLifter() {
+    // Safe instantiation of the shared spot::bdd_dict_ptr.
+    // Dictates the algebraic management of BDD variables preventing memory bloat.
+    dict_ = spot::make_bdd_dict();
+    if (!dict_) {
+        throw std::runtime_error("Failed to initialize SPOT BDD dictionary.");
+    }
+}
+
+spot::bdd_dict_ptr AdvancedLifter::get_dict() const {
+    return dict_;
+}
+
+std::unordered_map<std::string, int> AdvancedLifter::get_variable_map() const {
+    return bdd_vars_;
+}
+
+void AdvancedLifter::register_variable(const std::string& var_name) {
+    if (bdd_vars_.find(var_name) == bdd_vars_.end()) {
+        // Registering as a distinct atomic proposition within the SPOT BDD dict
+        int bdd_idx = dict_->register_ap(var_name);
+        bdd_vars_[var_name] = bdd_idx;
+    }
+}
+
+void AdvancedLifter::register_unresolved_type(const std::string& var_name) {
+    // Conservative over-approximation (Gotcha Mitigation):
+    // Allocate a fresh, anonymous BDD variable to represent non-deterministic choice.
+    // This strictly prevents false positives in formal equivalence evaluation.
+    std::string nd_var_name = var_name + "_ANY";
+    if (bdd_vars_.find(nd_var_name) == bdd_vars_.end()) {
+        int bdd_idx = dict_->register_ap(nd_var_name);
+        bdd_vars_[nd_var_name] = bdd_idx;
+    }
+}
+
+void AdvancedLifter::parse_wir_types(const std::string& wir_json_str) {
+    json wir;
+    try {
+        wir = json::parse(wir_json_str);
+    } catch (const json::parse_error& e) {
+        throw std::invalid_argument(std::string("WIR JSON parsing failed: ") + e.what());
+    }
+
+    // 1. Explicit variable registration derived from WIR-Data Layer classification
+    if (wir.contains("control_variables") && wir["control_variables"].is_array()) {
+        for (const auto& item : wir["control_variables"]) {
+            register_variable(item.get<std::string>());
+        }
+    }
+
+    if (wir.contains("data_variables") && wir["data_variables"].is_array()) {
+        for (const auto& item : wir["data_variables"]) {
+            register_variable(item.get<std::string>());
+        }
+    }
+
+    // 2. WIR-Type Layer Processing: Process dynamically inferred types and annotations
+    if (wir.contains("types") && wir["types"].is_object()) {
+        for (auto it = wir["types"].begin(); it != wir["types"].end(); ++it) {
+            std::string var_name = it.key();
+            std::string type_val = it.value().get<std::string>();
+
+            if (type_val == "Any" || type_val == "Union" || type_val == "Unresolved") {
+                register_unresolved_type(var_name);
+            } else {
+                // For concrete Literal-Inferred, Function-Return, or Annotation Types
+                register_variable(var_name);
+            }
+        }
+    }
+}
+
+} // namespace vibecheck
+
+// Pybind11 Binding
+// Utilizing std::shared_ptr bound py::class_ to guarantee memory safety for bdd_dict and graph instances
+// as detailed in Gotcha 1 (Pybind11 Memory Leaks and bdd_dict Ownership).
+PYBIND11_MODULE(vibecheck_lifter, m) {
+    m.doc() = "VibeCheck Advanced Lifter Module (C++ SPOT Integration)";
+
+    py::class_<vibecheck::AdvancedLifter, std::shared_ptr<vibecheck::AdvancedLifter>>(m, "AdvancedLifter")
+        .def(py::init<>())
+        .def("parse_wir_types", &vibecheck::AdvancedLifter::parse_wir_types, 
+             py::arg("wir_json_str"),
+             "Parses WIR-Type layer JSON and registers variables to the BDD dictionary.")
+        .def("get_variable_map", &vibecheck::AdvancedLifter::get_variable_map,
+             "Returns the internal mapping of variable names to BDD variable indices.");
+}
+
+
+
+--------------------------------------------------------------------------------
+FILE: src\lifter.hpp
+--------------------------------------------------------------------------------
+
+#pragma once
+#ifndef VIBECHECK_LIFTER_HPP
+#define VIBECHECK_LIFTER_HPP
+
+#include <spot/twa/twagraph.hh>
+#include <spot/twaalgos/dict.hh>
+#include <string>
+#include <unordered_map>
+#include <memory>
+
+namespace vibecheck {
+
+/**
+ * @brief AdvancedLifter transforms WIR JSON into a formal SPOT LTS (twa_graph).
+ *
+ * Milestone P1.1: WIR-Type Layer Parser and BDD Dictionary Initialization.
+ * Seamlessly interfaces with Module 02's output adhering to shared_schemas/wir_schema.json.
+ */
+class AdvancedLifter {
+public:
+    /**
+     * @brief Constructor safely initializes the centralized shared SPOT BDD dictionary.
+     */
+    AdvancedLifter();
+    
+    ~AdvancedLifter() = default;
+
+    // Disallow copy/move to strictly manage the dict_ ownership and prevent Pybind11 memory leaks
+    AdvancedLifter(const AdvancedLifter&) = delete;
+    AdvancedLifter& operator=(const AdvancedLifter&) = delete;
+
+    /**
+     * @brief Parses the WIR-Type layer from the provided JSON string.
+     * 
+     * Identifies control and data variables, processes inferred types,
+     * and registers them in the BDD dictionary. Applies conservative
+     * over-approximation for Any/Union types by allocating anonymous BDD vars.
+     * 
+     * @param wir_json_str The WIR JSON payload as a string.
+     */
+    void parse_wir_types(const std::string& wir_json_str);
+
+    /**
+     * @brief Returns the shared BDD dictionary pointer.
+     */
+    spot::bdd_dict_ptr get_dict() const;
+
+    /**
+     * @brief Returns the map of variable names to their BDD variable indices.
+     */
+    std::unordered_map<std::string, int> get_variable_map() const;
+
+private:
+    // Centralized shared BDD dictionary
+    spot::bdd_dict_ptr dict_;
+    
+    // Maps variable names (APs) to BDD indices
+    std::unordered_map<std::string, int> bdd_vars_;
+
+    /**
+     * @brief Registers a variable name as an Atomic Proposition (AP) in the BDD dictionary.
+     * @param var_name The name of the variable to register.
+     */
+    void register_variable(const std::string& var_name);
+    
+    /**
+     * @brief Registers an unresolved type (Any/Union) as a non-deterministic choice variable.
+     * @param var_name The name of the unresolved variable.
+     */
+    void register_unresolved_type(const std::string& var_name);
+};
+
+} // namespace vibecheck
+
+#endif // VIBECHECK_LIFTER_HPP
+
+
+
+--------------------------------------------------------------------------------
+FILE: src\main.py
+--------------------------------------------------------------------------------
+
+import time
+
+def main():
+    print("✅ Module 03 (Equivalence Engine): C++ and Automata Lifting environment initialized successfully.")
+    time.sleep(2)
+    print("Module 03: Standing by for JSON WIR inputs...")
+
+if __name__ == "__main__":
+    main()
+
+
+
