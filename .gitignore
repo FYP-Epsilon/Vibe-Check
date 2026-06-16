@@ -12,3 +12,5 @@ build/
 # pytest
 .pytest_cache/
 **/.pytest_cache/
+
+*:Zone.Identifier
