@@ -1,8 +1,8 @@
 # Module 02: VibeCheck IR Validator — Architecture Overview
 
-> **Status**: Implementation complete (V1/V2/V3). Phases 1–6 in progress.  
+> **Status**: Core validator (V1/V2/V3) implemented in `src/`. Phases 1–6 (hardening, AI refinement, multi-impl, evaluation, integration) not yet implemented — see §4.  
 > **Owner**: Module 02 Lead Developer  
-> **Last Updated**: 2026-05-17
+> **Last Updated**: 2026-06-22
 
 ---
 
@@ -36,28 +36,35 @@ A WIR is **certified valid** if `combined >= 0.95`. Each mode contributes indepe
 
 ## 3. Component Map
 
+Legend: ✅ implemented in `module_02_extract/src/` · ⏳ planned, not yet implemented.
+
 ```
-module02/
-├── ast_extractor.py          # V3: CFGExtractor, DominatorAnalyzer, GuardExtractor, WIRDataLayer
-├── z3_sym_engine.py          # V2: Z3VariableRegistry, WIRSymbolicTracer, BoundedConcolicEngine
-├── dynamic_tracer.py         # V1: WIRTraceCollector, WIRReferenceInterpreter, DifferentialComparator
-├── main.py                   # FastAPI: /verify endpoint, orchestration
-├── models.py                 # Pydantic: ValidationRequest, ValidationResponse, Certificate schemas
-├── adapters/                 # NEW (Phase 3): Multi-implementation generation
-│   ├── base.py              # GenerationAdapter abstract interface
-│   ├── llm_adapter.py       # SelfConsistencyAdapter: temperature-sampled LLM generation
-│   └── m01_adapter.py       # Module01Adapter: delegates to external Module 01
-├── ai_refinement/           # NEW (Phase 2): LLM-based diagnostic refinement
-│   ├── client.py            # OpenAI GPT-4o-mini client wrapper
-│   ├── counterexample.py    # V1 failure explanation generator
-│   ├── narrative.py         # Certificate → human-readable report
-│   └── guard_simplify.py    # Guard expression simplification
-└── eval/                    # NEW (Phases 4–5): Evaluation framework
-    ├── generate_golden.py   # Layer 1: Golden workflow generator
-    ├── augment_flowbench.py # Layer 2: FLOW-BENCH derivative augmenter
-    ├── mutation_engine.py   # Layer 3: Mutation testing engine
-    ├── adversarial.py       # Layer 4: Hand-crafted edge cases
-    └── run_experiments.py   # Evaluation orchestrator + metric calculator
+module_02_extract/
+├── src/
+│   ├── ast_extractor.py      # ✅ V3: CFGExtractor, DominatorAnalyzer, GuardExtractor, WIRDataLayer, V3Certificate, run_v3_pipeline
+│   ├── z3_sym_engine.py      # ✅ V2: Z3VariableRegistry, SymbolicEvaluator, WIRSymbolicTracer, BoundedConcolicEngine (QCE state merging)
+│   ├── dynamic_tracer.py     # ✅ V1: WIRTraceCollector, WIRReferenceInterpreter, DifferentialComparator, RandomizedDifferentialTester, run_v1_pipeline
+│   └── main.py               # ✅ FastAPI /verify endpoint + orchestration; CodePayload(BaseModel) defined inline
+├── tests/                    # ✅ test_ast_extractor, test_z3_sym_engine, test_dynamic_tracer(_parity), test_integration
+├── inputs/                   # ✅ sample workflows (e.g. loan_approval.py)
+│
+│   # --- Planned, not yet present in src/ ---
+├── models.py                 # ⏳ Pydantic schemas (currently CodePayload lives inline in main.py)
+├── adapters/                 # ⏳ Phase 3: Multi-implementation generation
+│   ├── base.py              #    GenerationAdapter abstract interface
+│   ├── llm_adapter.py       #    SelfConsistencyAdapter: temperature-sampled LLM generation
+│   └── m01_adapter.py       #    Module01Adapter: delegates to external Module 01 (blocked on Module 01)
+├── ai_refinement/           # ⏳ Phase 2: LLM-based diagnostic refinement
+│   ├── client.py            #    OpenAI GPT-4o-mini client wrapper
+│   ├── counterexample.py    #    V1 failure explanation generator
+│   ├── narrative.py         #    Certificate → human-readable report
+│   └── guard_simplify.py    #    Guard expression simplification
+└── eval/                    # ⏳ Phases 4–5: Evaluation framework
+    ├── generate_golden.py   #    Layer 1: Golden workflow generator
+    ├── augment_flowbench.py #    Layer 2: FLOW-BENCH derivative augmenter
+    ├── mutation_engine.py   #    Layer 3: Mutation testing engine
+    ├── adversarial.py       #    Layer 4: Hand-crafted edge cases
+    └── run_experiments.py   #    Evaluation orchestrator + metric calculator
 ```
 
 ---
@@ -77,33 +84,32 @@ module02/
 
 ## 5. External Interfaces
 
-### Input: From Module 01 (or Generation Adapter)
+### Input: `POST /verify` — `CodePayload`
+
+The implemented endpoint takes a single field (`main.py: CodePayload`). The `specification` field below is planned, not yet accepted.
 
 ```json
 {
-  "workflow_code": "def handle_incident() -> str:\n    incident = ServiceNow_incident__4_0_0__retrievewithwhere_incident()\n    if incident.impact == 'high':\n        ...",
-  "specification": "BPMN XML or natural language spec (optional, for diagnostics)"
+  "source_code": "def handle_incident() -> str:\n    incident = ServiceNow_incident__4_0_0__retrievewithwhere_incident()\n    if incident.impact == 'high':\n        ..."
 }
 ```
 
-### Output: To Module 03
+### Output: actual `/verify` response (flat wire format)
+
+The current `_run_verification` returns a flat object (not the nested `wir`+`certificate` shape that was originally envisioned). On error it returns the same keys with `passed: false` and a `message`.
 
 ```json
 {
-  "wir": {
-    "entry": "node_0",
-    "nodes": [...],
-    "edges": [...],
-    "control_variables": [...],
-    "data_variables": [...]
-  },
-  "certificate": {
-    "v1": { "score": 0.92, "tests_run": 50, "mismatches": 0 },
-    "v2": { "score": 0.85, "paths_explored": 12, "solver_time": 2.3 },
-    "v3": { "score": 0.98, "nodes": 8, "edges": 10, "guards_cnf": 4 },
-    "combined": 0.9997,
-    "passed": true
-  }
+  "v3_coverage": 0.98,
+  "v2_confidence": 0.85,
+  "v1_confidence": 0.92,
+  "combined_confidence": 0.9997,
+  "passed": true,
+  "message": "",
+  "v3_details": { "...": "V3Certificate.generate()" },
+  "v2_details": { "...": "V2 certificate" },
+  "v1_details": { "...": "V1 certificate" },
+  "wir": { "entry": "node_0", "nodes": [], "edges": [] }
 }
 ```
 
