@@ -1249,4 +1249,3 @@ def run_v2_pipeline(
         "certificate": cert,
         "engine": engine,
     }
-
