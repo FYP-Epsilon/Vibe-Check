@@ -1,5 +1,3 @@
-//lifter.cpp
-
 #include "lifter.hpp"
 #include <nlohmann/json.hpp>
 #include <pybind11/pybind11.h>
