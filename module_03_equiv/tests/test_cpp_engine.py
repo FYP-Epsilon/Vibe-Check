@@ -1,5 +1,3 @@
-/tests/test_cpp_engine.py
-
 import json
 import sys
 import os
