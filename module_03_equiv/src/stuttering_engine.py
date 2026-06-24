@@ -319,7 +319,7 @@ class StutteringEngine:
             )
         return visited
 
-    # -- naive partition refinement ----------------------------------------
+# -- path-closure partition refinement ---------------------------------
 
     def _naive_partition_refinement(
         self,
@@ -327,91 +327,89 @@ class StutteringEngine:
         divergent_states: set[str],
     ) -> tuple[dict[str, int], dict[int, set[str]]]:
         """
-        O(n²) naive partition refinement for stuttering equivalence.
-
-        Initial partition groups states by:
-            (is_divergent, frozenset of observable outgoing labels)
-
-        Refinement iterates until fixpoint, using signatures:
-            (current_block, tau-reachable blocks, observable (label, target_block) pairs)
+        Divergence-sensitive Partition Refinement for true Stuttering Bisimulation.
+        
+        Evaluates block-controlled tau-stuttering path closure to ensure 
+        true process equivalence logic.
         """
         all_states = list(lts.states.keys())
         if not all_states:
             return {}, {}
 
-        # Build per-state outgoing info
-        obs_out: dict[str, set[str]] = {s: set() for s in all_states}
-        tau_out: dict[str, list[str]] = {s: [] for s in all_states}
+        # 1. Map transitions for quick lookup
+        tau_successors: dict[str, list[str]] = {s: [] for s in all_states}
         obs_edges: dict[str, list[tuple[str, str]]] = {s: [] for s in all_states}
 
         for src, tgt, lbl in lts.transitions:
             if lbl in ("tau", "true"):
-                tau_out.setdefault(src, []).append(tgt)
+                tau_successors.setdefault(src, []).append(tgt)
             else:
-                obs_out.setdefault(src, set()).add(lbl)
                 obs_edges.setdefault(src, []).append((lbl, tgt))
 
-        # --- Initial partition ---
-        sig_to_block: dict[tuple[bool, frozenset[str]], int] = {}
+        # 2. Initial partition: Group strictly by divergence status
         state_to_block: dict[str, int] = {}
-        next_block_id = 0
-
         for s in all_states:
-            is_div = s in divergent_states
-            sig = (is_div, frozenset(obs_out.get(s, set())))
-            if sig not in sig_to_block:
-                sig_to_block[sig] = next_block_id
-                next_block_id += 1
-            state_to_block[s] = sig_to_block[sig]
+            state_to_block[s] = 1 if s in divergent_states else 0
 
-        # --- Refinement loop ---
-        max_iterations = len(all_states) ** 2  # safety bound
+        def get_stuttering_reachable_blocks(start_state: str, current_partition: dict[str, int]) -> set[int]:
+            """
+            Computes blocks reachable via zero or more tau transitions 
+            that remain entirely within start_state's equivalence block.
+            """
+            start_block = current_partition[start_state]
+            visited = {start_state}
+            queue = deque([start_state])
+            reachable_blocks = set()
+
+            while queue:
+                curr = queue.popleft()
+                for target in tau_successors.get(curr, []):
+                    target_block = current_partition.get(target)
+                    if target_block is None:
+                        continue
+                    
+                    if target_block == start_block:
+                        if target not in visited:
+                            visited.add(target)
+                            queue.append(target)
+                    else:
+                        reachable_blocks.add(target_block)
+            return reachable_blocks
+
+        # 3. Refinement Fixed-Point Loop
+        max_iterations = len(all_states)
         for iteration in range(max_iterations):
             new_block_map: dict[tuple, int] = {}
             new_state_to_block: dict[str, int] = {}
             new_id = 0
 
             for s in all_states:
-                # Tau-reachable blocks
-                tau_blocks = frozenset(
-                    state_to_block[t]
-                    for t in tau_out.get(s, [])
-                    if t in state_to_block
-                )
-                # Observable edges → (label, target_block)
+                # True Stuttering Property: Compute structural path-closure
+                stutter_blocks = frozenset(get_stuttering_reachable_blocks(s, state_to_block))
+                
+                # Observable transition matching
                 obs_pairs = frozenset(
                     (lbl, state_to_block[t])
                     for lbl, t in obs_edges.get(s, [])
                     if t in state_to_block
                 )
 
-                refined_sig = (state_to_block[s], tau_blocks, obs_pairs)
+                # Signature compounds: (current_block_id, tau_stutter_blocks, observable_targets)
+                refined_sig = (state_to_block[s], stutter_blocks, obs_pairs)
+                
                 if refined_sig not in new_block_map:
                     new_block_map[refined_sig] = new_id
                     new_id += 1
                 new_state_to_block[s] = new_block_map[refined_sig]
 
             if new_state_to_block == state_to_block:
-                logger.debug(
-                    "Partition refinement stabilised after %d iterations.",
-                    iteration + 1,
-                )
+                logger.debug("Partition refinement stabilized after %d iterations.", iteration + 1)
                 break
             state_to_block = new_state_to_block
-        else:
-            logger.warning(
-                "Partition refinement hit safety bound (%d iterations).",
-                max_iterations,
-            )
 
-        # --- Invert to block → states ---
+        # 4. Invert map structure back to block_id -> set(states)
         block_to_states: dict[int, set[str]] = {}
         for s, b in state_to_block.items():
             block_to_states.setdefault(b, set()).add(s)
 
-        logger.info(
-            "Partition refinement result: %d equivalence classes for %d states.",
-            len(block_to_states),
-            len(all_states),
-        )
         return state_to_block, block_to_states

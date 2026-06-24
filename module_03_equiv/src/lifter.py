@@ -8,7 +8,7 @@ as pure Python data structures. Implements:
   - Bounded Loop State Duplication up to loop_max
   - loop_exceeds_bound_error trap state generation
   - Nested FSM traversal via the 'functions' block
-  - Universal boolean guard mapping for unresolved/failed extractions
+  - Distinct fallback mapping for unresolved/failed extractions to prevent tau-absorption
 """
 
 from __future__ import annotations
@@ -292,7 +292,7 @@ class WIRLifter:
 
         Guard mapping rules:
         * ``None`` / empty string → ``'tau'`` (silent)
-        * Unresolvable / failed extraction → ``'true'`` (universal boolean)
+        * Unresolvable / failed extraction → ``'unknown_unresolved_guard'`` (observable)
         * Otherwise → literal guard string (observable label)
         """
         for edge in edges:
@@ -323,16 +323,14 @@ class WIRLifter:
         Attempt to resolve a raw guard string.
 
         If the guard is a recognisable boolean expression or loop
-        iterator, return it as-is.  If resolution fails (e.g. the
-        string is garbled or the upstream ``guard_extraction`` flagged
-        a failure), fall back to ``'true'`` (universal boolean) to
-        avoid false positives.
+        iterator, return it as-is. If resolution fails (e.g. the
+        string is garbled or extraction flagged a failure), fall back
+        to an observable unique label identifier to prevent unintended 
+        tau-stuttering absorption during partition refinement.
         """
         if not guard_str or guard_str.strip() == "":
             return "tau"
 
-        # Heuristic: if the guard looks like a valid Python expression
-        # fragment, keep it.  Otherwise map to 'true'.
         guard_stripped = guard_str.strip()
 
         # Known safe patterns
@@ -353,29 +351,18 @@ class WIRLifter:
         if guard_stripped.isidentifier():
             return guard_stripped
 
-        # Fallback: unresolvable → universal boolean
-        logger.debug(
-            "Guard '%s' unresolvable; mapping to universal boolean 'true'.",
+        # Fallback: Force unresolvable to an observable label to prevent silent absorption
+        logger.warning(
+            "Guard '%s' unresolvable; fallback to observable distinct label.",
             guard_stripped,
         )
-        return "true"
+        return "unknown_unresolved_guard"
 
     # -- bounded loop state duplication ------------------------------------
 
     def _apply_loop_unrolling(self, lts: LTS, nodes: list[dict]) -> None:
         """
         Perform Bounded Loop State Duplication for every ``loop``-type node.
-
-        For each loop node with id ``L``:
-
-        1. Identify the *loop body*: all states reachable from ``L`` that
-           eventually loop back to ``L`` (simple heuristic: direct
-           successors of ``L`` that are not the exit).
-        2. Duplicate the loop node ``loop_max`` times as
-           ``L_iter_0 … L_iter_{loop_max-1}``.
-        3. Chain the iterations sequentially.
-        4. After the last iteration, redirect the back-edge to a new
-           trap state ``L_loop_exceeds_bound_error``.
         """
         loop_nodes = [
             n for n in nodes
@@ -391,15 +378,29 @@ class WIRLifter:
             loop_id: str = loop_node["id"]
             guard = loop_node.get("guard", "true")
 
-            # --- find back-edges (transitions that go *back* to loop_id) ---
+            # --- 1. Identify the genuine Loop Body Nodes via Reachability ---
+            loop_body_nodes = set()
+            frontier = [tgt for src, tgt, _ in lts.transitions if src == loop_id and tgt != loop_id]
+            
+            while frontier:
+                current = frontier.pop(0)
+                if current not in loop_body_nodes and current != loop_id:
+                    loop_body_nodes.add(current)
+                    successors = [tgt for src, tgt, _ in lts.transitions if src == current]
+                    frontier.extend(successors)
+
+            # --- 2. Classify Edges Accurately ---
             back_edges: list[tuple[str, str, str]] = []
+            entry_edges: list[tuple[str, str, str]] = []
             forward_edges: list[tuple[str, str, str]] = []
             other_edges: list[tuple[str, str, str]] = []
 
             for src, tgt, lbl in lts.transitions:
-                if tgt == loop_id and src != loop_id:
-                    # potential back-edge from body → loop head
-                    back_edges.append((src, tgt, lbl))
+                if tgt == loop_id:
+                    if src in loop_body_nodes:
+                        back_edges.append((src, tgt, lbl))
+                    else:
+                        entry_edges.append((src, tgt, lbl))
                 elif src == loop_id:
                     forward_edges.append((src, tgt, lbl))
                 else:
@@ -412,16 +413,8 @@ class WIRLifter:
                 )
                 continue
 
-            # --- duplicate iterations ---
+            # --- 3. Duplicate iterations ---
             new_transitions: list[tuple[str, str, str]] = list(other_edges)
-
-            # Keep original transitions that enter the loop head from outside
-            # (these will go to iter_0 instead)
-            entry_edges = [
-                (s, t, l) for s, t, l in lts.transitions
-                if t == loop_id and (s, t, l) not in back_edges
-                and s != loop_id
-            ]
 
             for k in range(loop_max):
                 iter_id = f"{loop_id}_iter_{k}"
@@ -433,29 +426,19 @@ class WIRLifter:
                 }
 
                 if k == 0:
-                    # Redirect external entries to iter_0
                     for s, _t, l in entry_edges:
                         new_transitions.append((s, iter_id, l))
-                    # Also, redirect the original loop node's own
-                    # incoming "start" to iter_0
-                    # Forward edges from loop head → body now go from iter_0
                     for _s, t, l in forward_edges:
                         new_transitions.append((iter_id, t, l))
                 else:
-                    # Chain: back-edge targets of previous iteration → this iter
                     prev_iter_id = f"{loop_id}_iter_{k - 1}"
                     for s, _t, l in back_edges:
-                        # Replace back-edge target with next iteration
-                        new_transitions.append(
-                            (s.replace(loop_id, prev_iter_id)
-                             if s == loop_id else s,
-                             iter_id, l)
-                        )
-                    # Forward edges from this iteration
+                        src_mapped = s.replace(loop_id, prev_iter_id) if s == loop_id else s
+                        new_transitions.append((src_mapped, iter_id, l))
                     for _s, t, l in forward_edges:
                         new_transitions.append((iter_id, t, l))
 
-            # --- trap state for overflow ---
+            # --- 4. Trap state for overflow ---
             trap_id = f"{loop_id}_loop_exceeds_bound_error"
             lts.states[trap_id] = {
                 "type": "error",
@@ -463,13 +446,11 @@ class WIRLifter:
                 "original_loop": loop_id,
             }
 
-            # Redirect back-edges from the last iteration to the trap
             last_iter = f"{loop_id}_iter_{loop_max - 1}"
             for s, _t, l in back_edges:
-                src_mapped = s if s != loop_id else last_iter
+                src_mapped = s.replace(loop_id, last_iter) if s == loop_id else s
                 new_transitions.append((src_mapped, trap_id, l))
 
-            # Remove the original loop node (it's been replaced by iter copies)
             lts.states.pop(loop_id, None)
             lts.transitions = new_transitions
 

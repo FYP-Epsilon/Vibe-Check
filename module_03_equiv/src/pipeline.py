@@ -23,7 +23,7 @@ import time
 from pathlib import Path
 
 from .lifter import LTS, LifterConfig, QualityGateError, WIRLifter
-from .stuttering_engine import StutteringEngine
+from .stuttering_engine import StutteringEngine, StutteringResult
 from .clustering import BehavioralClusterer, ClusterResult
 from .model_checker import ModelChecker, PropertyMonitor, VerificationVerdict
 
@@ -51,12 +51,12 @@ DEMO_WIR: dict = {
         {"id": "node_3", "type": "gateway",  "successors": ["node_4", "node_5"], "predecessors": ["node_2"], "control_vars": ["approved"], "data_vars": [], "guard": "approved"},
         {"id": "node_4", "type": "task",     "successors": ["node_6"], "predecessors": ["node_3"], "control_vars": [], "data_vars": []},
         {"id": "node_5", "type": "task",     "successors": ["node_6"], "predecessors": ["node_3"], "control_vars": [], "data_vars": []},
-        {"id": "node_6", "type": "exit",     "successors": [],         "predecessors": ["node_4", "node_5"], "control_vars": [], "data_vars": []},
+        {"id": "node_6", "type": "exit",     "successors": [],          "predecessors": ["node_4", "node_5"], "control_vars": [], "data_vars": []},
     ],
     "edges": [
         {"source": "node_1", "target": "node_2", "guard": None, "exception_type": None},
         {"source": "node_2", "target": "node_3", "guard": None, "exception_type": None},
-        {"source": "node_3", "target": "node_4", "guard": "approved",     "exception_type": None},
+        {"source": "node_3", "target": "node_4", "guard": "approved",      "exception_type": None},
         {"source": "node_3", "target": "node_5", "guard": "not approved", "exception_type": None},
         {"source": "node_4", "target": "node_6", "guard": None, "exception_type": None},
         {"source": "node_5", "target": "node_6", "guard": None, "exception_type": None},
@@ -68,14 +68,14 @@ DEMO_WIR: dict = {
             "nodes": [
                 {"id": "fn_1", "type": "entry",   "successors": ["fn_2"], "predecessors": [],       "control_vars": [], "data_vars": []},
                 {"id": "fn_2", "type": "loop",    "successors": ["fn_3"], "predecessors": ["fn_1"], "control_vars": [], "data_vars": [], "guard": "iter order_quantities", "ast_type": "For"},
-                {"id": "fn_3", "type": "task",    "successors": ["fn_4"], "predecessors": ["fn_2"], "control_vars": [], "data_vars": []},
+                {"id": "fn_3", "type": "task",    "successors": ["fn_4"], "predecessors": ["fn_3"], "control_vars": [], "data_vars": []},
                 {"id": "fn_4", "type": "gateway", "successors": ["fn_2", "fn_5"], "predecessors": ["fn_3"], "control_vars": ["inventory_level"], "data_vars": [], "guard": "inventory_level == 0"},
                 {"id": "fn_5", "type": "exit",    "successors": [],        "predecessors": ["fn_4"], "control_vars": [], "data_vars": []},
             ],
             "edges": [
-                {"source": "fn_1", "target": "fn_2", "guard": None,                    "exception_type": None},
+                {"source": "fn_1", "target": "fn_2", "guard": None,                     "exception_type": None},
                 {"source": "fn_2", "target": "fn_3", "guard": "iter order_quantities", "exception_type": None},
-                {"source": "fn_3", "target": "fn_4", "guard": None,                    "exception_type": None},
+                {"source": "fn_3", "target": "fn_4", "guard": None,                     "exception_type": None},
                 {"source": "fn_4", "target": "fn_2", "guard": "inventory_level == 0",  "exception_type": None},
                 {"source": "fn_4", "target": "fn_5", "guard": "not inventory_level == 0", "exception_type": None},
             ],
@@ -152,26 +152,32 @@ def run_pipeline(wir_json: dict) -> dict:
     print("╚══════════════════════════════════════════════════════════════╝")
 
     engine = StutteringEngine()
+    
+    # Cache compilation dict to optimize execution footprint
+    results_cache: dict[str, StutteringResult] = {}
+    per_lts_summary: list[dict] = []
 
     for lts in lts_list:
+        # Compute EXACTLY once per structural variant
         result = engine.compute(lts)
+        results_cache[lts.name] = result
+        
         div_count = len(result.divergent_states)
         print(
             f"  {lts.name}: {result.num_blocks} equivalence classes, "
             f"{div_count} divergent states, "
             f"{len(result.scc_components)} SCCs"
         )
+        
+        per_lts_summary.append({
+            "name": lts.name,
+            "blocks": result.num_blocks,
+            "divergent": div_count,
+        })
 
     summary["phases"]["B"] = {
         "status": "OK",
-        "per_lts": [
-            {
-                "name": l.name,
-                "blocks": engine.compute(l).num_blocks,
-                "divergent": len(engine.compute(l).divergent_states),
-            }
-            for l in lts_list
-        ],
+        "per_lts": per_lts_summary,
     }
 
     # ── Phase C: Pairwise Clustering ─────────────────────────────────────
@@ -233,7 +239,6 @@ def run_pipeline(wir_json: dict) -> dict:
         })
 
         # Property 2: Check for reachability of any known forbidden labels
-        # (demo: check that no "error" label is reachable)
         for forbidden in ["error", "abort", "panic"]:
             if forbidden in rep_lts.atomic_propositions:
                 mon = PropertyMonitor.from_reachability(forbidden)
