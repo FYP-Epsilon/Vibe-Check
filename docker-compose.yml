@@ -20,5 +20,8 @@ services:
     build:
       context: ./module_04_ui
     container_name: ui-engine
+    volumes:
+      - ./module_04_ui:/app
+      - ./module_01_spec:/module_01_spec
     ports:
       - "8501:8501"
