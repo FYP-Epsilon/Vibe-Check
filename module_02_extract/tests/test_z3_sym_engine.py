@@ -383,3 +383,14 @@ class TestRobustness:
         pc, branches = tracer.trace()
         # Should not crash; falls back to True.
         assert pc is not None
+
+    def test_concrete_exec_undefined_name_degrades_not_crashes(self):
+        """A function body calling an undefined name raises NameError during
+        concrete execution. This must degrade V2 to confidence 0 rather than
+        propagate the exception (regression for the narrow except tuple in
+        _concolic_iteration)."""
+        source = "def foo(x: int) -> int:\n    return undefined_task_call(x)"
+        engine = BoundedConcolicEngine(source, "foo", max_k=3, query_budget=10)
+        cert = engine.run({"x": 0})
+        assert cert["confidence"] == 0.0
+        assert cert["input_mismatch_count"] > 0
