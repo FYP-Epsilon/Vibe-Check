@@ -38,6 +38,7 @@ class BoundedConcolicEngine:
         query_budget: int = 500,
         timeout_ms: int = 5000,
         compiled_ns: Optional[dict[str, Any]] = None,
+        wir: Optional[dict[str, Any]] = None,
     ) -> None:
         self.source = source
         self.function_name = function_name
@@ -52,8 +53,11 @@ class BoundedConcolicEngine:
             self._compiled_ns: dict[str, Any] = {"__builtins__": SAFE_BUILTINS}
             exec(compile(self.source, "<string>", "exec"), self._compiled_ns)
 
-        # Pre-extract the WIR (Phase 1) for symbolic tracing.
-        self.wir = CFGExtractor().extract(self.source)
+        # Pre-extract the WIR (Phase 1) for symbolic tracing, unless an
+        # external WIR was supplied (differential mode: explore the *base*
+        # program's spec-shaped WIR while concretely executing *source*,
+        # which may be a mutant of it).
+        self.wir = wir if wir is not None else CFGExtractor().extract(self.source)
 
         # Build a comprehensive node map that includes top-level nodes AND
         # every node inside function sub-CFGs.  This is required for QCE

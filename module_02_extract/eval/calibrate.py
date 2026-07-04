@@ -3,16 +3,33 @@
 Splits the FLOW-BENCH-derived corpus (label "correct") and its mutants
 (label "buggy") into CALIB/EVAL sets -- 50/50, stratified by the base
 program's semantic tag, fixed seed -- runs every program through the real
-V3->V2->V1 pipeline, picks a decision threshold tau on CALIB by maximizing
-Youden's J on the combined_confidence ROC curve, then reports detection
-rate (recall on buggy) and false-alarm rate (1 - specificity on correct)
-on the held-out EVAL set with exact Clopper-Pearson binomial confidence
-intervals. No scipy/numpy dependency: the binomial CDF is computed
-exactly via math.comb and inverted by bisection.
+verification pipeline, picks a decision threshold tau on CALIB by
+maximizing Youden's J on the combined_confidence ROC curve, then reports
+detection rate (recall on buggy) and false-alarm rate (1 - specificity on
+correct) on the held-out EVAL set with exact Clopper-Pearson binomial
+confidence intervals. No scipy/numpy dependency: the binomial CDF is
+computed exactly via math.comb and inverted by bisection.
+
+Two modes (--mode):
+
+  self (legacy)   -- run mutants through the ordinary /verify pipeline.
+                      V1's oracle is a WIR *re-derived from the mutant
+                      itself*, so it cannot distinguish a mutant from its
+                      base program (see round3_verified_findings "Round-3b").
+                      Preserved as a documented negative finding --
+                      NEVER regenerate calibration_report.md automatically
+                      from a differential run.
+  differential    -- (default) run each mutant's compiled code against the
+                      *base* program's WIR as the V1/V2 oracle
+                      (run_v1_pipeline(source=mutant, wir=base_func_wir)).
+                      This is the actual bug detector; V2 in this mode
+                      contributes spec-path coverage, not detection --
+                      see run_differential_verification's docstring.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import random
@@ -24,7 +41,14 @@ EVAL_DIR = Path(__file__).resolve().parent
 MODULE02_DIR = EVAL_DIR.parent
 sys.path.insert(0, str(MODULE02_DIR / "src"))
 
-from main import _run_verification  # noqa: E402
+from main import (  # noqa: E402
+    _run_verification, _derive_v1_params, _derive_initial_inputs,
+    _select_entry_function, SAFE_BUILTINS,
+)
+from ast_extractor import run_v3_pipeline  # noqa: E402
+from z3_sym_engine import run_v2_pipeline  # noqa: E402
+from dynamic_tracer import run_v1_pipeline, MultiModalCertificateComposer  # noqa: E402
+import ast  # noqa: E402
 
 MANIFEST_PATH = EVAL_DIR / "manifest.json"
 THRESHOLD_PATH = EVAL_DIR / "threshold.json"
@@ -132,9 +156,98 @@ def stratified_split(manifest: list[dict[str, Any]], seed: int = SEED) -> tuple[
 # Pipeline execution
 # ----------------------------------------------------------------------
 
-def run_pipeline_on_manifest(manifest: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Run every runnable manifest entry through _run_verification."""
+def _base_func_wir(base_uid: int, manifest_by_uid: dict[int, dict[str, Any]],
+                    cache: dict[int, tuple[str, dict[str, Any]]]) -> Optional[tuple[str, dict[str, Any]]]:
+    """(base_source, base WIR for its first function), cached per base_uid
+    so N mutants sharing one base don't re-extract its WIR N times."""
+    if base_uid in cache:
+        return cache[base_uid]
+    base_entry = manifest_by_uid.get(base_uid)
+    if base_entry is None:
+        return None
+    base_path = EVAL_DIR / base_entry["source_file"]
+    if not base_path.exists():
+        return None
+    base_source = base_path.read_text(encoding="utf-8")
+    base_wir = run_v3_pipeline(base_source)
+    functions = base_wir.get("functions", {})
+    if not functions:
+        return None
+    result = (base_source, functions[_select_entry_function(functions)])
+    cache[base_uid] = result
+    return result
+
+
+def run_differential_verification(mutant_source: str, base_func_wir: dict[str, Any]) -> dict[str, Any]:
+    """
+    Verify *mutant_source* against the *base* program's WIR instead of a
+    WIR re-derived from the mutant itself.
+
+    V3 still runs on the mutant standalone (extraction fidelity is a
+    property of the mutant's own syntax, independent of any oracle) and
+    gates the result exactly as in self-mode. V1 is the actual
+    differential detector: its "expected" trace now comes from the base
+    program's control flow, so a mutation that changes actual behavior
+    (dropped step, reordered step, flipped guard direction) diverges from
+    an oracle that no longer matches. V2 in this mode explores the base
+    program's *symbolic path structure* while concretely executing the
+    mutant -- it has no actual/expected comparator of its own, so it
+    contributes spec-path coverage statistics, not detection.
+    """
+    wir = run_v3_pipeline(mutant_source)
+    v3_cert = wir.get("certificate", {})
+
+    functions = wir.get("functions", {})
+    if not functions:
+        return {"combined_confidence": 0.0, "passed": False, "message": "no functions in mutant"}
+    function_name = _select_entry_function(functions)
+
+    local_env: dict[str, Any] = {"__builtins__": SAFE_BUILTINS}
+    try:
+        exec(compile(mutant_source, "<string>", "exec"), local_env)
+        func_obj = local_env[function_name]
+    except Exception as e:
+        return {"combined_confidence": 0.0, "passed": False, "message": f"mutant failed to compile/exec: {e}"}
+
+    v1_params = _derive_v1_params(base_func_wir)
+    initial_inputs = _derive_initial_inputs(ast.parse(mutant_source), func_obj)
+
+    v1_cert = run_v1_pipeline(
+        source=mutant_source,
+        function_name=function_name,
+        wir=base_func_wir,
+        task_patterns=[function_name],
+        branch_lines=v1_params["branch_lines"],
+        control_variables=v1_params["control_variables"],
+        state_variables=v1_params["state_variables"] or None,
+        n_runs=10,
+        seed=42,
+        compiled_ns=local_env,
+    )
+
+    v2_result = run_v2_pipeline(
+        source=mutant_source,
+        function_name=function_name,
+        initial_inputs=initial_inputs,
+        max_k=3,
+        query_budget=20,
+        compiled_ns=local_env,
+        wir=base_func_wir,
+    )
+    v2_cert = v2_result["certificate"]
+
+    composer = MultiModalCertificateComposer()
+    return composer.compose(v1_cert, v2_cert, v3_cert)
+
+
+def run_pipeline_on_manifest(
+    manifest: list[dict[str, Any]],
+    mode: str = "differential",
+    manifest_by_uid: Optional[dict[int, dict[str, Any]]] = None,
+) -> list[dict[str, Any]]:
+    """Run every runnable manifest entry through the chosen mode's pipeline."""
     records: list[dict[str, Any]] = []
+    wir_cache: dict[int, tuple[str, dict[str, Any]]] = {}
     for entry in manifest:
         if entry.get("applicable") is False:
             continue
@@ -145,7 +258,17 @@ def run_pipeline_on_manifest(manifest: list[dict[str, Any]]) -> list[dict[str, A
         if not path.exists():
             continue
         source = path.read_text(encoding="utf-8")
-        cert = _run_verification(source)
+
+        if mode == "self":
+            cert = _run_verification(source)
+        else:
+            base_uid = _uid_for(entry)
+            base = _base_func_wir(base_uid, manifest_by_uid or {}, wir_cache)
+            if base is None:
+                continue
+            _, base_func_wir = base
+            cert = run_differential_verification(source, base_func_wir)
+
         records.append({
             "uid": _uid_for(entry),
             "label": _label_for(entry),
@@ -223,11 +346,12 @@ def _fmt_ci(ci: Optional[tuple[float, float]]) -> str:
     return f"[{ci[0]:.3f}, {ci[1]:.3f}]"
 
 
-def render_report(calib_summary: dict[str, Any], eval_summary: dict[str, Any], seed: int) -> str:
+def render_report(calib_summary: dict[str, Any], eval_summary: dict[str, Any], seed: int, mode: str = "differential") -> str:
+    title = "Differential-Mode" if mode == "differential" else "Self-Mode"
     lines = [
-        "# Module 02 Calibration Report",
+        f"# Module 02 Calibration Report ({title})",
         "",
-        f"Seed: `{seed}`. CALIB/EVAL split: 50/50 stratified by base-program tag.",
+        f"Mode: `{mode}`. Seed: `{seed}`. CALIB/EVAL split: 50/50 stratified by base-program tag.",
         "",
         "## Threshold selection (CALIB)",
         "",
@@ -262,34 +386,53 @@ def render_report(calib_summary: dict[str, Any], eval_summary: dict[str, Any], s
 # ----------------------------------------------------------------------
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--mode", choices=["self", "differential"], default="differential",
+        help="self: mutant verified against its own re-derived WIR (documented "
+             "negative finding, calibration_report.md). differential (default): "
+             "mutant verified against its base program's WIR "
+             "(calibration_report_differential.md).",
+    )
+    args = parser.parse_args()
+
     manifest = _load_manifest()
+    manifest_by_uid = {e["uid"]: e for e in manifest if "base_uid" not in e}
     calib_uids, eval_uids = stratified_split(manifest, seed=SEED)
 
     calib_manifest = [e for e in manifest if _uid_for(e) in calib_uids]
     eval_manifest = [e for e in manifest if _uid_for(e) in eval_uids]
 
-    calib_records = run_pipeline_on_manifest(calib_manifest)
-    eval_records = run_pipeline_on_manifest(eval_manifest)
+    calib_records = run_pipeline_on_manifest(calib_manifest, mode=args.mode, manifest_by_uid=manifest_by_uid)
+    eval_records = run_pipeline_on_manifest(eval_manifest, mode=args.mode, manifest_by_uid=manifest_by_uid)
 
     tau, best_j = youdens_j_threshold(calib_records)
     calib_summary = evaluate_at_threshold(calib_records, tau)
     calib_summary["best_j"] = best_j
     eval_summary = evaluate_at_threshold(eval_records, tau)
 
-    THRESHOLD_PATH.write_text(
-        json.dumps({
-            "tau": tau,
-            "youdens_j": best_j,
-            "seed": SEED,
-            "n_calib_positives": calib_summary["n_positives"],
-            "n_calib_negatives": calib_summary["n_negatives"],
-        }, indent=2),
-        encoding="utf-8",
-    )
-
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    report = render_report(calib_summary, eval_summary, SEED)
-    (RESULTS_DIR / "calibration_report.md").write_text(report, encoding="utf-8")
+    report = render_report(calib_summary, eval_summary, SEED, mode=args.mode)
+
+    if args.mode == "differential":
+        # threshold.json is frozen from differential-mode CALIB only -- the
+        # self-mode J=0 result is not a usable operating point.
+        THRESHOLD_PATH.write_text(
+            json.dumps({
+                "mode": args.mode,
+                "tau": tau,
+                "youdens_j": best_j,
+                "seed": SEED,
+                "n_calib_positives": calib_summary["n_positives"],
+                "n_calib_negatives": calib_summary["n_negatives"],
+            }, indent=2),
+            encoding="utf-8",
+        )
+        (RESULTS_DIR / "calibration_report_differential.md").write_text(report, encoding="utf-8")
+    else:
+        # Never overwrite the self-mode negative-finding report from a
+        # differential run; only a self-mode run regenerates it.
+        (RESULTS_DIR / "calibration_report.md").write_text(report, encoding="utf-8")
 
     print(report)
 

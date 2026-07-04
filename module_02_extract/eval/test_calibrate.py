@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from eval.calibrate import clopper_pearson, stratified_split, _base_tag
+from eval.calibrate import clopper_pearson, stratified_split, _base_tag, run_differential_verification
+from ast_extractor import run_v3_pipeline
 
 
 class TestClopperPearson:
@@ -61,3 +62,34 @@ class TestStratifiedSplit:
     def test_base_tag_skips_numeric_tags(self):
         assert _base_tag(["4", "conditional"]) == "conditional"
         assert _base_tag(["9"]) == "unknown"
+
+
+class TestRunDifferentialVerification:
+    def test_returns_well_formed_certificate(self):
+        """Mechanical smoke test: differential mode must return the same
+        wire-shaped cert as self-mode, not crash."""
+        source = "def workflow(x: int) -> int:\n    if x > 0:\n        return 1\n    return 0\n"
+        base_wir = run_v3_pipeline(source)["functions"]["workflow"]
+        cert = run_differential_verification(source, base_wir)
+        assert "combined_confidence" in cert
+        assert isinstance(cert["passed"], bool)
+
+    def test_value_only_guard_mutation_not_detected(self):
+        """Documents a known, verified limitation (D4 session finding): a
+        guard negated to its logical opposite produces IDENTICAL trace
+        *shape* (same task/branch-point counts) on both sides, and D3's
+        decision-aware comparison can only activate when the real
+        actual-side collector also carries a taken_branch field, which it
+        does not (see comparator.py). So even against the correct base
+        program's WIR as oracle, differential mode cannot currently tell
+        this mutant apart from the base. This is a REGRESSION test for a
+        documented gap, not a desired behavior -- if collector.py is ever
+        enhanced to emit decisions, this test should start failing and
+        should be revisited, not "fixed" by weakening it."""
+        base_source = "def workflow(status: str) -> int:\n    if status == 'high':\n        return 1\n    return 0\n"
+        mutant_source = "def workflow(status: str) -> int:\n    if not (status == 'high'):\n        return 1\n    return 0\n"
+        base_wir = run_v3_pipeline(base_source)["functions"]["workflow"]
+
+        base_cert = run_differential_verification(base_source, base_wir)
+        mutant_cert = run_differential_verification(mutant_source, base_wir)
+        assert base_cert["combined_confidence"] == pytest.approx(mutant_cert["combined_confidence"])
