@@ -335,6 +335,35 @@ def foo(x):
         # x should be an ITE.
         assert "If" in str(merged["x"])
 
+    def test_seed_containers_list_gets_real_branch_coverage(self):
+        """An empty list input must be seeded with non-empty samples so the
+        concolic loop actually enters the loop body and both branches of
+        the guard inside it, instead of trivially exiting with 1 edge."""
+        source = """
+def process_items(items: list[int]) -> int:
+    total = 0
+    for item in items:
+        if item > 0:
+            total += item
+        else:
+            total -= item
+    return total
+"""
+        engine = BoundedConcolicEngine(source, "process_items", max_k=3, query_budget=20)
+        cert = engine.run({"items": []})
+        assert cert["covered_edges"] >= 4
+        assert cert["confidence"] > 0.0
+
+    def test_seed_containers_dict_discovers_subscripted_keys(self):
+        """An empty dict input must be seeded with the string keys the
+        function actually subscripts, not generic placeholders, so
+        concrete execution doesn't KeyError immediately."""
+        source = "def foo(order: dict) -> int:\n    return order['total']"
+        engine = BoundedConcolicEngine(source, "foo", max_k=3, query_budget=10)
+        inputs = {"order": {}}
+        engine._seed_containers(inputs)
+        assert "total" in inputs["order"]
+
 
 # ----------------------------------------------------------------------
 # run_v2_pipeline orchestrator
