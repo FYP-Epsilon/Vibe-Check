@@ -30,6 +30,11 @@ class Z3VariableRegistry:
         self._type_history: dict[str, list[type]] = {}
         # Flattened dictionary fields: "order_total" -> z3.Int("order_total")
         self._flat_registry: dict[str, z3.ExprRef] = {}
+        # Reverse map for string tokenization (see SymbolicEvaluator.visit_Constant):
+        # a str literal is encoded as an int token for arithmetic constraints, but
+        # a solved model gives back only the token -- this lets _z3_to_python
+        # decode it back into the original string instead of a bare int.
+        self._string_tokens: dict[int, str] = {}
 
     # -- sort inference --------------------------------------------------
 
@@ -137,6 +142,18 @@ class Z3VariableRegistry:
     def get_flat(self, flat_name: str) -> Optional[z3.ExprRef]:
         """Retrieve a flattened field by its dot-path key."""
         return self._flat_registry.get(flat_name)
+
+    # -- string tokenization -----------------------------------------------
+
+    def register_string_token(self, token: int, literal: str) -> None:
+        """Record that *token* encodes *literal* (called from visit_Constant
+        every time a string literal is tokenized for Z3)."""
+        self._string_tokens[token] = literal
+
+    def resolve_string_token(self, token: int) -> Optional[str]:
+        """Decode a solved model token back into its original string, if
+        this registry ever tokenized it."""
+        return self._string_tokens.get(token)
 
     # -- list / array helpers --------------------------------------------
 

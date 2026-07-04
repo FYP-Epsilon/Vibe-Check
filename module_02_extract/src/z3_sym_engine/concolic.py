@@ -425,8 +425,7 @@ class BoundedConcolicEngine:
         finally:
             solver.pop()
 
-    @staticmethod
-    def _z3_to_python(z3_val: Any, py_type: type) -> Any:
+    def _z3_to_python(self, z3_val: Any, py_type: type) -> Any:
         """Best-effort conversion from a Z3 model value to a Python value."""
         if hasattr(z3_val, "as_long"):
             v = z3_val.as_long()
@@ -434,6 +433,14 @@ class BoundedConcolicEngine:
                 return bool(v)
             if py_type == float:
                 return float(v)
+            if py_type == str:
+                # Strings are tokenized to ints for arithmetic constraints
+                # (see SymbolicEvaluator.visit_Constant); decode the token
+                # back to its literal instead of returning a bare int, or
+                # the next concrete iteration would feed a wrong-typed
+                # value into a str-typed parameter.
+                literal = self.registry.resolve_string_token(v)
+                return literal if literal is not None else f"__tok_{v}"
             return v
         if hasattr(z3_val, "as_fraction"):
             v = float(z3_val.as_fraction())

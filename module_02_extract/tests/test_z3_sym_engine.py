@@ -364,6 +364,17 @@ def process_items(items: list[int]) -> int:
         engine._seed_containers(inputs)
         assert "total" in inputs["order"]
 
+    def test_string_guard_round_trips_through_solver(self):
+        """D2: solving a string guard must feed a real string back into the
+        next concrete iteration, not a raw int token -- both branches of
+        `status == "high"` must get explored starting from a non-matching
+        concrete input."""
+        source = 'def f(status: str) -> int:\n    if status == "high":\n        return 1\n    return 0'
+        engine = BoundedConcolicEngine(source, "f", max_k=3, query_budget=20)
+        cert = engine.run({"status": ""})
+        assert engine.covered_edges == {("node_1", "True"), ("node_1", "False")}
+        assert cert["covered_edges"] == 2
+
 
 # ----------------------------------------------------------------------
 # run_v2_pipeline orchestrator
