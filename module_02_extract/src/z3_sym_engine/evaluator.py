@@ -57,8 +57,12 @@ class SymbolicEvaluator(ast.NodeVisitor):
         elif isinstance(v, float):
             return z3.RealVal(v)
         elif isinstance(v, str):
-            # String-as-token encoding.
-            return z3.IntVal(hash(v) & 0x7FFFFFFF)
+            # String-as-token encoding. Record the reverse mapping so a
+            # solved model's token can be decoded back into this literal
+            # (see Z3VariableRegistry.resolve_string_token / _z3_to_python).
+            token = hash(v) & 0x7FFFFFFF
+            self.registry.register_string_token(token, v)
+            return z3.IntVal(token)
         else:
             sort = self.registry.infer_sort(v)
             return z3.Const(f"const_{id(v)}", sort)
