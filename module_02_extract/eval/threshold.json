@@ -1,7 +1,7 @@
 {
   "mode": "differential",
   "tau": 0.09999999999999998,
-  "youdens_j": 0.0506220095693779,
+  "youdens_j": 0.8068899521531101,
   "seed": 1234,
   "n_calib_positives": 209,
   "n_calib_negatives": 50

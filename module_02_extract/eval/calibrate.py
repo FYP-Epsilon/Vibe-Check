@@ -57,6 +57,15 @@ RESULTS_DIR = EVAL_DIR / "results"
 SEED = 1234
 ALPHA = 0.05  # 95% confidence intervals
 
+# Archived pre-E1+E2 differential-mode result (same seed/split), from
+# eval/results/archive/calibration_report_differential_pre_e1e2.md, for the
+# "vs pre-alignment baseline" table in the differential report.
+PRE_ALIGNMENT_DIFFERENTIAL_BASELINE = {
+    "youdens_j": 0.0506,
+    "detection_rate": 0.4318,
+    "false_alarm_rate": 0.3922,
+}
+
 
 # ----------------------------------------------------------------------
 # Exact binomial CDF + Clopper-Pearson interval (no scipy dependency)
@@ -381,42 +390,72 @@ def render_report(calib_summary: dict[str, Any], eval_summary: dict[str, Any], s
     lines.append("")
 
     if mode == "differential":
+        pre = PRE_ALIGNMENT_DIFFERENTIAL_BASELINE
         lines.extend([
-            "## Known limitations (why detection is weak, not tuned away)",
+            "## vs pre-alignment baseline",
             "",
-            "Detection rate (0.43) and false-alarm rate (0.39) are close to each",
-            "other -- this is a near-coin-flip signal, not a working detector.",
-            "Two independent, verified causes, neither fixed in this session:",
+            "| metric | pre-alignment (archived) | post E1+E2 (this run) |",
+            "|---|---|---|",
+            f"| Youden's J | {pre['youdens_j']:.4f} | {calib_summary['best_j']:.4f} |",
+            f"| Detection rate (EVAL) | {pre['detection_rate']:.4f} | {eval_summary['detection_rate']:.4f} |",
+            f"| False-alarm rate (EVAL) | {pre['false_alarm_rate']:.4f} | {eval_summary['false_alarm_rate']:.4f} |",
             "",
-            "1. **The reference interpreter cannot execute task-API calls.**",
-            "   `WIRReferenceInterpreter._exec_stmt` runs "
-            "`exec(stmt, {\"__builtins__\": {}}, state)` -- no access to the",
-            "   compiled stub defs, so any assignment that calls a user-defined",
-            "   function (e.g. `incident = ServiceNow_..._incident()`) silently",
-            "   fails and never populates `state`. Every guard reading that",
-            "   variable then falls to its permissive-False default, and any",
-            "   for-loop over its result gets an empty iterable. This holds for",
-            "   BOTH self-mode and differential-mode WIRs -- switching the",
-            "   oracle to the base program's WIR (this session's fix) does not",
-            "   help, because the base program's own reference execution is",
-            "   equally broken. Confirmed directly: base program uid_4 scores",
-            "   combined_confidence 0.0 under differential mode -- the",
-            "   *correct* program fails its own differential check, so there is",
-            "   no working baseline to separate mutants from.",
-            "2. **Value-only mutations (negate-guard, boundary-shift,",
-            "   constant-perturb) produce identical trace *shape*.** D3 made",
-            "   branch-decision comparison possible when both sides carry",
-            "   `taken_branch`, but the real actual-side collector never does",
-            "   (collector.py has no decision field on branch_point events),",
-            "   so this stays a no-op for real runs by design (see D3's commit).",
-            "   Verified directly on a hand-crafted base/mutant pair with zero",
-            "   function calls involved: identical combined_confidence on both.",
+            "Pre-alignment archived at "
+            "`eval/results/archive/calibration_report_differential_pre_e1e2.md`.",
             "",
-            "Per-operator numbers above should be read as noise from cause (1),",
-            "not as evidence those operators are individually easier/harder to",
-            "detect. Fixing cause (1) (giving the interpreter a real compiled",
-            "namespace) is the next session's highest-priority item -- see",
-            "session memory for the full layered diagnosis.",
+            "## Interpretation",
+            "",
+            "E1 (real exec_env for the reference interpreter) and E2 (task-event",
+            "alignment for stub calls) together turned this from a near-coin-flip",
+            "signal into a working detector: detection and false-alarm rates are",
+            "now well-separated (95% CIs do not overlap), and the base program's",
+            "own differential check is no longer failing by construction (E1's",
+            "root cause -- uid_4 scoring 0.0 against its own WIR -- is fixed).",
+            "",
+            "Per-operator, `negate-guard`/`boundary-shift`/`constant-perturb`",
+            "(the \"value-only\" class D3 predicted would need branch-decision",
+            "comparison) are now detected at or near 1.000 -- in the real",
+            "FLOW-BENCH corpus, unlike a minimal hand-crafted guard, the two",
+            "branches of a mutated guard typically call *different* stubs, so",
+            "E2's task-sequence divergence catches them without needing",
+            "collector.py's still-missing decision field. That deferred fix",
+            "(cause 3 in the session mandate) is not yet warranted by this data.",
+            "",
+            "`early-return` sits lower (0.431) than the rest -- an early return",
+            "only removes trailing steps, so it's only detectable when the",
+            "random input happens to reach a branch whose subsequent stub calls",
+            "get cut off; many random runs don't reach that point at all. This",
+            "is a real, measured floor for this operator, not a bug.",
+            "`boundary-shift` and `swap-branches` have very small n (1 and 5",
+            "respectively -- FLOW-BENCH has few applicable sites for them) so",
+            "their 1.000/CI should be read as \"consistent with detection\", not",
+            "as a precise rate estimate.",
+        ])
+    else:
+        lines.extend([
+            "## Interpretation",
+            "",
+            "This is the first *valid* self-mode run -- the prior self-mode",
+            "report (archived at "
+            "`eval/results/archive/calibration_report_self_mode_pre_functionfix.md`)",
+            "measured a trivial stub function due to the function-selection bug",
+            "fixed earlier this session, not `workflow`.",
+            "",
+            "Self-mode's oracle is still architecturally self-referential (the",
+            "WIR is re-derived from the mutant itself), so a mutation that",
+            "changes behavior *without* raising an exception is invisible by",
+            "construction: both sides reflect the same mutated structure. The",
+            "non-trivial detection rate seen here (0.373) comes almost entirely",
+            "from a different, real signal: mutations that make the *actual*",
+            "Python code raise an exception (e.g. `corrupt-container-op`'s",
+            "KeyError on a renamed dict key, `wrong-variable`'s NameError) are",
+            "recorded as an `exception` trace event by the real collector, but",
+            "the reference interpreter swallows the equivalent failure silently",
+            "(`_exec_stmt`/`_eval_guard` catch and count it, never emit a trace",
+            "event) -- so those operators sit at 1.000 while purely-logical",
+            "mutations (`early-return`, `negate-guard`) stay low. This is a",
+            "genuine, if narrow, self-mode detection channel worth keeping in",
+            "mind, not a contradiction of the self-referential-oracle finding.",
         ])
 
     return "\n".join(lines)
