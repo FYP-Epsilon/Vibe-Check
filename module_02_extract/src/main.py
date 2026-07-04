@@ -80,55 +80,32 @@ def _derive_v1_params(func_wir: dict) -> dict:
     }
 
 
-def _run_verification(source: str) -> dict:
+def _select_entry_function(functions: dict[str, Any]) -> str:
     """
-    Execute the full V3 → V2 → V1 pipeline on *source* and return the
-    aggregated certificate dictionary.
+    Pick the function to verify.
+
+    ``next(iter(functions))`` silently picked whichever function the
+    source *defines first* -- correct for the single-function test
+    fixtures this pipeline was originally built against, but wrong for
+    any multi-function source (e.g. eval/flowbench_adapter.py's generated
+    corpus, which emits task-API stub defs *before* the ``workflow`` def
+    they support): it verified a trivial stub, never the orchestration
+    logic. Prefer a function literally named "workflow"; fall back to
+    the first one so single-function sources are unaffected.
     """
-    # ------------------------------------------------------------------
-    # Normalize literal escapes and enforce size / complexity limits
-    # ------------------------------------------------------------------
-    source = source.replace('\\n', '\n').replace('\\t', '\t')
+    if "workflow" in functions:
+        return "workflow"
+    return next(iter(functions))
 
-    if len(source) > 50000:
-        raise ValueError("Source code exceeds maximum length of 50,000 characters.")
 
-    try:
-        tree = ast.parse(source)
-    except SyntaxError:
-        raise ValueError("Source code is not valid Python syntax.")
+def _derive_initial_inputs(tree: ast.Module, func_obj: Any) -> dict[str, Any]:
+    """
+    Derive a starting concrete input dict from *func_obj*'s type hints.
 
-    ast_node_count = len(list(ast.walk(tree)))
-    if ast_node_count > 5000:
-        raise ValueError("AST complexity exceeds maximum of 5,000 nodes.")
-
-    # ------------------------------------------------------------------
-    # Phase 1  --  Hardened Static AST Extraction (V3)
-    # ------------------------------------------------------------------
-    wir = run_v3_pipeline(source)
-    v3_cert = wir.get("certificate", {})
-
-    # ------------------------------------------------------------------
-    # Dynamically select the first function for V2 / V1
-    # ------------------------------------------------------------------
-    functions = wir.get("functions", {})
-    if not functions:
-        raise ValueError("No functions found in source — cannot verify.")
-
-    function_name = next(iter(functions))
-    func_wir = functions[function_name]
-    v1_params = _derive_v1_params(func_wir)
-
-    # ------------------------------------------------------------------
-    # Compile source once and share the namespace with V2 and V1
-    # ------------------------------------------------------------------
-    local_env: dict[str, Any] = {"__builtins__": SAFE_BUILTINS}
-    exec(compile(source, "<string>", "exec"), local_env)
-    func_obj = local_env[function_name]
-
-    # ------------------------------------------------------------------
-    # Derive initial inputs dynamically from function signature
-    # ------------------------------------------------------------------
+    Shared by the /verify pipeline and eval/calibrate.py's differential
+    mode so both seed str params with the same guard-literal heuristic
+    rather than duplicating this logic.
+    """
     try:
         type_hints = get_type_hints(func_obj)
     except Exception:
@@ -167,6 +144,59 @@ def _run_verification(source: str) -> dict:
             initial_inputs[param_name] = {}
         else:
             initial_inputs[param_name] = 0
+    return initial_inputs
+
+
+def _run_verification(source: str) -> dict:
+    """
+    Execute the full V3 → V2 → V1 pipeline on *source* and return the
+    aggregated certificate dictionary.
+    """
+    # ------------------------------------------------------------------
+    # Normalize literal escapes and enforce size / complexity limits
+    # ------------------------------------------------------------------
+    source = source.replace('\\n', '\n').replace('\\t', '\t')
+
+    if len(source) > 50000:
+        raise ValueError("Source code exceeds maximum length of 50,000 characters.")
+
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        raise ValueError("Source code is not valid Python syntax.")
+
+    ast_node_count = len(list(ast.walk(tree)))
+    if ast_node_count > 5000:
+        raise ValueError("AST complexity exceeds maximum of 5,000 nodes.")
+
+    # ------------------------------------------------------------------
+    # Phase 1  --  Hardened Static AST Extraction (V3)
+    # ------------------------------------------------------------------
+    wir = run_v3_pipeline(source)
+    v3_cert = wir.get("certificate", {})
+
+    # ------------------------------------------------------------------
+    # Dynamically select the first function for V2 / V1
+    # ------------------------------------------------------------------
+    functions = wir.get("functions", {})
+    if not functions:
+        raise ValueError("No functions found in source — cannot verify.")
+
+    function_name = _select_entry_function(functions)
+    func_wir = functions[function_name]
+    v1_params = _derive_v1_params(func_wir)
+
+    # ------------------------------------------------------------------
+    # Compile source once and share the namespace with V2 and V1
+    # ------------------------------------------------------------------
+    local_env: dict[str, Any] = {"__builtins__": SAFE_BUILTINS}
+    exec(compile(source, "<string>", "exec"), local_env)
+    func_obj = local_env[function_name]
+
+    # ------------------------------------------------------------------
+    # Derive initial inputs dynamically from function signature
+    # ------------------------------------------------------------------
+    initial_inputs = _derive_initial_inputs(tree, func_obj)
 
     # ------------------------------------------------------------------
     # Phase 2  --  Symbolic Refinement with Z3 (V2)

@@ -15,9 +15,38 @@ SRC = Path(__file__).resolve().parent.parent / "src"
 sys.path.insert(0, str(SRC))
 
 from ast_extractor import run_v3_pipeline
-from main import _derive_v1_params
+from main import _derive_v1_params, _select_entry_function, _run_verification
 from z3_sym_engine import run_v2_pipeline
 from dynamic_tracer import run_v1_pipeline, MultiModalCertificateComposer
+
+
+class TestSelectEntryFunction:
+    def test_prefers_workflow_over_definition_order(self):
+        """Regression: next(iter(functions)) picked whichever function a
+        source defines first. Every eval/flowbench_adapter.py-generated
+        program defines its task-API stub(s) before `workflow`, so this
+        silently verified a trivial stub instead of the orchestration
+        logic for the entire FLOW-BENCH corpus."""
+        functions = {"some_stub": {}, "workflow": {}, "another_stub": {}}
+        assert _select_entry_function(functions) == "workflow"
+
+    def test_falls_back_to_first_when_no_workflow(self):
+        """Single-function test fixtures (e.g. loan_approval.py) have no
+        function named "workflow" -- must still pick the only function."""
+        functions = {"process_loan_application": {}}
+        assert _select_entry_function(functions) == "process_loan_application"
+
+    def test_run_verification_targets_workflow_not_first_stub(self):
+        source = (
+            "def some_stub():\n    return {}\n"
+            "def workflow(x: int) -> int:\n"
+            "    if x > 0:\n        return 1\n    return 0\n"
+        )
+        result = _run_verification(source)
+        # If the stub (0 branches) had been selected, v3_coverage would
+        # reflect a 1-statement function, not workflow's if/return shape.
+        assert result["wir"]["functions"]["workflow"]["nodes"]  # sanity: exists
+        assert result["combined_confidence"] > 0.0
 
 
 class TestFullPipeline:
