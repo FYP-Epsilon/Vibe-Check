@@ -134,6 +134,20 @@ def _run_verification(source: str) -> dict:
     except Exception:
         type_hints = {}
 
+    # First guard-compared string literal in the source, if any -- gives V2's
+    # initial concrete input a value that can actually reach a string-guarded
+    # branch instead of always starting from "" (mirrors randomized.py's pool).
+    first_str_literal = next(
+        (
+            side.value
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Compare)
+            for side in (node.left, *node.comparators)
+            if isinstance(side, ast.Constant) and isinstance(side.value, str)
+        ),
+        "",
+    )
+
     sig = inspect.signature(func_obj)
     initial_inputs: dict[str, Any] = {}
     for param_name, param in sig.parameters.items():
@@ -146,7 +160,7 @@ def _run_verification(source: str) -> dict:
         elif ann is bool:
             initial_inputs[param_name] = False
         elif ann is str:
-            initial_inputs[param_name] = ""
+            initial_inputs[param_name] = first_str_literal
         elif ann is list or origin is list:
             initial_inputs[param_name] = []  # Prevent element-type crashes on untyped collections.
         elif ann is dict or origin is dict:

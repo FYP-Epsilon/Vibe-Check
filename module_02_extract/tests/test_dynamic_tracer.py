@@ -497,6 +497,35 @@ def classify(x, y):
         assert cert["input_coverage_score"] <= 1.0
         assert cert["input_coverage_score"] > 0.0
 
+    def test_string_pool_varies_str_param_across_runs(self):
+        """D1: str-typed params must not collapse to the same value on
+        every run -- the guard-literal pool must actually get sampled,
+        and non-matching junk values too, so both sides of a string guard
+        get exercised."""
+        source = 'def classify(status: str) -> str:\n    if status == "high":\n        return "A"\n    return "B"\n'
+        from ast_extractor import CFGExtractor
+        wir = CFGExtractor().extract(source)
+        func_wir = wir["functions"]["classify"]
+
+        tester = RandomizedDifferentialTester(
+            source=source,
+            function_name="classify",
+            wir=func_wir,
+            task_patterns=["classify"],
+            branch_lines={2},
+            control_variables=["status"],
+            n_runs=20,
+            seed=7,
+        )
+        assert tester._string_pool == ["high"]
+
+        seen = {tester._generate_random_inputs()["status"] for _ in range(20)}
+        assert len(seen) > 1
+        assert "high" in seen
+
+        cert = tester.run()
+        assert cert["input_coverage_score"] > 1 / 20
+
 
 # ----------------------------------------------------------------------
 # P3.5 -- MultiModalCertificateComposer
