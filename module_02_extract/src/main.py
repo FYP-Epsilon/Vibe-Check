@@ -98,6 +98,28 @@ def _select_entry_function(functions: dict[str, Any]) -> str:
     return next(iter(functions))
 
 
+def _derive_task_patterns(tree: ast.Module, entry_function: str) -> list[str]:
+    """
+    Task patterns for V1: the entry function plus every other function
+    defined at module level in the source.
+
+    Previously task_patterns was just [entry_function], so stub-call
+    assignments (e.g. ``incident = get_incident()``) were invisible to
+    both the actual-side collector (it only tracks functions matching a
+    task pattern) and the reference interpreter (E2) -- a drop-step
+    mutant that deleted a leaf stub call produced zero trace difference.
+    Single-function fixtures (loan_approval.py) are unaffected: this
+    degenerates to [entry_function] when there's nothing else defined.
+    """
+    others = [
+        node.name
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name != entry_function
+    ]
+    return [entry_function] + others
+
+
 def _derive_initial_inputs(tree: ast.Module, func_obj: Any) -> dict[str, Any]:
     """
     Derive a starting concrete input dict from *func_obj*'s type hints.
@@ -225,7 +247,7 @@ def _run_verification(source: str) -> dict:
         source=source,
         function_name=function_name,
         wir=func_wir,
-        task_patterns=[function_name],
+        task_patterns=_derive_task_patterns(tree, function_name),
         branch_lines=v1_params["branch_lines"],
         control_variables=v1_params["control_variables"],
         state_variables=v1_params["state_variables"] or None,

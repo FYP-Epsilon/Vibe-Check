@@ -39,6 +39,11 @@ class RandomizedDifferentialTester:
         self.function_name = function_name
         self.wir = wir
         self.task_patterns = task_patterns
+        # Stub/task names (besides the entry function itself) the reference
+        # interpreter should observe as synthetic task_entry/task_exit
+        # events (E2) -- lets stub-call assignments show up in the expected
+        # trace instead of being invisible WIR block statements.
+        self._stub_task_names: set[str] = set(task_patterns) - {function_name}
         self.branch_lines = branch_lines
         self.control_variables = control_variables
         self.state_variables = state_variables
@@ -149,8 +154,11 @@ class RandomizedDifferentialTester:
         """Execute the WIR reference interpreter."""
         # Share the tester's own compiled namespace (stub defs + SAFE_BUILTINS)
         # so WIR statements that call a task-API stub actually execute instead
-        # of silently NameError-ing (see WIRReferenceInterpreter.exec_env).
-        interpreter = WIRReferenceInterpreter(self.wir, exec_env=self._compiled_ns)
+        # of silently NameError-ing (see WIRReferenceInterpreter.exec_env), and
+        # observe those calls as task events (E2) so they're visible in the trace.
+        interpreter = WIRReferenceInterpreter(
+            self.wir, exec_env=self._compiled_ns, task_names=self._stub_task_names
+        )
         trace = interpreter.execute(inputs)
         # If the function name matches a task pattern, wrap the trace with
         # synthetic task-entry / task-exit events so it aligns with the
