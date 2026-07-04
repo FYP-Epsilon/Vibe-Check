@@ -288,6 +288,24 @@ class TestGuardExtractor:
         assert lit.negated is False
         assert lit.text == "x >= 5"
 
+    def test_not_call_fallback_no_warning(self):
+        """Guard fallback (Not wrapping a non-Compare/BoolOp node, e.g. a bare
+        call) must produce a real CNF literal and must not emit a
+        DeprecationWarning from the ast.UnaryOp constructor (regression for
+        the operand= vs value= kwarg bug)."""
+        import warnings
+        ge = GuardExtractor()
+        node = ast.parse("not some_call()", mode="eval").body
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", DeprecationWarning)
+            cnf = ge.extract(node)
+        assert cnf is not None
+        assert len(cnf) == 1
+        assert len(cnf[0]) == 1
+        lit = cnf[0][0]
+        assert lit.negated is True
+        assert lit.text == "not (some_call())"
+
     def test_ite_encoding_and(self):
         ge = GuardExtractor()
         node = ast.parse("a and b and c", mode="eval").body
