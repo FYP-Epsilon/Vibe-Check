@@ -206,19 +206,28 @@ class TestFullPipeline:
         This was investigated further with a differential-mode harness
         (eval/calibrate.py --mode differential: verify a mutant against its
         *base* program's WIR instead of one re-derived from the mutant
-        itself). That does NOT rescue logic-class detection either, for two
-        independently verified reasons documented in
-        eval/results/calibration_report_differential.md: (1) the reference
-        interpreter (WIRReferenceInterpreter._exec_stmt) cannot execute any
-        statement that calls a user-defined function -- it silently fails
-        and never populates state, so even a *correct* base program fails
-        its own differential check; (2) value-only mutations produce
-        identical trace shape regardless of which WIR is used as oracle,
-        since the real actual-side collector never carries a branch
-        decision field (see comparator.py's D3 commit). Full corpus run:
-        detection 0.432, false-alarm 0.392 (near-coin-flip, not a working
-        detector) -- see the report and session memory for the complete
-        layered diagnosis.
+        itself). An initial differential run did NOT rescue detection
+        either, for two independently verified reasons: (1) the reference
+        interpreter (WIRReferenceInterpreter._exec_stmt) couldn't execute
+        any statement that calls a user-defined function -- it silently
+        failed and never populated state, so even a *correct* base program
+        failed its own differential check; (2) value-only mutations
+        produced identical trace shape regardless of which WIR was used as
+        oracle, since stub-call assignments (WIR *block* statements) never
+        emitted a task_entry/task_exit event on either side.
+
+        Both were fixed in a follow-up session: E1 gave the reference
+        interpreter a real exec_env (stub defs + SAFE_BUILTINS) so it can
+        actually call stubs; E2 made stub calls observable as synthetic
+        task_entry/task_exit events on the reference side (mirroring the
+        real collector), derived from task_patterns that now include every
+        module-level function, not just the entry point. With both fixes,
+        differential mode IS a working detector on the FLOW-BENCH corpus:
+        Youden's J 0.0506 -> 0.8069, detection 0.432 -> 0.864, false-alarm
+        0.392 -> 0.059 (see eval/results/calibration_report_differential.md
+        and its "vs pre-alignment baseline" table). Self-mode above remains
+        architecturally limited as described -- that finding still stands;
+        it's specifically the differential-mode remedy that now works.
         """
         from main import _run_verification
 
