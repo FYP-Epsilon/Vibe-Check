@@ -50,7 +50,14 @@ class V3Certificate:
             "guard_success_rate": guard_rate,
             "unsupported_constructs": unsupported,
             "abort": abort,
-            "confidence": 1.0 if not abort and node_cov >= 0.95 else node_cov,
+            # NOTE: this is an extraction-fidelity score (how much of the AST
+            # was captured in the WIR), not a correctness signal. It must
+            # never saturate to 1.0 -- a saturated V3 confidence made the
+            # multi-modal OR-composition vacuous (any structurally
+            # extractable program passed, regardless of behavior). See
+            # MultiModalCertificateComposer.compose, which now treats V3 as
+            # a pass/fail gate rather than an OR-composed confidence term.
+            "confidence": node_cov,
             "message": (
                 "ABORT: node coverage below 0.95 threshold — manual review required."
                 if abort else "V3 structural extraction passed quality gate."

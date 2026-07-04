@@ -82,6 +82,39 @@ class TestFullPipeline:
         assert v3_cert["node_coverage"] > 0.5
         assert isinstance(final["passed"], bool)
 
+    def test_crash_mutation_fails(self):
+        """A crash-inducing mutation of the loan-approval program (introduces
+        a ZeroDivisionError on every execution path) must fail the full
+        V3->V2->V1 pipeline.
+
+        NOTE -- this does not generalize to pure logic-class mutations (e.g.
+        negating a guard's comparison operator without inducing a crash).
+        V1's oracle is a WIR reference interpreter re-derived from the same
+        (possibly mutated) source, and the trace comparator discards branch
+        decisions when matching (comparator.py _normalise keeps only
+        ("branch_point",)), so actual and expected diverge identically under
+        a pure logic mutation and v1 stays saturated at 1.0 -- verified
+        empirically on this program with guard-negation, boundary-shift, and
+        constant-perturb mutations, all of which left v1=1.0 and left v2
+        unchanged from the correct-program baseline. Only a mutation that
+        changes runtime behavior observably (a crash, here) moves the
+        verdict. Quantifying detection power by mutation-operator class is
+        what the FLOW-BENCH mutation corpus and calibration run (eval/)
+        measure.
+        """
+        from main import _run_verification
+
+        input_path = Path(__file__).resolve().parent.parent / "inputs" / "loan_approval.py"
+        source = input_path.read_text(encoding="utf-8")
+        mutated = source.replace(
+            'temp_audit_log = f"Processed {approved_amount} for score {credit_score}"',
+            "temp_audit_log = 1 / (credit_score - credit_score)",
+        )
+        assert mutated != source
+
+        result = _run_verification(mutated)
+        assert result["passed"] is False
+
 
     def test_infinite_loop_rejected(self):
         source = "def f():\n    while True:\n        pass"
