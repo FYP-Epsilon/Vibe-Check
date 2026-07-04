@@ -43,7 +43,7 @@ sys.path.insert(0, str(MODULE02_DIR / "src"))
 
 from main import (  # noqa: E402
     _run_verification, _derive_v1_params, _derive_initial_inputs,
-    _select_entry_function, SAFE_BUILTINS,
+    _select_entry_function, _derive_task_patterns, SAFE_BUILTINS,
 )
 from ast_extractor import run_v3_pipeline  # noqa: E402
 from z3_sym_engine import run_v2_pipeline  # noqa: E402
@@ -209,14 +209,15 @@ def run_differential_verification(mutant_source: str, base_func_wir: dict[str, A
     except Exception as e:
         return {"combined_confidence": 0.0, "passed": False, "message": f"mutant failed to compile/exec: {e}"}
 
+    mutant_tree = ast.parse(mutant_source)
     v1_params = _derive_v1_params(base_func_wir)
-    initial_inputs = _derive_initial_inputs(ast.parse(mutant_source), func_obj)
+    initial_inputs = _derive_initial_inputs(mutant_tree, func_obj)
 
     v1_cert = run_v1_pipeline(
         source=mutant_source,
         function_name=function_name,
         wir=base_func_wir,
-        task_patterns=[function_name],
+        task_patterns=_derive_task_patterns(mutant_tree, function_name),
         branch_lines=v1_params["branch_lines"],
         control_variables=v1_params["control_variables"],
         state_variables=v1_params["state_variables"] or None,

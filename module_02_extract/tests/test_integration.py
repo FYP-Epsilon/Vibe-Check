@@ -7,6 +7,7 @@ Runs the full V3 -> V2 -> V1 pipeline on the loan_approval sample
 and asserts aggregate certificate properties.
 """
 
+import ast
 import sys
 from pathlib import Path
 
@@ -15,7 +16,7 @@ SRC = Path(__file__).resolve().parent.parent / "src"
 sys.path.insert(0, str(SRC))
 
 from ast_extractor import run_v3_pipeline
-from main import _derive_v1_params, _select_entry_function, _run_verification
+from main import _derive_v1_params, _select_entry_function, _derive_task_patterns, _run_verification
 from z3_sym_engine import run_v2_pipeline
 from dynamic_tracer import run_v1_pipeline, MultiModalCertificateComposer
 
@@ -47,6 +48,79 @@ class TestSelectEntryFunction:
         # reflect a 1-statement function, not workflow's if/return shape.
         assert result["wir"]["functions"]["workflow"]["nodes"]  # sanity: exists
         assert result["combined_confidence"] > 0.0
+
+
+class TestTaskObservabilityAlignment:
+    """E2 acceptance test -- the session's real definition of done.
+
+    Stub-call assignments (``a = stub_a()``) are WIR *block* statements,
+    not "task"-type nodes, so before E1+E2 they were completely invisible
+    to the differential comparison: the reference interpreter couldn't
+    execute them (E1), and even once it could, neither side emitted a
+    task_entry/task_exit event for them (E2). A drop-step mutant deleting
+    one produced zero trace difference against the base program's WIR.
+    """
+
+    BASE_SOURCE = (
+        "def stub_a():\n    return {}\n\n\n"
+        "def stub_b():\n    return {}\n\n\n"
+        "def stub_high():\n    return {}\n\n\n"
+        "def stub_low():\n    return {}\n\n\n"
+        "def workflow(status: str) -> int:\n"
+        "    a = stub_a()\n"
+        "    b = stub_b()\n"
+        "    if status == \"high\":\n"
+        "        c = stub_high()\n"
+        "    else:\n"
+        "        c = stub_low()\n"
+        "    return 0\n"
+    )
+
+    def _verify_against_base(self, mutant_source: str, base_func_wir: dict, task_patterns: list[str]) -> dict:
+        local_env = {"__builtins__": __builtins__}
+        exec(compile(mutant_source, "<string>", "exec"), local_env)
+        v1_params = _derive_v1_params(base_func_wir)
+        return run_v1_pipeline(
+            source=mutant_source,
+            function_name="workflow",
+            wir=base_func_wir,
+            task_patterns=task_patterns,
+            branch_lines=v1_params["branch_lines"],
+            control_variables=v1_params["control_variables"],
+            state_variables=v1_params["state_variables"] or None,
+            n_runs=20,
+            seed=1,
+            compiled_ns=local_env,
+        )
+
+    def _base_wir_and_patterns(self):
+        wir = run_v3_pipeline(self.BASE_SOURCE)
+        base_func_wir = wir["functions"]["workflow"]
+        task_patterns = _derive_task_patterns(ast.parse(self.BASE_SOURCE), "workflow")
+        return base_func_wir, task_patterns
+
+    def test_base_vs_itself_is_clean(self):
+        base_func_wir, task_patterns = self._base_wir_and_patterns()
+        cert = self._verify_against_base(self.BASE_SOURCE, base_func_wir, task_patterns)
+        assert cert["matching_traces"] == cert["total_runs"]
+
+    def test_drop_step_detected_against_base_wir(self):
+        base_func_wir, task_patterns = self._base_wir_and_patterns()
+        mutant = self.BASE_SOURCE.replace("    b = stub_b()\n", "")
+        assert mutant != self.BASE_SOURCE
+
+        base_cert = self._verify_against_base(self.BASE_SOURCE, base_func_wir, task_patterns)
+        mutant_cert = self._verify_against_base(mutant, base_func_wir, task_patterns)
+        assert mutant_cert["matching_traces"] < base_cert["matching_traces"]
+
+    def test_branch_divergence_detected_against_base_wir(self):
+        base_func_wir, task_patterns = self._base_wir_and_patterns()
+        mutant = self.BASE_SOURCE.replace('if status == "high":', 'if not (status == "high"):')
+        assert mutant != self.BASE_SOURCE
+
+        base_cert = self._verify_against_base(self.BASE_SOURCE, base_func_wir, task_patterns)
+        mutant_cert = self._verify_against_base(mutant, base_func_wir, task_patterns)
+        assert mutant_cert["matching_traces"] < base_cert["matching_traces"]
 
 
 class TestFullPipeline:
