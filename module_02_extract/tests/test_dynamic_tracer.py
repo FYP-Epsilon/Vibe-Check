@@ -486,6 +486,30 @@ class TestMultiModalCertificateComposer:
         result = MultiModalCertificateComposer.compose(v1, v2, v3)
         assert result["combined_confidence"] == pytest.approx(0.9, 0.001)
 
+    def test_v3_confidence_excluded_from_combined_formula(self):
+        """V3 is extraction fidelity, not a correctness signal -- it must not
+        enter the OR-composition. combined_confidence depends only on v1/v2."""
+        v1 = {"confidence": 0.8}
+        v2 = {"confidence": 0.5}
+        low_v3 = {"confidence": 0.1, "abort": False}
+        high_v3 = {"confidence": 0.99, "abort": False}
+        result_low = MultiModalCertificateComposer.compose(v1, v2, low_v3)
+        result_high = MultiModalCertificateComposer.compose(v1, v2, high_v3)
+        expected = 1.0 - (1.0 - 0.8) * (1.0 - 0.5)
+        assert result_low["combined_confidence"] == pytest.approx(expected, 0.001)
+        assert result_high["combined_confidence"] == pytest.approx(expected, 0.001)
+
+    def test_v3_abort_gates_regardless_of_v1_v2(self):
+        """A low-fidelity WIR (V3 abort) means V1/V2 ran against an unfaithful
+        model -- the result must fail even when v1/v2 are both saturated."""
+        v1 = {"confidence": 1.0}
+        v2 = {"confidence": 1.0}
+        v3 = {"confidence": 0.5, "abort": True}
+        result = MultiModalCertificateComposer.compose(v1, v2, v3)
+        assert result["combined_confidence"] == pytest.approx(1.0, 0.001)
+        assert result["passed"] is False
+        assert result["v3_abort"] is True
+
 
 # ----------------------------------------------------------------------
 # Orchestrator

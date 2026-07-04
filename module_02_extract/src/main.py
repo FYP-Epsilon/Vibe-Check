@@ -199,6 +199,7 @@ def _run_verification(source: str) -> dict:
     # Normalise to the wire format expected by the UI
     return {
         "v3_coverage": v3_cert.get("node_coverage", 0.0),
+        "v3_abort": final.get("v3_abort", False),
         "v2_confidence": final.get("v2_confidence", 0.0),
         "v1_confidence": final.get("v1_confidence", 0.0),
         "combined_confidence": final.get("combined_confidence", 0.0),
