@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from typing import Any, Callable, Optional, get_type_hints
-from .safe_exec import _safe_eval
+from .safe_exec import _safe_eval, SAFE_BUILTINS
 
 
 class WIRReferenceInterpreter:
@@ -19,13 +19,28 @@ class WIRReferenceInterpreter:
     actual execution trace is compared.
     """
 
-    def __init__(self, wir: dict[str, Any]) -> None:
+    def __init__(self, wir: dict[str, Any], exec_env: Optional[dict[str, Any]] = None) -> None:
         self.wir = wir
         self.nodes: dict[str, dict[str, Any]] = {
             n["id"]: n for n in wir.get("nodes", [])
         }
         self.trace_log: list[dict[str, Any]] = []
         self._for_iterators: dict[str, dict] = {}
+        # Execution environment for WIR statement strings. Without this, an
+        # assignment that calls a user-defined function (e.g. a task-API
+        # stub) silently NameErrors and never populates state -- passing the
+        # tester's own compiled namespace (stub defs + SAFE_BUILTINS) here
+        # lets those assignments actually run. None preserves the original
+        # empty-builtins behavior for callers that don't supply one.
+        if exec_env is not None:
+            self._exec_globals: dict[str, Any] = dict(exec_env)
+            self._exec_globals.setdefault("__builtins__", SAFE_BUILTINS)
+        else:
+            self._exec_globals = {"__builtins__": {}}
+        # Counts _exec_stmt/_eval_guard failures so a reference execution
+        # that fails on every statement can't silently look like a clean,
+        # simply-short trace.
+        self.exec_errors: int = 0
 
     def execute(self, inputs: dict[str, Any]) -> list[dict[str, Any]]:
         """
@@ -50,6 +65,11 @@ class WIRReferenceInterpreter:
         if steps >= max_steps:
             self.trace_log.append(
                 {"event": "_warning", "message": "Step limit exceeded — possible infinite loop."}
+            )
+
+        if self.exec_errors:
+            self.trace_log.append(
+                {"event": "_exec_errors", "count": self.exec_errors}
             )
 
         return self.trace_log
@@ -171,14 +191,15 @@ class WIRReferenceInterpreter:
         try:
             return bool(_safe_eval(expr, state))
         except (NameError, KeyError):
+            self.exec_errors += 1
             return False
         except Exception:
             # Permissive fallback: guard assumed False on error.
+            self.exec_errors += 1
             return False
 
-    @staticmethod
-    def _exec_stmt(stmt: str, state: dict[str, Any]) -> None:
+    def _exec_stmt(self, stmt: str, state: dict[str, Any]) -> None:
         try:
-            exec(stmt, {"__builtins__": {}}, state)
+            exec(stmt, self._exec_globals, state)
         except Exception:
-            pass
+            self.exec_errors += 1

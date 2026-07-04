@@ -332,6 +332,46 @@ class TestWIRReferenceInterpreter:
         # Should evaluate loop condition at least 3 times (enter 3x, exit 1x)
         assert len(branch_events) >= 2
 
+    def test_exec_env_lets_stub_call_populate_state(self):
+        """E1: a stub-call assignment must actually run when exec_env is
+        supplied, so a guard reading the stub's return value evaluates
+        correctly instead of falling to the permissive-False default."""
+        wir = self._make_wir(
+            [
+                {"id": "e", "type": "entry", "successors": ["b"]},
+                {"id": "b", "type": "block", "code": ["incident = get_incident()"], "successors": ["g"]},
+                {
+                    "id": "g",
+                    "type": "gateway",
+                    "guard": "incident['impact'] == 'high'",
+                    "code": ["gateway"],
+                    "successors": ["t", "f"],
+                },
+                {"id": "t", "type": "block", "code": ["y = 1"], "successors": ["x"]},
+                {"id": "f", "type": "block", "code": ["y = 2"], "successors": ["x"]},
+                {"id": "x", "type": "exit", "successors": []},
+            ],
+            "e",
+            "x",
+        )
+
+        def get_incident():
+            return {"impact": "high"}
+
+        exec_env = {"__builtins__": {}, "get_incident": get_incident}
+
+        # Without exec_env: the stub call NameErrors, guard falls back to False.
+        interp_old = WIRReferenceInterpreter(wir)
+        trace_old = interp_old.execute({})
+        assert any(e["event"] == "branch_point" and e["taken_branch"] is False for e in trace_old)
+        assert interp_old.exec_errors > 0
+
+        # With exec_env: the stub call succeeds, guard correctly evaluates True.
+        interp_new = WIRReferenceInterpreter(wir, exec_env=exec_env)
+        trace_new = interp_new.execute({})
+        assert any(e["event"] == "branch_point" and e["taken_branch"] is True for e in trace_new)
+        assert interp_new.exec_errors == 0
+
 
 # ----------------------------------------------------------------------
 # P3.3 -- DifferentialComparator
