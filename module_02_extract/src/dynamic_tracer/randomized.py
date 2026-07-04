@@ -147,7 +147,10 @@ class RandomizedDifferentialTester:
 
     def _run_expected(self, inputs: dict[str, Any]) -> list[dict[str, Any]]:
         """Execute the WIR reference interpreter."""
-        interpreter = WIRReferenceInterpreter(self.wir)
+        # Share the tester's own compiled namespace (stub defs + SAFE_BUILTINS)
+        # so WIR statements that call a task-API stub actually execute instead
+        # of silently NameError-ing (see WIRReferenceInterpreter.exec_env).
+        interpreter = WIRReferenceInterpreter(self.wir, exec_env=self._compiled_ns)
         trace = interpreter.execute(inputs)
         # If the function name matches a task pattern, wrap the trace with
         # synthetic task-entry / task-exit events so it aligns with the
