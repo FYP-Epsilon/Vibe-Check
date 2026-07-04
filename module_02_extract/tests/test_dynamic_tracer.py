@@ -403,6 +403,46 @@ class TestDifferentialComparator:
         b = [("A",), ("C",), ("D",)]
         assert DifferentialComparator._lcs(a, b) == 2
 
+    def test_branch_decision_compared_when_present_on_both_sides(self):
+        """When every branch_point event on BOTH sides carries taken_branch,
+        a differing decision must lower similarity below 1.0 (D3)."""
+        actual = [
+            {"event": "task_entry", "function": "foo"},
+            {"event": "branch_point", "function": "foo", "taken_branch": True},
+            {"event": "task_exit", "function": "foo"},
+        ]
+        expected_same = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "branch_point", "task": "foo", "taken_branch": True},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        expected_diff = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "branch_point", "task": "foo", "taken_branch": False},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        same_result = DifferentialComparator(actual, expected_same).compare()
+        diff_result = DifferentialComparator(actual, expected_diff).compare()
+        assert same_result["similarity_score"] == 1.0
+        assert diff_result["similarity_score"] < 1.0
+
+    def test_branch_decision_ignored_when_actual_side_lacks_it(self):
+        """Real actual-side traces (from collector.py) never carry
+        taken_branch -- this must stay a no-op fallback, not a mismatch,
+        so unmutated programs still get similarity 1.0 (no regression)."""
+        actual = [
+            {"event": "task_entry", "function": "foo"},
+            {"event": "branch_point", "function": "foo"},  # no taken_branch
+            {"event": "task_exit", "function": "foo"},
+        ]
+        expected = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "branch_point", "task": "foo", "taken_branch": True},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        result = DifferentialComparator(actual, expected).compare()
+        assert result["similarity_score"] == 1.0
+
 
 # ----------------------------------------------------------------------
 # P3.4 -- RandomizedDifferentialTester
