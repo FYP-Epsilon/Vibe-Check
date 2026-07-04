@@ -246,6 +246,16 @@ class TestBoundedConcolicEngine:
         result = engine._execute_concrete({"x": 5})
         assert result == 6
 
+    def test_external_wir_skips_reextraction(self):
+        """D4: an externally supplied wir (differential mode's base-program
+        spec) must be used as-is, not re-extracted from source."""
+        base_source = "def foo(x):\n    if x > 0:\n        return 1\n    return 0"
+        base_wir = CFGExtractor().extract(base_source)
+
+        mutant_source = "def foo(x):\n    if x > 100:\n        return 1\n    return 0"
+        engine = BoundedConcolicEngine(mutant_source, "foo", max_k=3, query_budget=10, wir=base_wir)
+        assert engine.wir is base_wir
+
     def test_negate_last_branch(self):
         source = "def foo(x):\n    if x > 0:\n        return 1\n    return 0"
         engine = BoundedConcolicEngine(source, "foo", max_k=3, query_budget=10)
