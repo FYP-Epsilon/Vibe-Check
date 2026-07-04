@@ -127,9 +127,24 @@ class TestFullPipeline:
         constant-perturb mutations, all of which left v1=1.0 and left v2
         unchanged from the correct-program baseline. Only a mutation that
         changes runtime behavior observably (a crash, here) moves the
-        verdict. Quantifying detection power by mutation-operator class is
-        what the FLOW-BENCH mutation corpus and calibration run (eval/)
-        measure.
+        verdict.
+
+        This was investigated further with a differential-mode harness
+        (eval/calibrate.py --mode differential: verify a mutant against its
+        *base* program's WIR instead of one re-derived from the mutant
+        itself). That does NOT rescue logic-class detection either, for two
+        independently verified reasons documented in
+        eval/results/calibration_report_differential.md: (1) the reference
+        interpreter (WIRReferenceInterpreter._exec_stmt) cannot execute any
+        statement that calls a user-defined function -- it silently fails
+        and never populates state, so even a *correct* base program fails
+        its own differential check; (2) value-only mutations produce
+        identical trace shape regardless of which WIR is used as oracle,
+        since the real actual-side collector never carries a branch
+        decision field (see comparator.py's D3 commit). Full corpus run:
+        detection 0.432, false-alarm 0.392 (near-coin-flip, not a working
+        detector) -- see the report and session memory for the complete
+        layered diagnosis.
         """
         from main import _run_verification
 
