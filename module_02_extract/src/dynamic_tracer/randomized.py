@@ -55,6 +55,11 @@ class RandomizedDifferentialTester:
 
         # Extract argument names from the AST so we know what to generate.
         self.arg_names = self._extract_arg_names()
+        # String literal pool for guard-varying str params (D1): the empty
+        # string alone means EVERY str param gets the identical input on
+        # every run, collapsing input_coverage_score to 1/n_runs regardless
+        # of program correctness. See [[session_2026_07_04_t1_t7_implementation]].
+        self._string_pool = self._extract_string_pool()
 
     def _extract_arg_names(self) -> list[str]:
         tree = ast.parse(self.source)
@@ -63,6 +68,22 @@ class RandomizedDifferentialTester:
                 if node.name == self.function_name:
                     return [a.arg for a in node.args.args]
         return []
+
+    def _extract_string_pool(self) -> list[str]:
+        """Every string literal compared against something in the source --
+        these are the guard-controlling values (e.g. "high", "urgent") that
+        an input actually needs to hit to exercise both sides of a branch."""
+        pool: set[str] = set()
+        try:
+            tree = ast.parse(self.source)
+        except SyntaxError:
+            return []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Compare):
+                for side in (node.left, *node.comparators):
+                    if isinstance(side, ast.Constant) and isinstance(side.value, str):
+                        pool.add(side.value)
+        return sorted(pool)
 
     def _generate_random_inputs(self) -> dict[str, Any]:
         """Produce a random concrete input dict for the target function."""
@@ -84,7 +105,13 @@ class RandomizedDifferentialTester:
             elif ann is bool:
                 inputs[param_name] = random.choice([True, False])
             elif ann is str:
-                inputs[param_name] = ""
+                # Sample from the guard-literal pool (so both sides of every
+                # string guard actually get exercised) plus "" and a random
+                # non-matching junk string (so unguarded/else paths still
+                # get hit too). A uniformly random string alone would almost
+                # never equal a specific guard literal like "high".
+                choices = self._string_pool + ["", f"junk_{random.randint(0, 10**6)}"]
+                inputs[param_name] = random.choice(choices)
             elif ann is dict or origin is dict:
                 inputs[param_name] = {
                     f"role_{i}": random.randint(1, 5)
