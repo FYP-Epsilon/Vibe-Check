@@ -1,0 +1,14 @@
+def Microsoft_Power_BI_Workspace__2_0_0__retrievewithwhere_Workspace():
+    return {}
+
+def Microsoft_Power_BI_Goal__2_0_0__retrievewithwhere_Goal():
+    return {}
+
+def Microsoft_Power_BI_Scorecard__2_0_0__retrievewithwhere_Scorecard():
+    return {}
+
+def workflow():
+    scorecards = Microsoft_Power_BI_Scorecard__2_0_0__retrievewithwhere_Scorecard()
+    workspaces = Microsoft_Power_BI_Workspace__2_0_0__retrievewithwhere_Workspace()
+    goals = Microsoft_Power_BI_Goal__2_0_0__retrievewithwhere_Goal()
+    return None
