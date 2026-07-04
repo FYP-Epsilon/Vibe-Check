@@ -85,7 +85,7 @@ class GuardExtractor:
 
         if negated:
             # Generic fallback: wrap in UnaryOp Not
-            return ast.UnaryOp(op=ast.Not(), value=node)
+            return ast.UnaryOp(op=ast.Not(), operand=node)
 
         return node
 
@@ -113,7 +113,7 @@ class GuardExtractor:
             inv = mapping.get(type(op))
             if inv is None:
                 # Fallback: wrap whole compare in not
-                return ast.UnaryOp(op=ast.Not(), value=node)  # type: ignore[return-value]
+                return ast.UnaryOp(op=ast.Not(), operand=node)  # type: ignore[return-value]
             new_ops.append(inv())
         return ast.Compare(left=node.left, ops=new_ops, comparators=node.comparators)
 
@@ -160,7 +160,7 @@ class GuardExtractor:
         """Create a Literal from an atomic AST node."""
         negated = isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not)
         if negated:
-            inner = node.value  # type: ignore[attr-defined]
+            inner = node.operand
             text = f"not ({_unparse(inner)})"
             vars_involved = _collect_vars(inner)
             return Literal(negated=True, ast_node=inner, text=text, vars_involved=vars_involved)
