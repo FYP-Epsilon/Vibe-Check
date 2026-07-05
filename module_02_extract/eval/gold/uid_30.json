@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "files = Box_File__3_0_0__retrievewithwhere_File(files_owned_by_0=files_owned_by_0, files_owned_by_1=files_owned_by_1)"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for file in files"
+    },
+    {
+      "gold_id": "g3",
+      "type": "gateway",
+      "code": "file['owned_by'] == user"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "boxfile = Box_File__3_0_0__deletewithwhere_File()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "block",
+      "code": "issue = Jira_Issue__2_0_0__create_Issue()"
+    },
+    {
+      "gold_id": "g6",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g5",
+      "dst_gold_id": "g6",
+      "label": "seq"
+    }
+  ]
+}

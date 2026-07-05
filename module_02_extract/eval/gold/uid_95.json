@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "contacts = Salesforce_Contact__5_0_0__retrievewithwhere_Contact(contacts_CleanStatus_0=contacts_CleanStatus_0, contacts_CleanStatus_1=contacts_CleanStatus_1)"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for contact in contacts"
+    },
+    {
+      "gold_id": "g3",
+      "type": "gateway",
+      "code": "contact['CleanStatus'] == 'new'"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "updated_contact = Salesforce_Contact__5_0_0__updatewithwhere_Contact()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "block",
+      "code": "task = user_task('check compliance')"
+    },
+    {
+      "gold_id": "g6",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g5",
+      "label": "false"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g5",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g6",
+      "label": "seq"
+    }
+  ]
+}

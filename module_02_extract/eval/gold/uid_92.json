@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "buckets = Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket(buckets_name_0=buckets_name_0, buckets_name_1=buckets_name_1)"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for bucket in buckets"
+    },
+    {
+      "gold_id": "g3",
+      "type": "gateway",
+      "code": "bucket['name'] == 'non-compliant'"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "delete_object = Amazon_S3_object__2_0_0__deletewithwhere_object()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "block",
+      "code": "notification = Amazon_SNS_Topic__3_0_0__PUBLISHMESSAGEONTOPIC_Topic()"
+    },
+    {
+      "gold_id": "g6",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g5",
+      "label": "false"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g5",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g6",
+      "label": "seq"
+    }
+  ]
+}

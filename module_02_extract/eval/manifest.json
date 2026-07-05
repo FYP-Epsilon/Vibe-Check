@@ -1117,14 +1117,6 @@
   },
   {
     "base_uid": 1,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/1__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 1,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -1191,14 +1183,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/2__corrupt-container-op__subscript_line19__key__impact__.py"
-  },
-  {
-    "base_uid": 2,
-    "operator": "early-return",
-    "site": "before_last@line24",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/2__early-return__before_last_line24.py"
   },
   {
     "base_uid": 2,
@@ -1270,14 +1254,6 @@
   },
   {
     "base_uid": 3,
-    "operator": "early-return",
-    "site": "before_last@line18",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/3__early-return__before_last_line18.py"
-  },
-  {
-    "base_uid": 3,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -1343,14 +1319,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/4__corrupt-container-op__subscript_line20__key__priority__.py"
-  },
-  {
-    "base_uid": 4,
-    "operator": "early-return",
-    "site": "before_last@line25",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/4__early-return__before_last_line25.py"
   },
   {
     "base_uid": 4,
@@ -1420,14 +1388,6 @@
   },
   {
     "base_uid": 5,
-    "operator": "early-return",
-    "site": "before_last@line18",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/5__early-return__before_last_line18.py"
-  },
-  {
-    "base_uid": 5,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -1490,14 +1450,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 6,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/6__early-return__before_last_line17.py"
   },
   {
     "base_uid": 6,
@@ -1567,14 +1519,6 @@
   },
   {
     "base_uid": 7,
-    "operator": "early-return",
-    "site": "before_last@line18",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/7__early-return__before_last_line18.py"
-  },
-  {
-    "base_uid": 7,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -1637,14 +1581,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 8,
-    "operator": "early-return",
-    "site": "before_last@line18",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/8__early-return__before_last_line18.py"
   },
   {
     "base_uid": 8,
@@ -1716,14 +1652,6 @@
   },
   {
     "base_uid": 9,
-    "operator": "early-return",
-    "site": "before_last@line26",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/9__early-return__before_last_line26.py"
-  },
-  {
-    "base_uid": 9,
     "operator": "constant-perturb",
     "site": "compare@line24 ('abc'->'abc_MUTATED')",
     "applicable": true,
@@ -1790,14 +1718,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/10__corrupt-container-op__subscript_line22__key__size__.py"
-  },
-  {
-    "base_uid": 10,
-    "operator": "early-return",
-    "site": "before_last@line24",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/10__early-return__before_last_line24.py"
   },
   {
     "base_uid": 10,
@@ -1871,14 +1791,6 @@
   },
   {
     "base_uid": 11,
-    "operator": "early-return",
-    "site": "before_last@line24",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/11__early-return__before_last_line24.py"
-  },
-  {
-    "base_uid": 11,
     "operator": "constant-perturb",
     "site": "compare@line19 ('high'->'high_MUTATED')",
     "applicable": true,
@@ -1945,14 +1857,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/12__corrupt-container-op__subscript_line20__key__name__.py"
-  },
-  {
-    "base_uid": 12,
-    "operator": "early-return",
-    "site": "before_last@line24",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/12__early-return__before_last_line24.py"
   },
   {
     "base_uid": 12,
@@ -2025,14 +1929,6 @@
   },
   {
     "base_uid": 13,
-    "operator": "early-return",
-    "site": "before_last@line30",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/13__early-return__before_last_line30.py"
-  },
-  {
-    "base_uid": 13,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -2098,14 +1994,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/14__corrupt-container-op__subscript_line16__key__type__.py"
-  },
-  {
-    "base_uid": 14,
-    "operator": "early-return",
-    "site": "before_last@line19",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/14__early-return__before_last_line19.py"
   },
   {
     "base_uid": 14,
@@ -2178,14 +2066,6 @@
   },
   {
     "base_uid": 15,
-    "operator": "early-return",
-    "site": "before_last@line20",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/15__early-return__before_last_line20.py"
-  },
-  {
-    "base_uid": 15,
     "operator": "constant-perturb",
     "site": "compare@line16 ('customer'->'customer_MUTATED')",
     "applicable": true,
@@ -2252,14 +2132,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/16__corrupt-container-op__subscript_line16__key__name__.py"
-  },
-  {
-    "base_uid": 16,
-    "operator": "early-return",
-    "site": "before_last@line20",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/16__early-return__before_last_line20.py"
   },
   {
     "base_uid": 16,
@@ -2332,14 +2204,6 @@
   },
   {
     "base_uid": 17,
-    "operator": "early-return",
-    "site": "before_last@line14",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/17__early-return__before_last_line14.py"
-  },
-  {
-    "base_uid": 17,
     "operator": "constant-perturb",
     "site": "compare@line12 ('critical'->'critical_MUTATED')",
     "applicable": true,
@@ -2406,14 +2270,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/18__corrupt-container-op__subscript_line16__key__topicarn__.py"
-  },
-  {
-    "base_uid": 18,
-    "operator": "early-return",
-    "site": "before_last@line19",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/18__early-return__before_last_line19.py"
   },
   {
     "base_uid": 18,
@@ -2486,14 +2342,6 @@
   },
   {
     "base_uid": 19,
-    "operator": "early-return",
-    "site": "before_last@line24",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/19__early-return__before_last_line24.py"
-  },
-  {
-    "base_uid": 19,
     "operator": "constant-perturb",
     "site": "compare@line20 ('critical'->'critical_MUTATED')",
     "applicable": true,
@@ -2560,14 +2408,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/20__corrupt-container-op__subscript_line12__key__type__.py"
-  },
-  {
-    "base_uid": 20,
-    "operator": "early-return",
-    "site": "before_last@line14",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/20__early-return__before_last_line14.py"
   },
   {
     "base_uid": 20,
@@ -2640,14 +2480,6 @@
   },
   {
     "base_uid": 21,
-    "operator": "early-return",
-    "site": "before_last@line19",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/21__early-return__before_last_line19.py"
-  },
-  {
-    "base_uid": 21,
     "operator": "constant-perturb",
     "site": "compare@line16 ('critical'->'critical_MUTATED')",
     "applicable": true,
@@ -2711,14 +2543,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 22,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/22__early-return__before_last_line17.py"
   },
   {
     "base_uid": 22,
@@ -2787,14 +2611,6 @@
   },
   {
     "base_uid": 23,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/23__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 23,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -2857,14 +2673,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 24,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/24__early-return__before_last_line17.py"
   },
   {
     "base_uid": 24,
@@ -2934,14 +2742,6 @@
   },
   {
     "base_uid": 25,
-    "operator": "early-return",
-    "site": "before_last@line13",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/25__early-return__before_last_line13.py"
-  },
-  {
-    "base_uid": 25,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -3008,14 +2808,6 @@
   },
   {
     "base_uid": 26,
-    "operator": "early-return",
-    "site": "before_last@line13",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/26__early-return__before_last_line13.py"
-  },
-  {
-    "base_uid": 26,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -3078,14 +2870,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 27,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/27__early-return__before_last_line17.py"
   },
   {
     "base_uid": 27,
@@ -3157,14 +2941,6 @@
   },
   {
     "base_uid": 28,
-    "operator": "early-return",
-    "site": "before_last@line14",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/28__early-return__before_last_line14.py"
-  },
-  {
-    "base_uid": 28,
     "operator": "constant-perturb",
     "site": "compare@line12 ('hot'->'hot_MUTATED')",
     "applicable": true,
@@ -3228,14 +3004,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 29,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/29__early-return__before_last_line22.py"
   },
   {
     "base_uid": 29,
@@ -3307,14 +3075,6 @@
   },
   {
     "base_uid": 30,
-    "operator": "early-return",
-    "site": "before_last@line19",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/30__early-return__before_last_line19.py"
-  },
-  {
-    "base_uid": 30,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -3378,14 +3138,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 31,
-    "operator": "early-return",
-    "site": "before_last@line18",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/31__early-return__before_last_line18.py"
   },
   {
     "base_uid": 31,
@@ -3454,14 +3206,6 @@
   },
   {
     "base_uid": 32,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/32__early-return__before_last_line17.py"
-  },
-  {
-    "base_uid": 32,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -3524,14 +3268,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 33,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/33__early-return__before_last_line12.py"
   },
   {
     "base_uid": 33,
@@ -3600,14 +3336,6 @@
   },
   {
     "base_uid": 34,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/34__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 34,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -3670,14 +3398,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 35,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/35__early-return__before_last_line17.py"
   },
   {
     "base_uid": 35,
@@ -3746,14 +3466,6 @@
   },
   {
     "base_uid": 36,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/36__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 36,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -3816,14 +3528,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 37,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/37__early-return__before_last_line17.py"
   },
   {
     "base_uid": 37,
@@ -3892,14 +3596,6 @@
   },
   {
     "base_uid": 38,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/38__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 38,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -3965,14 +3661,6 @@
   },
   {
     "base_uid": 39,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/39__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 39,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -4034,14 +3722,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 40,
-    "operator": "early-return",
-    "site": "before_last@line7",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/40__early-return__before_last_line7.py"
   },
   {
     "base_uid": 40,
@@ -4110,14 +3790,6 @@
   },
   {
     "base_uid": 41,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/41__early-return__before_last_line17.py"
-  },
-  {
-    "base_uid": 41,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -4180,14 +3852,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 42,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/42__early-return__before_last_line12.py"
   },
   {
     "base_uid": 42,
@@ -4256,14 +3920,6 @@
   },
   {
     "base_uid": 43,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/43__early-return__before_last_line22.py"
-  },
-  {
-    "base_uid": 43,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -4326,14 +3982,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 44,
-    "operator": "early-return",
-    "site": "before_last@line27",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/44__early-return__before_last_line27.py"
   },
   {
     "base_uid": 44,
@@ -4402,14 +4050,6 @@
   },
   {
     "base_uid": 45,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/45__early-return__before_last_line17.py"
-  },
-  {
-    "base_uid": 45,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -4472,14 +4112,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 46,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/46__early-return__before_last_line17.py"
   },
   {
     "base_uid": 46,
@@ -4548,14 +4180,6 @@
   },
   {
     "base_uid": 47,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/47__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 47,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -4618,14 +4242,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 48,
-    "operator": "early-return",
-    "site": "before_last@line23",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/48__early-return__before_last_line23.py"
   },
   {
     "base_uid": 48,
@@ -4694,14 +4310,6 @@
   },
   {
     "base_uid": 49,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/49__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 49,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -4764,14 +4372,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 50,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/50__early-return__before_last_line17.py"
   },
   {
     "base_uid": 50,
@@ -4840,14 +4440,6 @@
   },
   {
     "base_uid": 51,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/51__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 51,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -4910,14 +4502,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 52,
-    "operator": "early-return",
-    "site": "before_last@line23",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/52__early-return__before_last_line23.py"
   },
   {
     "base_uid": 52,
@@ -4988,14 +4572,6 @@
   },
   {
     "base_uid": 53,
-    "operator": "early-return",
-    "site": "before_last@line24",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/53__early-return__before_last_line24.py"
-  },
-  {
-    "base_uid": 53,
     "operator": "constant-perturb",
     "site": "compare@line22 ('confidential'->'confidential_MUTATED')",
     "applicable": true,
@@ -5059,14 +4635,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 54,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/54__early-return__before_last_line12.py"
   },
   {
     "base_uid": 54,
@@ -5136,14 +4704,6 @@
   },
   {
     "base_uid": 55,
-    "operator": "early-return",
-    "site": "before_last@line13",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/55__early-return__before_last_line13.py"
-  },
-  {
-    "base_uid": 55,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -5207,14 +4767,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 56,
-    "operator": "early-return",
-    "site": "before_last@line18",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/56__early-return__before_last_line18.py"
   },
   {
     "base_uid": 56,
@@ -5283,14 +4835,6 @@
   },
   {
     "base_uid": 57,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/57__early-return__before_last_line22.py"
-  },
-  {
-    "base_uid": 57,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -5353,14 +4897,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 58,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/58__early-return__before_last_line17.py"
   },
   {
     "base_uid": 58,
@@ -5429,14 +4965,6 @@
   },
   {
     "base_uid": 59,
-    "operator": "early-return",
-    "site": "before_last@line13",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/59__early-return__before_last_line13.py"
-  },
-  {
-    "base_uid": 59,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -5499,14 +5027,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 60,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/60__early-return__before_last_line17.py"
   },
   {
     "base_uid": 60,
@@ -5575,14 +5095,6 @@
   },
   {
     "base_uid": 61,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/61__early-return__before_last_line22.py"
-  },
-  {
-    "base_uid": 61,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -5645,14 +5157,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 62,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/62__early-return__before_last_line17.py"
   },
   {
     "base_uid": 62,
@@ -5721,14 +5225,6 @@
   },
   {
     "base_uid": 63,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/63__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 63,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -5791,14 +5287,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 64,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/64__early-return__before_last_line12.py"
   },
   {
     "base_uid": 64,
@@ -5867,14 +5355,6 @@
   },
   {
     "base_uid": 65,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/65__early-return__before_last_line17.py"
-  },
-  {
-    "base_uid": 65,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -5937,14 +5417,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 66,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/66__early-return__before_last_line17.py"
   },
   {
     "base_uid": 66,
@@ -6013,14 +5485,6 @@
   },
   {
     "base_uid": 67,
-    "operator": "early-return",
-    "site": "before_last@line15",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/67__early-return__before_last_line15.py"
-  },
-  {
-    "base_uid": 67,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -6083,14 +5547,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 68,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/68__early-return__before_last_line12.py"
   },
   {
     "base_uid": 68,
@@ -6162,14 +5618,6 @@
   },
   {
     "base_uid": 69,
-    "operator": "early-return",
-    "site": "before_last@line14",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/69__early-return__before_last_line14.py"
-  },
-  {
-    "base_uid": 69,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -6232,14 +5680,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 70,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/70__early-return__before_last_line12.py"
   },
   {
     "base_uid": 70,
@@ -6308,14 +5748,6 @@
   },
   {
     "base_uid": 71,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/71__early-return__before_last_line22.py"
-  },
-  {
-    "base_uid": 71,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -6378,14 +5810,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 72,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/72__early-return__before_last_line22.py"
   },
   {
     "base_uid": 72,
@@ -6454,14 +5878,6 @@
   },
   {
     "base_uid": 73,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/73__early-return__before_last_line22.py"
-  },
-  {
-    "base_uid": 73,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -6524,14 +5940,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 74,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/74__early-return__before_last_line22.py"
   },
   {
     "base_uid": 74,
@@ -6600,14 +6008,6 @@
   },
   {
     "base_uid": 75,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/75__early-return__before_last_line22.py"
-  },
-  {
-    "base_uid": 75,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -6670,14 +6070,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 76,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/76__early-return__before_last_line17.py"
   },
   {
     "base_uid": 76,
@@ -6746,14 +6138,6 @@
   },
   {
     "base_uid": 77,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/77__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 77,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -6815,14 +6199,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 78,
-    "operator": "early-return",
-    "site": "before_last@line7",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/78__early-return__before_last_line7.py"
   },
   {
     "base_uid": 78,
@@ -6891,14 +6267,6 @@
   },
   {
     "base_uid": 79,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/79__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 79,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -6961,14 +6329,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 80,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/80__early-return__before_last_line12.py"
   },
   {
     "base_uid": 80,
@@ -7037,14 +6397,6 @@
   },
   {
     "base_uid": 81,
-    "operator": "early-return",
-    "site": "before_last@line12",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/81__early-return__before_last_line12.py"
-  },
-  {
-    "base_uid": 81,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -7107,14 +6459,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 82,
-    "operator": "early-return",
-    "site": "before_last@line27",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/82__early-return__before_last_line27.py"
   },
   {
     "base_uid": 82,
@@ -7183,14 +6527,6 @@
   },
   {
     "base_uid": 83,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/83__early-return__before_last_line17.py"
-  },
-  {
-    "base_uid": 83,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -7253,14 +6589,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 84,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/84__early-return__before_last_line22.py"
   },
   {
     "base_uid": 84,
@@ -7329,14 +6657,6 @@
   },
   {
     "base_uid": 85,
-    "operator": "early-return",
-    "site": "before_last@line17",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/85__early-return__before_last_line17.py"
-  },
-  {
-    "base_uid": 85,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -7399,14 +6719,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 86,
-    "operator": "early-return",
-    "site": "before_last@line22",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/86__early-return__before_last_line22.py"
   },
   {
     "base_uid": 86,
@@ -7478,14 +6790,6 @@
   },
   {
     "base_uid": 87,
-    "operator": "early-return",
-    "site": "before_last@line14",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/87__early-return__before_last_line14.py"
-  },
-  {
-    "base_uid": 87,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -7553,14 +6857,6 @@
   },
   {
     "base_uid": 88,
-    "operator": "early-return",
-    "site": "before_last@line13",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/88__early-return__before_last_line13.py"
-  },
-  {
-    "base_uid": 88,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -7624,14 +6920,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 89,
-    "operator": "early-return",
-    "site": "before_last@line13",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/89__early-return__before_last_line13.py"
   },
   {
     "base_uid": 89,
@@ -7703,14 +6991,6 @@
   },
   {
     "base_uid": 90,
-    "operator": "early-return",
-    "site": "before_last@line14",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/90__early-return__before_last_line14.py"
-  },
-  {
-    "base_uid": 90,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -7774,14 +7054,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 91,
-    "operator": "early-return",
-    "site": "before_last@line13",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/91__early-return__before_last_line13.py"
   },
   {
     "base_uid": 91,
@@ -7854,14 +7126,6 @@
   },
   {
     "base_uid": 92,
-    "operator": "early-return",
-    "site": "before_last@line20",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/92__early-return__before_last_line20.py"
-  },
-  {
-    "base_uid": 92,
     "operator": "constant-perturb",
     "site": "compare@line16 ('non-compliant'->'non-compliant_MUTATED')",
     "applicable": true,
@@ -7931,14 +7195,6 @@
   },
   {
     "base_uid": 93,
-    "operator": "early-return",
-    "site": "before_last@line19",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/93__early-return__before_last_line19.py"
-  },
-  {
-    "base_uid": 93,
     "operator": "constant-perturb",
     "site": "compare@line16 ('inactive'->'inactive_MUTATED')",
     "applicable": true,
@@ -8005,14 +7261,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/94__corrupt-container-op__subscript_line16__key__item_status__.py"
-  },
-  {
-    "base_uid": 94,
-    "operator": "early-return",
-    "site": "before_last@line19",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/94__early-return__before_last_line19.py"
   },
   {
     "base_uid": 94,
@@ -8086,14 +7334,6 @@
   },
   {
     "base_uid": 95,
-    "operator": "early-return",
-    "site": "before_last@line20",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/95__early-return__before_last_line20.py"
-  },
-  {
-    "base_uid": 95,
     "operator": "constant-perturb",
     "site": "compare@line16 ('new'->'new_MUTATED')",
     "applicable": true,
@@ -8164,14 +7404,6 @@
   },
   {
     "base_uid": 96,
-    "operator": "early-return",
-    "site": "before_last@line20",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/96__early-return__before_last_line20.py"
-  },
-  {
-    "base_uid": 96,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
@@ -8235,14 +7467,6 @@
     "site": null,
     "applicable": false,
     "label": "buggy"
-  },
-  {
-    "base_uid": 97,
-    "operator": "early-return",
-    "site": "before_last@line13",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/97__early-return__before_last_line13.py"
   },
   {
     "base_uid": 97,
@@ -8315,14 +7539,6 @@
   },
   {
     "base_uid": 98,
-    "operator": "early-return",
-    "site": "before_last@line20",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/98__early-return__before_last_line20.py"
-  },
-  {
-    "base_uid": 98,
     "operator": "constant-perturb",
     "site": "compare@line16 ('high'->'high_MUTATED')",
     "applicable": true,
@@ -8389,14 +7605,6 @@
     "applicable": true,
     "label": "buggy",
     "source_file": "mutants/99__corrupt-container-op__subscript_line20__key__completed__.py"
-  },
-  {
-    "base_uid": 99,
-    "operator": "early-return",
-    "site": "before_last@line24",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/99__early-return__before_last_line24.py"
   },
   {
     "base_uid": 99,
@@ -8468,14 +7676,6 @@
   },
   {
     "base_uid": 100,
-    "operator": "early-return",
-    "site": "before_last@line14",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/100__early-return__before_last_line14.py"
-  },
-  {
-    "base_uid": 100,
     "operator": "constant-perturb",
     "site": "compare@line12 ('completed'->'completed_MUTATED')",
     "applicable": true,
@@ -8543,17 +7743,815 @@
   },
   {
     "base_uid": 101,
-    "operator": "early-return",
-    "site": "before_last@line19",
-    "applicable": true,
-    "label": "buggy",
-    "source_file": "mutants/101__early-return__before_last_line19.py"
-  },
-  {
-    "base_uid": 101,
     "operator": "constant-perturb",
     "site": null,
     "applicable": false,
     "label": "buggy"
+  },
+  {
+    "base_uid": 1,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/1__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 2,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/2__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 3,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/3__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 4,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/4__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 5,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/5__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 6,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/6__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 7,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/7__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 8,
+    "operator": "early-return",
+    "site": "before_stmt@line17",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/8__early-return__before_stmt_line17.py"
+  },
+  {
+    "base_uid": 9,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/9__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 10,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/10__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 11,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/11__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 12,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/12__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 13,
+    "operator": "early-return",
+    "site": "before_stmt@line23",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/13__early-return__before_stmt_line23.py"
+  },
+  {
+    "base_uid": 14,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/14__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 15,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/15__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 16,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/16__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 17,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/17__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 18,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/18__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 19,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/19__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 20,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/20__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 21,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/21__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 22,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/22__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 23,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/23__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 24,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/24__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 25,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/25__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 26,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/26__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 27,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/27__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 28,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/28__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 29,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/29__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 30,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/30__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 31,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/31__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 32,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/32__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 33,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/33__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 34,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/34__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 35,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/35__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 36,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/36__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 37,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/37__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 38,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/38__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 39,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/39__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 40,
+    "operator": "early-return",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 41,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/41__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 42,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/42__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 43,
+    "operator": "early-return",
+    "site": "before_stmt@line21",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/43__early-return__before_stmt_line21.py"
+  },
+  {
+    "base_uid": 44,
+    "operator": "early-return",
+    "site": "before_stmt@line25",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/44__early-return__before_stmt_line25.py"
+  },
+  {
+    "base_uid": 45,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/45__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 46,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/46__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 47,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/47__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 48,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/48__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 49,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/49__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 50,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/50__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 51,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/51__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 52,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/52__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 53,
+    "operator": "early-return",
+    "site": "before_stmt@line21",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/53__early-return__before_stmt_line21.py"
+  },
+  {
+    "base_uid": 54,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/54__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 55,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/55__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 56,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/56__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 57,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/57__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 58,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/58__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 59,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/59__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 60,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/60__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 61,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/61__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 62,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/62__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 63,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/63__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 64,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/64__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 65,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/65__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 66,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/66__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 67,
+    "operator": "early-return",
+    "site": "before_stmt@line13",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/67__early-return__before_stmt_line13.py"
+  },
+  {
+    "base_uid": 68,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/68__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 69,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/69__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 70,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/70__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 71,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/71__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 72,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/72__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 73,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/73__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 74,
+    "operator": "early-return",
+    "site": "before_stmt@line21",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/74__early-return__before_stmt_line21.py"
+  },
+  {
+    "base_uid": 75,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/75__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 76,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/76__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 77,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/77__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 78,
+    "operator": "early-return",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 79,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/79__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 80,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/80__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 81,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/81__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 82,
+    "operator": "early-return",
+    "site": "before_stmt@line26",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/82__early-return__before_stmt_line26.py"
+  },
+  {
+    "base_uid": 83,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/83__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 84,
+    "operator": "early-return",
+    "site": "before_stmt@line21",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/84__early-return__before_stmt_line21.py"
+  },
+  {
+    "base_uid": 85,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/85__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 86,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/86__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 87,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/87__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 88,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/88__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 89,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/89__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 90,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/90__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 91,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/91__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 92,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/92__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 93,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/93__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 94,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/94__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 95,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/95__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 96,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/96__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 97,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/97__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 98,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/98__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 99,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/99__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 100,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/100__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 101,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/101__early-return__before_stmt_line15.py"
   }
 ]

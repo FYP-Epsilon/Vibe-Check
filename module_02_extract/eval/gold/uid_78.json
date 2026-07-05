@@ -1,0 +1,21 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "file = Dropbox_files__3_0_0__create_files()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    }
+  ]
+}
