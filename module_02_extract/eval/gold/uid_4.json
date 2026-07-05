@@ -1,0 +1,96 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "issues = Jira_Issue__2_0_0__retrievewithwhere_Issue(issues_priority_0=issues_priority_0, issues_priority_1=issues_priority_1)"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for issue in issues"
+    },
+    {
+      "gold_id": "g3",
+      "type": "gateway",
+      "code": "issue['priority'] == 'urgent'"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "task = Asana_Tasks__2_0_0__create_Tasks()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "block",
+      "code": "email = Gmail_mail__2_0_0__create_mail()"
+    },
+    {
+      "gold_id": "g6",
+      "type": "gateway",
+      "code": "issue['priority'] == 'low'"
+    },
+    {
+      "gold_id": "g7",
+      "type": "block",
+      "code": "message = Slack_message__3_0_0__create_message()"
+    },
+    {
+      "gold_id": "g8",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g6",
+      "dst_gold_id": "g7",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g6",
+      "label": "false"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g5",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g7",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g6",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g8",
+      "label": "seq"
+    }
+  ]
+}

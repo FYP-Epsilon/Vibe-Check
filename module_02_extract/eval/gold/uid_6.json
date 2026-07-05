@@ -1,0 +1,41 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "folder = Box_Folder__3_0_0__create_Folder()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "message = Slack_message__3_0_0__create_message()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "block",
+      "code": "task = user_task('check team status')"
+    },
+    {
+      "gold_id": "g4",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "seq"
+    }
+  ]
+}

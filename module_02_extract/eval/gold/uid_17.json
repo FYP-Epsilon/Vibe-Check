@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "topics = Amazon_SNS_Topic__3_0_0__retrievewithwhere_Topic(topics_topicarn_0=topics_topicarn_0, topics_topicarn_1=topics_topicarn_1)"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for topic in topics"
+    },
+    {
+      "gold_id": "g3",
+      "type": "gateway",
+      "code": "topic['topicarn'] == 'critical'"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "email = Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    }
+  ]
+}

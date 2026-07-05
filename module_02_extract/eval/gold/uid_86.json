@@ -1,0 +1,51 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "attachment = Zendesk_Service_ticketAttachment__2_0_0__UPLOADATTACHMENT_ticketAttachment()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "block",
+      "code": "comments = Zendesk_Service_ticketComment__2_0_0__retrievewithwhere_ticketComment()"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "message = Gmail_mail__2_0_0__create_mail()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    }
+  ]
+}

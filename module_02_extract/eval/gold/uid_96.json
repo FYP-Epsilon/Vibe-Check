@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "folders = Box_Folder__3_0_0__retrievewithwhere_Folder(folders_is_collaboration_restricted_to_enterprise_0=folders_is_collaboration_restricted_to_enterprise_0, folders_is_collaboration_restricted_to_enterprise_1=folders_is_collaboration_restricted_to_enterprise_1)"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for folder in folders"
+    },
+    {
+      "gold_id": "g3",
+      "type": "gateway",
+      "code": "folder['is_collaboration_restricted_to_enterprise'] == false"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "new_folder = Box_Folder__3_0_0__COPYFOLDER_Folder()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "block",
+      "code": "folder = Box_Folder__3_0_0__updatewithwhere_Folder()"
+    },
+    {
+      "gold_id": "g6",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g5",
+      "label": "false"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g5",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g6",
+      "label": "seq"
+    }
+  ]
+}
