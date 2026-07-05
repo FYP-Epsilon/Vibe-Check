@@ -34,4 +34,31 @@ directory, not inside it) for the current, valid measurements, and
 `.claude/memory/session_2026_07_04_t1_t7_implementation.md` for the full
 diagnosis and before/after numbers. Post-alignment (E1+E2) differential
 result: Youden's J = 0.807, detection 0.864 vs false-alarm 0.059 -- a
-working detector, not a coin flip.
+working detector, not a coin flip. **This aggregate 0.864 figure was
+itself superseded by the correction session below** (it conflated
+genuinely-buggy and behaviorally-equivalent mutants into one class).
+
+## `calibration_report_differential_pre_lineshift_fix.md`, `calibration_report_self_mode_pre_earlyreturn_fix.md`, `e3_correlation_report_pre_earlyreturn_fix.md`, `e3_pairs_pre_earlyreturn_fix.csv`
+
+Correction session (C1-C5). Two bugs found while investigating the E3
+session's "early-return is 101/101 equivalent" finding:
+
+1. **Line-shift false positives** (C1, confirmed empirically before
+   fixing anything): `run_differential_verification` derived
+   `branch_lines` from the *base* program's WIR. Any single-statement
+   insertion/deletion mutation shifts every subsequent line in the
+   mutant relative to the base, so the collector watched the wrong
+   lines, producing spurious divergence unrelated to any real behavior
+   change. A/B test on 3 real early-return mutants: 2 of 3 were false
+   flags that recovered to exactly their base's own score once
+   `branch_lines` came from the mutant's own WIR instead. Fixed (C2).
+2. **`op_early_return` was a no-op** (found in the E2/E3 session, fixed
+   here as C3): it inserted its return immediately before the
+   function's existing trailing `return None`, cutting nothing.
+
+Corrected differential report presents three figures instead of one
+aggregate: genuine-bug detection (0.929, was 0.864 conflated),
+equivalent-mutant specificity, and false-alarm rate on untouched bases
+(unchanged, 0.059) -- see `eval/results/calibration_report_differential.md`
+for the full breakdown and the investigation of why figure 2's small
+sample (n=9) looks noisy (it isn't a new bug -- checked directly).

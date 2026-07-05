@@ -5,13 +5,13 @@ Mode: `self`. Seed: `1234`. CALIB/EVAL split: 50/50 stratified by base-program t
 ## Threshold selection (CALIB)
 
 - Youden's J-optimal tau: **0.1000**
-- Youden's J at tau: 0.2917
-- CALIB positives (buggy): 208
+- Youden's J at tau: 0.2997
+- CALIB positives (buggy): 209
 - CALIB negatives (correct): 50
 
 ## Held-out evaluation (EVAL)
 
-- Detection rate (recall on buggy): 0.3607 (95% CI [0.297, 0.428], n=219)
+- Detection rate (recall on buggy): 0.3727 (95% CI [0.309, 0.440], n=220)
 - False-alarm rate (buggy-predicted among correct): 0.0588 (95% CI [0.012, 0.162], n=51)
 
 ## Detection rate by mutation operator (EVAL)
@@ -22,7 +22,7 @@ Mode: `self`. Seed: `1234`. CALIB/EVAL split: 50/50 stratified by base-program t
 | constant-perturb | 10 | 1 | 0.100 |
 | corrupt-container-op | 17 | 17 | 1.000 |
 | drop-step | 51 | 19 | 0.373 |
-| early-return | 50 | 0 | 0.000 |
+| early-return | 51 | 3 | 0.059 |
 | negate-guard | 17 | 3 | 0.176 |
 | reorder-steps | 50 | 19 | 0.380 |
 | swap-branches | 5 | 1 | 0.200 |
