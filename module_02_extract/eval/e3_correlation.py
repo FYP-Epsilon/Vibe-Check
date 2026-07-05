@@ -402,6 +402,27 @@ def render_report(result: dict[str, Any]) -> str:
             "detection.",
             "",
         ]
+    elif early_return_equiv[1] and early_return_equiv[0] <= 2:
+        lines += [
+            "## RESOLVED: early-return no longer a mutate.py implementation bug",
+            "",
+            f"An earlier run of this report found `early-return` at "
+            f"{early_return_equiv[1]}/{early_return_equiv[1]} equivalent mutants "
+            "-- `op_early_return` inserted its return immediately before the "
+            "function's existing trailing `return None`, cutting nothing. "
+            "Fixed (see `eval/mutate.py`'s current `op_early_return` and its "
+            "commit message): the operator now inserts at a seeded-random "
+            f"index that always precedes a real statement. Current run: "
+            f"{early_return_equiv[0]}/{early_return_equiv[1]} equivalent -- "
+            "consistent with the other operators' background rate, not a "
+            "systematic bug anymore. Corrected calibration numbers "
+            "(genuine-bug detection / equivalent-mutant specificity / "
+            "false-alarm three-figure split) are in "
+            "`eval/results/calibration_report_differential.md`; the "
+            "pre-correction numbers are archived in "
+            "`eval/results/archive/`.",
+            "",
+        ]
 
     if result["execution_failed"]:
         lines += [f"Execution-failed mutant ids: {result['execution_failed']}", ""]

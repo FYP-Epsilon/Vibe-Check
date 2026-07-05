@@ -28,16 +28,16 @@ are indistinguishable at this sample size," not an exact count.
 
 ## Correlation: 1 - combined_confidence vs semantic_diff_rate
 
-- n = 427 mutants scored (execution failed: 0)
-- Pearson r = 0.4359, 95% CI [0.3557, 0.5097]
-- Spearman rho = 0.6774
+- n = 429 mutants scored (execution failed: 0)
+- Pearson r = 0.6238, 95% CI [0.5624, 0.6784]
+- Spearman rho = 0.6198
 
-### Restricted to semantic_diff_rate > 0 (n=416)
+### Restricted to semantic_diff_rate > 0 (n=318)
 
-- Pearson r = 0.6493, 95% CI [0.5900, 0.7016]
-- Spearman rho = 0.7632
+- Pearson r = 0.3164, 95% CI [0.2139, 0.4121]
+- Spearman rho = 0.2408
 
-## Equivalent mutants (semantic_diff_rate == 0 at N=25): 11 / 427
+## Equivalent mutants (semantic_diff_rate == 0 at N=25): 111 / 429
 
 | operator | equivalent | total |
 |---|---|---|
@@ -45,12 +45,13 @@ are indistinguishable at this sample size," not an exact count.
 | constant-perturb | 1 | 21 |
 | corrupt-container-op | 1 | 30 |
 | drop-step | 0 | 101 |
-| early-return | 1 | 99 |
+| early-return | 101 | 101 |
 | negate-guard | 5 | 32 |
 | reorder-steps | 1 | 99 |
 | swap-branches | 1 | 8 |
 | wrong-variable | 0 | 36 |
 
-## RESOLVED: early-return no longer a mutate.py implementation bug
+## Finding: early-return is a mutate.py implementation bug, not just a hard-to-detect operator
 
-An earlier run of this report found `early-return` at 99/99 equivalent mutants -- `op_early_return` inserted its return immediately before the function's existing trailing `return None`, cutting nothing. Fixed (see `eval/mutate.py`'s current `op_early_return` and its commit message): the operator now inserts at a seeded-random index that always precedes a real statement. Current run: 1/99 equivalent -- consistent with the other operators' background rate, not a systematic bug anymore. Corrected calibration numbers (genuine-bug detection / equivalent-mutant specificity / false-alarm three-figure split) are in `eval/results/calibration_report_differential.md`; the pre-correction numbers are archived in `eval/results/archive/`.
+`early-return` shows 100% equivalent mutants -- verified by inspecting
+generated mutant files directly, not just inferred from the rate: `eval/mutate.py`'s `op_early_return` inserts the new `return None` at `len(body) - 1`, i.e. immediately *before* the function's existing trailing statement. Every `eval/flowbench_adapter.py`-generated workflow already ends with a bare `return None` as that trailing statement, so the mutation fires at the exact same point the original would have -- it never actually cuts off any real logic (the for-loop/if-chain/stub calls all execute in full either way), it just duplicates the terminal no-op return as dead code. This reframes the earlier differential-mode calibration's ~0.43 detection rate for `early-return`: those weren't successfully detected genuine bugs surviving on hard-to-reach inputs -- they were **false positives on semantically-equivalent programs** (the certificate reporting `combined_confidence < tau` for code that is not actually buggy). Not fixed this session (`eval/mutate.py` is out of scope -- src/ and prior sessions' infra are frozen here), but this should be corrected before `early-return`'s detection numbers are cited anywhere as evidence of genuine bug detection.
