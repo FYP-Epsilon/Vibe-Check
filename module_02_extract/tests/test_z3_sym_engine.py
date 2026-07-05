@@ -246,6 +246,16 @@ class TestBoundedConcolicEngine:
         result = engine._execute_concrete({"x": 5})
         assert result == 6
 
+    def test_external_wir_skips_reextraction(self):
+        """D4: an externally supplied wir (differential mode's base-program
+        spec) must be used as-is, not re-extracted from source."""
+        base_source = "def foo(x):\n    if x > 0:\n        return 1\n    return 0"
+        base_wir = CFGExtractor().extract(base_source)
+
+        mutant_source = "def foo(x):\n    if x > 100:\n        return 1\n    return 0"
+        engine = BoundedConcolicEngine(mutant_source, "foo", max_k=3, query_budget=10, wir=base_wir)
+        assert engine.wir is base_wir
+
     def test_negate_last_branch(self):
         source = "def foo(x):\n    if x > 0:\n        return 1\n    return 0"
         engine = BoundedConcolicEngine(source, "foo", max_k=3, query_budget=10)
@@ -335,6 +345,46 @@ def foo(x):
         # x should be an ITE.
         assert "If" in str(merged["x"])
 
+    def test_seed_containers_list_gets_real_branch_coverage(self):
+        """An empty list input must be seeded with non-empty samples so the
+        concolic loop actually enters the loop body and both branches of
+        the guard inside it, instead of trivially exiting with 1 edge."""
+        source = """
+def process_items(items: list[int]) -> int:
+    total = 0
+    for item in items:
+        if item > 0:
+            total += item
+        else:
+            total -= item
+    return total
+"""
+        engine = BoundedConcolicEngine(source, "process_items", max_k=3, query_budget=20)
+        cert = engine.run({"items": []})
+        assert cert["covered_edges"] >= 4
+        assert cert["confidence"] > 0.0
+
+    def test_seed_containers_dict_discovers_subscripted_keys(self):
+        """An empty dict input must be seeded with the string keys the
+        function actually subscripts, not generic placeholders, so
+        concrete execution doesn't KeyError immediately."""
+        source = "def foo(order: dict) -> int:\n    return order['total']"
+        engine = BoundedConcolicEngine(source, "foo", max_k=3, query_budget=10)
+        inputs = {"order": {}}
+        engine._seed_containers(inputs)
+        assert "total" in inputs["order"]
+
+    def test_string_guard_round_trips_through_solver(self):
+        """D2: solving a string guard must feed a real string back into the
+        next concrete iteration, not a raw int token -- both branches of
+        `status == "high"` must get explored starting from a non-matching
+        concrete input."""
+        source = 'def f(status: str) -> int:\n    if status == "high":\n        return 1\n    return 0'
+        engine = BoundedConcolicEngine(source, "f", max_k=3, query_budget=20)
+        cert = engine.run({"status": ""})
+        assert engine.covered_edges == {("node_1", "True"), ("node_1", "False")}
+        assert cert["covered_edges"] == 2
+
 
 # ----------------------------------------------------------------------
 # run_v2_pipeline orchestrator
@@ -383,3 +433,14 @@ class TestRobustness:
         pc, branches = tracer.trace()
         # Should not crash; falls back to True.
         assert pc is not None
+
+    def test_concrete_exec_undefined_name_degrades_not_crashes(self):
+        """A function body calling an undefined name raises NameError during
+        concrete execution. This must degrade V2 to confidence 0 rather than
+        propagate the exception (regression for the narrow except tuple in
+        _concolic_iteration)."""
+        source = "def foo(x: int) -> int:\n    return undefined_task_call(x)"
+        engine = BoundedConcolicEngine(source, "foo", max_k=3, query_budget=10)
+        cert = engine.run({"x": 0})
+        assert cert["confidence"] == 0.0
+        assert cert["input_mismatch_count"] > 0

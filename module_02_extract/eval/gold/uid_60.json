@@ -1,0 +1,41 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "bucket = IBM_Cloud_Object_Storage_S3_bucket__4_0_0__create_bucket()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "bucket = IBM_Cloud_Object_Storage_S3_bucketAcl__4_0_0__CREATE_STANDARD_ACL_FOR_BUCKET_bucketAcl()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "block",
+      "code": "object = IBM_Cloud_Object_Storage_S3_object__4_0_0__create_object()"
+    },
+    {
+      "gold_id": "g4",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "seq"
+    }
+  ]
+}

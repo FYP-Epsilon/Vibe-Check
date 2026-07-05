@@ -1,0 +1,51 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "dataflows = Microsoft_Power_BI_Dataflow__2_0_0__retrievewithwhere_Dataflow()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "datasets = Microsoft_Power_BI_Dataset__2_0_0__retrievewithwhere_Dataset()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "block",
+      "code": "goals = Microsoft_Power_BI_Goal__2_0_0__retrievewithwhere_Goal()"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "workspace = Microsoft_Power_BI_Workspace__2_0_0__create_Workspace()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    }
+  ]
+}

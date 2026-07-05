@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "task = user_task('Create new lambda function called calculator')"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "function = AWS_Lambda_function__2_0_0__INVOKEFUNCTION_function()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    }
+  ]
+}

@@ -332,6 +332,46 @@ class TestWIRReferenceInterpreter:
         # Should evaluate loop condition at least 3 times (enter 3x, exit 1x)
         assert len(branch_events) >= 2
 
+    def test_exec_env_lets_stub_call_populate_state(self):
+        """E1: a stub-call assignment must actually run when exec_env is
+        supplied, so a guard reading the stub's return value evaluates
+        correctly instead of falling to the permissive-False default."""
+        wir = self._make_wir(
+            [
+                {"id": "e", "type": "entry", "successors": ["b"]},
+                {"id": "b", "type": "block", "code": ["incident = get_incident()"], "successors": ["g"]},
+                {
+                    "id": "g",
+                    "type": "gateway",
+                    "guard": "incident['impact'] == 'high'",
+                    "code": ["gateway"],
+                    "successors": ["t", "f"],
+                },
+                {"id": "t", "type": "block", "code": ["y = 1"], "successors": ["x"]},
+                {"id": "f", "type": "block", "code": ["y = 2"], "successors": ["x"]},
+                {"id": "x", "type": "exit", "successors": []},
+            ],
+            "e",
+            "x",
+        )
+
+        def get_incident():
+            return {"impact": "high"}
+
+        exec_env = {"__builtins__": {}, "get_incident": get_incident}
+
+        # Without exec_env: the stub call NameErrors, guard falls back to False.
+        interp_old = WIRReferenceInterpreter(wir)
+        trace_old = interp_old.execute({})
+        assert any(e["event"] == "branch_point" and e["taken_branch"] is False for e in trace_old)
+        assert interp_old.exec_errors > 0
+
+        # With exec_env: the stub call succeeds, guard correctly evaluates True.
+        interp_new = WIRReferenceInterpreter(wir, exec_env=exec_env)
+        trace_new = interp_new.execute({})
+        assert any(e["event"] == "branch_point" and e["taken_branch"] is True for e in trace_new)
+        assert interp_new.exec_errors == 0
+
 
 # ----------------------------------------------------------------------
 # P3.3 -- DifferentialComparator
@@ -403,6 +443,46 @@ class TestDifferentialComparator:
         b = [("A",), ("C",), ("D",)]
         assert DifferentialComparator._lcs(a, b) == 2
 
+    def test_branch_decision_compared_when_present_on_both_sides(self):
+        """When every branch_point event on BOTH sides carries taken_branch,
+        a differing decision must lower similarity below 1.0 (D3)."""
+        actual = [
+            {"event": "task_entry", "function": "foo"},
+            {"event": "branch_point", "function": "foo", "taken_branch": True},
+            {"event": "task_exit", "function": "foo"},
+        ]
+        expected_same = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "branch_point", "task": "foo", "taken_branch": True},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        expected_diff = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "branch_point", "task": "foo", "taken_branch": False},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        same_result = DifferentialComparator(actual, expected_same).compare()
+        diff_result = DifferentialComparator(actual, expected_diff).compare()
+        assert same_result["similarity_score"] == 1.0
+        assert diff_result["similarity_score"] < 1.0
+
+    def test_branch_decision_ignored_when_actual_side_lacks_it(self):
+        """Real actual-side traces (from collector.py) never carry
+        taken_branch -- this must stay a no-op fallback, not a mismatch,
+        so unmutated programs still get similarity 1.0 (no regression)."""
+        actual = [
+            {"event": "task_entry", "function": "foo"},
+            {"event": "branch_point", "function": "foo"},  # no taken_branch
+            {"event": "task_exit", "function": "foo"},
+        ]
+        expected = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "branch_point", "task": "foo", "taken_branch": True},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        result = DifferentialComparator(actual, expected).compare()
+        assert result["similarity_score"] == 1.0
+
 
 # ----------------------------------------------------------------------
 # P3.4 -- RandomizedDifferentialTester
@@ -457,6 +537,35 @@ def classify(x, y):
         assert cert["input_coverage_score"] <= 1.0
         assert cert["input_coverage_score"] > 0.0
 
+    def test_string_pool_varies_str_param_across_runs(self):
+        """D1: str-typed params must not collapse to the same value on
+        every run -- the guard-literal pool must actually get sampled,
+        and non-matching junk values too, so both sides of a string guard
+        get exercised."""
+        source = 'def classify(status: str) -> str:\n    if status == "high":\n        return "A"\n    return "B"\n'
+        from ast_extractor import CFGExtractor
+        wir = CFGExtractor().extract(source)
+        func_wir = wir["functions"]["classify"]
+
+        tester = RandomizedDifferentialTester(
+            source=source,
+            function_name="classify",
+            wir=func_wir,
+            task_patterns=["classify"],
+            branch_lines={2},
+            control_variables=["status"],
+            n_runs=20,
+            seed=7,
+        )
+        assert tester._string_pool == ["high"]
+
+        seen = {tester._generate_random_inputs()["status"] for _ in range(20)}
+        assert len(seen) > 1
+        assert "high" in seen
+
+        cert = tester.run()
+        assert cert["input_coverage_score"] > 1 / 20
+
 
 # ----------------------------------------------------------------------
 # P3.5 -- MultiModalCertificateComposer
@@ -485,6 +594,30 @@ class TestMultiModalCertificateComposer:
         v3 = {"confidence": 0.0}
         result = MultiModalCertificateComposer.compose(v1, v2, v3)
         assert result["combined_confidence"] == pytest.approx(0.9, 0.001)
+
+    def test_v3_confidence_excluded_from_combined_formula(self):
+        """V3 is extraction fidelity, not a correctness signal -- it must not
+        enter the OR-composition. combined_confidence depends only on v1/v2."""
+        v1 = {"confidence": 0.8}
+        v2 = {"confidence": 0.5}
+        low_v3 = {"confidence": 0.1, "abort": False}
+        high_v3 = {"confidence": 0.99, "abort": False}
+        result_low = MultiModalCertificateComposer.compose(v1, v2, low_v3)
+        result_high = MultiModalCertificateComposer.compose(v1, v2, high_v3)
+        expected = 1.0 - (1.0 - 0.8) * (1.0 - 0.5)
+        assert result_low["combined_confidence"] == pytest.approx(expected, 0.001)
+        assert result_high["combined_confidence"] == pytest.approx(expected, 0.001)
+
+    def test_v3_abort_gates_regardless_of_v1_v2(self):
+        """A low-fidelity WIR (V3 abort) means V1/V2 ran against an unfaithful
+        model -- the result must fail even when v1/v2 are both saturated."""
+        v1 = {"confidence": 1.0}
+        v2 = {"confidence": 1.0}
+        v3 = {"confidence": 0.5, "abort": True}
+        result = MultiModalCertificateComposer.compose(v1, v2, v3)
+        assert result["combined_confidence"] == pytest.approx(1.0, 0.001)
+        assert result["passed"] is False
+        assert result["v3_abort"] is True
 
 
 # ----------------------------------------------------------------------

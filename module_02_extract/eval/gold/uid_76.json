@@ -1,0 +1,41 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "jira_issues = Jira_Issue__2_0_0__retrievewithwhere_Issue()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "status = Jira_Status__2_0_0__retrievewithwhere_Status()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "block",
+      "code": "comment = GitHub_Comment__3_0_0__create_Comment()"
+    },
+    {
+      "gold_id": "g4",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "seq"
+    }
+  ]
+}

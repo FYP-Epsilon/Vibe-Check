@@ -80,6 +80,95 @@ def _derive_v1_params(func_wir: dict) -> dict:
     }
 
 
+def _select_entry_function(functions: dict[str, Any]) -> str:
+    """
+    Pick the function to verify.
+
+    ``next(iter(functions))`` silently picked whichever function the
+    source *defines first* -- correct for the single-function test
+    fixtures this pipeline was originally built against, but wrong for
+    any multi-function source (e.g. eval/flowbench_adapter.py's generated
+    corpus, which emits task-API stub defs *before* the ``workflow`` def
+    they support): it verified a trivial stub, never the orchestration
+    logic. Prefer a function literally named "workflow"; fall back to
+    the first one so single-function sources are unaffected.
+    """
+    if "workflow" in functions:
+        return "workflow"
+    return next(iter(functions))
+
+
+def _derive_task_patterns(tree: ast.Module, entry_function: str) -> list[str]:
+    """
+    Task patterns for V1: the entry function plus every other function
+    defined at module level in the source.
+
+    Previously task_patterns was just [entry_function], so stub-call
+    assignments (e.g. ``incident = get_incident()``) were invisible to
+    both the actual-side collector (it only tracks functions matching a
+    task pattern) and the reference interpreter (E2) -- a drop-step
+    mutant that deleted a leaf stub call produced zero trace difference.
+    Single-function fixtures (loan_approval.py) are unaffected: this
+    degenerates to [entry_function] when there's nothing else defined.
+    """
+    others = [
+        node.name
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        and node.name != entry_function
+    ]
+    return [entry_function] + others
+
+
+def _derive_initial_inputs(tree: ast.Module, func_obj: Any) -> dict[str, Any]:
+    """
+    Derive a starting concrete input dict from *func_obj*'s type hints.
+
+    Shared by the /verify pipeline and eval/calibrate.py's differential
+    mode so both seed str params with the same guard-literal heuristic
+    rather than duplicating this logic.
+    """
+    try:
+        type_hints = get_type_hints(func_obj)
+    except Exception:
+        type_hints = {}
+
+    # First guard-compared string literal in the source, if any -- gives V2's
+    # initial concrete input a value that can actually reach a string-guarded
+    # branch instead of always starting from "" (mirrors randomized.py's pool).
+    first_str_literal = next(
+        (
+            side.value
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Compare)
+            for side in (node.left, *node.comparators)
+            if isinstance(side, ast.Constant) and isinstance(side.value, str)
+        ),
+        "",
+    )
+
+    sig = inspect.signature(func_obj)
+    initial_inputs: dict[str, Any] = {}
+    for param_name, param in sig.parameters.items():
+        ann = type_hints.get(param_name)
+        origin = getattr(ann, "__origin__", None)
+        if ann is int:
+            initial_inputs[param_name] = 0
+        elif ann is float:
+            initial_inputs[param_name] = 0.0
+        elif ann is bool:
+            initial_inputs[param_name] = False
+        elif ann is str:
+            initial_inputs[param_name] = first_str_literal
+        elif ann is list or origin is list:
+            initial_inputs[param_name] = []  # Prevent element-type crashes on untyped collections.
+        elif ann is dict or origin is dict:
+            initial_inputs[param_name] = {}
+        else:
+            initial_inputs[param_name] = 0
+    return initial_inputs
+
+
 def _run_verification(source: str) -> dict:
     """
     Execute the full V3 → V2 → V1 pipeline on *source* and return the
@@ -115,7 +204,7 @@ def _run_verification(source: str) -> dict:
     if not functions:
         raise ValueError("No functions found in source — cannot verify.")
 
-    function_name = next(iter(functions))
+    function_name = _select_entry_function(functions)
     func_wir = functions[function_name]
     v1_params = _derive_v1_params(func_wir)
 
@@ -129,30 +218,7 @@ def _run_verification(source: str) -> dict:
     # ------------------------------------------------------------------
     # Derive initial inputs dynamically from function signature
     # ------------------------------------------------------------------
-    try:
-        type_hints = get_type_hints(func_obj)
-    except Exception:
-        type_hints = {}
-
-    sig = inspect.signature(func_obj)
-    initial_inputs: dict[str, Any] = {}
-    for param_name, param in sig.parameters.items():
-        ann = type_hints.get(param_name)
-        origin = getattr(ann, "__origin__", None)
-        if ann is int:
-            initial_inputs[param_name] = 0
-        elif ann is float:
-            initial_inputs[param_name] = 0.0
-        elif ann is bool:
-            initial_inputs[param_name] = False
-        elif ann is str:
-            initial_inputs[param_name] = ""
-        elif ann is list or origin is list:
-            initial_inputs[param_name] = []  # Prevent element-type crashes on untyped collections.
-        elif ann is dict or origin is dict:
-            initial_inputs[param_name] = {}
-        else:
-            initial_inputs[param_name] = 0
+    initial_inputs = _derive_initial_inputs(tree, func_obj)
 
     # ------------------------------------------------------------------
     # Phase 2  --  Symbolic Refinement with Z3 (V2)
@@ -181,7 +247,7 @@ def _run_verification(source: str) -> dict:
         source=source,
         function_name=function_name,
         wir=func_wir,
-        task_patterns=[function_name],
+        task_patterns=_derive_task_patterns(tree, function_name),
         branch_lines=v1_params["branch_lines"],
         control_variables=v1_params["control_variables"],
         state_variables=v1_params["state_variables"] or None,
@@ -199,6 +265,7 @@ def _run_verification(source: str) -> dict:
     # Normalise to the wire format expected by the UI
     return {
         "v3_coverage": v3_cert.get("node_coverage", 0.0),
+        "v3_abort": final.get("v3_abort", False),
         "v2_confidence": final.get("v2_confidence", 0.0),
         "v1_confidence": final.get("v1_confidence", 0.0),
         "combined_confidence": final.get("combined_confidence", 0.0),
