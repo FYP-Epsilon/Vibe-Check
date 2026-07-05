@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "tasks = Microsoft_Dynamics_365_for_Sales_Task__7_0_0__retrievewithwhere_Task(tasks_statuscode_0=tasks_statuscode_0, tasks_statuscode_1=tasks_statuscode_1)"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for task in tasks"
+    },
+    {
+      "gold_id": "g3",
+      "type": "gateway",
+      "code": "task['statuscode'] == 'completed'"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "deleted_task = Microsoft_Dynamics_365_for_Sales_Task__7_0_0__deletewithwhere_Task()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    }
+  ]
+}

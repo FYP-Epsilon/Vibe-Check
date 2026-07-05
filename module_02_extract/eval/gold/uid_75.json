@@ -1,0 +1,51 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "campaigns = Marketo_campaigns__3_0_0__retrievewithwhere_campaigns()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "lead = Marketo_leads__3_0_0__create_leads()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "block",
+      "code": "updated_lead = Marketo_leads__3_0_0__updatewithwhere_leads()"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "leads = Marketo_leads__3_0_0__retrievewithwhere_leads()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    }
+  ]
+}

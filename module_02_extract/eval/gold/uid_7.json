@@ -1,0 +1,56 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "channels = Slack_channel__3_0_0__retrievewithwhere_channel()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for channel in channels"
+    },
+    {
+      "gold_id": "g3",
+      "type": "block",
+      "code": "users = Slack_user__4_0_0__retrievewithwhere_user()"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "task = user_task('validate credentials')"
+    },
+    {
+      "gold_id": "g5",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    }
+  ]
+}

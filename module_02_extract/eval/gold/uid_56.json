@@ -1,0 +1,56 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "leads = Marketo_leads__3_0_0__retrievewithwhere_leads()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for lead in leads"
+    },
+    {
+      "gold_id": "g3",
+      "type": "block",
+      "code": "lead = Salesforce_Lead__5_0_0__create_Lead()"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "message = Microsoft_Teams_Message__2_0_0__create_Message()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g4",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    }
+  ]
+}

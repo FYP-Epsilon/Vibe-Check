@@ -1,0 +1,8557 @@
+[
+  {
+    "uid": 1,
+    "tags": [
+      "1",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_1.py"
+  },
+  {
+    "uid": 2,
+    "tags": [
+      "2",
+      "conditional"
+    ],
+    "params": {
+      "incident_impact": "str"
+    },
+    "source_file": "corpus/uid_2.py"
+  },
+  {
+    "uid": 3,
+    "tags": [
+      "3",
+      "conditional"
+    ],
+    "params": {
+      "folder_name": "str"
+    },
+    "source_file": "corpus/uid_3.py"
+  },
+  {
+    "uid": 4,
+    "tags": [
+      "4",
+      "conditional"
+    ],
+    "params": {
+      "issues_priority_0": "str",
+      "issues_priority_1": "str"
+    },
+    "source_file": "corpus/uid_4.py"
+  },
+  {
+    "uid": 5,
+    "tags": [
+      "5",
+      "conditional"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_5.py"
+  },
+  {
+    "uid": 6,
+    "tags": [
+      "6",
+      "conditional",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_6.py"
+  },
+  {
+    "uid": 7,
+    "tags": [
+      "7",
+      "conditional",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_7.py"
+  },
+  {
+    "uid": 8,
+    "tags": [
+      "8",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_8.py"
+  },
+  {
+    "uid": 9,
+    "tags": [
+      "9",
+      "conditional"
+    ],
+    "params": {
+      "comments_author_0": "str",
+      "comments_author_1": "str"
+    },
+    "source_file": "corpus/uid_9.py"
+  },
+  {
+    "uid": 10,
+    "tags": [
+      "10",
+      "conditional"
+    ],
+    "params": {
+      "object_size": "int"
+    },
+    "source_file": "corpus/uid_10.py"
+  },
+  {
+    "uid": 11,
+    "tags": [
+      "11",
+      "conditional_update",
+      "conditional_update_replace"
+    ],
+    "params": {
+      "incident_priority": "str"
+    },
+    "source_file": "corpus/uid_11.py"
+  },
+  {
+    "uid": 12,
+    "tags": [
+      "12",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {
+      "folder_name": "str"
+    },
+    "source_file": "corpus/uid_12.py"
+  },
+  {
+    "uid": 13,
+    "tags": [
+      "13",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {
+      "issues_fields_0": "str",
+      "issues_fields_1": "str"
+    },
+    "source_file": "corpus/uid_13.py"
+  },
+  {
+    "uid": 14,
+    "tags": [
+      "14",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {
+      "campaigns_type_0": "str",
+      "campaigns_type_1": "str"
+    },
+    "source_file": "corpus/uid_14.py"
+  },
+  {
+    "uid": 15,
+    "tags": [
+      "15",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {
+      "teams_name_0": "str",
+      "teams_name_1": "str"
+    },
+    "source_file": "corpus/uid_15.py"
+  },
+  {
+    "uid": 16,
+    "tags": [
+      "16",
+      "conditional_update",
+      "conditional_update_replace"
+    ],
+    "params": {
+      "teams_name_0": "str",
+      "teams_name_1": "str"
+    },
+    "source_file": "corpus/uid_16.py"
+  },
+  {
+    "uid": 17,
+    "tags": [
+      "17",
+      "conditional_update",
+      "conditional_update_delete"
+    ],
+    "params": {
+      "topics_topicarn_0": "str",
+      "topics_topicarn_1": "str"
+    },
+    "source_file": "corpus/uid_17.py"
+  },
+  {
+    "uid": 18,
+    "tags": [
+      "18",
+      "conditional_update",
+      "conditional_update_replace"
+    ],
+    "params": {
+      "topics_topicarn_0": "str",
+      "topics_topicarn_1": "str"
+    },
+    "source_file": "corpus/uid_18.py"
+  },
+  {
+    "uid": 19,
+    "tags": [
+      "19",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {
+      "topics_topicarn_0": "str",
+      "topics_topicarn_1": "str"
+    },
+    "source_file": "corpus/uid_19.py"
+  },
+  {
+    "uid": 20,
+    "tags": [
+      "20",
+      "conditional"
+    ],
+    "params": {
+      "teams_type_0": "str",
+      "teams_type_1": "str"
+    },
+    "source_file": "corpus/uid_20.py"
+  },
+  {
+    "uid": 21,
+    "tags": [
+      "21",
+      "conditional"
+    ],
+    "params": {
+      "topics_type_0": "str",
+      "topics_type_1": "str"
+    },
+    "source_file": "corpus/uid_21.py"
+  },
+  {
+    "uid": 22,
+    "tags": [
+      "22",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_22.py"
+  },
+  {
+    "uid": 23,
+    "tags": [
+      "23",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_23.py"
+  },
+  {
+    "uid": 24,
+    "tags": [
+      "24",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_24.py"
+  },
+  {
+    "uid": 25,
+    "tags": [
+      "25",
+      "conditional"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_25.py"
+  },
+  {
+    "uid": 26,
+    "tags": [
+      "26",
+      "conditional"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_26.py"
+  },
+  {
+    "uid": 27,
+    "tags": [
+      "27",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_27.py"
+  },
+  {
+    "uid": 28,
+    "tags": [
+      "28",
+      "conditional"
+    ],
+    "params": {
+      "leads_rating_0": "str",
+      "leads_rating_1": "str"
+    },
+    "source_file": "corpus/uid_28.py"
+  },
+  {
+    "uid": 29,
+    "tags": [
+      "29",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_29.py"
+  },
+  {
+    "uid": 30,
+    "tags": [
+      "30",
+      "conditional"
+    ],
+    "params": {
+      "files_owned_by_0": "str",
+      "files_owned_by_1": "str"
+    },
+    "source_file": "corpus/uid_30.py"
+  },
+  {
+    "uid": 31,
+    "tags": [
+      "31",
+      "conditional",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_31.py"
+  },
+  {
+    "uid": 32,
+    "tags": [
+      "32",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_32.py"
+  },
+  {
+    "uid": 33,
+    "tags": [
+      "33",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_33.py"
+  },
+  {
+    "uid": 34,
+    "tags": [
+      "34",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_34.py"
+  },
+  {
+    "uid": 35,
+    "tags": [
+      "35",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_35.py"
+  },
+  {
+    "uid": 36,
+    "tags": [
+      "36",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_36.py"
+  },
+  {
+    "uid": 37,
+    "tags": [
+      "37",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_37.py"
+  },
+  {
+    "uid": 38,
+    "tags": [
+      "38",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_38.py"
+  },
+  {
+    "uid": 39,
+    "tags": [
+      "39",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_39.py"
+  },
+  {
+    "uid": 40,
+    "tags": [
+      "40",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_40.py"
+  },
+  {
+    "uid": 41,
+    "tags": [
+      "41",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_41.py"
+  },
+  {
+    "uid": 42,
+    "tags": [
+      "42",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_42.py"
+  },
+  {
+    "uid": 43,
+    "tags": [
+      "43",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_43.py"
+  },
+  {
+    "uid": 44,
+    "tags": [
+      "44",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_44.py"
+  },
+  {
+    "uid": 45,
+    "tags": [
+      "45",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_45.py"
+  },
+  {
+    "uid": 46,
+    "tags": [
+      "46",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_46.py"
+  },
+  {
+    "uid": 47,
+    "tags": [
+      "47",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_47.py"
+  },
+  {
+    "uid": 48,
+    "tags": [
+      "48",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_48.py"
+  },
+  {
+    "uid": 49,
+    "tags": [
+      "49",
+      "linear_update",
+      "linear_update_add",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_49.py"
+  },
+  {
+    "uid": 50,
+    "tags": [
+      "50",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_50.py"
+  },
+  {
+    "uid": 51,
+    "tags": [
+      "51",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_51.py"
+  },
+  {
+    "uid": 52,
+    "tags": [
+      "52",
+      "conditional"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_52.py"
+  },
+  {
+    "uid": 53,
+    "tags": [
+      "53",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {
+      "folder_items_itemType_0": "str",
+      "folder_items_itemType_1": "str"
+    },
+    "source_file": "corpus/uid_53.py"
+  },
+  {
+    "uid": 54,
+    "tags": [
+      "54",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_54.py"
+  },
+  {
+    "uid": 55,
+    "tags": [
+      "55",
+      "conditional"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_55.py"
+  },
+  {
+    "uid": 56,
+    "tags": [
+      "56",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_56.py"
+  },
+  {
+    "uid": 57,
+    "tags": [
+      "57",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_57.py"
+  },
+  {
+    "uid": 58,
+    "tags": [
+      "58",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_58.py"
+  },
+  {
+    "uid": 59,
+    "tags": [
+      "59",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_59.py"
+  },
+  {
+    "uid": 60,
+    "tags": [
+      "60",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_60.py"
+  },
+  {
+    "uid": 61,
+    "tags": [
+      "61",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_61.py"
+  },
+  {
+    "uid": 62,
+    "tags": [
+      "62",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_62.py"
+  },
+  {
+    "uid": 63,
+    "tags": [
+      "63",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_63.py"
+  },
+  {
+    "uid": 64,
+    "tags": [
+      "64",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_64.py"
+  },
+  {
+    "uid": 65,
+    "tags": [
+      "65",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_65.py"
+  },
+  {
+    "uid": 66,
+    "tags": [
+      "66",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_66.py"
+  },
+  {
+    "uid": 67,
+    "tags": [
+      "67",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_67.py"
+  },
+  {
+    "uid": 68,
+    "tags": [
+      "68",
+      "linear",
+      "user_task"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_68.py"
+  },
+  {
+    "uid": 69,
+    "tags": [
+      "69",
+      "conditional",
+      "user_task"
+    ],
+    "params": {
+      "dms_messages_0": "str",
+      "dms_messages_1": "str"
+    },
+    "source_file": "corpus/uid_69.py"
+  },
+  {
+    "uid": 70,
+    "tags": [
+      "70",
+      "linear"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_70.py"
+  },
+  {
+    "uid": 71,
+    "tags": [
+      "71",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_71.py"
+  },
+  {
+    "uid": 72,
+    "tags": [
+      "72",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_72.py"
+  },
+  {
+    "uid": 73,
+    "tags": [
+      "73",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_73.py"
+  },
+  {
+    "uid": 74,
+    "tags": [
+      "74",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_74.py"
+  },
+  {
+    "uid": 75,
+    "tags": [
+      "75",
+      "linear_update",
+      "linear_update_add"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_75.py"
+  },
+  {
+    "uid": 76,
+    "tags": [
+      "76",
+      "linear_update",
+      "linear_update_delete"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_76.py"
+  },
+  {
+    "uid": 77,
+    "tags": [
+      "77",
+      "linear_update",
+      "linear_update_delete"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_77.py"
+  },
+  {
+    "uid": 78,
+    "tags": [
+      "78",
+      "linear_update",
+      "linear_update_delete"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_78.py"
+  },
+  {
+    "uid": 79,
+    "tags": [
+      "79",
+      "linear_update",
+      "linear_update_delete"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_79.py"
+  },
+  {
+    "uid": 80,
+    "tags": [
+      "80",
+      "linear_update",
+      "linear_update_delete"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_80.py"
+  },
+  {
+    "uid": 81,
+    "tags": [
+      "81",
+      "linear_update",
+      "linear_update_replace"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_81.py"
+  },
+  {
+    "uid": 82,
+    "tags": [
+      "82",
+      "linear_update",
+      "linear_update_replace"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_82.py"
+  },
+  {
+    "uid": 83,
+    "tags": [
+      "83",
+      "linear_update",
+      "linear_update_replace"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_83.py"
+  },
+  {
+    "uid": 84,
+    "tags": [
+      "84",
+      "linear_update",
+      "linear_update_replace"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_84.py"
+  },
+  {
+    "uid": 85,
+    "tags": [
+      "85",
+      "linear_update",
+      "linear_update_replace"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_85.py"
+  },
+  {
+    "uid": 86,
+    "tags": [
+      "86",
+      "linear_update",
+      "linear_update_replace"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_86.py"
+  },
+  {
+    "uid": 87,
+    "tags": [
+      "87",
+      "conditional_update",
+      "conditional_update_delete"
+    ],
+    "params": {
+      "devices_isCompliant_0": "bool",
+      "devices_isCompliant_1": "bool"
+    },
+    "source_file": "corpus/uid_87.py"
+  },
+  {
+    "uid": 88,
+    "tags": [
+      "88",
+      "conditional_update",
+      "conditional_update_delete"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_88.py"
+  },
+  {
+    "uid": 89,
+    "tags": [
+      "89",
+      "conditional_update",
+      "conditional_update_delete"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_89.py"
+  },
+  {
+    "uid": 90,
+    "tags": [
+      "90",
+      "conditional_update",
+      "conditional_update_delete"
+    ],
+    "params": {
+      "repositories_has_projects_0": "bool",
+      "repositories_has_projects_1": "bool"
+    },
+    "source_file": "corpus/uid_90.py"
+  },
+  {
+    "uid": 91,
+    "tags": [
+      "91",
+      "conditional_update",
+      "conditional_update_delete"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_91.py"
+  },
+  {
+    "uid": 92,
+    "tags": [
+      "92",
+      "conditional_update",
+      "conditional_update_delete"
+    ],
+    "params": {
+      "buckets_name_0": "str",
+      "buckets_name_1": "str"
+    },
+    "source_file": "corpus/uid_92.py"
+  },
+  {
+    "uid": 93,
+    "tags": [
+      "93",
+      "conditional_update",
+      "conditional_update_delete"
+    ],
+    "params": {
+      "roles_name_0": "str",
+      "roles_name_1": "str"
+    },
+    "source_file": "corpus/uid_93.py"
+  },
+  {
+    "uid": 94,
+    "tags": [
+      "94",
+      "conditional_update",
+      "conditional_update_delete",
+      "user_task"
+    ],
+    "params": {
+      "folders_item_status_0": "str",
+      "folders_item_status_1": "str"
+    },
+    "source_file": "corpus/uid_94.py"
+  },
+  {
+    "uid": 95,
+    "tags": [
+      "95",
+      "conditional_update",
+      "conditional_update_replace"
+    ],
+    "params": {
+      "contacts_CleanStatus_0": "str",
+      "contacts_CleanStatus_1": "str"
+    },
+    "source_file": "corpus/uid_95.py"
+  },
+  {
+    "uid": 96,
+    "tags": [
+      "96",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {
+      "folders_is_collaboration_restricted_to_enterprise_0": "str",
+      "folders_is_collaboration_restricted_to_enterprise_1": "str"
+    },
+    "source_file": "corpus/uid_96.py"
+  },
+  {
+    "uid": 97,
+    "tags": [
+      "97",
+      "conditional_update",
+      "conditional_update_replace"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_97.py"
+  },
+  {
+    "uid": 98,
+    "tags": [
+      "98",
+      "conditional_update",
+      "conditional_update_replace"
+    ],
+    "params": {
+      "leads_rating_0": "str",
+      "leads_rating_1": "str"
+    },
+    "source_file": "corpus/uid_98.py"
+  },
+  {
+    "uid": 99,
+    "tags": [
+      "99",
+      "conditional_update",
+      "conditional_update_replace"
+    ],
+    "params": {
+      "tasks_completed_0": "str",
+      "tasks_completed_1": "str"
+    },
+    "source_file": "corpus/uid_99.py"
+  },
+  {
+    "uid": 100,
+    "tags": [
+      "100",
+      "conditional_update",
+      "conditional_update_add"
+    ],
+    "params": {
+      "tasks_statuscode_0": "str",
+      "tasks_statuscode_1": "str"
+    },
+    "source_file": "corpus/uid_100.py"
+  },
+  {
+    "uid": 101,
+    "tags": [
+      "101",
+      "conditional"
+    ],
+    "params": {},
+    "source_file": "corpus/uid_101.py"
+  },
+  {
+    "base_uid": 1,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 1,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 1,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 1,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 1,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/1__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 1,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/1__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 1,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 1,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 1,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 2,
+    "operator": "negate-guard",
+    "site": "if@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/2__negate-guard__if_line19.py"
+  },
+  {
+    "base_uid": 2,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 2,
+    "operator": "swap-branches",
+    "site": "if@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/2__swap-branches__if_line19.py"
+  },
+  {
+    "base_uid": 2,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 2,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/2__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 2,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/2__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 2,
+    "operator": "wrong-variable",
+    "site": "name@line19 (incident->issue)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/2__wrong-variable__name_line19__incident__issue_.py"
+  },
+  {
+    "base_uid": 2,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line19 (key='impact')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/2__corrupt-container-op__subscript_line19__key__impact__.py"
+  },
+  {
+    "base_uid": 2,
+    "operator": "constant-perturb",
+    "site": "compare@line19 ('high'->'high_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/2__constant-perturb__compare_line19___high____high_MUTATED__.py"
+  },
+  {
+    "base_uid": 3,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/3__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 3,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 3,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 3,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 3,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/3__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 3,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/3__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 3,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 3,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='name')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/3__corrupt-container-op__subscript_line16__key__name__.py"
+  },
+  {
+    "base_uid": 3,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 4,
+    "operator": "negate-guard",
+    "site": "if@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/4__negate-guard__if_line20.py"
+  },
+  {
+    "base_uid": 4,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 4,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 4,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 4,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/4__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 4,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/4__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 4,
+    "operator": "wrong-variable",
+    "site": "name@line19 (issues->issue)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/4__wrong-variable__name_line19__issues__issue_.py"
+  },
+  {
+    "base_uid": 4,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line20 (key='priority')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/4__corrupt-container-op__subscript_line20__key__priority__.py"
+  },
+  {
+    "base_uid": 4,
+    "operator": "constant-perturb",
+    "site": "compare@line20 ('urgent'->'urgent_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/4__constant-perturb__compare_line20___urgent____urgent_MUTATED__.py"
+  },
+  {
+    "base_uid": 5,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 5,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 5,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 5,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 5,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/5__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 5,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/5__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 5,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 5,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 5,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 6,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 6,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 6,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 6,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 6,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/6__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 6,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/6__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 6,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 6,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 6,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 7,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 7,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 7,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 7,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 7,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/7__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 7,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/7__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 7,
+    "operator": "wrong-variable",
+    "site": "name@line15 (channels->channel)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/7__wrong-variable__name_line15__channels__channel_.py"
+  },
+  {
+    "base_uid": 7,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 7,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 8,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 8,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 8,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 8,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 8,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/8__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 8,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/8__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 8,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 8,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 8,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 9,
+    "operator": "negate-guard",
+    "site": "if@line24",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/9__negate-guard__if_line24.py"
+  },
+  {
+    "base_uid": 9,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 9,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 9,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 9,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/9__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 9,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/9__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 9,
+    "operator": "wrong-variable",
+    "site": "name@line19 (repositories->repository)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/9__wrong-variable__name_line19__repositories__repository_.py"
+  },
+  {
+    "base_uid": 9,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line24 (key='author')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/9__corrupt-container-op__subscript_line24__key__author__.py"
+  },
+  {
+    "base_uid": 9,
+    "operator": "constant-perturb",
+    "site": "compare@line24 ('abc'->'abc_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/9__constant-perturb__compare_line24___abc____abc_MUTATED__.py"
+  },
+  {
+    "base_uid": 10,
+    "operator": "negate-guard",
+    "site": "if@line22",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/10__negate-guard__if_line22.py"
+  },
+  {
+    "base_uid": 10,
+    "operator": "boundary-shift",
+    "site": "compare@line22",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/10__boundary-shift__compare_line22.py"
+  },
+  {
+    "base_uid": 10,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 10,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 10,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/10__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 10,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/10__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 10,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 10,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line22 (key='size')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/10__corrupt-container-op__subscript_line22__key__size__.py"
+  },
+  {
+    "base_uid": 10,
+    "operator": "constant-perturb",
+    "site": "compare@line22 (100->1100)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/10__constant-perturb__compare_line22__100__1100_.py"
+  },
+  {
+    "base_uid": 11,
+    "operator": "negate-guard",
+    "site": "if@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/11__negate-guard__if_line19.py"
+  },
+  {
+    "base_uid": 11,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 11,
+    "operator": "swap-branches",
+    "site": "if@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/11__swap-branches__if_line19.py"
+  },
+  {
+    "base_uid": 11,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 11,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/11__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 11,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/11__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 11,
+    "operator": "wrong-variable",
+    "site": "name@line19 (incident->issue)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/11__wrong-variable__name_line19__incident__issue_.py"
+  },
+  {
+    "base_uid": 11,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line19 (key='priority')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/11__corrupt-container-op__subscript_line19__key__priority__.py"
+  },
+  {
+    "base_uid": 11,
+    "operator": "constant-perturb",
+    "site": "compare@line19 ('high'->'high_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/11__constant-perturb__compare_line19___high____high_MUTATED__.py"
+  },
+  {
+    "base_uid": 12,
+    "operator": "negate-guard",
+    "site": "if@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/12__negate-guard__if_line20.py"
+  },
+  {
+    "base_uid": 12,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 12,
+    "operator": "swap-branches",
+    "site": "if@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/12__swap-branches__if_line20.py"
+  },
+  {
+    "base_uid": 12,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 12,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/12__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 12,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/12__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 12,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 12,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line20 (key='name')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/12__corrupt-container-op__subscript_line20__key__name__.py"
+  },
+  {
+    "base_uid": 12,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 13,
+    "operator": "negate-guard",
+    "site": "if@line24",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/13__negate-guard__if_line24.py"
+  },
+  {
+    "base_uid": 13,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 13,
+    "operator": "swap-branches",
+    "site": "if@line24",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/13__swap-branches__if_line24.py"
+  },
+  {
+    "base_uid": 13,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 13,
+    "operator": "drop-step",
+    "site": "stmt@line22",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/13__drop-step__stmt_line22.py"
+  },
+  {
+    "base_uid": 13,
+    "operator": "reorder-steps",
+    "site": "stmts@lines22-23",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/13__reorder-steps__stmts_lines22_23.py"
+  },
+  {
+    "base_uid": 13,
+    "operator": "wrong-variable",
+    "site": "name@line23 (issues->issue)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/13__wrong-variable__name_line23__issues__issue_.py"
+  },
+  {
+    "base_uid": 13,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line24 (key='fields')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/13__corrupt-container-op__subscript_line24__key__fields__.py"
+  },
+  {
+    "base_uid": 13,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 14,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/14__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 14,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 14,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 14,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 14,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/14__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 14,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/14__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 14,
+    "operator": "wrong-variable",
+    "site": "name@line15 (campaigns->campaign)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/14__wrong-variable__name_line15__campaigns__campaign_.py"
+  },
+  {
+    "base_uid": 14,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='type')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/14__corrupt-container-op__subscript_line16__key__type__.py"
+  },
+  {
+    "base_uid": 14,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('Finance'->'Finance_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/14__constant-perturb__compare_line16___Finance____Finance_MUTATED__.py"
+  },
+  {
+    "base_uid": 15,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/15__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 15,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 15,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 15,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 15,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/15__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 15,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/15__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 15,
+    "operator": "wrong-variable",
+    "site": "name@line15 (teams->team)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/15__wrong-variable__name_line15__teams__team_.py"
+  },
+  {
+    "base_uid": 15,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='name')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/15__corrupt-container-op__subscript_line16__key__name__.py"
+  },
+  {
+    "base_uid": 15,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('customer'->'customer_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/15__constant-perturb__compare_line16___customer____customer_MUTATED__.py"
+  },
+  {
+    "base_uid": 16,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/16__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 16,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 16,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 16,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 16,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/16__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 16,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/16__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 16,
+    "operator": "wrong-variable",
+    "site": "name@line15 (teams->team)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/16__wrong-variable__name_line15__teams__team_.py"
+  },
+  {
+    "base_uid": 16,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='name')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/16__corrupt-container-op__subscript_line16__key__name__.py"
+  },
+  {
+    "base_uid": 16,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('customer'->'customer_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/16__constant-perturb__compare_line16___customer____customer_MUTATED__.py"
+  },
+  {
+    "base_uid": 17,
+    "operator": "negate-guard",
+    "site": "if@line12",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/17__negate-guard__if_line12.py"
+  },
+  {
+    "base_uid": 17,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 17,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 17,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 17,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/17__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 17,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/17__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 17,
+    "operator": "wrong-variable",
+    "site": "name@line11 (topics->topic)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/17__wrong-variable__name_line11__topics__topic_.py"
+  },
+  {
+    "base_uid": 17,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line12 (key='topicarn')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/17__corrupt-container-op__subscript_line12__key__topicarn__.py"
+  },
+  {
+    "base_uid": 17,
+    "operator": "constant-perturb",
+    "site": "compare@line12 ('critical'->'critical_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/17__constant-perturb__compare_line12___critical____critical_MUTATED__.py"
+  },
+  {
+    "base_uid": 18,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/18__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 18,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 18,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 18,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 18,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/18__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 18,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/18__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 18,
+    "operator": "wrong-variable",
+    "site": "name@line15 (topics->topic)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/18__wrong-variable__name_line15__topics__topic_.py"
+  },
+  {
+    "base_uid": 18,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='topicarn')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/18__corrupt-container-op__subscript_line16__key__topicarn__.py"
+  },
+  {
+    "base_uid": 18,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('critical'->'critical_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/18__constant-perturb__compare_line16___critical____critical_MUTATED__.py"
+  },
+  {
+    "base_uid": 19,
+    "operator": "negate-guard",
+    "site": "if@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/19__negate-guard__if_line20.py"
+  },
+  {
+    "base_uid": 19,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 19,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 19,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 19,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/19__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 19,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/19__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 19,
+    "operator": "wrong-variable",
+    "site": "name@line19 (topics->topic)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/19__wrong-variable__name_line19__topics__topic_.py"
+  },
+  {
+    "base_uid": 19,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line20 (key='topicarn')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/19__corrupt-container-op__subscript_line20__key__topicarn__.py"
+  },
+  {
+    "base_uid": 19,
+    "operator": "constant-perturb",
+    "site": "compare@line20 ('critical'->'critical_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/19__constant-perturb__compare_line20___critical____critical_MUTATED__.py"
+  },
+  {
+    "base_uid": 20,
+    "operator": "negate-guard",
+    "site": "if@line12",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/20__negate-guard__if_line12.py"
+  },
+  {
+    "base_uid": 20,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 20,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 20,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 20,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/20__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 20,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/20__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 20,
+    "operator": "wrong-variable",
+    "site": "name@line11 (teams->team)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/20__wrong-variable__name_line11__teams__team_.py"
+  },
+  {
+    "base_uid": 20,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line12 (key='type')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/20__corrupt-container-op__subscript_line12__key__type__.py"
+  },
+  {
+    "base_uid": 20,
+    "operator": "constant-perturb",
+    "site": "compare@line12 ('customer'->'customer_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/20__constant-perturb__compare_line12___customer____customer_MUTATED__.py"
+  },
+  {
+    "base_uid": 21,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/21__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 21,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 21,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 21,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 21,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/21__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 21,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/21__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 21,
+    "operator": "wrong-variable",
+    "site": "name@line15 (topics->topic)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/21__wrong-variable__name_line15__topics__topic_.py"
+  },
+  {
+    "base_uid": 21,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='type')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/21__corrupt-container-op__subscript_line16__key__type__.py"
+  },
+  {
+    "base_uid": 21,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('critical'->'critical_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/21__constant-perturb__compare_line16___critical____critical_MUTATED__.py"
+  },
+  {
+    "base_uid": 22,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 22,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 22,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 22,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 22,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/22__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 22,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/22__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 22,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 22,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 22,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 23,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 23,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 23,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 23,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 23,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/23__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 23,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/23__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 23,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 23,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 23,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 24,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 24,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 24,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 24,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 24,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/24__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 24,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/24__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 24,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 24,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 24,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 25,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 25,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 25,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 25,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 25,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/25__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 25,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/25__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 25,
+    "operator": "wrong-variable",
+    "site": "name@line11 (tasks->task)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/25__wrong-variable__name_line11__tasks__task_.py"
+  },
+  {
+    "base_uid": 25,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 25,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 26,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 26,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 26,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 26,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 26,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/26__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 26,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/26__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 26,
+    "operator": "wrong-variable",
+    "site": "name@line11 (leads->lead)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/26__wrong-variable__name_line11__leads__lead_.py"
+  },
+  {
+    "base_uid": 26,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 26,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 27,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 27,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 27,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 27,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 27,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/27__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 27,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/27__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 27,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 27,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 27,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 28,
+    "operator": "negate-guard",
+    "site": "if@line12",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/28__negate-guard__if_line12.py"
+  },
+  {
+    "base_uid": 28,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 28,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 28,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 28,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/28__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 28,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/28__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 28,
+    "operator": "wrong-variable",
+    "site": "name@line11 (leads->lead)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/28__wrong-variable__name_line11__leads__lead_.py"
+  },
+  {
+    "base_uid": 28,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line12 (key='rating')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/28__corrupt-container-op__subscript_line12__key__rating__.py"
+  },
+  {
+    "base_uid": 28,
+    "operator": "constant-perturb",
+    "site": "compare@line12 ('hot'->'hot_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/28__constant-perturb__compare_line12___hot____hot_MUTATED__.py"
+  },
+  {
+    "base_uid": 29,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 29,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 29,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 29,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 29,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/29__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 29,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/29__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 29,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 29,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 29,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 30,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/30__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 30,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 30,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 30,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 30,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/30__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 30,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/30__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 30,
+    "operator": "wrong-variable",
+    "site": "name@line15 (files->file)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/30__wrong-variable__name_line15__files__file_.py"
+  },
+  {
+    "base_uid": 30,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='owned_by')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/30__corrupt-container-op__subscript_line16__key__owned_by__.py"
+  },
+  {
+    "base_uid": 30,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 31,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/31__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 31,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 31,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 31,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 31,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/31__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 31,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/31__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 31,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 31,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 31,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 32,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 32,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 32,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 32,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 32,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/32__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 32,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/32__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 32,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 32,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 32,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 33,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 33,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 33,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 33,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 33,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/33__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 33,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/33__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 33,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 33,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 33,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 34,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 34,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 34,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 34,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 34,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/34__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 34,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/34__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 34,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 34,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 34,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 35,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 35,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 35,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 35,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 35,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/35__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 35,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/35__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 35,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 35,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 35,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 36,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 36,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 36,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 36,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 36,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/36__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 36,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/36__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 36,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 36,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 36,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 37,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 37,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 37,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 37,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 37,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/37__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 37,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/37__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 37,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 37,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 37,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 38,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 38,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 38,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 38,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 38,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/38__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 38,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/38__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 38,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 38,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 38,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 39,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 39,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 39,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 39,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 39,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/39__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 39,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/39__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 39,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 39,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 39,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 40,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 40,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 40,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 40,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 40,
+    "operator": "drop-step",
+    "site": "stmt@line6",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/40__drop-step__stmt_line6.py"
+  },
+  {
+    "base_uid": 40,
+    "operator": "reorder-steps",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 40,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 40,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 40,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 41,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 41,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 41,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 41,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 41,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/41__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 41,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/41__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 41,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 41,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 41,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 42,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 42,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 42,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 42,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 42,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/42__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 42,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/42__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 42,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 42,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 42,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 43,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 43,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 43,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 43,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 43,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/43__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 43,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/43__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 43,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 43,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 43,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 44,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 44,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 44,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 44,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 44,
+    "operator": "drop-step",
+    "site": "stmt@line22",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/44__drop-step__stmt_line22.py"
+  },
+  {
+    "base_uid": 44,
+    "operator": "reorder-steps",
+    "site": "stmts@lines22-23",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/44__reorder-steps__stmts_lines22_23.py"
+  },
+  {
+    "base_uid": 44,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 44,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 44,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 45,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 45,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 45,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 45,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 45,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/45__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 45,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/45__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 45,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 45,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 45,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 46,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 46,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 46,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 46,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 46,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/46__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 46,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/46__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 46,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 46,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 46,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 47,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 47,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 47,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 47,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 47,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/47__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 47,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/47__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 47,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 47,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 47,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 48,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 48,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 48,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 48,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 48,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/48__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 48,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/48__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 48,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 48,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 48,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 49,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 49,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 49,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 49,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 49,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/49__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 49,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/49__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 49,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 49,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 49,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 50,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 50,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 50,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 50,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 50,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/50__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 50,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/50__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 50,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 50,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 50,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 51,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 51,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 51,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 51,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 51,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/51__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 51,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/51__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 51,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 51,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 51,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 52,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 52,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 52,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 52,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 52,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/52__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 52,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/52__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 52,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 52,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 52,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 53,
+    "operator": "negate-guard",
+    "site": "if@line22",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/53__negate-guard__if_line22.py"
+  },
+  {
+    "base_uid": 53,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 53,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 53,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 53,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/53__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 53,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/53__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 53,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 53,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line22 (key='itemType')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/53__corrupt-container-op__subscript_line22__key__itemType__.py"
+  },
+  {
+    "base_uid": 53,
+    "operator": "constant-perturb",
+    "site": "compare@line22 ('confidential'->'confidential_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/53__constant-perturb__compare_line22___confidential____confidential_MUTATED__.py"
+  },
+  {
+    "base_uid": 54,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 54,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 54,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 54,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 54,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/54__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 54,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/54__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 54,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 54,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 54,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 55,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 55,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 55,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 55,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 55,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/55__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 55,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/55__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 55,
+    "operator": "wrong-variable",
+    "site": "name@line11 (leads->lead)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/55__wrong-variable__name_line11__leads__lead_.py"
+  },
+  {
+    "base_uid": 55,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 55,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 56,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 56,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 56,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 56,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 56,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/56__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 56,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/56__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 56,
+    "operator": "wrong-variable",
+    "site": "name@line15 (leads->lead)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/56__wrong-variable__name_line15__leads__lead_.py"
+  },
+  {
+    "base_uid": 56,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 56,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 57,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 57,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 57,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 57,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 57,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/57__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 57,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/57__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 57,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 57,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 57,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 58,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 58,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 58,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 58,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 58,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/58__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 58,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/58__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 58,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 58,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 58,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 59,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 59,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 59,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 59,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 59,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/59__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 59,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/59__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 59,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 59,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 59,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 60,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 60,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 60,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 60,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 60,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/60__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 60,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/60__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 60,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 60,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 60,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 61,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 61,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 61,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 61,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 61,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/61__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 61,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/61__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 61,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 61,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 61,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 62,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 62,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 62,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 62,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 62,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/62__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 62,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/62__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 62,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 62,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 62,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 63,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 63,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 63,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 63,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 63,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/63__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 63,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/63__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 63,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 63,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 63,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 64,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 64,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 64,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 64,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 64,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/64__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 64,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/64__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 64,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 64,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 64,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 65,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 65,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 65,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 65,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 65,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/65__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 65,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/65__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 65,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 65,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 65,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 66,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 66,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 66,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 66,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 66,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/66__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 66,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/66__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 66,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 66,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 66,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 67,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 67,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 67,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 67,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 67,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/67__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 67,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/67__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 67,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 67,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 67,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 68,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 68,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 68,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 68,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 68,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/68__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 68,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/68__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 68,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 68,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 68,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 69,
+    "operator": "negate-guard",
+    "site": "if@line12",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/69__negate-guard__if_line12.py"
+  },
+  {
+    "base_uid": 69,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 69,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 69,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 69,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/69__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 69,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/69__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 69,
+    "operator": "wrong-variable",
+    "site": "name@line11 (dms->dm)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/69__wrong-variable__name_line11__dms__dm_.py"
+  },
+  {
+    "base_uid": 69,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line12 (key='messages')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/69__corrupt-container-op__subscript_line12__key__messages__.py"
+  },
+  {
+    "base_uid": 69,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 70,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 70,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 70,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 70,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 70,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/70__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 70,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/70__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 70,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 70,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 70,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 71,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 71,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 71,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 71,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 71,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/71__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 71,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/71__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 71,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 71,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 71,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 72,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 72,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 72,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 72,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 72,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/72__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 72,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/72__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 72,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 72,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 72,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 73,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 73,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 73,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 73,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 73,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/73__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 73,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/73__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 73,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 73,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 73,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 74,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 74,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 74,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 74,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 74,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/74__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 74,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/74__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 74,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 74,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 74,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 75,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 75,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 75,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 75,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 75,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/75__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 75,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/75__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 75,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 75,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 75,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 76,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 76,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 76,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 76,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 76,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/76__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 76,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/76__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 76,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 76,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 76,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 77,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 77,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 77,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 77,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 77,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/77__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 77,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/77__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 77,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 77,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 77,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 78,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 78,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 78,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 78,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 78,
+    "operator": "drop-step",
+    "site": "stmt@line6",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/78__drop-step__stmt_line6.py"
+  },
+  {
+    "base_uid": 78,
+    "operator": "reorder-steps",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 78,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 78,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 78,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 79,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 79,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 79,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 79,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 79,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/79__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 79,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/79__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 79,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 79,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 79,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 80,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 80,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 80,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 80,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 80,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/80__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 80,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/80__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 80,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 80,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 80,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 81,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 81,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 81,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 81,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 81,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/81__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 81,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/81__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 81,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 81,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 81,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 82,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 82,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 82,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 82,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 82,
+    "operator": "drop-step",
+    "site": "stmt@line22",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/82__drop-step__stmt_line22.py"
+  },
+  {
+    "base_uid": 82,
+    "operator": "reorder-steps",
+    "site": "stmts@lines22-23",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/82__reorder-steps__stmts_lines22_23.py"
+  },
+  {
+    "base_uid": 82,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 82,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 82,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 83,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 83,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 83,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 83,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 83,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/83__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 83,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/83__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 83,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 83,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 83,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 84,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 84,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 84,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 84,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 84,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/84__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 84,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/84__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 84,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 84,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 84,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 85,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 85,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 85,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 85,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 85,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/85__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 85,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/85__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 85,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 85,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 85,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 86,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 86,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 86,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 86,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 86,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/86__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 86,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/86__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 86,
+    "operator": "wrong-variable",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 86,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 86,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 87,
+    "operator": "negate-guard",
+    "site": "if@line12",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/87__negate-guard__if_line12.py"
+  },
+  {
+    "base_uid": 87,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 87,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 87,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 87,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/87__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 87,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/87__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 87,
+    "operator": "wrong-variable",
+    "site": "name@line11 (devices->device)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/87__wrong-variable__name_line11__devices__device_.py"
+  },
+  {
+    "base_uid": 87,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line12 (key='isCompliant')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/87__corrupt-container-op__subscript_line12__key__isCompliant__.py"
+  },
+  {
+    "base_uid": 87,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 88,
+    "operator": "negate-guard",
+    "site": "if@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/88__negate-guard__if_line11.py"
+  },
+  {
+    "base_uid": 88,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 88,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 88,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 88,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/88__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 88,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/88__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 88,
+    "operator": "wrong-variable",
+    "site": "name@line11 (buckets->objects)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/88__wrong-variable__name_line11__buckets__objects_.py"
+  },
+  {
+    "base_uid": 88,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 88,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 89,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 89,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 89,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 89,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 89,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/89__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 89,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/89__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 89,
+    "operator": "wrong-variable",
+    "site": "name@line11 (repositories->repo)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/89__wrong-variable__name_line11__repositories__repo_.py"
+  },
+  {
+    "base_uid": 89,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 89,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 90,
+    "operator": "negate-guard",
+    "site": "if@line12",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/90__negate-guard__if_line12.py"
+  },
+  {
+    "base_uid": 90,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 90,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 90,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 90,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/90__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 90,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/90__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 90,
+    "operator": "wrong-variable",
+    "site": "name@line11 (repositories->repo)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/90__wrong-variable__name_line11__repositories__repo_.py"
+  },
+  {
+    "base_uid": 90,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line12 (key='has_projects')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/90__corrupt-container-op__subscript_line12__key__has_projects__.py"
+  },
+  {
+    "base_uid": 90,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 91,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 91,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 91,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 91,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 91,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/91__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 91,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/91__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 91,
+    "operator": "wrong-variable",
+    "site": "name@line11 (buckets->bucket)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/91__wrong-variable__name_line11__buckets__bucket_.py"
+  },
+  {
+    "base_uid": 91,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 91,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 92,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/92__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 92,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 92,
+    "operator": "swap-branches",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/92__swap-branches__if_line16.py"
+  },
+  {
+    "base_uid": 92,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 92,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/92__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 92,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/92__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 92,
+    "operator": "wrong-variable",
+    "site": "name@line15 (buckets->bucket)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/92__wrong-variable__name_line15__buckets__bucket_.py"
+  },
+  {
+    "base_uid": 92,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='name')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/92__corrupt-container-op__subscript_line16__key__name__.py"
+  },
+  {
+    "base_uid": 92,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('non-compliant'->'non-compliant_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/92__constant-perturb__compare_line16___non_compliant____non_compliant_MUTATED__.py"
+  },
+  {
+    "base_uid": 93,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/93__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 93,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 93,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 93,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 93,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/93__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 93,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/93__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 93,
+    "operator": "wrong-variable",
+    "site": "name@line15 (roles->role)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/93__wrong-variable__name_line15__roles__role_.py"
+  },
+  {
+    "base_uid": 93,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='name')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/93__corrupt-container-op__subscript_line16__key__name__.py"
+  },
+  {
+    "base_uid": 93,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('inactive'->'inactive_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/93__constant-perturb__compare_line16___inactive____inactive_MUTATED__.py"
+  },
+  {
+    "base_uid": 94,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/94__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 94,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 94,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 94,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 94,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/94__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 94,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/94__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 94,
+    "operator": "wrong-variable",
+    "site": "name@line15 (folders->folder)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/94__wrong-variable__name_line15__folders__folder_.py"
+  },
+  {
+    "base_uid": 94,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='item_status')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/94__corrupt-container-op__subscript_line16__key__item_status__.py"
+  },
+  {
+    "base_uid": 94,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('empty'->'empty_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/94__constant-perturb__compare_line16___empty____empty_MUTATED__.py"
+  },
+  {
+    "base_uid": 95,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/95__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 95,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 95,
+    "operator": "swap-branches",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/95__swap-branches__if_line16.py"
+  },
+  {
+    "base_uid": 95,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 95,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/95__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 95,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/95__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 95,
+    "operator": "wrong-variable",
+    "site": "name@line15 (contacts->contact)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/95__wrong-variable__name_line15__contacts__contact_.py"
+  },
+  {
+    "base_uid": 95,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='CleanStatus')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/95__corrupt-container-op__subscript_line16__key__CleanStatus__.py"
+  },
+  {
+    "base_uid": 95,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('new'->'new_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/95__constant-perturb__compare_line16___new____new_MUTATED__.py"
+  },
+  {
+    "base_uid": 96,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/96__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 96,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 96,
+    "operator": "swap-branches",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/96__swap-branches__if_line16.py"
+  },
+  {
+    "base_uid": 96,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 96,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/96__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 96,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/96__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 96,
+    "operator": "wrong-variable",
+    "site": "name@line15 (folders->folder)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/96__wrong-variable__name_line15__folders__folder_.py"
+  },
+  {
+    "base_uid": 96,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='is_collaboration_restricted_to_enterprise')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/96__corrupt-container-op__subscript_line16__key__is_collaboration_restricted_to_enterp.py"
+  },
+  {
+    "base_uid": 96,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 97,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 97,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 97,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 97,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 97,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/97__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 97,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/97__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 97,
+    "operator": "wrong-variable",
+    "site": "name@line11 (repositories->repo)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/97__wrong-variable__name_line11__repositories__repo_.py"
+  },
+  {
+    "base_uid": 97,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 97,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 98,
+    "operator": "negate-guard",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/98__negate-guard__if_line16.py"
+  },
+  {
+    "base_uid": 98,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 98,
+    "operator": "swap-branches",
+    "site": "if@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/98__swap-branches__if_line16.py"
+  },
+  {
+    "base_uid": 98,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 98,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/98__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 98,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/98__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 98,
+    "operator": "wrong-variable",
+    "site": "name@line15 (leads->lead)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/98__wrong-variable__name_line15__leads__lead_.py"
+  },
+  {
+    "base_uid": 98,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line16 (key='rating')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/98__corrupt-container-op__subscript_line16__key__rating__.py"
+  },
+  {
+    "base_uid": 98,
+    "operator": "constant-perturb",
+    "site": "compare@line16 ('high'->'high_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/98__constant-perturb__compare_line16___high____high_MUTATED__.py"
+  },
+  {
+    "base_uid": 99,
+    "operator": "negate-guard",
+    "site": "if@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/99__negate-guard__if_line20.py"
+  },
+  {
+    "base_uid": 99,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 99,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 99,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 99,
+    "operator": "drop-step",
+    "site": "stmt@line18",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/99__drop-step__stmt_line18.py"
+  },
+  {
+    "base_uid": 99,
+    "operator": "reorder-steps",
+    "site": "stmts@lines18-19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/99__reorder-steps__stmts_lines18_19.py"
+  },
+  {
+    "base_uid": 99,
+    "operator": "wrong-variable",
+    "site": "name@line19 (tasks->task)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/99__wrong-variable__name_line19__tasks__task_.py"
+  },
+  {
+    "base_uid": 99,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line20 (key='completed')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/99__corrupt-container-op__subscript_line20__key__completed__.py"
+  },
+  {
+    "base_uid": 99,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 100,
+    "operator": "negate-guard",
+    "site": "if@line12",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/100__negate-guard__if_line12.py"
+  },
+  {
+    "base_uid": 100,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 100,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 100,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 100,
+    "operator": "drop-step",
+    "site": "stmt@line10",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/100__drop-step__stmt_line10.py"
+  },
+  {
+    "base_uid": 100,
+    "operator": "reorder-steps",
+    "site": "stmts@lines10-11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/100__reorder-steps__stmts_lines10_11.py"
+  },
+  {
+    "base_uid": 100,
+    "operator": "wrong-variable",
+    "site": "name@line11 (tasks->task)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/100__wrong-variable__name_line11__tasks__task_.py"
+  },
+  {
+    "base_uid": 100,
+    "operator": "corrupt-container-op",
+    "site": "subscript@line12 (key='statuscode')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/100__corrupt-container-op__subscript_line12__key__statuscode__.py"
+  },
+  {
+    "base_uid": 100,
+    "operator": "constant-perturb",
+    "site": "compare@line12 ('completed'->'completed_MUTATED')",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/100__constant-perturb__compare_line12___completed____completed_MUTATED__.py"
+  },
+  {
+    "base_uid": 101,
+    "operator": "negate-guard",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 101,
+    "operator": "boundary-shift",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 101,
+    "operator": "swap-branches",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 101,
+    "operator": "off-by-one-loop",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 101,
+    "operator": "drop-step",
+    "site": "stmt@line14",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/101__drop-step__stmt_line14.py"
+  },
+  {
+    "base_uid": 101,
+    "operator": "reorder-steps",
+    "site": "stmts@lines14-15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/101__reorder-steps__stmts_lines14_15.py"
+  },
+  {
+    "base_uid": 101,
+    "operator": "wrong-variable",
+    "site": "name@line15 (users->user)",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/101__wrong-variable__name_line15__users__user_.py"
+  },
+  {
+    "base_uid": 101,
+    "operator": "corrupt-container-op",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 101,
+    "operator": "constant-perturb",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 1,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/1__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 2,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/2__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 3,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/3__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 4,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/4__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 5,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/5__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 6,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/6__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 7,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/7__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 8,
+    "operator": "early-return",
+    "site": "before_stmt@line17",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/8__early-return__before_stmt_line17.py"
+  },
+  {
+    "base_uid": 9,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/9__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 10,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/10__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 11,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/11__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 12,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/12__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 13,
+    "operator": "early-return",
+    "site": "before_stmt@line23",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/13__early-return__before_stmt_line23.py"
+  },
+  {
+    "base_uid": 14,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/14__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 15,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/15__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 16,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/16__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 17,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/17__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 18,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/18__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 19,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/19__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 20,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/20__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 21,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/21__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 22,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/22__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 23,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/23__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 24,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/24__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 25,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/25__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 26,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/26__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 27,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/27__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 28,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/28__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 29,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/29__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 30,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/30__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 31,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/31__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 32,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/32__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 33,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/33__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 34,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/34__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 35,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/35__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 36,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/36__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 37,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/37__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 38,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/38__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 39,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/39__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 40,
+    "operator": "early-return",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 41,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/41__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 42,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/42__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 43,
+    "operator": "early-return",
+    "site": "before_stmt@line21",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/43__early-return__before_stmt_line21.py"
+  },
+  {
+    "base_uid": 44,
+    "operator": "early-return",
+    "site": "before_stmt@line25",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/44__early-return__before_stmt_line25.py"
+  },
+  {
+    "base_uid": 45,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/45__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 46,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/46__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 47,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/47__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 48,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/48__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 49,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/49__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 50,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/50__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 51,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/51__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 52,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/52__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 53,
+    "operator": "early-return",
+    "site": "before_stmt@line21",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/53__early-return__before_stmt_line21.py"
+  },
+  {
+    "base_uid": 54,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/54__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 55,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/55__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 56,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/56__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 57,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/57__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 58,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/58__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 59,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/59__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 60,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/60__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 61,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/61__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 62,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/62__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 63,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/63__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 64,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/64__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 65,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/65__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 66,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/66__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 67,
+    "operator": "early-return",
+    "site": "before_stmt@line13",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/67__early-return__before_stmt_line13.py"
+  },
+  {
+    "base_uid": 68,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/68__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 69,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/69__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 70,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/70__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 71,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/71__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 72,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/72__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 73,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/73__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 74,
+    "operator": "early-return",
+    "site": "before_stmt@line21",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/74__early-return__before_stmt_line21.py"
+  },
+  {
+    "base_uid": 75,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/75__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 76,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/76__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 77,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/77__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 78,
+    "operator": "early-return",
+    "site": null,
+    "applicable": false,
+    "label": "buggy"
+  },
+  {
+    "base_uid": 79,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/79__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 80,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/80__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 81,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/81__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 82,
+    "operator": "early-return",
+    "site": "before_stmt@line26",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/82__early-return__before_stmt_line26.py"
+  },
+  {
+    "base_uid": 83,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/83__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 84,
+    "operator": "early-return",
+    "site": "before_stmt@line21",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/84__early-return__before_stmt_line21.py"
+  },
+  {
+    "base_uid": 85,
+    "operator": "early-return",
+    "site": "before_stmt@line16",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/85__early-return__before_stmt_line16.py"
+  },
+  {
+    "base_uid": 86,
+    "operator": "early-return",
+    "site": "before_stmt@line20",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/86__early-return__before_stmt_line20.py"
+  },
+  {
+    "base_uid": 87,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/87__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 88,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/88__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 89,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/89__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 90,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/90__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 91,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/91__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 92,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/92__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 93,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/93__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 94,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/94__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 95,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/95__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 96,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/96__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 97,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/97__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 98,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/98__early-return__before_stmt_line15.py"
+  },
+  {
+    "base_uid": 99,
+    "operator": "early-return",
+    "site": "before_stmt@line19",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/99__early-return__before_stmt_line19.py"
+  },
+  {
+    "base_uid": 100,
+    "operator": "early-return",
+    "site": "before_stmt@line11",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/100__early-return__before_stmt_line11.py"
+  },
+  {
+    "base_uid": 101,
+    "operator": "early-return",
+    "site": "before_stmt@line15",
+    "applicable": true,
+    "label": "buggy",
+    "source_file": "mutants/101__early-return__before_stmt_line15.py"
+  }
+]

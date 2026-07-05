@@ -1,0 +1,10 @@
+def Coupa_expense_reports__4_0_0__create_expense_reports():
+    return {}
+
+def Coupa_invoices__4_0_0__create_invoices():
+    return {}
+
+def workflow():
+    expense_report = Coupa_expense_reports__4_0_0__create_expense_reports()
+    invoice = Coupa_invoices__4_0_0__create_invoices()
+    return None
