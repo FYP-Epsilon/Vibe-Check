@@ -14,6 +14,7 @@ from __future__ import annotations
 import ast
 import copy
 import json
+import random
 from pathlib import Path
 from typing import Any, Callable, Optional
 
@@ -146,12 +147,32 @@ def op_corrupt_container_op(tree: ast.Module, fn: ast.FunctionDef) -> Optional[s
 
 
 def op_early_return(tree: ast.Module, fn: ast.FunctionDef) -> Optional[str]:
+    """Insert a `return None` at a position that actually cuts logic.
+
+    The original version always inserted at len(body)-1 -- immediately
+    before the function's existing trailing statement. Every
+    eval/flowbench_adapter.py-generated workflow already ends with a bare
+    `return None` as that trailing statement, so the insert landed right
+    before an identical statement and cut nothing: 101/101 early-return
+    mutants were semantically equivalent to their base (see
+    eval/results/e3_correlation_report.md's "early-return is a mutate.py
+    bug" finding). Fixed by inserting at a site that necessarily precedes
+    at least one real statement: index range [1, len(body)-2] always
+    excludes the trailing position. Seeded by the function's own unparsed
+    source (deterministic and reproducible regardless of PYTHONHASHSEED --
+    random.Random on a str/bytes seed uses a fixed hash algorithm per the
+    stdlib docs), not a fixed formula, so the cut position varies
+    sensibly across the corpus rather than always landing on the same
+    relative offset.
+    """
     body = fn.body
-    if len(body) < 2:
+    if len(body) < 3:
         return None
-    insert_at = len(body) - 1  # before the trailing `return None` we append
-    site = f"before_last@line{getattr(body[insert_at], 'lineno', '?')}"
-    body.insert(insert_at, ast.Return(value=ast.Constant(value=None)))
+    rng = random.Random(ast.unparse(fn))
+    idx = rng.randint(1, len(body) - 2)
+    site_target = body[idx]
+    site = f"before_stmt@line{getattr(site_target, 'lineno', '?')}"
+    body.insert(idx, ast.Return(value=ast.Constant(value=None)))
     return site
 
 
@@ -250,6 +271,59 @@ def generate_mutants(
     manifest.extend(mutant_entries)
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
+
+
+def regenerate_operator(
+    operator: str,
+    corpus_dir: Path = CORPUS_DIR,
+    mutants_dir: Path = MUTANTS_DIR,
+    manifest_path: Path = MANIFEST_PATH,
+) -> list[dict[str, Any]]:
+    """Regenerate mutants for a single *operator* only, leaving every
+    other operator's mutant files and manifest entries untouched.
+
+    Used to fix a single buggy operator (e.g. early-return) without
+    invalidating the rest of the corpus's cross-report comparability --
+    regenerating everything would force re-scoring every mutant, not
+    just the fixed operator's.
+    """
+    mutants_dir.mkdir(parents=True, exist_ok=True)
+
+    # Delete this operator's old mutant files.
+    for old_file in mutants_dir.glob(f"*__{operator}__*.py"):
+        old_file.unlink()
+
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        manifest = json.load(f)
+    # Drop this operator's old entries (applicable and inapplicable);
+    # every other entry (corpus + all other operators) is untouched.
+    manifest = [e for e in manifest if not (e.get("operator") == operator and "base_uid" in e)]
+
+    new_entries: list[dict[str, Any]] = []
+    for base_file in sorted(corpus_dir.glob("uid_*.py"), key=lambda p: int(p.stem.split("_")[1])):
+        uid = int(base_file.stem.split("_")[1])
+        source = base_file.read_text(encoding="utf-8")
+        result = apply_operator(source, operator)
+        if result is None:
+            new_entries.append({
+                "base_uid": uid, "operator": operator, "site": None,
+                "applicable": False, "label": "buggy",
+            })
+            continue
+        mutated_source, site = result
+        filename = f"{uid}__{operator}__{_slugify(site)}.py"
+        (mutants_dir / filename).write_text(mutated_source, encoding="utf-8")
+        new_entries.append({
+            "base_uid": uid, "operator": operator, "site": site,
+            "applicable": True, "label": "buggy",
+            "source_file": f"mutants/{filename}",
+        })
+
+    manifest.extend(new_entries)
+    with open(manifest_path, "w", encoding="utf-8") as f:
+        json.dump(manifest, f, indent=2)
+
+    return new_entries
 
     return mutant_entries
 
