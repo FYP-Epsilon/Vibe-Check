@@ -222,12 +222,32 @@ def run_differential_verification(mutant_source: str, base_func_wir: dict[str, A
     v1_params = _derive_v1_params(base_func_wir)
     initial_inputs = _derive_initial_inputs(mutant_tree, func_obj)
 
+    # branch_lines must come from the MUTANT's own WIR (functions[function_name]
+    # extracted above), not the base's. branch_lines are raw source line
+    # numbers; any single-statement insertion/deletion mutation (drop-step,
+    # early-return, ...) shifts every subsequent line by +/-1 in the mutant
+    # relative to the base, so base-derived branch_lines point the collector
+    # at the wrong (or a nonexistent) line in the mutant -- it then misses
+    # real branch_point events and/or fires on unrelated lines, producing
+    # spurious trace divergence unrelated to any actual behavior change.
+    # Confirmed empirically (C1): re-deriving branch_lines from the mutant
+    # recovered 2 of 3 sampled early-return false-positives to exactly their
+    # base program's own score. This is sound anti-circularity-wise: WHERE to
+    # watch is a property of the code under test (observable from its own
+    # syntax, no oracle knowledge needed), not spec knowledge -- only WHAT to
+    # expect there (the oracle) must come from the base. control_variables
+    # and state_variables stay base-derived: they're name-based, not
+    # line-based, so they aren't subject to this shift and changing them
+    # would reintroduce a real oracle leak.
+    mutant_func_wir = functions[function_name]
+    mutant_v1_params = _derive_v1_params(mutant_func_wir)
+
     v1_cert = run_v1_pipeline(
         source=mutant_source,
         function_name=function_name,
         wir=base_func_wir,
         task_patterns=_derive_task_patterns(mutant_tree, function_name),
-        branch_lines=v1_params["branch_lines"],
+        branch_lines=mutant_v1_params["branch_lines"],
         control_variables=v1_params["control_variables"],
         state_variables=v1_params["state_variables"] or None,
         n_runs=10,

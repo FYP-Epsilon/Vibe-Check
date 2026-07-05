@@ -93,3 +93,36 @@ class TestRunDifferentialVerification:
         base_cert = run_differential_verification(base_source, base_wir)
         mutant_cert = run_differential_verification(mutant_source, base_wir)
         assert base_cert["combined_confidence"] == pytest.approx(mutant_cert["combined_confidence"])
+
+    def test_line_shifted_equivalent_mutant_scores_like_its_base(self):
+        """C2 regression test: a semantically equivalent mutant that merely
+        shifts every subsequent line (an inserted no-op statement) must
+        score within epsilon of the base's own differential score.
+
+        branch_lines are raw source line numbers; deriving them from the
+        BASE WIR (as the code did before this fix) points the collector at
+        the wrong line in a shifted mutant, producing spurious divergence
+        unrelated to any real behavior change -- confirmed empirically
+        (C1) on 3 real early-return mutants, 2 of which were false-flagged
+        under the old behavior and recovered exactly under the fix."""
+        base_source = (
+            "def stub_a():\n    return {'v': 1}\n\n\n"
+            "def stub_b():\n    return {'v': 2}\n\n\n"
+            "def workflow(status: str) -> int:\n"
+            "    a = stub_a()\n"
+            "    if status == \"high\":\n"
+            "        b = stub_b()\n"
+            "    return 0\n"
+        )
+        shifted_source = base_source.replace(
+            "    a = stub_a()\n    if status",
+            "    a = stub_a()\n    x_pad = 0\n    if status",
+        )
+        assert shifted_source != base_source
+
+        base_wir = run_v3_pipeline(base_source)["functions"]["workflow"]
+        base_cert = run_differential_verification(base_source, base_wir)
+        shifted_cert = run_differential_verification(shifted_source, base_wir)
+        assert shifted_cert["combined_confidence"] == pytest.approx(
+            base_cert["combined_confidence"], abs=0.01
+        )
