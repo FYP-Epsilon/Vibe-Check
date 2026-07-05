@@ -233,7 +233,7 @@ class WIRSymbolicTracer:
     def _eval_symbolic(self, expr: str) -> z3.ExprRef:
         try:
             tree = ast.parse(expr, mode="eval")
-            ev = SymbolicEvaluator(self.registry, self.symbolic_state)
+            ev = SymbolicEvaluator(self.registry, self.symbolic_state, self.concrete_state)
             return ev.eval(tree.body)
         except (NotImplementedError, SyntaxError):
             # Symbolic guard fallback: False on error to prevent fake path coverage.

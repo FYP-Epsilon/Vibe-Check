@@ -1,0 +1,19 @@
+def Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder():
+    return {}
+
+def Slack_message__3_0_0__create_message():
+    return {}
+
+def Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel():
+    return {}
+
+def Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice():
+    return {}
+
+def workflow():
+    orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()
+    lists = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel()
+    invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()
+    message = Slack_message__3_0_0__create_message()
+    return None
+    return None

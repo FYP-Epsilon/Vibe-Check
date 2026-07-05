@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import ast
 import copy
 import inspect
 import sys
@@ -37,6 +38,7 @@ class BoundedConcolicEngine:
         query_budget: int = 500,
         timeout_ms: int = 5000,
         compiled_ns: Optional[dict[str, Any]] = None,
+        wir: Optional[dict[str, Any]] = None,
     ) -> None:
         self.source = source
         self.function_name = function_name
@@ -51,8 +53,11 @@ class BoundedConcolicEngine:
             self._compiled_ns: dict[str, Any] = {"__builtins__": SAFE_BUILTINS}
             exec(compile(self.source, "<string>", "exec"), self._compiled_ns)
 
-        # Pre-extract the WIR (Phase 1) for symbolic tracing.
-        self.wir = CFGExtractor().extract(self.source)
+        # Pre-extract the WIR (Phase 1) for symbolic tracing, unless an
+        # external WIR was supplied (differential mode: explore the *base*
+        # program's spec-shaped WIR while concretely executing *source*,
+        # which may be a mutant of it).
+        self.wir = wir if wir is not None else CFGExtractor().extract(self.source)
 
         # Build a comprehensive node map that includes top-level nodes AND
         # every node inside function sub-CFGs.  This is required for QCE
@@ -98,6 +103,10 @@ class BoundedConcolicEngine:
         Returns a V2 certificate dictionary.
         """
         inputs = copy.deepcopy(initial_inputs)
+        # Replace empty container inputs with small non-empty samples so that
+        # container-dependent loops and branches are actually explored instead
+        # of trivially bailing to V1 (the dominant cause of the container gap).
+        self._seed_containers(inputs)
 
         while self.iteration < self.query_budget:
             next_inputs = self._concolic_iteration(inputs)
@@ -134,6 +143,73 @@ class BoundedConcolicEngine:
                 cert["message"] = "V2 skipped: uninterpreted container types"
         return cert
 
+    # -- container input synthesis ---------------------------------------
+
+    def _seed_containers(self, inputs: dict[str, Any]) -> None:
+        """
+        Fill empty ``list`` / ``dict`` inputs with small non-empty samples.
+
+        Lists get two distinct scalar elements (typed from the annotation when
+        available).  Dicts get the string keys the function actually subscripts
+        (discovered from the source AST) so concrete execution does not
+        ``KeyError``; if none are found, two generic keys are used.  This is a
+        scoped first step: it gets execution *into* container logic.  Full
+        symbolic-length / element solving is deliberately out of scope here.
+        """
+        func = self._compiled_ns.get(self.function_name)
+        try:
+            params = inspect.signature(func).parameters if func is not None else {}
+        except (TypeError, ValueError):
+            params = {}
+
+        for name, value in list(inputs.items()):
+            ann = params[name].annotation if name in params else inspect.Parameter.empty
+            if isinstance(value, list) and not value:
+                elem_t = self._annotation_arg(ann, 0)
+                inputs[name] = [self._default_scalar(elem_t, i) for i in range(2)]
+            elif isinstance(value, dict) and not value:
+                val_t = self._annotation_arg(ann, 1)
+                keys = self._discover_string_keys(name)
+                if keys:
+                    inputs[name] = {k: self._default_scalar(val_t, i) for i, k in enumerate(sorted(keys))}
+                else:
+                    inputs[name] = {f"k{i}": self._default_scalar(val_t, i) for i in range(2)}
+
+    def _discover_string_keys(self, param_name: str) -> set[str]:
+        """Find string-literal keys subscripted on *param_name* in the source."""
+        keys: set[str] = set()
+        try:
+            tree = ast.parse(self.source)
+        except SyntaxError:
+            return keys
+        for sub in ast.walk(tree):
+            if (isinstance(sub, ast.Subscript)
+                    and isinstance(sub.value, ast.Name)
+                    and sub.value.id == param_name
+                    and isinstance(sub.slice, ast.Constant)
+                    and isinstance(sub.slice.value, str)):
+                keys.add(sub.slice.value)
+        return keys
+
+    @staticmethod
+    def _annotation_arg(ann: Any, idx: int) -> Any:
+        """Best-effort element/value type from a generic annotation (e.g. list[int])."""
+        args = getattr(ann, "__args__", None)
+        if args and idx < len(args):
+            return args[idx]
+        return int
+
+    @staticmethod
+    def _default_scalar(t: Any, i: int) -> Any:
+        """A distinct default value of (best-effort) type *t* for index *i*."""
+        if t is str:
+            return f"v{i}"
+        if t is float:
+            return float(i)
+        if t is bool:
+            return bool(i % 2)
+        return i  # int / unknown -> distinct ints
+
     def _concolic_iteration(
         self, inputs: dict[str, Any]
     ) -> Optional[dict[str, Any]]:
@@ -144,7 +220,8 @@ class BoundedConcolicEngine:
         # 1. Concrete execution.
         try:
             concrete_result = self._execute_concrete(inputs)
-        except (TypeError, KeyError, IndexError, AttributeError, ZeroDivisionError):
+        except (TypeError, KeyError, IndexError, AttributeError, ZeroDivisionError,
+                 NameError, ValueError, RecursionError):
             self.input_mismatch_count += 1
             return None
 
@@ -352,8 +429,7 @@ class BoundedConcolicEngine:
         finally:
             solver.pop()
 
-    @staticmethod
-    def _z3_to_python(z3_val: Any, py_type: type) -> Any:
+    def _z3_to_python(self, z3_val: Any, py_type: type) -> Any:
         """Best-effort conversion from a Z3 model value to a Python value."""
         if hasattr(z3_val, "as_long"):
             v = z3_val.as_long()
@@ -361,6 +437,14 @@ class BoundedConcolicEngine:
                 return bool(v)
             if py_type == float:
                 return float(v)
+            if py_type == str:
+                # Strings are tokenized to ints for arithmetic constraints
+                # (see SymbolicEvaluator.visit_Constant); decode the token
+                # back to its literal instead of returning a bare int, or
+                # the next concrete iteration would feed a wrong-typed
+                # value into a str-typed parameter.
+                literal = self.registry.resolve_string_token(v)
+                return literal if literal is not None else f"__tok_{v}"
             return v
         if hasattr(z3_val, "as_fraction"):
             v = float(z3_val.as_fraction())
@@ -475,6 +559,18 @@ class BoundedConcolicEngine:
         branch_diversity_score = (
             diverse_gateways / total_gateways if total_gateways > 0 else 1.0
         )
+
+        # Coverage-credit term: pure-container functions have no scalar
+        # inputs for the solver to re-solve, so solver_rate stays 0 and pins
+        # confidence at 0 even when the seeded container inputs (see
+        # _seed_containers) achieved real branch coverage. Credit branch
+        # diversity and edge coverage directly in that case; the diversity
+        # and branches-explored caps below still apply on top of this.
+        if solver_rate == 0 and len(self.covered_edges) >= 2:
+            coverage_credit = 0.5 * branch_diversity_score + 0.3 * min(
+                len(self.covered_edges) / 4, 1.0
+            )
+            confidence = max(confidence, coverage_credit)
 
         if confidence > 0 and total_gateways > 0 and branch_diversity_score < 0.5:
             confidence = min(confidence, 0.80)

@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import ast
+from typing import Any, Optional
 import z3
 try:
     from .ast_extractor import CFGExtractor, _unparse
@@ -27,9 +28,13 @@ class SymbolicEvaluator(ast.NodeVisitor):
         self,
         registry: Z3VariableRegistry,
         symbolic_state: dict[str, z3.ExprRef],
+        concrete_state: Optional[dict[str, Any]] = None,
     ) -> None:
         self.registry = registry
         self.symbolic_state = symbolic_state
+        # Concrete values for the current path (used to interpret container
+        # builtins such as len() against the actual data on this path).
+        self.concrete_state = concrete_state or {}
 
     def eval(self, node: ast.AST) -> z3.ExprRef:
         """Entry point -- dispatch to ``visit_*``."""
@@ -52,8 +57,12 @@ class SymbolicEvaluator(ast.NodeVisitor):
         elif isinstance(v, float):
             return z3.RealVal(v)
         elif isinstance(v, str):
-            # String-as-token encoding.
-            return z3.IntVal(hash(v) & 0x7FFFFFFF)
+            # String-as-token encoding. Record the reverse mapping so a
+            # solved model's token can be decoded back into this literal
+            # (see Z3VariableRegistry.resolve_string_token / _z3_to_python).
+            token = hash(v) & 0x7FFFFFFF
+            self.registry.register_string_token(token, v)
+            return z3.IntVal(token)
         else:
             sort = self.registry.infer_sort(v)
             return z3.Const(f"const_{id(v)}", sort)
@@ -159,6 +168,16 @@ class SymbolicEvaluator(ast.NodeVisitor):
         function name heuristic (e.g. ``len`` -> IntSort).
         """
         func_name = _unparse(node.func)
+        # len() of a container that is concrete on this path -> its actual
+        # length, so length-dependent guards (e.g. ``len(items) > 3``) carry
+        # real symbolic meaning instead of an unconstrained placeholder.
+        if func_name == "len" and len(node.args) == 1:
+            arg = node.args[0]
+            if isinstance(arg, ast.Name) and arg.id in self.concrete_state:
+                try:
+                    return z3.IntVal(len(self.concrete_state[arg.id]))
+                except TypeError:
+                    pass
         # Simple heuristic: len -> Int, anything else -> generic.
         sort = z3.IntSort() if func_name == "len" else z3.DeclareSort("PyObject")
         return z3.Const(f"call_{func_name}_{id(node)}", sort)
