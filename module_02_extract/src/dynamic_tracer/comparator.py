@@ -39,9 +39,18 @@ class DifferentialComparator:
         expected_tasks = self._extract_task_names(self.expected_raw)
         actual_filtered = self._eliminate_stutter(self.actual_raw, expected_tasks)
 
-        # 2. Normalise to comparable tuples.
-        actual_seq = self._normalise(actual_filtered)
-        expected_seq = self._normalise(self.expected_raw)
+        # 2. Normalise to comparable tuples. Branch decisions (taken_branch)
+        # are only compared when EVERY branch_point event on BOTH sides
+        # carries the field -- today's actual-side collector never emits
+        # it (see collector.py's branch_point events: "observables" +
+        # "iteration_info", no decision field), so real traces always fall
+        # back to the bare ("branch_point",) tuple, unchanged from before.
+        # This stays symmetric on purpose: comparing a taken-aware expected
+        # tuple against a taken-blind actual tuple would make every branch
+        # mismatch regardless of correctness.
+        use_taken = self._both_sides_have_taken(actual_filtered, self.expected_raw)
+        actual_seq = self._normalise(actual_filtered, use_taken)
+        expected_seq = self._normalise(self.expected_raw, use_taken)
 
         # 3. LCS similarity.
         lcs_len = self._lcs(actual_seq, expected_seq)
@@ -100,7 +109,21 @@ class DifferentialComparator:
         return filtered
 
     @staticmethod
-    def _normalise(trace: list[dict[str, Any]]) -> list[tuple[Any, ...]]:
+    def _both_sides_have_taken(
+        actual_trace: list[dict[str, Any]],
+        expected_trace: list[dict[str, Any]],
+    ) -> bool:
+        """True iff every branch_point event on both sides carries a
+        taken_branch value (see the comment in compare() for why this must
+        be an all-or-nothing, symmetric decision)."""
+        for trace in (actual_trace, expected_trace):
+            branch_events = [e for e in trace if e["event"] == "branch_point"]
+            if any(e.get("taken_branch") is None for e in branch_events):
+                return False
+        return True
+
+    @staticmethod
+    def _normalise(trace: list[dict[str, Any]], use_taken: bool = False) -> list[tuple[Any, ...]]:
         """Convert trace records into comparable tuples."""
         seq: list[tuple[Any, ...]] = []
         for e in trace:
@@ -110,9 +133,12 @@ class DifferentialComparator:
             elif ev == "task_exit":
                 seq.append(("task_exit", e.get("task", e.get("function", ""))))
             elif ev == "branch_point":
-                # Under the task-observable abstraction we only care that a
-                # branch point was reached, not its specific label or decision.
-                seq.append(("branch_point",))
+                if use_taken:
+                    seq.append(("branch_point", e.get("taken_branch")))
+                else:
+                    # Under the task-observable abstraction we only care that
+                    # a branch point was reached, not its label or decision.
+                    seq.append(("branch_point",))
             elif ev == "exception":
                 seq.append(("exception", e.get("exception_type")))
         return seq
