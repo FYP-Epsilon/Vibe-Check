@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "teams = Trello_Organization__2_0_0__retrievewithwhere_Organization(teams_type_0=teams_type_0, teams_type_1=teams_type_1)"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for team in teams"
+    },
+    {
+      "gold_id": "g3",
+      "type": "gateway",
+      "code": "team['type'] == 'customer'"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "lead = Marketo_leads__3_0_0__create_leads()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    }
+  ]
+}

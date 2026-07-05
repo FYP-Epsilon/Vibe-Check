@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "calendar = Microsoft_Exchange_Calendars__2_0_0__retrievewithwhere_Calendars()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "meeting = Microsoft_Exchange_Events__2_0_0__create_Events()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    }
+  ]
+}

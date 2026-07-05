@@ -1,0 +1,81 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "tasks = Asana_Tasks__2_0_0__retrievewithwhere_Tasks(tasks_completed_0=tasks_completed_0, tasks_completed_1=tasks_completed_1)"
+    },
+    {
+      "gold_id": "g2",
+      "type": "loop",
+      "code": "for task in tasks"
+    },
+    {
+      "gold_id": "g3",
+      "type": "gateway",
+      "code": "task['completed'] == true"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "retrieve_task = Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "block",
+      "code": "retrieve_object = Box_File__3_0_0__retrievewithwhere_File()"
+    },
+    {
+      "gold_id": "g6",
+      "type": "block",
+      "code": "retrieve_queue = GitHub_Issue__3_0_0__retrievewithwhere_Issue()"
+    },
+    {
+      "gold_id": "g7",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g5",
+      "dst_gold_id": "g6",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g6",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g2",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g7",
+      "label": "seq"
+    }
+  ]
+}

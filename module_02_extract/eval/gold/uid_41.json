@@ -1,0 +1,41 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "branch = GitHub_Branch__3_0_0__retrievewithwhere_Branch()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "pr = GitHub_Pullrequest__3_0_0__create_Pullrequest()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "block",
+      "code": "issue = GitHub_Issue__3_0_0__create_Issue()"
+    },
+    {
+      "gold_id": "g4",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "seq"
+    }
+  ]
+}

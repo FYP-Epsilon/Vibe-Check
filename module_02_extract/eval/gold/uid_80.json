@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "incident = ServiceNow_incident__4_0_0__create_incident()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "attachement = ServiceNow_sys_attachment__4_0_0__create_sys_attachment()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    }
+  ]
+}

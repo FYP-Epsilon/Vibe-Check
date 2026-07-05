@@ -1,0 +1,81 @@
+{
+  "nodes": [
+    {
+      "gold_id": "g1",
+      "type": "block",
+      "code": "bucket = Amazon_S3_bucket__2_0_0__create_bucket()"
+    },
+    {
+      "gold_id": "g2",
+      "type": "block",
+      "code": "files = Box_File__3_0_0__retrievewithwhere_File()"
+    },
+    {
+      "gold_id": "g3",
+      "type": "loop",
+      "code": "for file in files"
+    },
+    {
+      "gold_id": "g4",
+      "type": "block",
+      "code": "object = Amazon_S3_object__2_0_0__create_object()"
+    },
+    {
+      "gold_id": "g5",
+      "type": "gateway",
+      "code": "object['size'] > 100"
+    },
+    {
+      "gold_id": "g6",
+      "type": "block",
+      "code": "object = Amazon_S3_object__2_0_0__deletewithwhere_object(object_size=object_size)"
+    },
+    {
+      "gold_id": "g7",
+      "type": "return",
+      "code": "return None"
+    }
+  ],
+  "edges": [
+    {
+      "src_gold_id": "g1",
+      "dst_gold_id": "g2",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g5",
+      "dst_gold_id": "g6",
+      "label": "true"
+    },
+    {
+      "src_gold_id": "g4",
+      "dst_gold_id": "g5",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g4",
+      "label": "enter"
+    },
+    {
+      "src_gold_id": "g6",
+      "dst_gold_id": "g3",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g5",
+      "dst_gold_id": "g3",
+      "label": "back"
+    },
+    {
+      "src_gold_id": "g2",
+      "dst_gold_id": "g3",
+      "label": "seq"
+    },
+    {
+      "src_gold_id": "g3",
+      "dst_gold_id": "g7",
+      "label": "seq"
+    }
+  ]
+}
