@@ -12,7 +12,7 @@ import ast
 import inspect
 import os
 import time
-from typing import Any, get_type_hints
+from typing import Any, Optional, get_type_hints
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -48,6 +48,44 @@ class CodePayload(BaseModel):
     source_code: str
 
 
+def _derive_branch_arms(func_wir: dict) -> dict[int, tuple[Optional[int], Optional[int]]]:
+    """
+    For each gateway/loop node, resolve the first source line reached via its
+    true (successors[0]) and false (successors[1]) outgoing edge.
+
+    This is the "observation layer" for F2's branch-decision inference: it
+    tells the collector WHERE the true/false arms of a branch land in the
+    source, derived purely from the code-under-test's own WIR structure (no
+    oracle/spec knowledge), matching the same observation-vs-oracle split
+    established for branch_lines in eval/calibrate.py's C2 fix. A node with no
+    code of its own (an entry/exit or an unremoved bookkeeping remnant) is
+    walked through to its own successors until a real line is found.
+    """
+    nodes = {n["id"]: n for n in func_wir.get("nodes", [])}
+
+    def _first_line(node_id: Optional[str], visited: set[str]) -> Optional[int]:
+        if node_id is None or node_id in visited or node_id not in nodes:
+            return None
+        visited.add(node_id)
+        node = nodes[node_id]
+        if node.get("line"):
+            return node["line"]
+        for succ in node.get("successors", []):
+            line = _first_line(succ, visited)
+            if line is not None:
+                return line
+        return None
+
+    arms: dict[int, tuple[Optional[int], Optional[int]]] = {}
+    for node in nodes.values():
+        if node["type"] in ("gateway", "loop") and node.get("line"):
+            succs = node.get("successors", [])
+            true_line = _first_line(succs[0], set()) if len(succs) >= 1 else None
+            false_line = _first_line(succs[1], set()) if len(succs) >= 2 else None
+            arms[node["line"]] = (true_line, false_line)
+    return arms
+
+
 def _derive_v1_params(func_wir: dict) -> dict:
     """
     Derive V1 pipeline parameters directly from a function sub-CFG.
@@ -57,6 +95,8 @@ def _derive_v1_params(func_wir: dict) -> dict:
       * control_variables – union of control_vars from all gateways
       * state_variables   – union of data_vars from block nodes (excluding
                             control variables)
+      * branch_arms       – per branch_line, (true_line, false_line) — see
+                            _derive_branch_arms
     """
     branch_lines: set[int] = set()
     control_variables: set[str] = set()
@@ -77,6 +117,7 @@ def _derive_v1_params(func_wir: dict) -> dict:
         "branch_lines": branch_lines,
         "control_variables": sorted(control_variables),
         "state_variables": sorted(state_variables),
+        "branch_arms": _derive_branch_arms(func_wir),
     }
 
 
@@ -254,6 +295,7 @@ def _run_verification(source: str) -> dict:
         n_runs=dynamic_n_runs,
         seed=42,
         compiled_ns=local_env,
+        branch_arms=v1_params["branch_arms"],
     )
 
     # ------------------------------------------------------------------
