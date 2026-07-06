@@ -29,13 +29,13 @@ are indistinguishable at this sample size," not an exact count.
 ## Correlation: 1 - combined_confidence vs semantic_diff_rate
 
 - n = 427 mutants scored (execution failed: 0)
-- Pearson r = 0.3653, 95% CI [0.2801, 0.4448]
-- Spearman rho = 0.5212
+- Pearson r = 0.4359, 95% CI [0.3557, 0.5097]
+- Spearman rho = 0.6774
 
 ### Restricted to semantic_diff_rate > 0 (n=416)
 
-- Pearson r = 0.5326, 95% CI [0.4600, 0.5981]
-- Spearman rho = 0.5784
+- Pearson r = 0.6493, 95% CI [0.5900, 0.7016]
+- Spearman rho = 0.7632
 
 ## Equivalent mutants (semantic_diff_rate == 0 at N=25): 11 / 427
 

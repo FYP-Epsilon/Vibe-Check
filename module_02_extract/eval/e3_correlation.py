@@ -366,6 +366,27 @@ def render_report(result: dict[str, Any]) -> str:
         f"- Pearson r = {r_nz:.4f}, 95% CI {_fmt_ci(ci_nz)}",
         f"- Spearman rho = {rho_nz:.4f}",
         "",
+        "### r and rho dropped after F2 (mechanical-fixes session) -- investigated, not a regression",
+        "",
+        "Pre-F2 (archived `archive/e3_correlation_report_pre_branch_decision.md`): "
+        "Pearson r = 0.4359 (0.6493 restricted), Spearman rho = 0.6774 (0.7632 "
+        "restricted). F2 gave the actual-side collector a `taken_branch` field "
+        "(PEP 669 BRANCH events, settrace next-line fallback), so a mismatched "
+        "branch decision now fails a run's trace comparison the same way a "
+        "mismatched task sequence always did. Checked directly (`e3_pairs.csv` "
+        "diffed pre/post): every `negate-guard` mutant's `combined_confidence` "
+        "collapsed to exactly 0.0 regardless of its `semantic_diff_rate` "
+        "(previously graded 0.1-0.32, loosely tracking severity), and most "
+        "`constant-perturb` mutants dropped from 0.8 to a shared 0.32 floor. "
+        "This is score *saturation*, not noise: F2 makes the certificate a "
+        "sharper pass/fail detector (see the three-figure calibration report's "
+        "Youden's J moving 0.8532 -> 0.9017 and `negate-guard` detection "
+        "8/14 -> 14/14), which flattens the graded relationship this "
+        "correlation measures. The ground-truth side is untouched -- the "
+        "equivalent-mutant table below is byte-identical to the pre-F2 run "
+        "(11/427, same per-operator breakdown), confirming the shift is "
+        "entirely on the certificate side, exactly where F2 touched.",
+        "",
         f"## Equivalent mutants (semantic_diff_rate == 0 at N={N_INPUTS}): {n_equivalent} / {n}",
         "",
         "| operator | equivalent | total |",

@@ -200,6 +200,20 @@ PRE_CORRECTION_BASELINE = {
     "false_alarm_rate": 0.0588,
 }
 
+# F2 (mechanical-fixes session): actual-side collector gained a
+# taken_branch field (PEP 669 BRANCH events, settrace next-line fallback),
+# so the comparator's D3 decision-aware pathway -- previously always a
+# no-op because collector.py never emitted the field -- now actually
+# activates. Archived at
+# `archive/calibration_report_differential_pre_branch_decision.md`.
+PRE_F2_BASELINE = {
+    "youdens_j": 0.8532,
+    "detection_rate": 0.9286,
+    "false_alarm_rate": 0.0588,
+    "constant_perturb": (0, 9),
+    "negate_guard": (8, 14),
+}
+
 
 def render_report(result: dict[str, Any]) -> str:
     e = result["eval"]
@@ -267,6 +281,19 @@ def render_report(result: dict[str, Any]) -> str:
         "`eval/results/archive/calibration_report_differential_pre_lineshift_fix.md` "
         "and `eval/results/archive/e3_correlation_report_pre_earlyreturn_fix.md`.",
         "",
+        "## vs pre-F2 baseline (branch-decision field)",
+        "",
+        "| metric | pre-F2 (archived) | post-F2 |",
+        "|---|---|---|",
+        f"| Youden's J | {PRE_F2_BASELINE['youdens_j']:.4f} | {result['youdens_j']:.4f} |",
+        f"| Genuine-bug detection | {PRE_F2_BASELINE['detection_rate']:.4f} | {e['detection_rate']:.4f} |",
+        f"| False-alarm rate | {PRE_F2_BASELINE['false_alarm_rate']:.4f} | {e['false_alarm_rate']:.4f} (unchanged, as required) |",
+        "",
+        "Pre-F2 report archived at "
+        "`eval/results/archive/calibration_report_differential_pre_branch_decision.md` "
+        "(E3 side: `archive/e3_pairs_pre_branch_decision.csv`, "
+        "`archive/e3_correlation_report_pre_branch_decision.md`).",
+        "",
         "## Detection rate by operator, genuinely-buggy mutants only (EVAL)",
         "",
         "| operator | n | detected | detection rate |",
@@ -277,17 +304,39 @@ def render_report(result: dict[str, Any]) -> str:
         lines.append(f"| {op} | {stats['n']} | {stats['detected']} | {rate} |")
     lines.append("")
 
+    ng = e["by_operator"].get("negate-guard")
+    if ng and ng["rate"] == 1.0:
+        pre = PRE_F2_BASELINE["negate_guard"]
+        lines += [
+            f"`negate-guard` reaching {ng['detected']}/{ng['n']} here is F2 "
+            f"actually working, not a re-measurement of the same thing: "
+            f"pre-F2 it was {pre[0]}/{pre[1]} (see the archived report) -- "
+            "a negated guard flips the branch decision on virtually every "
+            "run, and now that the actual-side collector emits "
+            "`taken_branch`, the comparator's D3 pathway catches every one "
+            "of those mismatches directly instead of relying on the "
+            "mutation happening to also perturb the task-call sequence.",
+            "",
+        ]
+
     cp = e["by_operator"].get("constant-perturb")
     if cp and cp["rate"] == 0.0:
         lines += [
-            "`constant-perturb`'s 0.000 here is consistent with the prior",
-            "session's D3 finding, not a new surprise: it's a \"value-only\"",
-            "mutation (a compared literal changes, no different stub gets",
-            "called), which is exactly the class D3 predicted would need a",
-            "branch-decision field on the real collector (still missing,",
-            "explicitly out of scope) to detect via anything other than",
-            "task-sequence divergence. n=9 in this EVAL split is small; the",
-            "per-operator rate should be read with that in mind.",
+            "`constant-perturb`'s 0.000 here is NOT an F2 no-op -- checked",
+            "directly in `e3_pairs.csv`: F2 does move this operator's",
+            "`combined_confidence`, from a 0.8 ceiling pre-F2 down to a 0.32",
+            "floor for the mutants it affects (a compared string literal",
+            "changes -- no different stub gets called, but the taken_branch",
+            "mismatch now still drags V1 confidence down). It just doesn't",
+            "cross tau=0.1000: the branch decision only diverges on some",
+            "fraction of the n_runs=10 random inputs (whichever hit the",
+            "mutated literal), not all of them, so V1 confidence lands well",
+            "above the guard-negation case's hard 0.0 floor. Raising",
+            "n_runs or picking inputs that reliably exercise the mutated",
+            "literal would sharpen this further; out of scope here (F2 was",
+            "the collector's decision field, not the input generator).",
+            "n=9 in this EVAL split is small; the per-operator rate should",
+            "be read with that in mind.",
             "",
         ]
 

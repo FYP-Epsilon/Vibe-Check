@@ -34,6 +34,7 @@ class RandomizedDifferentialTester:
         n_runs: int = 20,
         seed: Optional[int] = None,
         compiled_ns: Optional[dict[str, Any]] = None,
+        branch_arms: Optional[dict[int, tuple[Optional[int], Optional[int]]]] = None,
     ) -> None:
         self.source = source
         self.function_name = function_name
@@ -45,6 +46,7 @@ class RandomizedDifferentialTester:
         # trace instead of being invisible WIR block statements.
         self._stub_task_names: set[str] = set(task_patterns) - {function_name}
         self.branch_lines = branch_lines
+        self.branch_arms = branch_arms or {}
         self.control_variables = control_variables
         self.state_variables = state_variables
         self.n_runs = n_runs
@@ -139,6 +141,7 @@ class RandomizedDifferentialTester:
             branch_lines=self.branch_lines,
             control_variables=self.control_variables,
             state_variables=self.state_variables,
+            branch_arms=self.branch_arms,
         )
         func = self._compiled_ns[self.function_name]
         with collector:

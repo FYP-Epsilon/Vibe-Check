@@ -467,9 +467,13 @@ class TestDifferentialComparator:
         assert diff_result["similarity_score"] < 1.0
 
     def test_branch_decision_ignored_when_actual_side_lacks_it(self):
-        """Real actual-side traces (from collector.py) never carry
-        taken_branch -- this must stay a no-op fallback, not a mismatch,
-        so unmutated programs still get similarity 1.0 (no regression)."""
+        """Actual-side traces without branch_arms configured (or an
+        unresolved corner case -- see collector.py's _infer_taken) never
+        carry taken_branch -- this must stay a no-op fallback, not a
+        mismatch, so those traces still get similarity 1.0 (no regression).
+        (F2 gave collector.py the *ability* to emit taken_branch when
+        branch_arms is supplied -- see test_branch_decision_via_real_collector
+        below for that path actually lighting up.)"""
         actual = [
             {"event": "task_entry", "function": "foo"},
             {"event": "branch_point", "function": "foo"},  # no taken_branch
@@ -482,6 +486,64 @@ class TestDifferentialComparator:
         ]
         result = DifferentialComparator(actual, expected).compare()
         assert result["similarity_score"] == 1.0
+
+    def test_branch_decision_via_real_collector(self):
+        """F2 end-to-end: WIRTraceCollector (real tracer, not a hand-built
+        trace) fed branch_arms derived from the program's own WIR emits
+        taken_branch, and the comparator's D3 pathway actually uses it --
+        an actual/expected pair that agrees on every event *except* the
+        branch decision must score below 1.0, where before F2 (no
+        taken_branch on the actual side) it would have scored 1.0."""
+        from ast_extractor import CFGExtractor
+        from main import _derive_v1_params
+
+        source = (
+            "def task_classify(x):\n"
+            "    if x > 0:\n"
+            "        y = 1\n"
+            "    else:\n"
+            "        y = 2\n"
+            "    return y\n"
+        )
+        wir = CFGExtractor().extract(source)
+        func_wir = wir["functions"]["task_classify"]
+        v1_params = _derive_v1_params(func_wir)
+
+        ns = {"__builtins__": __builtins__}
+        exec(compile(source, "<string>", "exec"), ns)
+
+        def _actual_trace(x):
+            coll = WIRTraceCollector(
+                target_file="<string>",
+                task_patterns=["task"],
+                branch_lines=v1_params["branch_lines"],
+                control_variables=v1_params["control_variables"],
+                state_variables=v1_params["state_variables"] or None,
+                branch_arms=v1_params["branch_arms"],
+            )
+            with coll:
+                ns["task_classify"](x=x)
+            return coll.trace_log
+
+        # Reference trace for x=5 (guard True) used as the "expected" side
+        # for both runs, so only the real collector's observed decision
+        # (True for x=5, False for x=-5) differs between the two calls.
+        expected = WIRReferenceInterpreter(func_wir).execute({"x": 5})
+        expected = [
+            {"event": "task_entry", "task": "task_classify"},
+            *expected,
+            {"event": "task_exit", "task": "task_classify"},
+        ]
+
+        same_result = DifferentialComparator(_actual_trace(5), expected).compare()
+        diff_result = DifferentialComparator(_actual_trace(-5), expected).compare()
+
+        assert any(
+            e.get("taken_branch") is not None
+            for e in _actual_trace(5) if e["event"] == "branch_point"
+        ), "collector did not emit taken_branch with branch_arms supplied"
+        assert same_result["similarity_score"] == 1.0
+        assert diff_result["similarity_score"] < 1.0
 
 
 # ----------------------------------------------------------------------
