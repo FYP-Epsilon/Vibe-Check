@@ -20,6 +20,7 @@ def run_v1_pipeline(
     n_runs: int = 20,
     seed: Optional[int] = None,
     compiled_ns: Optional[dict[str, Any]] = None,
+    branch_arms: Optional[dict[int, tuple[Optional[int], Optional[int]]]] = None,
 ) -> dict[str, Any]:
     """
     End-to-end Phase-3 pipeline.
@@ -38,5 +39,6 @@ def run_v1_pipeline(
         n_runs=n_runs,
         seed=seed,
         compiled_ns=compiled_ns,
+        branch_arms=branch_arms,
     )
     return tester.run()
