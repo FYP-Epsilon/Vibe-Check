@@ -8,7 +8,7 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 2__wrong-variable__name@line19 (incident->issue),wrong-variable,2,1.0,0.0
 2__corrupt-container-op__subscript@line19 (key='impact'),corrupt-container-op,2,1.0,0.0
 2__constant-perturb__compare@line19 ('high'->'high_MUTATED'),constant-perturb,2,0.36,0.19999999999999996
-3__negate-guard__if@line16,negate-guard,3,1.0,0.0
+3__negate-guard__if@line16,negate-guard,3,1.0,0.30000000000000004
 3__drop-step__stmt@line14,drop-step,3,1.0,0.0
 3__reorder-steps__stmts@lines14-15,reorder-steps,3,1.0,0.0
 3__corrupt-container-op__subscript@line16 (key='name'),corrupt-container-op,3,1.0,0.0
@@ -27,12 +27,12 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 7__wrong-variable__name@line15 (channels->channel),wrong-variable,7,1.0,0.0
 8__drop-step__stmt@line14,drop-step,8,1.0,0.0
 8__reorder-steps__stmts@lines14-15,reorder-steps,8,0.0,0.09999999999999998
-9__negate-guard__if@line24,negate-guard,9,0.48,0.0
+9__negate-guard__if@line24,negate-guard,9,0.48,0.32000000000000006
 9__drop-step__stmt@line18,drop-step,9,1.0,0.0
 9__reorder-steps__stmts@lines18-19,reorder-steps,9,1.0,0.0
 9__wrong-variable__name@line19 (repositories->repository),wrong-variable,9,1.0,0.0
 9__corrupt-container-op__subscript@line24 (key='author'),corrupt-container-op,9,1.0,0.0
-9__constant-perturb__compare@line24 ('abc'->'abc_MUTATED'),constant-perturb,9,0.6,0.32000000000000006
+9__constant-perturb__compare@line24 ('abc'->'abc_MUTATED'),constant-perturb,9,0.6,0.8
 10__negate-guard__if@line22,negate-guard,10,0.0,0.0
 10__boundary-shift__compare@line22,boundary-shift,10,0.0,0.0
 10__drop-step__stmt@line18,drop-step,10,1.0,0.0
@@ -57,12 +57,12 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 13__reorder-steps__stmts@lines22-23,reorder-steps,13,1.0,0.0
 13__wrong-variable__name@line23 (issues->issue),wrong-variable,13,1.0,0.0
 13__corrupt-container-op__subscript@line24 (key='fields'),corrupt-container-op,13,1.0,0.0
-14__negate-guard__if@line16,negate-guard,14,0.52,0.0
+14__negate-guard__if@line16,negate-guard,14,0.52,0.32000000000000006
 14__drop-step__stmt@line14,drop-step,14,1.0,0.0
 14__reorder-steps__stmts@lines14-15,reorder-steps,14,1.0,0.0
 14__wrong-variable__name@line15 (campaigns->campaign),wrong-variable,14,1.0,0.0
 14__corrupt-container-op__subscript@line16 (key='type'),corrupt-container-op,14,1.0,0.0
-14__constant-perturb__compare@line16 ('Finance'->'Finance_MUTATED'),constant-perturb,14,0.6,0.32000000000000006
+14__constant-perturb__compare@line16 ('Finance'->'Finance_MUTATED'),constant-perturb,14,0.6,0.8
 15__negate-guard__if@line16,negate-guard,15,0.68,0.0
 15__drop-step__stmt@line14,drop-step,15,1.0,0.0
 15__reorder-steps__stmts@lines14-15,reorder-steps,15,1.0,0.0
@@ -75,36 +75,36 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 16__wrong-variable__name@line15 (teams->team),wrong-variable,16,1.0,0.0
 16__corrupt-container-op__subscript@line16 (key='name'),corrupt-container-op,16,1.0,0.0
 16__constant-perturb__compare@line16 ('customer'->'customer_MUTATED'),constant-perturb,16,0.28,0.24
-17__negate-guard__if@line12,negate-guard,17,0.56,0.0
+17__negate-guard__if@line12,negate-guard,17,0.56,0.32000000000000006
 17__drop-step__stmt@line10,drop-step,17,1.0,0.0
 17__reorder-steps__stmts@lines10-11,reorder-steps,17,1.0,0.0
 17__wrong-variable__name@line11 (topics->topic),wrong-variable,17,1.0,0.0
 17__corrupt-container-op__subscript@line12 (key='topicarn'),corrupt-container-op,17,1.0,0.0
-17__constant-perturb__compare@line12 ('critical'->'critical_MUTATED'),constant-perturb,17,0.56,0.32000000000000006
-18__negate-guard__if@line16,negate-guard,18,0.56,0.0
+17__constant-perturb__compare@line12 ('critical'->'critical_MUTATED'),constant-perturb,17,0.56,0.8
+18__negate-guard__if@line16,negate-guard,18,0.56,0.32000000000000006
 18__drop-step__stmt@line14,drop-step,18,1.0,0.0
 18__reorder-steps__stmts@lines14-15,reorder-steps,18,1.0,0.0
 18__wrong-variable__name@line15 (topics->topic),wrong-variable,18,1.0,0.0
 18__corrupt-container-op__subscript@line16 (key='topicarn'),corrupt-container-op,18,1.0,0.0
-18__constant-perturb__compare@line16 ('critical'->'critical_MUTATED'),constant-perturb,18,0.64,0.32000000000000006
-19__negate-guard__if@line20,negate-guard,19,0.56,0.0
+18__constant-perturb__compare@line16 ('critical'->'critical_MUTATED'),constant-perturb,18,0.64,0.8
+19__negate-guard__if@line20,negate-guard,19,0.56,0.32000000000000006
 19__drop-step__stmt@line18,drop-step,19,1.0,0.0
 19__reorder-steps__stmts@lines18-19,reorder-steps,19,1.0,0.0
 19__wrong-variable__name@line19 (topics->topic),wrong-variable,19,1.0,0.0
 19__corrupt-container-op__subscript@line20 (key='topicarn'),corrupt-container-op,19,1.0,0.0
-19__constant-perturb__compare@line20 ('critical'->'critical_MUTATED'),constant-perturb,19,0.56,0.32000000000000006
-20__negate-guard__if@line12,negate-guard,20,0.4,0.0
+19__constant-perturb__compare@line20 ('critical'->'critical_MUTATED'),constant-perturb,19,0.56,0.8
+20__negate-guard__if@line12,negate-guard,20,0.4,0.32000000000000006
 20__drop-step__stmt@line10,drop-step,20,1.0,0.0
 20__reorder-steps__stmts@lines10-11,reorder-steps,20,1.0,0.0
 20__wrong-variable__name@line11 (teams->team),wrong-variable,20,1.0,0.0
 20__corrupt-container-op__subscript@line12 (key='type'),corrupt-container-op,20,1.0,0.0
-20__constant-perturb__compare@line12 ('customer'->'customer_MUTATED'),constant-perturb,20,0.72,0.32000000000000006
-21__negate-guard__if@line16,negate-guard,21,0.44,0.0
+20__constant-perturb__compare@line12 ('customer'->'customer_MUTATED'),constant-perturb,20,0.72,0.8
+21__negate-guard__if@line16,negate-guard,21,0.44,0.32000000000000006
 21__drop-step__stmt@line14,drop-step,21,1.0,0.0
 21__reorder-steps__stmts@lines14-15,reorder-steps,21,1.0,0.0
 21__wrong-variable__name@line15 (topics->topic),wrong-variable,21,1.0,0.0
 21__corrupt-container-op__subscript@line16 (key='type'),corrupt-container-op,21,1.0,0.0
-21__constant-perturb__compare@line16 ('critical'->'critical_MUTATED'),constant-perturb,21,0.68,0.32000000000000006
+21__constant-perturb__compare@line16 ('critical'->'critical_MUTATED'),constant-perturb,21,0.68,0.8
 22__drop-step__stmt@line14,drop-step,22,1.0,0.0
 22__reorder-steps__stmts@lines14-15,reorder-steps,22,1.0,0.0
 23__drop-step__stmt@line10,drop-step,23,1.0,0.0
@@ -119,12 +119,12 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 26__wrong-variable__name@line11 (leads->lead),wrong-variable,26,1.0,0.0
 27__drop-step__stmt@line14,drop-step,27,1.0,0.0
 27__reorder-steps__stmts@lines14-15,reorder-steps,27,1.0,0.0
-28__negate-guard__if@line12,negate-guard,28,0.56,0.0
+28__negate-guard__if@line12,negate-guard,28,0.56,0.32000000000000006
 28__drop-step__stmt@line10,drop-step,28,1.0,0.0
 28__reorder-steps__stmts@lines10-11,reorder-steps,28,1.0,0.0
 28__wrong-variable__name@line11 (leads->lead),wrong-variable,28,1.0,0.0
 28__corrupt-container-op__subscript@line12 (key='rating'),corrupt-container-op,28,1.0,0.0
-28__constant-perturb__compare@line12 ('hot'->'hot_MUTATED'),constant-perturb,28,0.48,0.32000000000000006
+28__constant-perturb__compare@line12 ('hot'->'hot_MUTATED'),constant-perturb,28,0.48,0.8
 29__drop-step__stmt@line18,drop-step,29,1.0,0.0
 29__reorder-steps__stmts@lines18-19,reorder-steps,29,1.0,0.0
 30__negate-guard__if@line16,negate-guard,30,0.0,0.0
@@ -132,7 +132,7 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 30__reorder-steps__stmts@lines14-15,reorder-steps,30,1.0,0.0
 30__wrong-variable__name@line15 (files->file),wrong-variable,30,1.0,0.0
 30__corrupt-container-op__subscript@line16 (key='owned_by'),corrupt-container-op,30,1.0,0.0
-31__negate-guard__if@line16,negate-guard,31,1.0,0.0
+31__negate-guard__if@line16,negate-guard,31,1.0,0.09999999999999998
 31__drop-step__stmt@line14,drop-step,31,1.0,0.0
 31__reorder-steps__stmts@lines14-15,reorder-steps,31,1.0,0.0
 32__drop-step__stmt@line14,drop-step,32,1.0,0.0
@@ -176,7 +176,7 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 51__reorder-steps__stmts@lines10-11,reorder-steps,51,1.0,0.0
 52__drop-step__stmt@line18,drop-step,52,1.0,0.0
 52__reorder-steps__stmts@lines18-19,reorder-steps,52,1.0,0.0
-53__negate-guard__if@line22,negate-guard,53,0.64,0.0
+53__negate-guard__if@line22,negate-guard,53,0.64,0.24
 53__drop-step__stmt@line18,drop-step,53,1.0,0.0
 53__reorder-steps__stmts@lines18-19,reorder-steps,53,1.0,0.0
 53__corrupt-container-op__subscript@line22 (key='itemType'),corrupt-container-op,53,1.0,0.0
@@ -213,7 +213,7 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 67__reorder-steps__stmts@lines10-11,reorder-steps,67,1.0,0.0
 68__drop-step__stmt@line10,drop-step,68,1.0,0.0
 68__reorder-steps__stmts@lines10-11,reorder-steps,68,1.0,0.0
-69__negate-guard__if@line12,negate-guard,69,0.52,0.0
+69__negate-guard__if@line12,negate-guard,69,0.52,0.32000000000000006
 69__drop-step__stmt@line10,drop-step,69,1.0,0.0
 69__reorder-steps__stmts@lines10-11,reorder-steps,69,1.0,0.0
 69__wrong-variable__name@line11 (dms->dm),wrong-variable,69,1.0,0.0
@@ -251,7 +251,7 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 85__reorder-steps__stmts@lines14-15,reorder-steps,85,1.0,0.0
 86__drop-step__stmt@line18,drop-step,86,1.0,0.0
 86__reorder-steps__stmts@lines18-19,reorder-steps,86,1.0,0.0
-87__negate-guard__if@line12,negate-guard,87,0.64,0.0
+87__negate-guard__if@line12,negate-guard,87,0.64,0.17999999999999994
 87__drop-step__stmt@line10,drop-step,87,1.0,0.0
 87__reorder-steps__stmts@lines10-11,reorder-steps,87,1.0,0.0
 87__wrong-variable__name@line11 (devices->device),wrong-variable,87,1.0,0.0
@@ -263,7 +263,7 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 89__drop-step__stmt@line10,drop-step,89,1.0,0.0
 89__reorder-steps__stmts@lines10-11,reorder-steps,89,1.0,0.0
 89__wrong-variable__name@line11 (repositories->repo),wrong-variable,89,1.0,0.0
-90__negate-guard__if@line12,negate-guard,90,0.32,0.0
+90__negate-guard__if@line12,negate-guard,90,0.32,0.030000000000000027
 90__drop-step__stmt@line10,drop-step,90,1.0,0.0
 90__reorder-steps__stmts@lines10-11,reorder-steps,90,1.0,0.0
 90__wrong-variable__name@line11 (repositories->repo),wrong-variable,90,1.0,0.0
@@ -278,13 +278,13 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 92__wrong-variable__name@line15 (buckets->bucket),wrong-variable,92,1.0,0.0
 92__corrupt-container-op__subscript@line16 (key='name'),corrupt-container-op,92,1.0,0.0
 92__constant-perturb__compare@line16 ('non-compliant'->'non-compliant_MUTATED'),constant-perturb,92,0.36,0.32000000000000006
-93__negate-guard__if@line16,negate-guard,93,0.52,0.0
+93__negate-guard__if@line16,negate-guard,93,0.52,0.24
 93__drop-step__stmt@line14,drop-step,93,1.0,0.0
 93__reorder-steps__stmts@lines14-15,reorder-steps,93,1.0,0.0
 93__wrong-variable__name@line15 (roles->role),wrong-variable,93,1.0,0.0
 93__corrupt-container-op__subscript@line16 (key='name'),corrupt-container-op,93,1.0,0.0
 93__constant-perturb__compare@line16 ('inactive'->'inactive_MUTATED'),constant-perturb,93,0.6,0.32000000000000006
-94__negate-guard__if@line16,negate-guard,94,0.72,0.0
+94__negate-guard__if@line16,negate-guard,94,0.72,0.24
 94__drop-step__stmt@line14,drop-step,94,1.0,0.0
 94__reorder-steps__stmts@lines14-15,reorder-steps,94,1.0,0.0
 94__wrong-variable__name@line15 (folders->folder),wrong-variable,94,1.0,0.0
@@ -318,12 +318,12 @@ mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
 99__reorder-steps__stmts@lines18-19,reorder-steps,99,1.0,0.0
 99__wrong-variable__name@line19 (tasks->task),wrong-variable,99,1.0,0.0
 99__corrupt-container-op__subscript@line20 (key='completed'),corrupt-container-op,99,1.0,0.0
-100__negate-guard__if@line12,negate-guard,100,0.6,0.0
+100__negate-guard__if@line12,negate-guard,100,0.6,0.32000000000000006
 100__drop-step__stmt@line10,drop-step,100,1.0,0.0
 100__reorder-steps__stmts@lines10-11,reorder-steps,100,1.0,0.0
 100__wrong-variable__name@line11 (tasks->task),wrong-variable,100,1.0,0.0
 100__corrupt-container-op__subscript@line12 (key='statuscode'),corrupt-container-op,100,1.0,0.0
-100__constant-perturb__compare@line12 ('completed'->'completed_MUTATED'),constant-perturb,100,0.48,0.32000000000000006
+100__constant-perturb__compare@line12 ('completed'->'completed_MUTATED'),constant-perturb,100,0.48,0.8
 101__drop-step__stmt@line14,drop-step,101,1.0,0.0
 101__reorder-steps__stmts@lines14-15,reorder-steps,101,1.0,0.0
 101__wrong-variable__name@line15 (users->user),wrong-variable,101,1.0,0.0

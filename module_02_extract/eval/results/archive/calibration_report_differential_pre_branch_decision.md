@@ -16,11 +16,11 @@ them into three figures. It also incorporates two fixes: C2
 -- line-shift false positives) and C3 (op_early_return actually
 cuts logic now, not a no-op).
 
-- Youden's J-optimal tau: **0.1000** (J=0.9017)
+- Youden's J-optimal tau: **0.1000** (J=0.8532)
 
 ## Three-figure result (EVAL, held out)
 
-1. **Genuine-bug detection**: 0.9571 (95% CI [0.920, 0.980], n=210)
+1. **Genuine-bug detection**: 0.9286 (95% CI [0.885, 0.959], n=210)
 2. **Equivalent-mutant specificity**: 0.1111 (95% CI [0.003, 0.482], n=9)
 3. **False-alarm rate (untouched bases)**: 0.0588 (95% CI [0.012, 0.162], n=51)
 
@@ -47,21 +47,11 @@ flag is arguably the more correct call here, not a bug to fix.
 
 | metric | pre-correction (archived) | corrected |
 |---|---|---|
-| Youden's J | 0.8069 | 0.9017 |
-| Detection / genuine-bug detection | 0.8636 (conflated) | 0.9571 |
+| Youden's J | 0.8069 | 0.8532 |
+| Detection / genuine-bug detection | 0.8636 (conflated) | 0.9286 |
 | False-alarm rate | 0.0588 | 0.0588 |
 
 Pre-correction reports archived at `eval/results/archive/calibration_report_differential_pre_lineshift_fix.md` and `eval/results/archive/e3_correlation_report_pre_earlyreturn_fix.md`.
-
-## vs pre-F2 baseline (branch-decision field)
-
-| metric | pre-F2 (archived) | post-F2 |
-|---|---|---|
-| Youden's J | 0.8532 | 0.9017 |
-| Genuine-bug detection | 0.9286 | 0.9571 |
-| False-alarm rate | 0.0588 | 0.0588 (unchanged, as required) |
-
-Pre-F2 report archived at `eval/results/archive/calibration_report_differential_pre_branch_decision.md` (E3 side: `archive/e3_pairs_pre_branch_decision.csv`, `archive/e3_correlation_report_pre_branch_decision.md`).
 
 ## Detection rate by operator, genuinely-buggy mutants only (EVAL)
 
@@ -71,25 +61,16 @@ Pre-F2 report archived at `eval/results/archive/calibration_report_differential_
 | corrupt-container-op | 16 | 16 | 1.000 |
 | drop-step | 51 | 51 | 1.000 |
 | early-return | 49 | 49 | 1.000 |
-| negate-guard | 14 | 14 | 1.000 |
+| negate-guard | 14 | 8 | 0.571 |
 | reorder-steps | 49 | 49 | 1.000 |
 | swap-branches | 4 | 4 | 1.000 |
 | wrong-variable | 18 | 18 | 1.000 |
 
-`negate-guard` reaching 14/14 here is F2 actually working, not a re-measurement of the same thing: pre-F2 it was 8/14 (see the archived report) -- a negated guard flips the branch decision on virtually every run, and now that the actual-side collector emits `taken_branch`, the comparator's D3 pathway catches every one of those mismatches directly instead of relying on the mutation happening to also perturb the task-call sequence.
-
-`constant-perturb`'s 0.000 here is NOT an F2 no-op -- checked
-directly in `e3_pairs.csv`: F2 does move this operator's
-`combined_confidence`, from a 0.8 ceiling pre-F2 down to a 0.32
-floor for the mutants it affects (a compared string literal
-changes -- no different stub gets called, but the taken_branch
-mismatch now still drags V1 confidence down). It just doesn't
-cross tau=0.1000: the branch decision only diverges on some
-fraction of the n_runs=10 random inputs (whichever hit the
-mutated literal), not all of them, so V1 confidence lands well
-above the guard-negation case's hard 0.0 floor. Raising
-n_runs or picking inputs that reliably exercise the mutated
-literal would sharpen this further; out of scope here (F2 was
-the collector's decision field, not the input generator).
-n=9 in this EVAL split is small; the per-operator rate should
-be read with that in mind.
+`constant-perturb`'s 0.000 here is consistent with the prior
+session's D3 finding, not a new surprise: it's a "value-only"
+mutation (a compared literal changes, no different stub gets
+called), which is exactly the class D3 predicted would need a
+branch-decision field on the real collector (still missing,
+explicitly out of scope) to detect via anything other than
+task-sequence divergence. n=9 in this EVAL split is small; the
+per-operator rate should be read with that in mind.
