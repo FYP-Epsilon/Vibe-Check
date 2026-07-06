@@ -110,6 +110,73 @@ class TestCFGExtractorBasics:
 
 
 # ----------------------------------------------------------------------
+# P1.1b – bookkeeping-node contraction (F1)
+# ----------------------------------------------------------------------
+
+def _blank_blocks(wir: dict) -> list:
+    return [
+        n for n in wir["nodes"]
+        if n["type"] == "block" and not (n.get("code") or []) and not n.get("guard")
+    ]
+
+
+class TestBookkeepingNodeContraction:
+    def test_if_else_merge_node_removed(self):
+        wir = _extract("if x:\n    a = 1\nelse:\n    a = 2\nb = 3")
+        assert _blank_blocks(wir) == []
+
+    def test_if_no_else_merge_and_empty_else_removed(self):
+        # This is the shape that creates TWO blank nodes per if (the
+        # synthetic empty-else block AND the merge point) when there's no
+        # explicit else clause.
+        wir = _extract("if x:\n    a = 1\nb = 2")
+        assert _blank_blocks(wir) == []
+
+    def test_loop_back_edge_survives_contraction_with_nested_if(self):
+        """The mandate's required acceptance case: for+if nesting must not
+        lose the loop's back-edge when the intervening bookkeeping nodes
+        (the if's merge node, the loop's exit block) are contracted away."""
+        source = "for i in range(3):\n    if i > 0:\n        a = i\n"
+        wir = _extract(source)
+
+        loops = [n for n in wir["nodes"] if n["type"] == "loop"]
+        assert len(loops) == 1
+        header = loops[0]
+
+        all_successors = {sid for n in wir["nodes"] for sid in n["successors"]}
+        assert header["id"] in all_successors, "loop back-edge must survive contraction"
+        assert _blank_blocks(wir) == []
+
+    def test_entry_exit_never_contracted(self):
+        wir = _extract("")
+        assert any(n["id"] == wir["entry_node"] for n in wir["nodes"])
+        assert any(n["id"] == wir["exit_node"] for n in wir["nodes"])
+
+    def test_edge_label_preserved_when_merge_and_empty_else_contracted(self):
+        """if-with-no-else contracts TWO nodes in a chain (empty-else block,
+        then the merge) -- the gateway's "false" edge must still carry its
+        original guard label and point directly at the real next statement."""
+        wir = _extract("if x:\n    a = 1\nb = 2")
+        gateways = [n for n in wir["nodes"] if n["type"] == "gateway"]
+        assert len(gateways) == 1
+        gw = gateways[0]
+
+        false_edges = [
+            e for e in wir["edges"]
+            if e["source"] == gw["id"] and (e.get("guard") or "").startswith("not")
+        ]
+        assert len(false_edges) == 1
+
+        target = next(n for n in wir["nodes"] if n["id"] == false_edges[0]["target"])
+        assert target["code"] == ["b = 2"]
+
+    def test_function_sub_cfg_also_contracted(self):
+        wir = _extract("def foo(x):\n    if x:\n        a = 1\n    return 0")
+        sub = wir["functions"]["foo"]
+        assert _blank_blocks(sub) == []
+
+
+# ----------------------------------------------------------------------
 # P1.1 – Python 3.10+ special constructs
 # ----------------------------------------------------------------------
 
