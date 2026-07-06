@@ -1,6 +1,6 @@
 {
   "mode": "differential-corrected",
-  "tau": 0.09999999999999998,
-  "youdens_j": 0.901747572815534,
+  "tau": 0.1,
+  "youdens_j": 0.96,
   "seed": 1234
 }
