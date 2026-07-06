@@ -17,24 +17,48 @@ matched 1:1 and direction agrees; edge labels are not required to
 agree (reported separately would require label-normalization work
 not undertaken this session -- out of scope).
 
-**Please eyeball these 10 randomly sampled uids** (seed 42) --
-gold-vs-extracted rendered side-by-side in `eval/results/e2_manual_check/`:
-4, 14, 15, 18, 29, 32, 36, 82, 87, 95. This is the human-validation
-step that makes the gold citable; ~15 minutes.
+Human-validated (seed 42, uids 4, 14, 15, 18, 29, 32, 36, 82, 87, 95): see `eval/results/e2_manual_check/VERDICT.md`. That review was done
+against the pre-contraction extractor output (before the F1 fix
+below) and confirmed every extra extracted node was blank
+merge/exit bookkeeping, zero genuine extraction errors -- exactly
+what F1 then removed. The manual-check render files and gold are
+intentionally left untouched by F1 (they're the validated
+evidence a fix was warranted, not something to regenerate).
 
 ## Aggregate (micro, across all scored programs)
 
 - Programs scored: 101 (extraction failed: 0)
-- Node precision/recall/F1: 0.8255 / 1.0000 / **0.9044**
-- Edge precision/recall/F1: 0.6204 / 0.7589 / **0.6827**
+- Node precision/recall/F1: 1.0000 / 1.0000 / **1.0000**
+- Edge precision/recall/F1: 1.0000 / 1.0000 / **1.0000**
 - Strong node matches: 473, weak (order-fallback) matches: 0
+
+## vs pre-contraction baseline (F1 fix)
+
+| metric | pre-contraction (archived) | post-contraction |
+|---|---|---|
+| Node precision | 0.8255 | 1.0000 |
+| Node recall | 1.0000 | 1.0000 |
+| Node F1 | 0.9044 | 1.0000 |
+| Edge precision | 0.6204 | 1.0000 |
+| Edge recall | 0.7589 | 1.0000 |
+| Edge F1 | 0.6827 | 1.0000 |
+
+Pre-contraction reports archived at `eval/results/archive/e2_structural_report_pre_bookkeeping_contraction.md` and `.../e2_per_program_pre_bookkeeping_contraction.csv`. The gap
+closes entirely: F1 is a pure post-construction graph-contraction
+pass (`contract_bookkeeping_nodes` in
+`src/ast_extractor/cfg_extractor.py`) removing the blank merge/exit
+nodes VERDICT.md confirmed were the whole precision gap -- no
+change to what the visitors extract, verified by zero new V3 abort
+gate failures across all 101 corpus programs (node_coverage stayed
+at 1.0 for every one) and the differential calibration not moving
+(task events don't ride on blank nodes).
 
 ## Per-tag breakdown
 
 | tag | n | node F1 | edge F1 |
 |---|---|---|---|
-| conditional | 19 | 0.8400 | 0.5515 |
-| conditional_update | 26 | 0.8333 | 0.5150 |
+| conditional | 19 | 1.0000 | 1.0000 |
+| conditional_update | 26 | 1.0000 | 1.0000 |
 | linear | 34 | 1.0000 | 1.0000 |
 | linear_update | 22 | 1.0000 | 1.0000 |
 
@@ -42,13 +66,13 @@ step that makes the gold citable; ~15 minutes.
 
 | uid | tag | node F1 | edge F1 | node fp | node fn | diagnosis |
 |---|---|---|---|---|---|---|
-| 17 | conditional_update | 0.769 | 0.400 | 3 | 0 | 3 extra extracted node(s) (likely merge/exit bookkeeping) |
-| 20 | conditional | 0.769 | 0.400 | 3 | 0 | 3 extra extracted node(s) (likely merge/exit bookkeeping) |
-| 28 | conditional | 0.769 | 0.400 | 3 | 0 | 3 extra extracted node(s) (likely merge/exit bookkeeping) |
-| 69 | conditional | 0.769 | 0.400 | 3 | 0 | 3 extra extracted node(s) (likely merge/exit bookkeeping) |
-| 87 | conditional_update | 0.769 | 0.400 | 3 | 0 | 3 extra extracted node(s) (likely merge/exit bookkeeping) |
-| 90 | conditional_update | 0.769 | 0.400 | 3 | 0 | 3 extra extracted node(s) (likely merge/exit bookkeeping) |
-| 100 | conditional_update | 0.769 | 0.400 | 3 | 0 | 3 extra extracted node(s) (likely merge/exit bookkeeping) |
-| 15 | conditional_update | 0.778 | 0.455 | 4 | 0 | 4 extra extracted node(s) (likely merge/exit bookkeeping) |
-| 16 | conditional_update | 0.778 | 0.455 | 4 | 0 | 4 extra extracted node(s) (likely merge/exit bookkeeping) |
-| 9 | conditional | 0.783 | 0.483 | 5 | 0 | 5 extra extracted node(s) (likely merge/exit bookkeeping) |
+| 1 | linear | 1.000 | 1.000 | 0 | 0 | n/a |
+| 2 | conditional | 1.000 | 1.000 | 0 | 0 | n/a |
+| 3 | conditional | 1.000 | 1.000 | 0 | 0 | n/a |
+| 4 | conditional | 1.000 | 1.000 | 0 | 0 | n/a |
+| 5 | conditional | 1.000 | 1.000 | 0 | 0 | n/a |
+| 6 | conditional | 1.000 | 1.000 | 0 | 0 | n/a |
+| 7 | conditional | 1.000 | 1.000 | 0 | 0 | n/a |
+| 8 | linear | 1.000 | 1.000 | 0 | 0 | n/a |
+| 9 | conditional | 1.000 | 1.000 | 0 | 0 | n/a |
+| 10 | conditional | 1.000 | 1.000 | 0 | 0 | n/a |

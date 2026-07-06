@@ -74,25 +74,38 @@ class TestRunDifferentialVerification:
         assert "combined_confidence" in cert
         assert isinstance(cert["passed"], bool)
 
-    def test_value_only_guard_mutation_not_detected(self):
-        """Documents a known, verified limitation (D4 session finding): a
-        guard negated to its logical opposite produces IDENTICAL trace
-        *shape* (same task/branch-point counts) on both sides, and D3's
-        decision-aware comparison can only activate when the real
-        actual-side collector also carries a taken_branch field, which it
-        does not (see comparator.py). So even against the correct base
-        program's WIR as oracle, differential mode cannot currently tell
-        this mutant apart from the base. This is a REGRESSION test for a
-        documented gap, not a desired behavior -- if collector.py is ever
-        enhanced to emit decisions, this test should start failing and
-        should be revisited, not "fixed" by weakening it."""
+    def test_value_only_guard_mutation_now_detected(self):
+        """F2 regression test (was ``test_value_only_guard_mutation_not_
+        detected``). Until the F2 fix this asserted the OPPOSITE: a guard
+        negated to its logical opposite produced IDENTICAL trace shape on
+        both sides, and D3's decision-aware comparison could not activate
+        because the real actual-side collector carried no taken_branch
+        field. The old docstring said "if collector.py is ever enhanced to
+        emit decisions, this test should start failing and should be
+        revisited" -- that happened (F2: PEP 669 BRANCH events + settrace
+        next-line fallback, branch_arms from the code-under-test's own
+        WIR), so this now asserts the fixed behavior: the negated guard
+        flips the branch decision on every run, the comparator sees the
+        taken_branch mismatch, and the mutant scores strictly below its
+        base against the same base-WIR oracle."""
         base_source = "def workflow(status: str) -> int:\n    if status == 'high':\n        return 1\n    return 0\n"
         mutant_source = "def workflow(status: str) -> int:\n    if not (status == 'high'):\n        return 1\n    return 0\n"
         base_wir = run_v3_pipeline(base_source)["functions"]["workflow"]
 
         base_cert = run_differential_verification(base_source, base_wir)
         mutant_cert = run_differential_verification(mutant_source, base_wir)
-        assert base_cert["combined_confidence"] == pytest.approx(mutant_cert["combined_confidence"])
+        # F2's deliverable is the V1 layer: every run's flipped decision is
+        # a taken_branch mismatch, so V1 confidence collapses to 0.
+        assert mutant_cert["v1_confidence"] < 0.10
+        assert mutant_cert["v1_confidence"] < base_cert["v1_confidence"]
+        assert mutant_cert["combined_confidence"] < base_cert["combined_confidence"]
+        # Deliberately NOT asserting combined < tau here: on a stub-free
+        # scalar workflow V2 stays active (v2=0.5, self-referential -- it has
+        # no oracle) and the OR-composition floors combined at v2 even when
+        # V1 detects with certainty. Corpus negate-guard mutants score 0.0
+        # only because container inputs make V2 bail (v2=0 -> combined=v1).
+        # Composition discounting V2 in differential mode is a known open
+        # item, not an F2 defect.
 
     def test_line_shifted_equivalent_mutant_scores_like_its_base(self):
         """C2 regression test: a semantically equivalent mutant that merely

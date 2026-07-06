@@ -11,6 +11,111 @@ from .models import WIRNode, WIREdge
 from .helpers import _unparse, _extract_name, _collect_vars
 
 
+def _is_bookkeeping_node(node: dict[str, Any], protected_ids: set[Optional[str]]) -> bool:
+    """A node is contractible iff it's a plain "block" with no code and no
+    guard, and isn't the graph's designated entry/exit (contracting those
+    would break anything that checks `current == exit_id` to terminate)."""
+    if node["id"] in protected_ids:
+        return False
+    if node.get("type") != "block":
+        return False
+    code = node.get("code") or []
+    if any(s.strip() for s in code):
+        return False
+    if node.get("guard"):
+        return False
+    return True
+
+
+def contract_bookkeeping_nodes(wir: dict[str, Any]) -> dict[str, Any]:
+    """
+    Post-construction pass: remove blank merge/exit bookkeeping nodes.
+
+    visit_If, visit_While, visit_For, visit_Try, visit_TryStar, and
+    visit_Match each create one or more ``_make_block(node)`` nodes purely
+    to join branches or mark a loop/exception exit -- these carry no code
+    and no guard, and don't correspond to any AST statement. They're
+    load-bearing *during construction* (e.g. visit_Try's finally-clause
+    rerouting rewires edges through the merge node), but once construction
+    is done they're pure noise in the emitted WIR: extra unmatched nodes
+    against any statement-level ground truth (see eval/gold_wir.py / E2),
+    and structure Module 03's equivalence clustering has to see through.
+
+    This does NOT touch the visitors -- it rewires the already-built graph:
+    every predecessor of a contractible node is linked directly to every
+    successor, preserving edge labels (guard / exception_type). If a
+    predecessor edge and a successor edge each carry a *different* label,
+    that node is left uncontracted (recorded, not silently dropped) rather
+    than picking one label and losing information.
+    """
+    nodes = {n["id"]: dict(n) for n in wir.get("nodes", [])}
+    edges = [dict(e) for e in wir.get("edges", [])]
+    protected: set[Optional[str]] = {wir.get("entry_node"), wir.get("exit_node")}
+
+    uncontracted: list[str] = []
+    progress = True
+    while progress:
+        progress = False
+        candidates = [nid for nid, n in nodes.items() if _is_bookkeeping_node(n, protected)]
+        for nid in candidates:
+            if nid not in nodes:
+                continue  # removed earlier in this same pass
+
+            preds = [e for e in edges if e["target"] == nid]
+            succs = [e for e in edges if e["source"] == nid]
+
+            conflict = False
+            for pe in preds:
+                for se in succs:
+                    p_label = (pe.get("guard"), pe.get("exception_type"))
+                    s_label = (se.get("guard"), se.get("exception_type"))
+                    if p_label != (None, None) and s_label != (None, None) and p_label != s_label:
+                        conflict = True
+                        break
+                if conflict:
+                    break
+            if conflict:
+                if nid not in uncontracted:
+                    uncontracted.append(nid)
+                continue
+
+            new_edges = []
+            for pe in preds:
+                for se in succs:
+                    guard = pe.get("guard") if pe.get("guard") is not None else se.get("guard")
+                    exc = pe.get("exception_type") if pe.get("exception_type") is not None else se.get("exception_type")
+                    new_edges.append({"source": pe["source"], "target": se["target"], "guard": guard, "exception_type": exc})
+
+            edges = [e for e in edges if e["target"] != nid and e["source"] != nid] + new_edges
+
+            for pe in preds:
+                pred = nodes.get(pe["source"])
+                if pred is not None:
+                    pred["successors"] = [s for s in pred.get("successors", []) if s != nid]
+            for se in succs:
+                succ = nodes.get(se["target"])
+                if succ is not None:
+                    succ["predecessors"] = [p for p in succ.get("predecessors", []) if p != nid]
+            for pe in preds:
+                pred = nodes.get(pe["source"])
+                for se in succs:
+                    succ = nodes.get(se["target"])
+                    if pred is not None and se["target"] not in pred["successors"]:
+                        pred["successors"].append(se["target"])
+                    if succ is not None and pe["source"] not in succ["predecessors"]:
+                        succ["predecessors"].append(pe["source"])
+
+            del nodes[nid]
+            progress = True
+
+    new_wir = dict(wir)
+    new_wir["nodes"] = list(nodes.values())
+    new_wir["edges"] = edges
+    if uncontracted:
+        new_wir["_bookkeeping_contraction_skipped"] = uncontracted
+    return new_wir
+
+
 class CFGExtractor:
     """
     Hardened AST → CFG builder.
@@ -126,9 +231,9 @@ class CFGExtractor:
                 for arg in child.args.kwonlyargs:
                     sub.nodes[func_entry.id].data_vars.append(arg.arg)
 
-                functions[child.name] = sub.to_wir()
+                functions[child.name] = contract_bookkeeping_nodes(sub.to_wir())
 
-        wir = self.to_wir()
+        wir = contract_bookkeeping_nodes(self.to_wir())
         wir["functions"] = functions
         return wir
 

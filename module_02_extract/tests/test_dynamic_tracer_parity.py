@@ -81,6 +81,20 @@ CASES = [
              control_variables=["loan_status"], state_variables=["loan_status"], for_loop_lines=set()),
         {"loan_status": "pending"},
     ),
+    (
+        # F2: branch_arms populated -- exercises both the sys.monitoring.
+        # events.BRANCH path and the settrace next-line fallback, and
+        # asserts they land on identical taken_branch values (line 4 =
+        # true arm "total += i" starts at line 5, false arm "else" body
+        # at line 7; per _derive_branch_arms, arms map gateway/loop line
+        # -> (true_line, false_line)).
+        "branch_decision_if_else_in_loop",
+        "def task_loop(items):\n    total = 0\n    for i in items:\n        if i > 0:\n            total += i\n        else:\n            total -= i\n    return total\n",
+        dict(task_patterns=["task"], branch_lines={3, 4},
+             control_variables=["items", "i", "total"], state_variables=[],
+             for_loop_lines={3}, branch_arms={3: (4, 8), 4: (5, 7)}),
+        {"items": [1, -2, 3]},
+    ),
 ]
 
 
@@ -133,3 +147,30 @@ def test_monitoring_matches_settrace(label, source, config, inputs, monkeypatch)
         f"Tracer parity broken for case '{label}':\n"
         f"monitoring={mon_result}\nsettrace={settrace_result}"
     )
+
+
+def test_branch_decision_populated_on_both_backends(monkeypatch):
+    """F2: with branch_arms supplied, every branch_point event on both
+    backends carries a non-None taken_branch -- not just equal to each
+    other (which the parametrized parity test already checks), but
+    actually present, so this can't silently pass via both sides staying
+    empty."""
+    label, source, config, inputs = next(
+        c for c in CASES if c[0] == "branch_decision_if_else_in_loop"
+    )
+
+    mon_result = _collect(source, config, inputs)
+    monkeypatch.setattr(dynamic_tracer.sys, "monitoring", None, raising=False)
+    settrace_result = _collect(source, config, inputs)
+
+    for result, backend in ((mon_result, "monitoring"), (settrace_result, "settrace")):
+        branch_events = [e for e in result["trace_log"] if e["event"] == "branch_point"]
+        assert len(branch_events) == 7, f"{backend}: expected 7 branch_point events"
+        assert all(e.get("taken_branch") is not None for e in branch_events), (
+            f"{backend}: taken_branch missing on some branch_point events: {branch_events}"
+        )
+
+    # Expected decisions for items=[1, -2, 3]: loop fires 3x (True) + 1
+    # exhausted (False); if/else per item: True, False, True.
+    mon_taken = [e["taken_branch"] for e in mon_result["trace_log"] if e["event"] == "branch_point"]
+    assert mon_taken == [True, True, True, False, True, True, False]
