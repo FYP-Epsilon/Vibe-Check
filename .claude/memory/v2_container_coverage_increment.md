@@ -1,9 +1,13 @@
 ---
 name: v2-container-coverage-increment
-description: V2 now seeds non-empty containers + concrete len() (coverage achieved); open follow-on is crediting coverage in the confidence formula
+description: RESOLVED — e4ba019 ported onto the modularized package (T4, commit ff0b1d4) including the coverage-credit formula follow-on
 metadata:
   type: project
 ---
+
+**RESOLVED 2026-07-04** on branch `fix/mod2/verdict-and-eval-corpus`, commit `ff0b1d4` (T4 in [[session-2026-07-04-t1-t7-implementation]]). `e4ba019` (below) never got merged into `develop` and its target file no longer existed post-modularization, so it was ported by hand onto `src/z3_sym_engine/{concolic,evaluator,tracer}.py`. The "OPEN FOLLOW-ON" this memory used to track is done: `_emit_certificate` now has a coverage-credit term (`0.5*branch_diversity_score + 0.3*min(covered_edges/4, 1.0)`, applied only when `solver_rate == 0 and covered_edges >= 2`). Verified: the list-loop-with-if/else test case now gets confidence 0.8 (was 0.0) with the same 4-edge/1.0-diversity coverage e4ba019 originally measured. Regression tests added in `tests/test_z3_sym_engine.py`.
+
+Original increment notes below, kept for the historical measurement numbers.
 
 Scoped first increment for the V2 container gap (vulnerability #5), on branch `fix/mod2/phase1-symbolic-hardening`, commit `e4ba019`. All 105 tests pass.
 

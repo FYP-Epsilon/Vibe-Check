@@ -253,6 +253,10 @@ def run_differential_verification(mutant_source: str, base_func_wir: dict[str, A
         n_runs=10,
         seed=42,
         compiled_ns=local_env,
+        # branch_arms follows branch_lines: WHERE the true/false arms of a
+        # branch land is a property of the mutant's own syntax (observation
+        # layer), not spec knowledge -- same anti-circularity rule as C2.
+        branch_arms=mutant_v1_params["branch_arms"],
     )
 
     v2_result = run_v2_pipeline(
