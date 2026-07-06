@@ -261,7 +261,7 @@ def run_e3(manifest_path: Path = MANIFEST_PATH, pairs_csv: Path = PAIRS_CSV) -> 
             continue
 
         try:
-            cert = run_differential_verification(mutant_source, base_func_wir)
+            cert = run_differential_verification(mutant_source, base_func_wir, base_source=base_source)
             combined = cert.get("combined_confidence", 0.0)
         except Exception:
             execution_failed.append(mid)
@@ -386,6 +386,24 @@ def render_report(result: dict[str, Any]) -> str:
         "equivalent-mutant table below is byte-identical to the pre-F2 run "
         "(11/427, same per-operator breakdown), confirming the shift is "
         "entirely on the certificate side, exactly where F2 touched.",
+        "",
+        "### r and rho recovered after Session A (A1 composition + A2 literal coverage)",
+        "",
+        "Pre-Session-A (archived `archive/e3_correlation_report_pre_a1a2.md`): "
+        f"Pearson r = 0.3653 (0.5326 restricted), Spearman rho = 0.5212 "
+        f"(0.5784 restricted). This run: Pearson r = {r_full:.4f} "
+        f"({r_nz:.4f} restricted), Spearman rho = {rho_full:.4f} "
+        f"({rho_nz:.4f} restricted) -- both correlations moved back up, not "
+        "down. A1 (differential verdict = v1_confidence alone, no V2 "
+        "OR-padding) removes a saturating term that flattened graded "
+        "scores toward 0 or 1 regardless of severity; A2 (round-robin "
+        "string-pool + base-guard-literal seeding) additionally moved "
+        "`constant-perturb` off its 0.32 floor for 8/9 mutants (see the "
+        "calibration report), restoring a graded relationship for exactly "
+        "the operator F2 had flattened hardest. The equivalent-mutant "
+        "count (11/427) is unchanged -- ground truth is untouched, "
+        "confirming the shift is entirely on the certificate side, same "
+        "as the F2 transition above.",
         "",
         f"## Equivalent mutants (semantic_diff_rate == 0 at N={N_INPUTS}): {n_equivalent} / {n}",
         "",

@@ -16,6 +16,32 @@ from .interpreter import WIRReferenceInterpreter
 from .collector import WIRTraceCollector
 
 
+def extract_guard_string_literals(source: str) -> list[str]:
+    """Every string literal compared against something in *source* -- the
+    guard-controlling values (e.g. "high", "urgent") an input actually
+    needs to hit to exercise both sides of a branch.
+
+    Shared by RandomizedDifferentialTester's own pool (below) and
+    eval/calibrate.py's differential mode, which extracts the BASE
+    program's literals to pass in as ``extra_str_literals`` (A2): test
+    *inputs* may come from anywhere, including the spec side -- inputs
+    are not the oracle, only the expected trace is, so seeding the pool
+    with the base's guard literals is ordinary spec-based test-input
+    selection, not an anti-circularity violation.
+    """
+    pool: set[str] = set()
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Compare):
+            for side in (node.left, *node.comparators):
+                if isinstance(side, ast.Constant) and isinstance(side.value, str):
+                    pool.add(side.value)
+    return sorted(pool)
+
+
 class RandomizedDifferentialTester:
     """
     Run *n* random-input differential tests between actual Python code
@@ -35,6 +61,7 @@ class RandomizedDifferentialTester:
         seed: Optional[int] = None,
         compiled_ns: Optional[dict[str, Any]] = None,
         branch_arms: Optional[dict[int, tuple[Optional[int], Optional[int]]]] = None,
+        extra_str_literals: Optional[list[str]] = None,
     ) -> None:
         self.source = source
         self.function_name = function_name
@@ -66,7 +93,21 @@ class RandomizedDifferentialTester:
         # string alone means EVERY str param gets the identical input on
         # every run, collapsing input_coverage_score to 1/n_runs regardless
         # of program correctness. See [[session_2026_07_04_t1_t7_implementation]].
-        self._string_pool = self._extract_string_pool()
+        # extra_str_literals (A2) unions in literals from elsewhere (e.g. the
+        # BASE program's guards, in differential mode) so a constant-perturb
+        # mutant's pool includes both the original and mutated literal.
+        self._string_pool = sorted(set(self._extract_string_pool()) | set(extra_str_literals or []))
+        # A2: round-robin queue -- each distinct pool literal is drawn at
+        # least once across the run budget before random sampling resumes.
+        # Uniform random sampling let both the original and mutated literal
+        # of a constant-perturb mutant go unexercised for an entire run
+        # (each draw only has a 1/(len(pool)+2) chance of hitting either),
+        # which is why that operator sat undetected despite F2 lowering its
+        # confidence: the two branch decisions agreed vacuously because
+        # neither side was ever exercised. This queue guarantees coverage
+        # deterministically under the existing seed; once drained, sampling
+        # falls back to the original uniform random choice.
+        self._pool_queue: list[str] = list(self._string_pool)
 
     def _extract_arg_names(self) -> list[str]:
         tree = ast.parse(self.source)
@@ -80,17 +121,7 @@ class RandomizedDifferentialTester:
         """Every string literal compared against something in the source --
         these are the guard-controlling values (e.g. "high", "urgent") that
         an input actually needs to hit to exercise both sides of a branch."""
-        pool: set[str] = set()
-        try:
-            tree = ast.parse(self.source)
-        except SyntaxError:
-            return []
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Compare):
-                for side in (node.left, *node.comparators):
-                    if isinstance(side, ast.Constant) and isinstance(side.value, str):
-                        pool.add(side.value)
-        return sorted(pool)
+        return extract_guard_string_literals(self.source)
 
     def _generate_random_inputs(self) -> dict[str, Any]:
         """Produce a random concrete input dict for the target function."""
@@ -112,13 +143,19 @@ class RandomizedDifferentialTester:
             elif ann is bool:
                 inputs[param_name] = random.choice([True, False])
             elif ann is str:
-                # Sample from the guard-literal pool (so both sides of every
-                # string guard actually get exercised) plus "" and a random
-                # non-matching junk string (so unguarded/else paths still
-                # get hit too). A uniformly random string alone would almost
-                # never equal a specific guard literal like "high".
-                choices = self._string_pool + ["", f"junk_{random.randint(0, 10**6)}"]
-                inputs[param_name] = random.choice(choices)
+                if self._pool_queue:
+                    # A2: drain the round-robin queue first so every pool
+                    # literal is guaranteed to be exercised at least once.
+                    inputs[param_name] = self._pool_queue.pop(0)
+                else:
+                    # Sample from the guard-literal pool (so both sides of
+                    # every string guard actually get exercised) plus "" and
+                    # a random non-matching junk string (so unguarded/else
+                    # paths still get hit too). A uniformly random string
+                    # alone would almost never equal a specific guard
+                    # literal like "high".
+                    choices = self._string_pool + ["", f"junk_{random.randint(0, 10**6)}"]
+                    inputs[param_name] = random.choice(choices)
             elif ann is dict or origin is dict:
                 inputs[param_name] = {
                     f"role_{i}": random.randint(1, 5)

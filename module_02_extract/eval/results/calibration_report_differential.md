@@ -16,11 +16,27 @@ them into three figures. It also incorporates two fixes: C2
 -- line-shift false positives) and C3 (op_early_return actually
 cuts logic now, not a no-op).
 
-- Youden's J-optimal tau: **0.1000** (J=0.9017)
+## Composition change (A1): V1 is the differential verdict
+
+Every score below is computed with `combined_confidence = v1_confidence` in differential mode, not the standard OR-composition
+`1-(1-v1)(1-v2)` (still used unchanged by self-mode `/verify`). In
+differential mode V1 has a real oracle (the base program's WIR) but
+V2 does not -- it symbolically explores the MUTANT's own code with
+no actual/expected comparator, so a high v2_confidence means "the
+mutant is internally consistent with itself," not "no bug found."
+OR-composing it padded every score, buggy and correct alike, with a
+term carrying no detection signal: a negate-guard mutant on a
+stub-free scalar workflow could score v1=0.0 (perfect detection) yet
+combined=0.5, because self-referential v2=0.5 floored the OR (see
+`eval/test_calibrate.py::test_value_only_guard_mutation_now_detected`).
+`v2_confidence` stays in every certificate as telemetry (spec-path
+coverage), it just no longer participates in the verdict.
+
+- Youden's J-optimal tau: **0.1000** (J=0.9600)
 
 ## Three-figure result (EVAL, held out)
 
-1. **Genuine-bug detection**: 0.9571 (95% CI [0.920, 0.980], n=210)
+1. **Genuine-bug detection**: 0.9952 (95% CI [0.974, 1.000], n=210)
 2. **Equivalent-mutant specificity**: 0.1111 (95% CI [0.003, 0.482], n=9)
 3. **False-alarm rate (untouched bases)**: 0.0588 (95% CI [0.012, 0.162], n=51)
 
@@ -47,8 +63,8 @@ flag is arguably the more correct call here, not a bug to fix.
 
 | metric | pre-correction (archived) | corrected |
 |---|---|---|
-| Youden's J | 0.8069 | 0.9017 |
-| Detection / genuine-bug detection | 0.8636 (conflated) | 0.9571 |
+| Youden's J | 0.8069 | 0.9600 |
+| Detection / genuine-bug detection | 0.8636 (conflated) | 0.9952 |
 | False-alarm rate | 0.0588 | 0.0588 |
 
 Pre-correction reports archived at `eval/results/archive/calibration_report_differential_pre_lineshift_fix.md` and `eval/results/archive/e3_correlation_report_pre_earlyreturn_fix.md`.
@@ -57,17 +73,42 @@ Pre-correction reports archived at `eval/results/archive/calibration_report_diff
 
 | metric | pre-F2 (archived) | post-F2 |
 |---|---|---|
-| Youden's J | 0.8532 | 0.9017 |
-| Genuine-bug detection | 0.9286 | 0.9571 |
+| Youden's J | 0.8532 | 0.9600 |
+| Genuine-bug detection | 0.9286 | 0.9952 |
 | False-alarm rate | 0.0588 | 0.0588 (unchanged, as required) |
 
 Pre-F2 report archived at `eval/results/archive/calibration_report_differential_pre_branch_decision.md` (E3 side: `archive/e3_pairs_pre_branch_decision.csv`, `archive/e3_correlation_report_pre_branch_decision.md`).
+
+## vs pre-A1/A2 baseline (composition + literal-coverage session)
+
+| metric | pre-A1/A2 (archived) | post-A1/A2 |
+|---|---|---|
+| Youden's J | 0.9017 | 0.9600 |
+| Genuine-bug detection | 0.9571 | 0.9952 |
+| False-alarm rate | 0.0588 | 0.0588 |
+
+**Honest-risk clause (pre-committed in the session mandate): false-alarm rate did NOT rise.** It is unchanged at 0.0588 (51 bases, same count flagged as before A1). This is not a coincidence masking
+traded-off bases -- checked directly (a clean pre-session worktree
+vs. this branch, same 101 base programs): `v2_confidence` is 0.0
+for every FLOW-BENCH-derived base program in this corpus
+(container-shaped inputs make V2 bail, the same reason corpus
+negate-guard mutants score v1=0 without V2 rescue, noted in the
+F2-era regression test). Since V2 already contributed no
+OR-composition padding to this corpus's negative class before A1,
+removing it from the verdict had nothing to take away. A1's
+masking risk is real for stub-free/scalar-input programs (the case
+the session mandate names and
+`test_value_only_guard_mutation_now_detected` demonstrates
+directly) -- this corpus's FLOW-BENCH-style programs are
+container-heavy and so do not exercise that risk. No newly-flagged
+bases; no per-base diagnosis is needed and the >0.15 hard-stop was
+not approached.
 
 ## Detection rate by operator, genuinely-buggy mutants only (EVAL)
 
 | operator | n | detected | detection rate |
 |---|---|---|---|
-| constant-perturb | 9 | 0 | 0.000 |
+| constant-perturb | 9 | 8 | 0.889 |
 | corrupt-container-op | 16 | 16 | 1.000 |
 | drop-step | 51 | 51 | 1.000 |
 | early-return | 49 | 49 | 1.000 |
@@ -78,18 +119,34 @@ Pre-F2 report archived at `eval/results/archive/calibration_report_differential_
 
 `negate-guard` reaching 14/14 here is F2 actually working, not a re-measurement of the same thing: pre-F2 it was 8/14 (see the archived report) -- a negated guard flips the branch decision on virtually every run, and now that the actual-side collector emits `taken_branch`, the comparator's D3 pathway catches every one of those mismatches directly instead of relying on the mutation happening to also perturb the task-call sequence.
 
-`constant-perturb`'s 0.000 here is NOT an F2 no-op -- checked
-directly in `e3_pairs.csv`: F2 does move this operator's
-`combined_confidence`, from a 0.8 ceiling pre-F2 down to a 0.32
-floor for the mutants it affects (a compared string literal
-changes -- no different stub gets called, but the taken_branch
-mismatch now still drags V1 confidence down). It just doesn't
-cross tau=0.1000: the branch decision only diverges on some
-fraction of the n_runs=10 random inputs (whichever hit the
-mutated literal), not all of them, so V1 confidence lands well
-above the guard-negation case's hard 0.0 floor. Raising
-n_runs or picking inputs that reliably exercise the mutated
-literal would sharpen this further; out of scope here (F2 was
-the collector's decision field, not the input generator).
-n=9 in this EVAL split is small; the per-operator rate should
-be read with that in mind.
+`constant-perturb` moved off 0/9 to 8/9 here -- this is A2 (round-robin
+string-pool sampling + seeding the pool with the BASE
+program's own guard literals, not just the mutant's) actually
+working, not a re-measurement of the same thing. Before A2,
+V1's pool came only from the mutant's OWN source -- for a
+constant-perturb mutant that pool is the single mutated
+literal, so a random run had only a small chance of ALSO
+drawing the original literal, and many runs exercised neither
+value -- the branch decision agreed vacuously on both sides.
+Guaranteeing both literals are drawn at least once within the
+n_runs=10 budget is what surfaces the taken_branch mismatch.
+
+The remaining 1/9 straggler (uid_4's `'urgent'` -> `'urgent_MUTATED'` mutant, checked directly) is not the numeric-literal case
+anticipated going into this session -- it's still a string
+guard. Its root cause is different: the guarded value
+(`issue['priority']`) is a dict field populated from TWO
+independent `str` parameters
+(`issues_priority_0`/`issues_priority_1`), and A2's
+round-robin queue is shared across a function's str
+params, not per-guard-site -- with a 2-literal pool and 2
+str params, the queue drains completely on the FIRST of
+the 10 runs (one param draws each literal), guaranteeing
+exactly one run explores the mismatch. The other 9 runs
+revert to uniform random sampling per param, which rarely
+re-hits either specific literal, so most runs agree
+vacuously and V1 confidence lands at 0.36 -- well above
+tau, unlike the single-str-param guards where the
+guaranteed run's effect dominates a larger share of the
+budget. Sharpening this (e.g. per-guard-site literal
+coverage instead of one pool-wide queue) is a real
+backlog item, out of scope here.

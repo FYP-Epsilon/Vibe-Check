@@ -87,25 +87,30 @@ class TestRunDifferentialVerification:
         WIR), so this now asserts the fixed behavior: the negated guard
         flips the branch decision on every run, the comparator sees the
         taken_branch mismatch, and the mutant scores strictly below its
-        base against the same base-WIR oracle."""
+        base against the same base-WIR oracle.
+
+        Until the Session A / A1 fix, this test could only assert
+        v1_confidence < 0.10, NOT combined_confidence < tau: on a stub-free
+        scalar workflow V2 stays active (v2=0.5, self-referential -- it has
+        no oracle of its own) and the old OR-composition
+        (1-(1-v1)(1-v2)) floored combined at v2 even when V1 detected with
+        certainty. A1 makes the differential verdict V1-only (V2 is
+        telemetry, not verdict), which resolves the masking -- this now
+        asserts combined_confidence < tau directly."""
         base_source = "def workflow(status: str) -> int:\n    if status == 'high':\n        return 1\n    return 0\n"
         mutant_source = "def workflow(status: str) -> int:\n    if not (status == 'high'):\n        return 1\n    return 0\n"
         base_wir = run_v3_pipeline(base_source)["functions"]["workflow"]
 
-        base_cert = run_differential_verification(base_source, base_wir)
-        mutant_cert = run_differential_verification(mutant_source, base_wir)
+        base_cert = run_differential_verification(base_source, base_wir, base_source=base_source)
+        mutant_cert = run_differential_verification(mutant_source, base_wir, base_source=base_source)
         # F2's deliverable is the V1 layer: every run's flipped decision is
         # a taken_branch mismatch, so V1 confidence collapses to 0.
         assert mutant_cert["v1_confidence"] < 0.10
         assert mutant_cert["v1_confidence"] < base_cert["v1_confidence"]
         assert mutant_cert["combined_confidence"] < base_cert["combined_confidence"]
-        # Deliberately NOT asserting combined < tau here: on a stub-free
-        # scalar workflow V2 stays active (v2=0.5, self-referential -- it has
-        # no oracle) and the OR-composition floors combined at v2 even when
-        # V1 detects with certainty. Corpus negate-guard mutants score 0.0
-        # only because container inputs make V2 bail (v2=0 -> combined=v1).
-        # Composition discounting V2 in differential mode is a known open
-        # item, not an F2 defect.
+        # A1 resolved: combined_confidence IS v1_confidence in differential
+        # mode now, so this is no longer floored by self-referential V2.
+        assert mutant_cert["combined_confidence"] < 0.10
 
     def test_line_shifted_equivalent_mutant_scores_like_its_base(self):
         """C2 regression test: a semantically equivalent mutant that merely
@@ -139,3 +144,21 @@ class TestRunDifferentialVerification:
         assert shifted_cert["combined_confidence"] == pytest.approx(
             base_cert["combined_confidence"], abs=0.01
         )
+
+    def test_constant_perturb_mutation_now_detected(self):
+        """A2 regression test: a hand-made constant-perturb mutant (the
+        guard literal changed from 'high' to 'high_X') must score well
+        below tau against the base WIR. Before A2, V1's string pool came
+        only from the mutant's OWN source -- for this mutant that pool is
+        {'high_X'} alone, so random inputs would almost never also draw
+        the base's 'high', many runs would exercise neither literal, and
+        both sides would agree vacuously. Passing base_source unions the
+        base's guard literals in and round-robin sampling guarantees both
+        get exercised within the n_runs=10 budget used by
+        run_differential_verification."""
+        base_source = "def workflow(status: str) -> int:\n    if status == 'high':\n        return 1\n    return 0\n"
+        mutant_source = "def workflow(status: str) -> int:\n    if status == 'high_X':\n        return 1\n    return 0\n"
+        base_wir = run_v3_pipeline(base_source)["functions"]["workflow"]
+
+        mutant_cert = run_differential_verification(mutant_source, base_wir, base_source=base_source)
+        assert mutant_cert["combined_confidence"] < 0.10
