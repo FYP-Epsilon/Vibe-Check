@@ -1,0 +1,51 @@
+{
+  "uid": 71,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "2570ba22149cc96424c63ceee1b19f4bc99acc387eb316a58a5ee2ead2f2eab1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-47565433-0ab4-4f31-9100-ea06272302f9",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    Amazon_SQS_Messages__3_0_0__PUTMESSAGE_Messages()\n    Amazon_SNS_Topic__3_0_0__updatewithwhere_Topic()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783441328,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 232,
+      "completion_tokens": 41,
+      "total_tokens": 273,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783441328830,
+        "prefill_wait_time_ms": 0.843576,
+        "prefill_time_ms": 54.946954,
+        "ttft_ms": 55.79053,
+        "total_time_ms": 571.223908,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    Amazon_SQS_Messages__3_0_0__PUTMESSAGE_Messages()\n    Amazon_SNS_Topic__3_0_0__updatewithwhere_Topic()"
+}

@@ -1,0 +1,51 @@
+{
+  "uid": 29,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "7447f64c1f0bc9b01bce6aa42ba6357d72a8aa454c9722f9a26d466267865b68",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-1bb67511-7751-42e7-a5ea-0e99d7f7a5f2",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create a new contact in Salesforce\n    contact = Salesforce_Contact__5_0_0__create_Contact()\n    \n    # Get the contact's ID\n    contact_id = contact['Id']\n    \n    # Create a new folder in Box\n    folder = Box_Folder__3_0_0__create_Folder()\n    \n    # Create a new file in the Box folder with the contact's details\n    file = Box_File__3_0_0__create_File(folder['id'], 'Contact ' + str(contact_id) + '.txt', contact)\n    \n    # Get the file's ID\n    file_id = file['id']\n    \n    # Create a new email using Gmail\n    mail = Gmail_mail__2_0_0__create_mail()\n    \n    # Add the contact's details to the email\n    mail['subject'] = 'New Contact: ' + contact['Name']\n    mail['body'] = 'Name: ' + contact['Name'] + '\\nEmail: ' + contact['Email'] + '\\nPhone: ' + contact['Phone']\n    \n    # Add the file to the email\n    mail['attachments'] = [file_id]\n    \n    # Send the email\n    Gmail_mail__2_0_0__create_mail(mail)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396232,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 224,
+      "completion_tokens": 271,
+      "total_tokens": 495,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396232649,
+        "prefill_wait_time_ms": 0.8312560000000001,
+        "prefill_time_ms": 19.137073,
+        "ttft_ms": 19.968329,
+        "total_time_ms": 1783.198481,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create a new contact in Salesforce\n    contact = Salesforce_Contact__5_0_0__create_Contact()\n    \n    # Get the contact's ID\n    contact_id = contact['Id']\n    \n    # Create a new folder in Box\n    folder = Box_Folder__3_0_0__create_Folder()\n    \n    # Create a new file in the Box folder with the contact's details\n    file = Box_File__3_0_0__create_File(folder['id'], 'Contact ' + str(contact_id) + '.txt', contact)\n    \n    # Get the file's ID\n    file_id = file['id']\n    \n    # Create a new email using Gmail\n    mail = Gmail_mail__2_0_0__create_mail()\n    \n    # Add the contact's details to the email\n    mail['subject'] = 'New Contact: ' + contact['Name']\n    mail['body'] = 'Name: ' + contact['Name'] + '\\nEmail: ' + contact['Email'] + '\\nPhone: ' + contact['Phone']\n    \n    # Add the file to the email\n    mail['attachments'] = [file_id]\n    \n    # Send the email\n    Gmail_mail__2_0_0__create_mail(mail)"
+}

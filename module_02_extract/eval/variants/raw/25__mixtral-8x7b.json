@@ -1,0 +1,45 @@
+{
+  "uid": 25,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "aea7661e1834923ad701edc252a0ddac490d5864ff3200ca5c0274bf1d614407",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b7e45e2463cebf9a",
+    "object": "chat.completion",
+    "created": 1783396107,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    tasks = Asana\\_Tasks\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Tasks()\n\n    for task in tasks:\n        message = f\"Task {task['name']} with id {task['gid']} needs to be completed.\"\n        Twilio\\_postMessagesjsonByFromphone\\_model\\_\\_2\\_0\\_0\\_\\_postMessagesjsonByFromphone\\_postMessagesjsonByFromphone\\_model(message)\n\n    return None",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 211,
+      "total_tokens": 324,
+      "completion_tokens": 113,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    tasks = Asana\\_Tasks\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Tasks()\n\n    for task in tasks:\n        message = f\"Task {task['name']} with id {task['gid']} needs to be completed.\"\n        Twilio\\_postMessagesjsonByFromphone\\_model\\_\\_2\\_0\\_0\\_\\_postMessagesjsonByFromphone\\_postMessagesjsonByFromphone\\_model(message)\n\n    return None"
+}

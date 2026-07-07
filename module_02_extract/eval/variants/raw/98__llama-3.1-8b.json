@@ -1,0 +1,51 @@
+{
+  "uid": 98,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "7bea0a762d06662021005327073feb9a8042606a43e51bc7e2c95fde729442e9",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9a9af5eb-b549-4f90-92b7-d277b3d7c38f",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(leads_rating_0: str, leads_rating_1: str):\n    existing_campaigns = Salesforce_Campaign__8_0_0__retrievewithwhere_Campaign()\n    leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead(leads_rating_0=leads_rating_0, leads_rating_1=leads_rating_1)\n    # Assuming we need to associate leads with campaigns, but since we're not creating new campaigns,\n    # we'll just assign the existing campaigns to each lead. In a real-world scenario, this might\n    # involve more complex logic and data manipulation.\n    for lead in leads:\n        lead['campaigns'] = existing_campaigns\n    return leads",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442687,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 154,
+      "total_tokens": 401,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442687930,
+        "prefill_wait_time_ms": 0.900268,
+        "prefill_time_ms": 27.666405,
+        "ttft_ms": 28.566673,
+        "total_time_ms": 1531.738073,
+        "kv_hit_rate": 0.0625,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(leads_rating_0: str, leads_rating_1: str):\n    existing_campaigns = Salesforce_Campaign__8_0_0__retrievewithwhere_Campaign()\n    leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead(leads_rating_0=leads_rating_0, leads_rating_1=leads_rating_1)\n    # Assuming we need to associate leads with campaigns, but since we're not creating new campaigns,\n    # we'll just assign the existing campaigns to each lead. In a real-world scenario, this might\n    # involve more complex logic and data manipulation.\n    for lead in leads:\n        lead['campaigns'] = existing_campaigns\n    return leads"
+}

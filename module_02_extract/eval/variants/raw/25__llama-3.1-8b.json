@@ -1,0 +1,51 @@
+{
+  "uid": 25,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "aea7661e1834923ad701edc252a0ddac490d5864ff3200ca5c0274bf1d614407",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9b2b61dd-1ef3-4b29-b484-cf3d0e438ba5",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    tasks = Asana_Tasks__2_0_0__retrievewithwhere_Tasks()\n    for task in tasks:\n        message = f\"Task {task['name']} is due on {task['due_date']}\"\n        Twilio_postMessagesjsonByFromphone_model__2_0_0__postMessagesjsonByFromphone_postMessagesjsonByFromphone_model(\n            from_phone_number=task['assignee']['phone_number'],\n            to_phone_number=task['assignee']['phone_number'],\n            message=message\n        )",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396105,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 212,
+      "completion_tokens": 116,
+      "total_tokens": 328,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396105915,
+        "prefill_wait_time_ms": 0.949661,
+        "prefill_time_ms": 27.194445,
+        "ttft_ms": 28.144105999999997,
+        "total_time_ms": 813.5712950000001,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    tasks = Asana_Tasks__2_0_0__retrievewithwhere_Tasks()\n    for task in tasks:\n        message = f\"Task {task['name']} is due on {task['due_date']}\"\n        Twilio_postMessagesjsonByFromphone_model__2_0_0__postMessagesjsonByFromphone_postMessagesjsonByFromphone_model(\n            from_phone_number=task['assignee']['phone_number'],\n            to_phone_number=task['assignee']['phone_number'],\n            message=message\n        )"
+}

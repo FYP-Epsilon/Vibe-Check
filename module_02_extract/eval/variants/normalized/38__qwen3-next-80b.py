@@ -1,0 +1,12 @@
+def Microsoft_To_Do_getUsersByUserIdTodoListsByTodoTaskListId_model__1_0_0__getUsersByUserIdTodoListsByTodoTaskListId_getUsersByUserIdTodoListsByTodoTaskListId_model():
+    return {}
+
+
+def Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model():
+    return {}
+
+
+def workflow():
+    todo_list = Microsoft_To_Do_getUsersByUserIdTodoListsByTodoTaskListId_model__1_0_0__getUsersByUserIdTodoListsByTodoTaskListId_getUsersByUserIdTodoListsByTodoTaskListId_model()
+    new_task = Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model()
+    return new_task

@@ -1,0 +1,45 @@
+{
+  "uid": 81,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "5e12240551abfadfc012e2b5ed9b2e862f40c95eeca1365218e728353f62d5ed",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9b07f2a6561541d3",
+    "object": "chat.completion",
+    "created": 1783442484,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new Box file with some initial content\n    box_file_id = ServiceNow_kb_knowledge__5_0_0__create_kb_knowledge()\n\n    # Now that the Box file is created, we can replace it with a Dropbox file\n    Dropbox_files__3_0_0__create_files(box_file_id)\n\n    # Delete the old Box file, since we no longer need it\n    ServiceNow_kb_knowledge__5_0_0__delete_kb_knowledge(box_file_id)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 183,
+      "total_tokens": 318,
+      "completion_tokens": 135,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Box file with some initial content\n    box_file_id = ServiceNow_kb_knowledge__5_0_0__create_kb_knowledge()\n\n    # Now that the Box file is created, we can replace it with a Dropbox file\n    Dropbox_files__3_0_0__create_files(box_file_id)\n\n    # Delete the old Box file, since we no longer need it\n    ServiceNow_kb_knowledge__5_0_0__delete_kb_knowledge(box_file_id)"
+}

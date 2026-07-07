@@ -1,0 +1,51 @@
+{
+  "uid": 19,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "a1827f201ef24089e579f1c565628dbcf746ec21e13b9b3daceeab45370f724e",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b32cc3db-b33b-4cc2-8d78-9c07ee1a9e18",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(topics_topicarn_0: str, topics_topicarn_1: str):\n    # Retrieve SNS topics with their respective conditions\n    sns_topics = Amazon_SNS_Topic__3_0_0__retrievewithwhere_Topic(topics_topicarn_0, topics_topicarn_1)\n    \n    # Create a ServiceNow incident\n    incident = ServiceNow_incident__4_0_0__create_incident()\n    \n    # Create a Zendesk ticket\n    ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Send the ServiceNow incident and Zendesk ticket via Outlook\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages(incident, ticket)\n    \n    # Return the created ServiceNow incident\n    return incident",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395887,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 264,
+      "completion_tokens": 173,
+      "total_tokens": 437,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395887754,
+        "prefill_wait_time_ms": 0.750822,
+        "prefill_time_ms": 93.19015399999999,
+        "ttft_ms": 93.94097599999999,
+        "total_time_ms": 1459.169953,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(topics_topicarn_0: str, topics_topicarn_1: str):\n    # Retrieve SNS topics with their respective conditions\n    sns_topics = Amazon_SNS_Topic__3_0_0__retrievewithwhere_Topic(topics_topicarn_0, topics_topicarn_1)\n    \n    # Create a ServiceNow incident\n    incident = ServiceNow_incident__4_0_0__create_incident()\n    \n    # Create a Zendesk ticket\n    ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Send the ServiceNow incident and Zendesk ticket via Outlook\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages(incident, ticket)\n    \n    # Return the created ServiceNow incident\n    return incident"
+}

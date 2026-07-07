@@ -1,0 +1,51 @@
+{
+  "uid": 90,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "ec691dd84364281df19d0a40062e2aebca1e7e8ec33227d8e0d64b8d52399170",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-650b9f8c-3c47-43e5-abcb-c61697b11f38",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(repositories_has_projects_0: bool, repositories_has_projects_1: bool):\n    # Implement the steps to remove the creation of a new GitHub issue and sending a Slack message\n    GitHub_Repository__3_0_0__retrievewithwhere_Repository(repositories_has_projects_0, repositories_has_projects_1)\n    GitHub_Pullrequest__3_0_0__retrievewithwhere_Pullrequest()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442609,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 232,
+      "completion_tokens": 92,
+      "total_tokens": 324,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442609337,
+        "prefill_wait_time_ms": 0.7,
+        "prefill_time_ms": 22.825773,
+        "ttft_ms": 23.525773,
+        "total_time_ms": 754.915661,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(repositories_has_projects_0: bool, repositories_has_projects_1: bool):\n    # Implement the steps to remove the creation of a new GitHub issue and sending a Slack message\n    GitHub_Repository__3_0_0__retrievewithwhere_Repository(repositories_has_projects_0, repositories_has_projects_1)\n    GitHub_Pullrequest__3_0_0__retrievewithwhere_Pullrequest()"
+}

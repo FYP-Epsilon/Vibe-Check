@@ -1,0 +1,45 @@
+{
+  "uid": 100,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "bab0f91842bcd0b0a89bbf1a749ed4bc5d825d0222421a310c6a1260ef577184",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a35ebd61f8f55b33",
+    "object": "chat.completion",
+    "created": 1783442713,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(tasks_statuscode_0, tasks_statuscode_1):\n    completed_tasks = Microsoft_Dynamics_365_for_Sales_Task__7_0_0__retrievewithwhere_Task(tasks_statuscode_0=tasks_statuscode_0, tasks_statuscode_1=tasks_statuscode_1)\n    for task in completed_tasks:\n        Microsoft_Dynamics_365_for_Sales_Task__7_0_0__deletewithwhere_Task(task)\n    return None",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 245,
+      "total_tokens": 372,
+      "completion_tokens": 127,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(tasks_statuscode_0, tasks_statuscode_1):\n    completed_tasks = Microsoft_Dynamics_365_for_Sales_Task__7_0_0__retrievewithwhere_Task(tasks_statuscode_0=tasks_statuscode_0, tasks_statuscode_1=tasks_statuscode_1)\n    for task in completed_tasks:\n        Microsoft_Dynamics_365_for_Sales_Task__7_0_0__deletewithwhere_Task(task)\n    return None"
+}

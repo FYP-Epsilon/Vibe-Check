@@ -1,0 +1,45 @@
+{
+  "uid": 63,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "072e66a4a4ba78694361d49eafd19dc23a725a6eeec5419ed7a01bc300582331",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-94ec47a995cc5752",
+    "object": "chat.completion",
+    "created": 1783440586,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Subscribe to the \"dogs\" list\n    Amazon_SNS_Subscription__3_0_0__create_Subscription(\n        TopicArn=\"arn:aws:sns:us-west-2:123456789012:dogs\",\n        Protocol=\"email\",\n        Endpoint=\"your.email@example.com\"\n    )\n\n    # List all subscriptions\n    subscriptions = Amazon_SNS_Subscription__3_0_0__retrievewithwhere_Subscription()\n\n    # Print all subscriptions\n    for subscription in subscriptions:\n        print(subscription)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 200,
+      "total_tokens": 349,
+      "completion_tokens": 149,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Subscribe to the \"dogs\" list\n    Amazon_SNS_Subscription__3_0_0__create_Subscription(\n        TopicArn=\"arn:aws:sns:us-west-2:123456789012:dogs\",\n        Protocol=\"email\",\n        Endpoint=\"your.email@example.com\"\n    )\n\n    # List all subscriptions\n    subscriptions = Amazon_SNS_Subscription__3_0_0__retrievewithwhere_Subscription()\n\n    # Print all subscriptions\n    for subscription in subscriptions:\n        print(subscription)"
+}

@@ -1,0 +1,45 @@
+{
+  "uid": 76,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "34a533c4ad12855973817eace91d746214fb54b7cf6722a187a21f4fc4caaa9c",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a12c69cb4ae3398d",
+    "object": "chat.completion",
+    "created": 1783441803,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve open Jira issues\n    open_issues = Jira_Issue__2_0_0__retrievewithwhere_Issue(where=\"status = Open\")\n\n    # Loop through open issues\n    for issue in open_issues:\n        # Check if the issue has a related GitHub pull request\n        prs = issue.fields.pullrequest.values()\n        if prs:\n            # Update the issue's status to \"In Progress\"\n            Jira_Issue__2_0_0__update_Issue(issue.id, {\"status\": {\"name\": \"In Progress\"}})\n\n            # Comment on the related GitHub pull request\n            for pr in prs:\n                comment = f\"Issue {issue.key} has been set to 'In Progress' in Jira.\"\n                GitHub_Comment__3_0_0__create_Comment(pr, comment)\n\n        else:\n            # If there's no related pull request, leave the issue's status as is\n            pass\n\n    # Retrieve all Jira statuses\n    all_statuses = Jira_Status__2_0_0__retrievewithwhere_Status()\n\n    # Loop through all statuses\n    for status in all_statuses:\n        # Retrieve issues with the current status\n        status_issues = Jira_Issue__2_0_0__retrievewithwhere_Issue(where=f\"status = {status.name}\")\n\n        # If there are no issues with the current status, delete it\n        if not status_issues:\n            Jira_Status__2_0_0__delete_Status(status.id)\n\n        else:\n            # If there are issues with the current status, check if any of them\n            # have been in this status for more than 7 days\n            for issue in status_issues:\n                if (issue.fields.updated - issue.fields.created).days > 7:\n                    # Update the issue's status to \"In Review\"\n                    Jira_Issue__2_0_0__update_Issue(issue.id, {\"status\": {\"name\": \"In Review\"}})\n\n                    # Comment on the issue\n                    comment = f\"Issue {issue.key} has been in '{status.name}' status for over 7 days. It has been set to 'In Review' in Jira.\"\n                    GitHub_Comment__3_0_0__create_Comment(issue.fields.pullrequest.values()[0], comment)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 204,
+      "total_tokens": 793,
+      "completion_tokens": 589,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve open Jira issues\n    open_issues = Jira_Issue__2_0_0__retrievewithwhere_Issue(where=\"status = Open\")\n\n    # Loop through open issues\n    for issue in open_issues:\n        # Check if the issue has a related GitHub pull request\n        prs = issue.fields.pullrequest.values()\n        if prs:\n            # Update the issue's status to \"In Progress\"\n            Jira_Issue__2_0_0__update_Issue(issue.id, {\"status\": {\"name\": \"In Progress\"}})\n\n            # Comment on the related GitHub pull request\n            for pr in prs:\n                comment = f\"Issue {issue.key} has been set to 'In Progress' in Jira.\"\n                GitHub_Comment__3_0_0__create_Comment(pr, comment)\n\n        else:\n            # If there's no related pull request, leave the issue's status as is\n            pass\n\n    # Retrieve all Jira statuses\n    all_statuses = Jira_Status__2_0_0__retrievewithwhere_Status()\n\n    # Loop through all statuses\n    for status in all_statuses:\n        # Retrieve issues with the current status\n        status_issues = Jira_Issue__2_0_0__retrievewithwhere_Issue(where=f\"status = {status.name}\")\n\n        # If there are no issues with the current status, delete it\n        if not status_issues:\n            Jira_Status__2_0_0__delete_Status(status.id)\n\n        else:\n            # If there are issues with the current status, check if any of them\n            # have been in this status for more than 7 days\n            for issue in status_issues:\n                if (issue.fields.updated - issue.fields.created).days > 7:\n                    # Update the issue's status to \"In Review\"\n                    Jira_Issue__2_0_0__update_Issue(issue.id, {\"status\": {\"name\": \"In Review\"}})\n\n                    # Comment on the issue\n                    comment = f\"Issue {issue.key} has been in '{status.name}' status for over 7 days. It has been set to 'In Review' in Jira.\"\n                    GitHub_Comment__3_0_0__create_Comment(issue.fields.pullrequest.values()[0], comment)"
+}

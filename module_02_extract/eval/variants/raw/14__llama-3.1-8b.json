@@ -1,0 +1,51 @@
+{
+  "uid": 14,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "b77ed8893d5d89e7d44b878eb11029a3ff6cf9077b6215406d9258d6b8fa5f8d",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-2cd5d0b9-cce6-42a7-80a9-bb140b994fa7",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(campaigns_type_0: str, campaigns_type_1: str):\n    if campaigns_type_0 == \"Finance\":\n        monday_com_Board__2_0_0__create_Board()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395716,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 258,
+      "completion_tokens": 45,
+      "total_tokens": 303,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395716745,
+        "prefill_wait_time_ms": 0.88917,
+        "prefill_time_ms": 22.632357,
+        "ttft_ms": 23.521527,
+        "total_time_ms": 280.21476099999995,
+        "kv_hit_rate": 0.058823529411764705,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(campaigns_type_0: str, campaigns_type_1: str):\n    if campaigns_type_0 == \"Finance\":\n        monday_com_Board__2_0_0__create_Board()"
+}

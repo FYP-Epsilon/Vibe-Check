@@ -1,0 +1,45 @@
+{
+  "uid": 13,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "2112a344715ffc2dd21f3753240b0bff77d9a8c9d9a269e1f9ee3068fc57ccf4",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8c430bc904e24099",
+    "object": "chat.completion",
+    "created": 1783395712,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(issues_fields_0: str, issues_fields_1: str):\n    issue_data = Jira_Issue__2_0_0__retrievewithwhere_Issue(issues_fields_0, issues_fields_1)\n    task = Asana_Tasks__2_0_0__create_Tasks()\n    Asana_Attachments__2_0_0__create_Attachments(task_id=task['gid'], file_url=issue_data.get('attachment_url'))\n    Gmail_mail__2_0_0__create_mail(to='team@example.com', subject='New Asana Task Created', body=f\"Task {task['name']} has been created.\")\n    Slack_message__3_0_0__create_message(channel='#tasks', text=f\"New Asana task created: {task['name']}\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 246,
+      "total_tokens": 419,
+      "completion_tokens": 173,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(issues_fields_0: str, issues_fields_1: str):\n    issue_data = Jira_Issue__2_0_0__retrievewithwhere_Issue(issues_fields_0, issues_fields_1)\n    task = Asana_Tasks__2_0_0__create_Tasks()\n    Asana_Attachments__2_0_0__create_Attachments(task_id=task['gid'], file_url=issue_data.get('attachment_url'))\n    Gmail_mail__2_0_0__create_mail(to='team@example.com', subject='New Asana Task Created', body=f\"Task {task['name']} has been created.\")\n    Slack_message__3_0_0__create_message(channel='#tasks', text=f\"New Asana task created: {task['name']}\")"
+}

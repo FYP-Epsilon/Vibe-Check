@@ -1,0 +1,45 @@
+{
+  "uid": 1,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "a78692bda9c9218ac35cce753991a99f6d75bf2c1df06770238fde052f18d11f",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b0cb10c84e07ac2b",
+    "object": "chat.completion",
+    "created": 1783395424,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new Jira issue\n    jira_issue_key = Jira_Issue__2_0_0__create_Issue()\n\n    # Create a new GitHub repository\n    github_repo_url = GitHub_Repository__3_0_0__create_Repository()\n\n    # Print the results\n    print(f\"Jira issue created: {jira_issue_key}\")\n    print(f\"GitHub repository created: {github_repo_url}\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 187,
+      "total_tokens": 306,
+      "completion_tokens": 119,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Jira issue\n    jira_issue_key = Jira_Issue__2_0_0__create_Issue()\n\n    # Create a new GitHub repository\n    github_repo_url = GitHub_Repository__3_0_0__create_Repository()\n\n    # Print the results\n    print(f\"Jira issue created: {jira_issue_key}\")\n    print(f\"GitHub repository created: {github_repo_url}\")"
+}

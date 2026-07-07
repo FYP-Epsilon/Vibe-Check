@@ -1,0 +1,51 @@
+{
+  "uid": 65,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "900b77e9eb5aec9ba24e1c266665c8977552fb84131c704875ad36b6bb4de783",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-1d7622df-22a1-4c23-a296-d703fe235e00",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create a new account\n    account_id = Salesforce_Account__5_0_0__create_Account()\n    \n    # Create a new case associated with the account\n    case_id = Salesforce_Case__5_0_0__create_Case(account_id)\n    \n    # Create a new asset associated with the case\n    asset_id = Salesforce_Asset__8_0_0__create_Asset(case_id)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783440769,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 204,
+      "completion_tokens": 91,
+      "total_tokens": 295,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783440769136,
+        "prefill_wait_time_ms": 0.858726,
+        "prefill_time_ms": 20.566467000000003,
+        "ttft_ms": 21.425193,
+        "total_time_ms": 676.768985,
+        "kv_hit_rate": 0.07692307692307693,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create a new account\n    account_id = Salesforce_Account__5_0_0__create_Account()\n    \n    # Create a new case associated with the account\n    case_id = Salesforce_Case__5_0_0__create_Case(account_id)\n    \n    # Create a new asset associated with the case\n    asset_id = Salesforce_Asset__8_0_0__create_Asset(case_id)"
+}

@@ -1,0 +1,51 @@
+{
+  "uid": 36,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "db6d8b34a02f1a7179697a78c9f44e1b1f886a9873db7d3383e784a4e9f8de69",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-49747e7f-1144-4ad3-b7ba-35a9de77d081",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    Coupa_expense_reports__4_0_0__create_expense_reports()\n    Coupa_invoices__4_0_0__create_invoices()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396622,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 186,
+      "completion_tokens": 38,
+      "total_tokens": 224,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396622507,
+        "prefill_wait_time_ms": 0.949287,
+        "prefill_time_ms": 16.663073,
+        "ttft_ms": 17.61236,
+        "total_time_ms": 589.634238,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    Coupa_expense_reports__4_0_0__create_expense_reports()\n    Coupa_invoices__4_0_0__create_invoices()"
+}

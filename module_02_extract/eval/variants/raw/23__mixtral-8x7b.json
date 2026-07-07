@@ -1,0 +1,45 @@
+{
+  "uid": 23,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "6e563146c88e7c4d78755971bf12428f3c227c86142e464468906ea6332e14c3",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9fc52909827d9dfe",
+    "object": "chat.completion",
+    "created": 1783396028,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new Zendesk ticket\n    zendesk_ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n\n    # Create a new task in the default Microsoft To Do list\n    microsoft_to_do_task = Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_model(\n        'default_user_id',  # replace this with the actual user id\n        'default_todo_list_id'  # replace this with the actual todo list id\n    )\n\n    # Return the created Zendesk ticket and Microsoft To Do task\n    return zendesk_ticket, microsoft_to_do_task",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 243,
+      "total_tokens": 438,
+      "completion_tokens": 195,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Zendesk ticket\n    zendesk_ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n\n    # Create a new task in the default Microsoft To Do list\n    microsoft_to_do_task = Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_model(\n        'default_user_id',  # replace this with the actual user id\n        'default_todo_list_id'  # replace this with the actual todo list id\n    )\n\n    # Return the created Zendesk ticket and Microsoft To Do task\n    return zendesk_ticket, microsoft_to_do_task"
+}

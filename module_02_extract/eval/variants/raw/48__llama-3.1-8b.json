@@ -1,0 +1,51 @@
+{
+  "uid": 48,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "b59fd4794ab43156071ead9bfddc1888e69bcdbdff5b58be5edbd4789506faa9",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-5fd999e1-a944-47be-945c-794ca5ec0904",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    issues = Jira_Issue__2_0_0__retrievewithwhere_Issue()\n    copies = [Jira_Issue__2_0_0__create_Issue() for issue in issues]\n    \n    for issue in issues:\n        issue.copy(copies.pop(0))\n    \n    Slack_message__3_0_0__create_message(\"Copies of issues created successfully\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783412656,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 230,
+      "completion_tokens": 87,
+      "total_tokens": 317,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783412656077,
+        "prefill_wait_time_ms": 0.6343110000000001,
+        "prefill_time_ms": 16.609779000000003,
+        "ttft_ms": 17.24409,
+        "total_time_ms": 404.866428,
+        "kv_hit_rate": 0.2,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    issues = Jira_Issue__2_0_0__retrievewithwhere_Issue()\n    copies = [Jira_Issue__2_0_0__create_Issue() for issue in issues]\n    \n    for issue in issues:\n        issue.copy(copies.pop(0))\n    \n    Slack_message__3_0_0__create_message(\"Copies of issues created successfully\")"
+}

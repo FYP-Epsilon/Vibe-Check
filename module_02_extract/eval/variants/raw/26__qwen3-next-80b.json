@@ -1,0 +1,45 @@
+{
+  "uid": 26,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "e3b7dfded7326b5a06db5765bebe97a3aa44423094e2b5a500731ab886481122",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-985aff09118d308e",
+    "object": "chat.completion",
+    "created": 1783396166,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead()\n    for lead in leads:\n        subject = f\"Status Update for Lead: {lead.get('Name', 'Unknown')}\"\n        body = f\"Hello,\\n\\nThis is a status update for the lead: {lead.get('Name', 'Unknown')}.\\nEmail: {lead.get('Email', 'N/A')}\\nPhone: {lead.get('Phone', 'N/A')}\\n\\nBest regards,\\nSales Team\"\n        Gmail_mail__2_0_0__create_mail(subject, body)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 164,
+      "total_tokens": 296,
+      "completion_tokens": 132,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead()\n    for lead in leads:\n        subject = f\"Status Update for Lead: {lead.get('Name', 'Unknown')}\"\n        body = f\"Hello,\\n\\nThis is a status update for the lead: {lead.get('Name', 'Unknown')}.\\nEmail: {lead.get('Email', 'N/A')}\\nPhone: {lead.get('Phone', 'N/A')}\\n\\nBest regards,\\nSales Team\"\n        Gmail_mail__2_0_0__create_mail(subject, body)"
+}

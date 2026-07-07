@@ -1,0 +1,45 @@
+{
+  "uid": 45,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "1debd2e6b62d353a48e6ccd11b6eab06006d71703ae12a041f392a60786c71ef",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a2cc3c3992b03e9c",
+    "object": "chat.completion",
+    "created": 1783439350,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new branch\n    branch = GitHub_Branch__3_0_0__retrievewithwhere_Branch(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        ref=\"master\"\n    )\n    new_branch = GitHub_Branch__3_0_0__create_Branch(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        new_branch_name=\"new-feature-branch\",\n        base=\"master\"\n    )\n\n    # Create a new pull request from the new branch\n    pull_request = GitHub_Pullrequest__3_0_0__create_Pullrequest(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        title=\"New feature branch\",\n        head=new_branch[\"node_id\"],\n        base=\"master\"\n    )\n\n    # Add a comment to the pull request\n    GitHub_Comment__3_0_0__create_Comment(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        pull_request=pull_request[\"number\"],\n        body=\"This is a comment on the new feature branch pull request.\"\n    )",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 200,
+      "total_tokens": 477,
+      "completion_tokens": 277,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new branch\n    branch = GitHub_Branch__3_0_0__retrievewithwhere_Branch(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        ref=\"master\"\n    )\n    new_branch = GitHub_Branch__3_0_0__create_Branch(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        new_branch_name=\"new-feature-branch\",\n        base=\"master\"\n    )\n\n    # Create a new pull request from the new branch\n    pull_request = GitHub_Pullrequest__3_0_0__create_Pullrequest(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        title=\"New feature branch\",\n        head=new_branch[\"node_id\"],\n        base=\"master\"\n    )\n\n    # Add a comment to the pull request\n    GitHub_Comment__3_0_0__create_Comment(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        pull_request=pull_request[\"number\"],\n        body=\"This is a comment on the new feature branch pull request.\"\n    )"
+}

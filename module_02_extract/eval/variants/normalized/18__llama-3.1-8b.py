@@ -1,0 +1,17 @@
+def Amazon_SNS_Topic__3_0_0__retrievewithwhere_Topic(topics_topicarn_0: str = None, topics_topicarn_1: str = None):
+    return [{"topicarn": topics_topicarn_0}, {"topicarn": topics_topicarn_1}]
+
+
+def Zendesk_Service_Ticket__2_0_0__create_Ticket():
+    return {}
+
+
+def Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages():
+    return {}
+
+
+def workflow(topics_topicarn_0: str, topics_topicarn_1: str):
+    if topics_topicarn_0 and topics_topicarn_1:
+        Zendesk_Service_Ticket__2_0_0__create_Ticket()
+    else:
+        print('Error: Topic ARNs are required')

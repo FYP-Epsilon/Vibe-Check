@@ -1,0 +1,8 @@
+{
+  "uid": 88,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "702edcc1ced5b373696ed32251c4e674ffdf2f80ee1281502406e2e82c53f68f",
+  "temperature": 0.7,
+  "error": "NIM POST /chat/completions failed after 3 attempt(s): The read operation timed out"
+}

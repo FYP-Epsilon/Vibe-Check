@@ -1,0 +1,51 @@
+{
+  "uid": 92,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "2f0b75e37e888d0c692440c917730d080b2bf25a27c2506b50b94bc929e0094f",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-212bdf40-4e14-43a0-a198-c4e099716cbe",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(buckets_name_0: str, buckets_name_1: str):\n    bucket_data = Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket(buckets_name_0, buckets_name_1)\n    if bucket_data:\n        Amazon_S3_object__2_0_0__deletewithwhere_object()\n        Amazon_SNS_Topic__3_0_0__PUBLISHMESSAGEONTOPIC_Topic()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442631,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 245,
+      "completion_tokens": 95,
+      "total_tokens": 340,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442631679,
+        "prefill_wait_time_ms": 0.806331,
+        "prefill_time_ms": 22.403594,
+        "ttft_ms": 23.209925,
+        "total_time_ms": 774.00317,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(buckets_name_0: str, buckets_name_1: str):\n    bucket_data = Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket(buckets_name_0, buckets_name_1)\n    if bucket_data:\n        Amazon_S3_object__2_0_0__deletewithwhere_object()\n        Amazon_SNS_Topic__3_0_0__PUBLISHMESSAGEONTOPIC_Topic()"
+}

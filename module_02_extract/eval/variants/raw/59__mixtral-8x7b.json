@@ -1,0 +1,45 @@
+{
+  "uid": 59,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "ee9e685a8581dc75e8a8afcf8d9c76f86dcef8e032958b2f9687515e5c79b819",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b66edbe9178e0531",
+    "object": "chat.completion",
+    "created": 1783440203,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new Active Directory domain on Azure\n    domain = Microsoft\\_Entra\\_ID\\_Domains\\_\\_4\\_0\\_0\\_\\_create\\_Domains()\n\n    # Add a new device to the Active Directory domain\n    user\\_task(\"Adding new device to the domain...\")\n    device = add\\_device\\_to\\_domain(domain)\n\n    # Authenticate the new device in the Active Directory domain\n    user\\_task(\"Authenticating new device in the domain...\")\n    authenticate\\_device(device, domain)\n\n# Helper function to add a device to the domain\ndef add\\_device\\_to\\_domain(domain):\n    # Implementation details for adding a device to the domain\n    ...\n    return device\n\n# Helper function to authenticate a device in the domain\ndef authenticate\\_device(device, domain):\n    # Implementation details for authenticating a device in the domain\n    ...",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 192,
+      "total_tokens": 414,
+      "completion_tokens": 222,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Active Directory domain on Azure\n    domain = Microsoft\\_Entra\\_ID\\_Domains\\_\\_4\\_0\\_0\\_\\_create\\_Domains()\n\n    # Add a new device to the Active Directory domain\n    user\\_task(\"Adding new device to the domain...\")\n    device = add\\_device\\_to\\_domain(domain)\n\n    # Authenticate the new device in the Active Directory domain\n    user\\_task(\"Authenticating new device in the domain...\")\n    authenticate\\_device(device, domain)\n\n# Helper function to add a device to the domain\ndef add\\_device\\_to\\_domain(domain):\n    # Implementation details for adding a device to the domain\n    ...\n    return device\n\n# Helper function to authenticate a device in the domain\ndef authenticate\\_device(device, domain):\n    # Implementation details for authenticating a device in the domain\n    ..."
+}

@@ -1,0 +1,45 @@
+{
+  "uid": 50,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "165492b3350ed4b311e10ed7d23aa8bf856a0f5f2e65ebff50ef8e4d809851ab",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a3870fa75bbdee62",
+    "object": "chat.completion",
+    "created": 1783412819,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new person\n    person_response = Zendesk_Service_person__3_0_0__create_person(\"John Doe\", \"johndoe@example.com\")\n    if person_response.status_code != 201:\n        raise Exception(\"Failed to create person\")\n\n    # Get the person ID from the response\n    person_id = person_response.json()[\"id\"]\n\n    # Create a new ticket\n    ticket_response = Zendesk_Service_Ticket__2_0_0__create_Ticket(\n        \"Sample Ticket\",\n        \"This is a sample ticket for testing purposes.\",\n        person_id\n    )\n\n    if ticket_response.status_code != 201:\n        raise Exception(\"Failed to create ticket\")\n\n    print(\"Successfully created person and ticket\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 209,
+      "total_tokens": 411,
+      "completion_tokens": 202,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new person\n    person_response = Zendesk_Service_person__3_0_0__create_person(\"John Doe\", \"johndoe@example.com\")\n    if person_response.status_code != 201:\n        raise Exception(\"Failed to create person\")\n\n    # Get the person ID from the response\n    person_id = person_response.json()[\"id\"]\n\n    # Create a new ticket\n    ticket_response = Zendesk_Service_Ticket__2_0_0__create_Ticket(\n        \"Sample Ticket\",\n        \"This is a sample ticket for testing purposes.\",\n        person_id\n    )\n\n    if ticket_response.status_code != 201:\n        raise Exception(\"Failed to create ticket\")\n\n    print(\"Successfully created person and ticket\")"
+}

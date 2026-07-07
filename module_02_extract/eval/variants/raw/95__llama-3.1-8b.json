@@ -1,0 +1,51 @@
+{
+  "uid": 95,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "c24a5d5f0a64968dbb376490775199bc8d002278c92c89d86f41932ea9135f53",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9d4c6e04-41d9-44c9-9f75-7f1617929275",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(contacts_CleanStatus_0: str, contacts_CleanStatus_1: str):\n    user_task(label=\"Retrieve existing contacts\")\n    contacts = Salesforce_Contact__5_0_0__retrievewithwhere_Contact(contacts_CleanStatus_0=contacts_CleanStatus_0, contacts_CleanStatus_1=contacts_CleanStatus_1)\n    if contacts:\n        user_task(label=\"Update existing contact\")\n        Salesforce_Contact__5_0_0__updatewithwhere_Contact()\n    else:\n        user_task(label=\"Contact not found\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442664,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 242,
+      "completion_tokens": 122,
+      "total_tokens": 364,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442664010,
+        "prefill_wait_time_ms": 0.936216,
+        "prefill_time_ms": 21.826103999999997,
+        "ttft_ms": 22.76232,
+        "total_time_ms": 1186.1549650000002,
+        "kv_hit_rate": 0.0625,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(contacts_CleanStatus_0: str, contacts_CleanStatus_1: str):\n    user_task(label=\"Retrieve existing contacts\")\n    contacts = Salesforce_Contact__5_0_0__retrievewithwhere_Contact(contacts_CleanStatus_0=contacts_CleanStatus_0, contacts_CleanStatus_1=contacts_CleanStatus_1)\n    if contacts:\n        user_task(label=\"Update existing contact\")\n        Salesforce_Contact__5_0_0__updatewithwhere_Contact()\n    else:\n        user_task(label=\"Contact not found\")"
+}

@@ -1,0 +1,45 @@
+{
+  "uid": 71,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "2570ba22149cc96424c63ceee1b19f4bc99acc387eb316a58a5ee2ead2f2eab1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-823ee97df53bb7b2",
+    "object": "chat.completion",
+    "created": 1783441329,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new SNS topic\n    topic\\_arn = Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_create\\_Topic()\n\n    # Add a message to the SQS queue\n    Amazon\\_SQS\\_Messages\\_\\_3\\_0\\_0\\_\\_PUTMESSAGE\\_Messages(queue\\_url=\"https://sqs.us-east-1.amazonaws.com/123456789012/MyQueue\",\n                                                                message\\_body=\"Hello, world!\",\n                                                                message\\_attributes={\"topic\\_arn\": {\"DataType\": \"String\", \"StringValue\": topic\\_arn}})\n\n    # Update the topic with a WHERE clause to filter messages by the topic\\_arn attribute\n    Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_updatewithwhere\\_Topic(topic\\_arn=topic\\_arn,\n                                                            where\\_expression=\"topic\\_arn = '{}'\".format(topic\\_arn))",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 238,
+      "total_tokens": 472,
+      "completion_tokens": 234,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new SNS topic\n    topic\\_arn = Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_create\\_Topic()\n\n    # Add a message to the SQS queue\n    Amazon\\_SQS\\_Messages\\_\\_3\\_0\\_0\\_\\_PUTMESSAGE\\_Messages(queue\\_url=\"https://sqs.us-east-1.amazonaws.com/123456789012/MyQueue\",\n                                                                message\\_body=\"Hello, world!\",\n                                                                message\\_attributes={\"topic\\_arn\": {\"DataType\": \"String\", \"StringValue\": topic\\_arn}})\n\n    # Update the topic with a WHERE clause to filter messages by the topic\\_arn attribute\n    Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_updatewithwhere\\_Topic(topic\\_arn=topic\\_arn,\n                                                            where\\_expression=\"topic\\_arn = '{}'\".format(topic\\_arn))"
+}

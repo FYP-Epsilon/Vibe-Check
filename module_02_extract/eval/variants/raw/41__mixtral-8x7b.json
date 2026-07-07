@@ -1,0 +1,45 @@
+{
+  "uid": 41,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "96b2dac6e83f287219954da6d8d6b1a09539f4af48c7a2303c2e98f5f0c97272",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-895831badf5855bb",
+    "object": "chat.completion",
+    "created": 1783396822,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve the GitHub branch\n    branch = GitHub\\_Branch\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Branch(\n        where=\"head\", ref=\"my-feature-branch\"\n    )\n\n    # Create a pull request from the branch\n    pull\\_request = GitHub\\_Pullrequest\\_\\_3\\_0\\_0\\_\\_create\\_Pullrequest(\n        title=\"Feature Branch\",\n        body=\"This is a new feature branch.\",\n        head=branch.name,\n        base=\"main\",\n    )\n\n    # Create a new issue\n    GitHub\\_Issue\\_\\_3\\_0\\_0\\_\\_create\\_Issue(\n        title=\"New Issue\",\n        body=\"This is a new issue.\",\n    )",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 217,
+      "total_tokens": 400,
+      "completion_tokens": 183,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the GitHub branch\n    branch = GitHub\\_Branch\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Branch(\n        where=\"head\", ref=\"my-feature-branch\"\n    )\n\n    # Create a pull request from the branch\n    pull\\_request = GitHub\\_Pullrequest\\_\\_3\\_0\\_0\\_\\_create\\_Pullrequest(\n        title=\"Feature Branch\",\n        body=\"This is a new feature branch.\",\n        head=branch.name,\n        base=\"main\",\n    )\n\n    # Create a new issue\n    GitHub\\_Issue\\_\\_3\\_0\\_0\\_\\_create\\_Issue(\n        title=\"New Issue\",\n        body=\"This is a new issue.\",\n    )"
+}

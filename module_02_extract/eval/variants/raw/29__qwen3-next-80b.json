@@ -1,0 +1,45 @@
+{
+  "uid": 29,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "7447f64c1f0bc9b01bce6aa42ba6357d72a8aa454c9722f9a26d466267865b68",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a4ead0df3a7e58f6",
+    "object": "chat.completion",
+    "created": 1783396284,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    # Create a new Salesforce contact\n    contact_id = Salesforce_Contact__5_0_0__create_Contact()\n    \n    # Create a new Box folder\n    folder_id = Box_Folder__3_0_0__create_Folder()\n    \n    # Create a corresponding file in the new Box folder\n    file_id = Box_File__3_0_0__create_File(folder_id)\n    \n    # Send an email using Gmail\n    Gmail_mail__2_0_0__create_mail()\n    \n    return None",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 200,
+      "total_tokens": 314,
+      "completion_tokens": 114,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Salesforce contact\n    contact_id = Salesforce_Contact__5_0_0__create_Contact()\n    \n    # Create a new Box folder\n    folder_id = Box_Folder__3_0_0__create_Folder()\n    \n    # Create a corresponding file in the new Box folder\n    file_id = Box_File__3_0_0__create_File(folder_id)\n    \n    # Send an email using Gmail\n    Gmail_mail__2_0_0__create_mail()\n    \n    return None"
+}

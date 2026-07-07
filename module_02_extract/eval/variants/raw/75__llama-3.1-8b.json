@@ -1,0 +1,51 @@
+{
+  "uid": 75,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "d73858ed94ee7923354e625e317781cd053aee1dc6c5b3fa5a8d3e5425591ba9",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-d239066c-e31b-4bc1-b16b-0f5ac09f86f1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    Marketo_leads__3_0_0__updatewithwhere_leads()\n    leads = Marketo_leads__3_0_0__retrievewithwhere_leads()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783441708,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 233,
+      "completion_tokens": 44,
+      "total_tokens": 277,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783441708825,
+        "prefill_wait_time_ms": 0.732383,
+        "prefill_time_ms": 20.554013,
+        "ttft_ms": 21.286396,
+        "total_time_ms": 417.181195,
+        "kv_hit_rate": 0.06666666666666667,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    Marketo_leads__3_0_0__updatewithwhere_leads()\n    leads = Marketo_leads__3_0_0__retrievewithwhere_leads()"
+}
