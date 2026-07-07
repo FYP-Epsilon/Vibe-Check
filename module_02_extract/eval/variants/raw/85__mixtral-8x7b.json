@@ -1,0 +1,45 @@
+{
+  "uid": 85,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "33c65080cac6e437d9534df2f0fb2f32d4a0bf872c70c267a37d33d5787ea579",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a5bcf79bebf83b91",
+    "object": "chat.completion",
+    "created": 1783442546,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new Trello board for the project\n    trello\\_board = Trello\\_Board\\_\\_2\\_0\\_0\\_\\_create\\_Board()\n\n    # Retrieve the list of GitHub issues for the project\n    github\\_issues = GitHub\\_Issue\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Issue()\n\n    # Iterate over the list of issues\n    for issue in github\\_issues:\n        # Extract the relevant information from the issue\n        title = issue['title']\n        description = issue['description']\n        labels = [label['name'] for label in issue['labels']]\n\n        # Create a corresponding Jira issue for the Trello board\n        jira\\_issue = Jira\\_Issue\\_\\_2\\_0\\_0\\_\\_create\\_Issue(\n            title=title,\n            description=description,\n            labels=labels,\n            project_key='MYPROJ'\n        )\n\n        # Add the Jira issue's key to the Trello issue's description\n        trello\\_issue = trello\\_board.get\\_issue\\_by\\_name(title)\n        trello\\_issue.description += '\\nJira Key: ' + jira\\_issue.key\n\n        # Add the Jira issue's key label to the Trello issue\n        trello\\_issue.add\\_label(jira\\_issue.key)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 207,
+      "total_tokens": 546,
+      "completion_tokens": 339,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Trello board for the project\n    trello\\_board = Trello\\_Board\\_\\_2\\_0\\_0\\_\\_create\\_Board()\n\n    # Retrieve the list of GitHub issues for the project\n    github\\_issues = GitHub\\_Issue\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Issue()\n\n    # Iterate over the list of issues\n    for issue in github\\_issues:\n        # Extract the relevant information from the issue\n        title = issue['title']\n        description = issue['description']\n        labels = [label['name'] for label in issue['labels']]\n\n        # Create a corresponding Jira issue for the Trello board\n        jira\\_issue = Jira\\_Issue\\_\\_2\\_0\\_0\\_\\_create\\_Issue(\n            title=title,\n            description=description,\n            labels=labels,\n            project_key='MYPROJ'\n        )\n\n        # Add the Jira issue's key to the Trello issue's description\n        trello\\_issue = trello\\_board.get\\_issue\\_by\\_name(title)\n        trello\\_issue.description += '\\nJira Key: ' + jira\\_issue.key\n\n        # Add the Jira issue's key label to the Trello issue\n        trello\\_issue.add\\_label(jira\\_issue.key)"
+}

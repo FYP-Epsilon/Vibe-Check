@@ -1,0 +1,45 @@
+{
+  "uid": 20,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "83a21525bdb80f93d78f0c18b7973ed612ffeeb75e00245d7c9543b0fd5c8887",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b93c3038efabb9f2",
+    "object": "chat.completion",
+    "created": 1783395929,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(teams_type_0, teams_type_1):\n    # Retrieve teams from the Trello organization\n    trello_teams = Trello_Organization__2_0_0__retrievewithwhere_Organization(teams_type_0, teams_type_1)\n\n    # Iterate through the teams\n    for team in trello_teams:\n        # Check if the team is of type 'customer'\n        if team['type'] == 'customer':\n            # Extract the required fields for creating a Marketo lead\n            lead_data = {\n                'field1': team['field1'],\n                'field2': team['field2'],\n                # Add more fields as needed\n            }\n\n            # Create a Marketo lead with the extracted data\n            Marketo_leads__3_0_0__create_leads(lead_data)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 247,
+      "total_tokens": 459,
+      "completion_tokens": 212,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(teams_type_0, teams_type_1):\n    # Retrieve teams from the Trello organization\n    trello_teams = Trello_Organization__2_0_0__retrievewithwhere_Organization(teams_type_0, teams_type_1)\n\n    # Iterate through the teams\n    for team in trello_teams:\n        # Check if the team is of type 'customer'\n        if team['type'] == 'customer':\n            # Extract the required fields for creating a Marketo lead\n            lead_data = {\n                'field1': team['field1'],\n                'field2': team['field2'],\n                # Add more fields as needed\n            }\n\n            # Create a Marketo lead with the extracted data\n            Marketo_leads__3_0_0__create_leads(lead_data)"
+}

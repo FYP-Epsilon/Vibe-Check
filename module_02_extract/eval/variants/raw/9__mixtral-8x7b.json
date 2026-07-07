@@ -1,0 +1,45 @@
+{
+  "uid": 9,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "dfc155be9d944ddff79c224212a8e266b1caa2f4d33fccf3f80fb6eb4c6fd6f1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-80b4e73f0de4c77b",
+    "object": "chat.completion",
+    "created": 1783395602,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(comments_author\\_0: str, comments_author\\_1: str):\n    repos = GitHub\\_Repository__3\\_0\\_0\\_\\_retrievewithwhere\\_Repository().data\n    for repo in repos:\n        issues = GitHub\\_Issue__3\\_0\\_0\\_\\_retrievewithwhere\\_Issue(repository\\_id=repo.id).data\n        for issue in issues:\n            comments = GitHub\\_Comment__3\\_0\\_0\\_\\_retrievewithwhere\\_Comment(issue\\_id=issue.id, author\\_0=comments_author\\_0, author\\_1=comments_author\\_1).data\n            for comment in comments:\n                if comment.author == \"abc\":\n                    Slack\\_message__3\\_0\\_0\\_\\_create\\_message(text=f\"Issue: {issue.title}, Comment: {comment.body}\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 307,
+      "total_tokens": 514,
+      "completion_tokens": 207,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(comments_author\\_0: str, comments_author\\_1: str):\n    repos = GitHub\\_Repository__3\\_0\\_0\\_\\_retrievewithwhere\\_Repository().data\n    for repo in repos:\n        issues = GitHub\\_Issue__3\\_0\\_0\\_\\_retrievewithwhere\\_Issue(repository\\_id=repo.id).data\n        for issue in issues:\n            comments = GitHub\\_Comment__3\\_0\\_0\\_\\_retrievewithwhere\\_Comment(issue\\_id=issue.id, author\\_0=comments_author\\_0, author\\_1=comments_author\\_1).data\n            for comment in comments:\n                if comment.author == \"abc\":\n                    Slack\\_message__3\\_0\\_0\\_\\_create\\_message(text=f\"Issue: {issue.title}, Comment: {comment.body}\")"
+}

@@ -1,0 +1,51 @@
+{
+  "uid": 26,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "e3b7dfded7326b5a06db5765bebe97a3aa44423094e2b5a500731ab886481122",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b67d65d8-80ba-4584-b72f-de296c127ff2",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead()\n    for lead in leads:\n        status_message = \"New lead from Salesforce: \" + str(lead)\n        mail = Gmail_mail__2_0_0__create_mail()\n        mail.set_subject(\"New Lead\")\n        mail.set_body(status_message)\n        mail.send()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396129,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 188,
+      "completion_tokens": 81,
+      "total_tokens": 269,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396129297,
+        "prefill_wait_time_ms": 0.610573,
+        "prefill_time_ms": 26.799039,
+        "ttft_ms": 27.409612,
+        "total_time_ms": 795.6074520000001,
+        "kv_hit_rate": 0.25,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead()\n    for lead in leads:\n        status_message = \"New lead from Salesforce: \" + str(lead)\n        mail = Gmail_mail__2_0_0__create_mail()\n        mail.set_subject(\"New Lead\")\n        mail.set_body(status_message)\n        mail.send()"
+}

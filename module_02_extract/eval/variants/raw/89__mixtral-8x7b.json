@@ -1,0 +1,45 @@
+{
+  "uid": 89,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "dee6fb07d41e84f5008f6a8cf45d8e5b3034f8b6bb50fab6a4876778cce0cc83",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a8e817d118418a43",
+    "object": "chat.completion",
+    "created": 1783442601,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve the repository\n    repo = GitHub_Repository__3_0_0__retrievewithwhere_Repository()\n\n    # Create a new pull request\n    pr = GitHub_Pullrequest__3_0_0__create_Pullrequest(\n        repo.organization.login,\n        repo.name,\n        \"Add a helpful feature\",\n        \"This is a description of the changes in the pull request\",\n        \"main\",\n        \"fix-issue-123\"\n    )\n\n    # Print the URL of the new pull request\n    print(\"Pull request created: \" + pr.html_url)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 194,
+      "total_tokens": 346,
+      "completion_tokens": 152,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the repository\n    repo = GitHub_Repository__3_0_0__retrievewithwhere_Repository()\n\n    # Create a new pull request\n    pr = GitHub_Pullrequest__3_0_0__create_Pullrequest(\n        repo.organization.login,\n        repo.name,\n        \"Add a helpful feature\",\n        \"This is a description of the changes in the pull request\",\n        \"main\",\n        \"fix-issue-123\"\n    )\n\n    # Print the URL of the new pull request\n    print(\"Pull request created: \" + pr.html_url)"
+}

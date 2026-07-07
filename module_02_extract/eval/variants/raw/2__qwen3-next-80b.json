@@ -1,0 +1,45 @@
+{
+  "uid": 2,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "3a3cd22ec02baf8f916cbf6717a7a787dc670ae3f4f76b261923fd6cc9b63d40",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-be560e810f1087aa",
+    "object": "chat.completion",
+    "created": 1783395517,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(incident_impact: str):\n    incident = ServiceNow_incident__4_0_0__retrievewithwhere_incident(incident_impact)\n    if incident_impact == \"high\":\n        Jira_Issue__2_0_0__create_Issue()\n        Slack_message__3_0_0__create_message()\n    else:\n        GitHub_Issue__3_0_0__create_Issue()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 233,
+      "total_tokens": 325,
+      "completion_tokens": 92,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(incident_impact: str):\n    incident = ServiceNow_incident__4_0_0__retrievewithwhere_incident(incident_impact)\n    if incident_impact == \"high\":\n        Jira_Issue__2_0_0__create_Issue()\n        Slack_message__3_0_0__create_message()\n    else:\n        GitHub_Issue__3_0_0__create_Issue()"
+}

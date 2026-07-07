@@ -1,0 +1,51 @@
+{
+  "uid": 51,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "769e26b7bb935a8a928284ebb3e716aa97955717ed3457a0f32f7d7cacb90047",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-34c5efe2-0d85-49b3-b5a2-6ab375b45190",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    user_task(label=\"Start new application\")\n    user_task(label=\"Create applicant\")\n    Microsoft_Dynamics_365_for_Finance_and_Operations_Applicant__2_0_0__create_Applicant()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783412881,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 185,
+      "completion_tokens": 47,
+      "total_tokens": 232,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783412881056,
+        "prefill_wait_time_ms": 1.0138040000000001,
+        "prefill_time_ms": 28.52897,
+        "ttft_ms": 29.542774,
+        "total_time_ms": 433.576399,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    user_task(label=\"Start new application\")\n    user_task(label=\"Create applicant\")\n    Microsoft_Dynamics_365_for_Finance_and_Operations_Applicant__2_0_0__create_Applicant()"
+}

@@ -1,0 +1,45 @@
+{
+  "uid": 20,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "83a21525bdb80f93d78f0c18b7973ed612ffeeb75e00245d7c9543b0fd5c8887",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8ea212b06ef09111",
+    "object": "chat.completion",
+    "created": 1783395956,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(teams_type_0: str, teams_type_1: str):\n    teams = Trello_Organization__2_0_0__retrievewithwhere_Organization(teams_type_0, teams_type_1)\n    for team in teams:\n        if team.get(\"type\") == \"customer\":\n            Marketo_leads__3_0_0__create_leads(\n                firstName=team.get(\"name\", \"\"),\n                lastName=\"\",\n                email=\"\",\n                organization=team.get(\"name\", \"\"),\n                source=\"Trello Team\"\n            )",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 214,
+      "total_tokens": 332,
+      "completion_tokens": 118,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(teams_type_0: str, teams_type_1: str):\n    teams = Trello_Organization__2_0_0__retrievewithwhere_Organization(teams_type_0, teams_type_1)\n    for team in teams:\n        if team.get(\"type\") == \"customer\":\n            Marketo_leads__3_0_0__create_leads(\n                firstName=team.get(\"name\", \"\"),\n                lastName=\"\",\n                email=\"\",\n                organization=team.get(\"name\", \"\"),\n                source=\"Trello Team\"\n            )"
+}

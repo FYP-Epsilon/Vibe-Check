@@ -1,0 +1,45 @@
+{
+  "uid": 48,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "b59fd4794ab43156071ead9bfddc1888e69bcdbdff5b58be5edbd4789506faa9",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-ae2ec9e98eb7b976",
+    "object": "chat.completion",
+    "created": 1783412656,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve the first issue from Jira\n    issue = Jira_Issue__2_0_0__retrievewithwhere_Issue(where='id=12345')\n\n    # Create a copy of the issue\n    copied_issue = Jira_Issue__2_0_0__create_Issue(issue=issue)\n\n    # Send a message to the Slack channel about the copied issue\n    Slack_message__3_0_0__create_message(channel='#team-channel', text=f'Issue {copied_issue[\"id\"]} has been copied.')",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 237,
+      "total_tokens": 384,
+      "completion_tokens": 147,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the first issue from Jira\n    issue = Jira_Issue__2_0_0__retrievewithwhere_Issue(where='id=12345')\n\n    # Create a copy of the issue\n    copied_issue = Jira_Issue__2_0_0__create_Issue(issue=issue)\n\n    # Send a message to the Slack channel about the copied issue\n    Slack_message__3_0_0__create_message(channel='#team-channel', text=f'Issue {copied_issue[\"id\"]} has been copied.')"
+}

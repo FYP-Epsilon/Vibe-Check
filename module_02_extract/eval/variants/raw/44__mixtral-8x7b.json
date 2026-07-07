@@ -1,0 +1,45 @@
+{
+  "uid": 44,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "7d6d6e995e7dd5e587af4978b54715ab7194d5dfdc270b2d472fc6f35b22bbe1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a487a6932797af70",
+    "object": "chat.completion",
+    "created": 1783397015,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve the invoice with a where clause\n    invoice = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n\n    # Retrieve the price level with a where clause\n    price\\_level = Microsoft\\_Dynamics\\_365\\_for\\_Sales\\_PriceLevel\\_\\_7\\_0\\_0\\_\\_retrievewithwhere\\_PriceLevel()\n\n    # Retrieve the sales order with a where clause\n    sales\\_order = Microsoft\\_Dynamics\\_365\\_for\\_Sales\\_SalesOrder\\_\\_7\\_0\\_0\\_\\_retrievewithwhere\\_SalesOrder()\n\n    # Create a Slack message with the retrieved data\n    slack\\_message = Slack\\_message\\_\\_3\\_0\\_0\\_\\_create\\_message(invoice, price\\_level, sales\\_order)\n\n    # Send the Slack message\n    Slack\\_message\\_\\_3\\_0\\_0\\_\\_send\\_Slack\\_message(slack\\_message)\n\n    # Send an email using Outlook\n    Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n        subject=\"Invoice Updated\",\n        body=\"An invoice has been updated in Dynamics 365 for Sales. See the Slack message for more details.\",\n        to=\"manager@example.com\",\n    )",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 294,
+      "total_tokens": 633,
+      "completion_tokens": 339,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the invoice with a where clause\n    invoice = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n\n    # Retrieve the price level with a where clause\n    price\\_level = Microsoft\\_Dynamics\\_365\\_for\\_Sales\\_PriceLevel\\_\\_7\\_0\\_0\\_\\_retrievewithwhere\\_PriceLevel()\n\n    # Retrieve the sales order with a where clause\n    sales\\_order = Microsoft\\_Dynamics\\_365\\_for\\_Sales\\_SalesOrder\\_\\_7\\_0\\_0\\_\\_retrievewithwhere\\_SalesOrder()\n\n    # Create a Slack message with the retrieved data\n    slack\\_message = Slack\\_message\\_\\_3\\_0\\_0\\_\\_create\\_message(invoice, price\\_level, sales\\_order)\n\n    # Send the Slack message\n    Slack\\_message\\_\\_3\\_0\\_0\\_\\_send\\_Slack\\_message(slack\\_message)\n\n    # Send an email using Outlook\n    Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n        subject=\"Invoice Updated\",\n        body=\"An invoice has been updated in Dynamics 365 for Sales. See the Slack message for more details.\",\n        to=\"manager@example.com\",\n    )"
+}

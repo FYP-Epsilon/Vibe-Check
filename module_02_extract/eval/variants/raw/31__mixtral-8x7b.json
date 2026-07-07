@@ -1,0 +1,45 @@
+{
+  "uid": 31,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "de478d6e493d85b0f65db737415c6979c904c87a042bf12f9aeb090d00e314ff",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b849628a268b15b6",
+    "object": "chat.completion",
+    "created": 1783396499,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new GitHub repository\n    repo = GitHub_Repository__3_0_0__create_Repository()\n    if not repo:\n        return\n\n    # Send a Slack message to request approval\n    message = Slack_message__3_0_0__create_message(\n        text=\"I have created a new GitHub repository. Please review and approve.\"\n    )\n    if not message:\n        return\n\n    # Wait for user approval\n    user_task(label=\"Waiting for approval...\")\n    approved = input(\"Has the repository been approved? (y/n) \")\n    if approved.lower() != \"y\":\n        # If not approved, send a Slack message to notify\n        message = Slack_message__3_0_0__create_message(\n            text=\"The new GitHub repository was not approved.\"\n        )\n        if not message:\n            return\n\n    # If approved, return a success message\n    user_task(label=\"All tasks completed!\")\n    print(\"The new GitHub repository has been created and approved.\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 211,
+      "total_tokens": 463,
+      "completion_tokens": 252,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new GitHub repository\n    repo = GitHub_Repository__3_0_0__create_Repository()\n    if not repo:\n        return\n\n    # Send a Slack message to request approval\n    message = Slack_message__3_0_0__create_message(\n        text=\"I have created a new GitHub repository. Please review and approve.\"\n    )\n    if not message:\n        return\n\n    # Wait for user approval\n    user_task(label=\"Waiting for approval...\")\n    approved = input(\"Has the repository been approved? (y/n) \")\n    if approved.lower() != \"y\":\n        # If not approved, send a Slack message to notify\n        message = Slack_message__3_0_0__create_message(\n            text=\"The new GitHub repository was not approved.\"\n        )\n        if not message:\n            return\n\n    # If approved, return a success message\n    user_task(label=\"All tasks completed!\")\n    print(\"The new GitHub repository has been created and approved.\")"
+}

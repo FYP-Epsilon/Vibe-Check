@@ -1,0 +1,51 @@
+{
+  "uid": 1,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "a78692bda9c9218ac35cce753991a99f6d75bf2c1df06770238fde052f18d11f",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b1654ac6-6463-41b0-81cd-93d312c8d05e",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create a new Jira issue\n    Jira_Issue__2_0_0__create_Issue()\n    \n    # Get the issue key from the last created Jira issue\n    issue_key = get_last_created_issue_key()\n    \n    # Create a new GitHub repository\n    GitHub_Repository__3_0_0__create_Repository(issue_key)\n\n# Helper function to get the last created issue key\ndef get_last_created_issue_key():\n    # This function should return the key of the last created Jira issue\n    # The actual implementation may vary based on the Jira API used\n    return 'JIRA-123'  # Replace with actual logic",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395423,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 187,
+      "completion_tokens": 143,
+      "total_tokens": 330,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395423524,
+        "prefill_wait_time_ms": 0.707347,
+        "prefill_time_ms": 16.630533999999997,
+        "ttft_ms": 17.337881,
+        "total_time_ms": 757.5538429999999,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create a new Jira issue\n    Jira_Issue__2_0_0__create_Issue()\n    \n    # Get the issue key from the last created Jira issue\n    issue_key = get_last_created_issue_key()\n    \n    # Create a new GitHub repository\n    GitHub_Repository__3_0_0__create_Repository(issue_key)\n\n# Helper function to get the last created issue key\ndef get_last_created_issue_key():\n    # This function should return the key of the last created Jira issue\n    # The actual implementation may vary based on the Jira API used\n    return 'JIRA-123'  # Replace with actual logic"
+}

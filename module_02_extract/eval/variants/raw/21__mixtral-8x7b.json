@@ -1,0 +1,45 @@
+{
+  "uid": 21,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "4b1b4ca0256d9266ce86f0abf2523673797df78ecfd73a89253ac037d507055e",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b45ecaf1749adef7",
+    "object": "chat.completion",
+    "created": 1783395960,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(topics_type_0, topics_type_1):\n    sns\\_topics = Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Topic(topics\\_type\\_0, topics\\_type\\_1)\n\n    for topic in sns\\_topics:\n        if topic['Type'] == 'critical':\n            Zendesk\\_Service\\_Ticket\\_\\_2\\_0\\_0\\_\\_create\\_Ticket()\n            Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n                to='your\\_email@example.com',\n                subject='New critical SNS topic: ' + topic['Name'],\n                body='A critical SNS topic named ' + topic['Name'] + ' was found. Please review.'\n            )",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 275,
+      "total_tokens": 473,
+      "completion_tokens": 198,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(topics_type_0, topics_type_1):\n    sns\\_topics = Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Topic(topics\\_type\\_0, topics\\_type\\_1)\n\n    for topic in sns\\_topics:\n        if topic['Type'] == 'critical':\n            Zendesk\\_Service\\_Ticket\\_\\_2\\_0\\_0\\_\\_create\\_Ticket()\n            Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n                to='your\\_email@example.com',\n                subject='New critical SNS topic: ' + topic['Name'],\n                body='A critical SNS topic named ' + topic['Name'] + ' was found. Please review.'\n            )"
+}

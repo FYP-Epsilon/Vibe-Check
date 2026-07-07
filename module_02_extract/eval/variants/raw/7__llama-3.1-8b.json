@@ -1,0 +1,51 @@
+{
+  "uid": 7,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "033326cd7d091d84e5300ec1de68be07d119c6ef701e1582b9f3cfffc532d591",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-0d75ca19-4362-4287-90d2-0bd4f6e17d9c",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Retrieve all the slack channels in the organization\n    channels = Slack_channel__3_0_0__retrievewithwhere_channel()\n\n    # Iterate over each channel\n    for channel in channels:\n        # Retrieve all the users in the channel\n        users = Slack_user__4_0_0__retrievewithwhere_user(channel)\n\n        # Iterate over each user\n        for user in users:\n            # Validate the user's credentials\n            user_task(label=\"Validate User Credentials\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395565,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 205,
+      "completion_tokens": 107,
+      "total_tokens": 312,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395565164,
+        "prefill_wait_time_ms": 0.926762,
+        "prefill_time_ms": 17.083415000000002,
+        "ttft_ms": 18.010177,
+        "total_time_ms": 466.850863,
+        "kv_hit_rate": 0.07692307692307693,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Retrieve all the slack channels in the organization\n    channels = Slack_channel__3_0_0__retrievewithwhere_channel()\n\n    # Iterate over each channel\n    for channel in channels:\n        # Retrieve all the users in the channel\n        users = Slack_user__4_0_0__retrievewithwhere_user(channel)\n\n        # Iterate over each user\n        for user in users:\n            # Validate the user's credentials\n            user_task(label=\"Validate User Credentials\")"
+}

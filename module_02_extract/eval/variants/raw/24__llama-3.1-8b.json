@@ -1,0 +1,51 @@
+{
+  "uid": 24,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "4b6c071f7116e92e055f78d3bdf9a2c178a434fdfb6a8ca59dbb591a48cbf985",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a8adca7d-4b31-4c28-ad6e-f2923a8969bf",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    tasks = Asana_Tasks__2_0_0__retrievewithwhere_Tasks()\n    message = \"Available tasks: \" + \", \".join([task['name'] for task in tasks])\n    Twilio_postMessagesjsonByFromphone_model__2_0_0__postMessagesjsonByFromphone_postMessagesjsonByFromphone_model(message)\n    Slack_message__3_0_0__create_message(message, \"Available tasks\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396065,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 229,
+      "completion_tokens": 98,
+      "total_tokens": 327,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396065103,
+        "prefill_wait_time_ms": 0.790172,
+        "prefill_time_ms": 47.733639000000004,
+        "ttft_ms": 48.523811,
+        "total_time_ms": 694.675652,
+        "kv_hit_rate": 0.06666666666666667,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    tasks = Asana_Tasks__2_0_0__retrievewithwhere_Tasks()\n    message = \"Available tasks: \" + \", \".join([task['name'] for task in tasks])\n    Twilio_postMessagesjsonByFromphone_model__2_0_0__postMessagesjsonByFromphone_postMessagesjsonByFromphone_model(message)\n    Slack_message__3_0_0__create_message(message, \"Available tasks\")"
+}

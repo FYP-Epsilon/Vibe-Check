@@ -1,0 +1,45 @@
+{
+  "uid": 95,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "c24a5d5f0a64968dbb376490775199bc8d002278c92c89d86f41932ea9135f53",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-911e0062e6ef329d",
+    "object": "chat.completion",
+    "created": 1783442665,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(contacts_CleanStatus_0: str, contacts_CleanStatus_1: str):\n    # Retrieve the contact using the provided CleanStatus values\n    contact = Salesforce_Contact__5_0_0__retrievewithwhere_Contact(contacts_CleanStatus_0, contacts_CleanStatus_1)\n\n    if contact:\n        # If the contact was retrieved, update it\n        Salesforce_Contact__5_0_0__updatewithwhere_Contact()\n        user_task(\"Updated existing Salesforce contact\")\n    else:\n        user_task(\"No existing Salesforce contact found to update\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 249,
+      "total_tokens": 391,
+      "completion_tokens": 142,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(contacts_CleanStatus_0: str, contacts_CleanStatus_1: str):\n    # Retrieve the contact using the provided CleanStatus values\n    contact = Salesforce_Contact__5_0_0__retrievewithwhere_Contact(contacts_CleanStatus_0, contacts_CleanStatus_1)\n\n    if contact:\n        # If the contact was retrieved, update it\n        Salesforce_Contact__5_0_0__updatewithwhere_Contact()\n        user_task(\"Updated existing Salesforce contact\")\n    else:\n        user_task(\"No existing Salesforce contact found to update\")"
+}

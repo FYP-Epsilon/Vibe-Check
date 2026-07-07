@@ -1,0 +1,45 @@
+{
+  "uid": 36,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "db6d8b34a02f1a7179697a78c9f44e1b1f886a9873db7d3383e784a4e9f8de69",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-aa395e27c1fa5e0d",
+    "object": "chat.completion",
+    "created": 1783396693,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    Coupa_expense_reports__4_0_0__create_expense_reports()\n    Coupa_invoices__4_0_0__create_invoices()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 162,
+      "total_tokens": 200,
+      "completion_tokens": 38,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    Coupa_expense_reports__4_0_0__create_expense_reports()\n    Coupa_invoices__4_0_0__create_invoices()"
+}

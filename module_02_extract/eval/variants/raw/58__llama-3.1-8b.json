@@ -1,0 +1,51 @@
+{
+  "uid": 58,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "bb2baed1f810d494c3a9801246338c66aa36e0fee429ed61c54be7627faae02c",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-bcac936b-a7b6-49d8-b189-7390eab3f556",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Get the ServiceNow incident report\n    incident_report = ServiceNow_incident__4_0_0__retrievewithwhere_incident()\n    \n    # Create a new Zendesk ticket with the incident report as an attachment\n    ticket_id = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Attach the incident report to the Zendesk ticket\n    Zendesk_Service_ticketAttachment__2_0_0__UPLOADATTACHMENT_ticketAttachment(ticket_id, incident_report)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783440074,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 218,
+      "completion_tokens": 111,
+      "total_tokens": 329,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783440074314,
+        "prefill_wait_time_ms": 0.932138,
+        "prefill_time_ms": 1448.284281,
+        "ttft_ms": 1449.2164189999999,
+        "total_time_ms": 2686.613043,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Get the ServiceNow incident report\n    incident_report = ServiceNow_incident__4_0_0__retrievewithwhere_incident()\n    \n    # Create a new Zendesk ticket with the incident report as an attachment\n    ticket_id = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Attach the incident report to the Zendesk ticket\n    Zendesk_Service_ticketAttachment__2_0_0__UPLOADATTACHMENT_ticketAttachment(ticket_id, incident_report)"
+}

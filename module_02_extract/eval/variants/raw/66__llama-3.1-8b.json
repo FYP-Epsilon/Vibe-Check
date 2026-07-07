@@ -1,0 +1,51 @@
+{
+  "uid": 66,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "ae45130d3b0467f6ca67949cec125723e12a0079cd1d0b65b6e9fda1e40c76db",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9e44ec40-8bcc-4ddd-a992-9db0b30fe61d",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # (a) create a salesforce contract\n    user_task(label=\"Create Salesforce Contract\")\n    Salesforce_Contract__8_0_0__create_Contract()\n\n    # (b) start a cadence\n    user_task(label=\"Start Cadence\")\n    # Assuming the cadence is started by calling a function 'start_cadence' which is not provided\n    # For the purpose of this task, we will assume it's a placeholder\n    start_cadence()\n\n    # (c) get the members in the case team\n    user_task(label=\"Get Case Team Members\")\n    case_team_members = Salesforce_CaseTeamMember__7_0_0__retrievewithwhere_CaseTeamMember()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783440859,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 216,
+      "completion_tokens": 154,
+      "total_tokens": 370,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783440859091,
+        "prefill_wait_time_ms": 0.745269,
+        "prefill_time_ms": 19.336993,
+        "ttft_ms": 20.082262,
+        "total_time_ms": 1321.277799,
+        "kv_hit_rate": 0.07142857142857142,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # (a) create a salesforce contract\n    user_task(label=\"Create Salesforce Contract\")\n    Salesforce_Contract__8_0_0__create_Contract()\n\n    # (b) start a cadence\n    user_task(label=\"Start Cadence\")\n    # Assuming the cadence is started by calling a function 'start_cadence' which is not provided\n    # For the purpose of this task, we will assume it's a placeholder\n    start_cadence()\n\n    # (c) get the members in the case team\n    user_task(label=\"Get Case Team Members\")\n    case_team_members = Salesforce_CaseTeamMember__7_0_0__retrievewithwhere_CaseTeamMember()"
+}

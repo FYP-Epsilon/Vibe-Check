@@ -1,0 +1,45 @@
+{
+  "uid": 37,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "6a14d8eb0783acfbd3e80d8ecc473b4427abce23552a1a761dd28e87f2a54195",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b8ca0ce311b98a27",
+    "object": "chat.completion",
+    "created": 1783396697,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new product\n    product = Zendesk_Service_product__3_0_0__create_product(name=\"New Product\", active=True)\n\n    # Create a new asset for the product\n    asset = Zendesk_Service_asset__3_0_0__create_asset(\n        type=\"product\", subtype=product[\"type\"], external_id=product[\"id\"], serial_number=\"123456\"\n    )\n\n    # Update the product details\n    product_data = {\n        \"name\": \"Updated Product\",\n        \"description\": \"This is an updated product.\",\n        \"organization_id\": \"12345\",\n        \"tags\": [\"tag1\", \"tag2\"],\n    }\n    Zendesk_Service_product__3_0_0__updatewithwhere_product(product[\"id\"], **product_data)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 217,
+      "total_tokens": 426,
+      "completion_tokens": 209,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new product\n    product = Zendesk_Service_product__3_0_0__create_product(name=\"New Product\", active=True)\n\n    # Create a new asset for the product\n    asset = Zendesk_Service_asset__3_0_0__create_asset(\n        type=\"product\", subtype=product[\"type\"], external_id=product[\"id\"], serial_number=\"123456\"\n    )\n\n    # Update the product details\n    product_data = {\n        \"name\": \"Updated Product\",\n        \"description\": \"This is an updated product.\",\n        \"organization_id\": \"12345\",\n        \"tags\": [\"tag1\", \"tag2\"],\n    }\n    Zendesk_Service_product__3_0_0__updatewithwhere_product(product[\"id\"], **product_data)"
+}

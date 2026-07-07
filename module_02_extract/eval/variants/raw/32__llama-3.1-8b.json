@@ -1,0 +1,51 @@
+{
+  "uid": 32,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "db7441ccf3bc8bdd12c7c49f6e44e55bb5ff6ad0a8591bac8930b2fc708ff9a5",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-ea0e5c25-8103-4901-a581-cc63b3bc8f85",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    project = GitLab_Project__5_0_0__create_Project()\n    user_task(label='Created new GitLab project: ' + project.get('name'))\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()\n    user_task(label='Sent message to manager')",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396533,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 200,
+      "completion_tokens": 67,
+      "total_tokens": 267,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396533920,
+        "prefill_wait_time_ms": 0.943225,
+        "prefill_time_ms": 17.787869,
+        "ttft_ms": 18.731094,
+        "total_time_ms": 339.09434799999997,
+        "kv_hit_rate": 0.07692307692307693,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    project = GitLab_Project__5_0_0__create_Project()\n    user_task(label='Created new GitLab project: ' + project.get('name'))\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()\n    user_task(label='Sent message to manager')"
+}

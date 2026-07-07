@@ -1,0 +1,45 @@
+{
+  "uid": 19,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "a1827f201ef24089e579f1c565628dbcf746ec21e13b9b3daceeab45370f724e",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-acefaf538df6f0f5",
+    "object": "chat.completion",
+    "created": 1783395889,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(topics_topicarn_0, topics_topicarn_1):\n    # Retrieve the SNS topic with the given ARN\n    sns\\_topic = Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Topic(topics\\_topicarn\\_0, topics\\_topicarn\\_1)\n\n    # If the SNS topic was found\n    if sns\\_topic:\n        # Create a ServiceNow incident for the SNS topic\n        service\\_now\\_incident = ServiceNow\\_incident\\_\\_4\\_0\\_0\\_\\_create\\_incident(sns\\_topic)\n\n        # If the ServiceNow incident was created successfully\n        if service\\_now\\_incident:\n            # Create a Zendesk ticket for the ServiceNow incident\n            zendesk\\_ticket = Zendesk\\_Service\\_Ticket\\_\\_2\\_0\\_0\\_\\_create\\_Ticket(service\\_now\\_incident)\n\n            # If the Zendesk ticket was created successfully\n            if zendesk\\_ticket:\n                # Send an email notification for the Zendesk ticket\n                Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(zendesk\\_ticket)\n\n    return",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 281,
+      "total_tokens": 580,
+      "completion_tokens": 299,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(topics_topicarn_0, topics_topicarn_1):\n    # Retrieve the SNS topic with the given ARN\n    sns\\_topic = Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Topic(topics\\_topicarn\\_0, topics\\_topicarn\\_1)\n\n    # If the SNS topic was found\n    if sns\\_topic:\n        # Create a ServiceNow incident for the SNS topic\n        service\\_now\\_incident = ServiceNow\\_incident\\_\\_4\\_0\\_0\\_\\_create\\_incident(sns\\_topic)\n\n        # If the ServiceNow incident was created successfully\n        if service\\_now\\_incident:\n            # Create a Zendesk ticket for the ServiceNow incident\n            zendesk\\_ticket = Zendesk\\_Service\\_Ticket\\_\\_2\\_0\\_0\\_\\_create\\_Ticket(service\\_now\\_incident)\n\n            # If the Zendesk ticket was created successfully\n            if zendesk\\_ticket:\n                # Send an email notification for the Zendesk ticket\n                Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(zendesk\\_ticket)\n\n    return"
+}

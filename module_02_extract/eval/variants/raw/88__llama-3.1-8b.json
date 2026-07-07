@@ -1,0 +1,51 @@
+{
+  "uid": 88,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "702edcc1ced5b373696ed32251c4e674ffdf2f80ee1281502406e2e82c53f68f",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-89b06bbe-fa7b-4d57-a645-c4cb6d193099",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Retrieve S3 object and bucket\n    object = Amazon_S3_object__2_0_0__retrievewithwhere_object()\n    bucket = Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()\n\n    # Perform task logic (simply print the retrieved object and bucket)\n    print(\"Retrieved S3 Object:\", object)\n    print(\"Retrieved S3 Bucket:\", bucket)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442590,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 191,
+      "completion_tokens": 92,
+      "total_tokens": 283,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442590534,
+        "prefill_wait_time_ms": 0.851247,
+        "prefill_time_ms": 29.208621,
+        "ttft_ms": 30.059868,
+        "total_time_ms": 1072.802847,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Retrieve S3 object and bucket\n    object = Amazon_S3_object__2_0_0__retrievewithwhere_object()\n    bucket = Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()\n\n    # Perform task logic (simply print the retrieved object and bucket)\n    print(\"Retrieved S3 Object:\", object)\n    print(\"Retrieved S3 Bucket:\", bucket)"
+}

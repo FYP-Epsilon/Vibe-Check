@@ -1,0 +1,51 @@
+{
+  "uid": 12,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "245c200ac5c5a39bbd7662426a897a32096e8aaa6e360923f6d70277df1efc34",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-15477040-8e87-4b7e-a0f2-89091fc43182",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(folder_name: str):\n    if folder_name is not None:\n        Slack_message__3_0_0__create_message()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395671,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 231,
+      "completion_tokens": 29,
+      "total_tokens": 260,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395671810,
+        "prefill_wait_time_ms": 0.885537,
+        "prefill_time_ms": 39.80681,
+        "ttft_ms": 40.692347,
+        "total_time_ms": 245.181852,
+        "kv_hit_rate": 0.06666666666666667,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(folder_name: str):\n    if folder_name is not None:\n        Slack_message__3_0_0__create_message()"
+}

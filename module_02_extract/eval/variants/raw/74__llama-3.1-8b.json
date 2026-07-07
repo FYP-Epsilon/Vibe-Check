@@ -1,0 +1,51 @@
+{
+  "uid": 74,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "c47b792041b60e95275573153ad9d2dfa40c02969e6dfe5f0e23f2b89e9bbd70",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-ceba3a4e-f6f1-46bc-a8e7-311e803d99d5",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    Jira_Issue__2_0_0__create_Issue()\n    print(\"Jira issue created\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783441609,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 219,
+      "completion_tokens": 28,
+      "total_tokens": 247,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783441609450,
+        "prefill_wait_time_ms": 0.7458229999999999,
+        "prefill_time_ms": 24.894983999999997,
+        "ttft_ms": 25.640807000000002,
+        "total_time_ms": 200.035653,
+        "kv_hit_rate": 0.07142857142857142,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    Jira_Issue__2_0_0__create_Issue()\n    print(\"Jira issue created\")"
+}

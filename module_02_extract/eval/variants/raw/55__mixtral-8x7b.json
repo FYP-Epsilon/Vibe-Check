@@ -1,0 +1,45 @@
+{
+  "uid": 55,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "b9aab9c3a4ce35945c2e442c88e6451371d9f9cfc3dcfa15c804ee8eefb41943",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8cf3eeeaa0665d08",
+    "object": "chat.completion",
+    "created": 1783439802,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    marketo\\_leads = Marketo\\_leads\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_leads()\n    for lead in marketo\\_leads:\n        Salesforce\\_Lead\\_\\_5\\_0\\_0\\_\\_create\\_Lead(lead)\n\nNote: This code assumes that the `Marketo_leads__3_0_0__retrievewithwhere_leads` and `Salesforce_Lead__5_0_0__create_Lead` functions are properly implemented to retrieve leads from Marketo and create leads in Salesforce, respectively. Also, it assumes that the `lead` object returned from `Marketo_leads__3_0_0__retrievewithwhere_leads` can be directly passed to `Salesforce_Lead__5_0_0__create_Lead`. If there are any transformations needed, they should be added in the loop.",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 185,
+      "total_tokens": 396,
+      "completion_tokens": 211,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    marketo\\_leads = Marketo\\_leads\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_leads()\n    for lead in marketo\\_leads:\n        Salesforce\\_Lead\\_\\_5\\_0\\_0\\_\\_create\\_Lead(lead)\n\nNote: This code assumes that the `Marketo_leads__3_0_0__retrievewithwhere_leads` and `Salesforce_Lead__5_0_0__create_Lead` functions are properly implemented to retrieve leads from Marketo and create leads in Salesforce, respectively. Also, it assumes that the `lead` object returned from `Marketo_leads__3_0_0__retrievewithwhere_leads` can be directly passed to `Salesforce_Lead__5_0_0__create_Lead`. If there are any transformations needed, they should be added in the loop."
+}

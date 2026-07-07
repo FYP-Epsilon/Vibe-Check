@@ -1,0 +1,51 @@
+{
+  "uid": 52,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "6e025b09494fe71462bb18a37099ce38b1403cf031775cd07d9f607307c44db0",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-f06a32f4-4f2b-40dc-890c-80780b6c9dbb",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Retrieve the OneDrive folder\n    onedrive_folder = Microsoft_OneDrive_for_Business_Folder__4_0_0__retrievewithwhere_FolderItem()\n\n    # Get the Box folder to copy files to\n    box_folder = Box_Folder__3_0_0__create_Folder()\n\n    # Iterate over each file in the OneDrive folder\n    for file in onedrive_folder.files:\n        # Copy the file to the Box folder\n        Box_File__3_0_0__COPYFILE_File(file, box_folder)\n\n    return box_folder",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783439543,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 241,
+      "completion_tokens": 125,
+      "total_tokens": 366,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783439543135,
+        "prefill_wait_time_ms": 0.843526,
+        "prefill_time_ms": 47.725739000000004,
+        "ttft_ms": 48.569265,
+        "total_time_ms": 1332.1532320000001,
+        "kv_hit_rate": 0.0625,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the OneDrive folder\n    onedrive_folder = Microsoft_OneDrive_for_Business_Folder__4_0_0__retrievewithwhere_FolderItem()\n\n    # Get the Box folder to copy files to\n    box_folder = Box_Folder__3_0_0__create_Folder()\n\n    # Iterate over each file in the OneDrive folder\n    for file in onedrive_folder.files:\n        # Copy the file to the Box folder\n        Box_File__3_0_0__COPYFILE_File(file, box_folder)\n\n    return box_folder"
+}
