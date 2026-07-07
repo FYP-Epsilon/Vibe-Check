@@ -1,0 +1,51 @@
+{
+  "uid": 23,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "6e563146c88e7c4d78755971bf12428f3c227c86142e464468906ea6332e14c3",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-e734fd5e-62f4-44ac-806a-ba5a324c79a8",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Get the default Microsoft To Do list ID\n    todo_list_id = get_default_todo_list_id()\n    \n    # Create a new To Do task in the default list\n    task = Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model(\n        users_by_user_id_todo_lists_by_todo_task_list_id_tasks_model=todo_list_id,\n        users_by_user_id_todo_lists_by_todo_task_list_id_tasks_post_users_by_user_id_todo_lists_by_todo_task_list_id_tasks_model=\"New Task\"\n    )\n    \n    # Get the task ID\n    task_id = task['id']\n    \n    # Create a new Zendesk ticket\n    ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket(\n        subject=\"New Task in Microsoft To Do\",\n        description=\"A new task was created in Microsoft To Do\",\n        assignee_id=get_default_assignee_id()\n    )\n    \n    # Get the ticket ID\n    ticket_id = ticket['id']\n    \n    # Create a task in the Zendesk ticket\n    create_ticket_task(ticket_id, task_id)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396025,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 228,
+      "completion_tokens": 262,
+      "total_tokens": 490,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396025721,
+        "prefill_wait_time_ms": 1.105233,
+        "prefill_time_ms": 25.531286,
+        "ttft_ms": 26.636519,
+        "total_time_ms": 1885.18739,
+        "kv_hit_rate": 0.06666666666666667,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Get the default Microsoft To Do list ID\n    todo_list_id = get_default_todo_list_id()\n    \n    # Create a new To Do task in the default list\n    task = Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model(\n        users_by_user_id_todo_lists_by_todo_task_list_id_tasks_model=todo_list_id,\n        users_by_user_id_todo_lists_by_todo_task_list_id_tasks_post_users_by_user_id_todo_lists_by_todo_task_list_id_tasks_model=\"New Task\"\n    )\n    \n    # Get the task ID\n    task_id = task['id']\n    \n    # Create a new Zendesk ticket\n    ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket(\n        subject=\"New Task in Microsoft To Do\",\n        description=\"A new task was created in Microsoft To Do\",\n        assignee_id=get_default_assignee_id()\n    )\n    \n    # Get the ticket ID\n    ticket_id = ticket['id']\n    \n    # Create a task in the Zendesk ticket\n    create_ticket_task(ticket_id, task_id)"
+}

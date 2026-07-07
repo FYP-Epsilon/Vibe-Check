@@ -1,0 +1,45 @@
+{
+  "uid": 35,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "c1476bf9b8c8d42c92a4a3c7c227ed5a8fdb7c9a204c02c4c00169aef0d52efd",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b0f171a7d2472a36",
+    "object": "chat.completion",
+    "created": 1783396597,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    workspaces = Microsoft_Power_BI_Workspace__2_0_0__retrievewithwhere_Workspace()\n    for workspace in workspaces[\"value\"]:\n        workspace_id = workspace[\"id\"]\n        scorecards = Microsoft_Power_BI_Scorecard__2_0_0__retrievewithwhere_Scorecard(workspace_id)\n        for scorecard in scorecards[\"value\"]:\n            scorecard_id = scorecard[\"id\"]\n            goals = Microsoft_Power_BI_Goal__2_0_0__retrievewithwhere_Goal(scorecard_id)\n            for goal in goals[\"value\"]:\n                print(f\"Workspace: {workspace['name']}, Scorecard: {scorecard['name']}, Goal: {goal['displayName']}\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 225,
+      "total_tokens": 415,
+      "completion_tokens": 190,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    workspaces = Microsoft_Power_BI_Workspace__2_0_0__retrievewithwhere_Workspace()\n    for workspace in workspaces[\"value\"]:\n        workspace_id = workspace[\"id\"]\n        scorecards = Microsoft_Power_BI_Scorecard__2_0_0__retrievewithwhere_Scorecard(workspace_id)\n        for scorecard in scorecards[\"value\"]:\n            scorecard_id = scorecard[\"id\"]\n            goals = Microsoft_Power_BI_Goal__2_0_0__retrievewithwhere_Goal(scorecard_id)\n            for goal in goals[\"value\"]:\n                print(f\"Workspace: {workspace['name']}, Scorecard: {scorecard['name']}, Goal: {goal['displayName']}\")"
+}

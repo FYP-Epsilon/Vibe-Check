@@ -1,0 +1,45 @@
+{
+  "uid": 44,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "7d6d6e995e7dd5e587af4978b54715ab7194d5dfdc270b2d472fc6f35b22bbe1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a511736f8be26d58",
+    "object": "chat.completion",
+    "created": 1783397034,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    # Retrieve invoice data\n    invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n    \n    # Retrieve price level data\n    price_levels = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel()\n    \n    # Retrieve sales order data\n    sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n    \n    # Prepare email content\n    email_body = \"Manager,\\n\\nHere is the latest sales data:\\n\"\n    email_body += f\"Invoices: {len(invoices)}\\n\"\n    email_body += f\"Price Levels: {len(price_levels)}\\n\"\n    email_body += f\"Sales Orders: {len(sales_orders)}\\n\\n\"\n    email_body += \"Please review the details in Dynamics 365.\\n\\nBest regards,\\nAutomated System\"\n    \n    # Send email via Outlook\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages(\n        to=\"manager@example.com\",\n        subject=\"Sales Data Summary\",\n        body=email_body\n    )\n    \n    # Optional: Send notification to Slack\n    Slack_message__3_0_0__create_message(\n        channel=\"#sales-updates\",\n        text=\"Email sent to manager with sales data summary.\"\n    )",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 250,
+      "total_tokens": 565,
+      "completion_tokens": 315,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve invoice data\n    invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n    \n    # Retrieve price level data\n    price_levels = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel()\n    \n    # Retrieve sales order data\n    sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n    \n    # Prepare email content\n    email_body = \"Manager,\\n\\nHere is the latest sales data:\\n\"\n    email_body += f\"Invoices: {len(invoices)}\\n\"\n    email_body += f\"Price Levels: {len(price_levels)}\\n\"\n    email_body += f\"Sales Orders: {len(sales_orders)}\\n\\n\"\n    email_body += \"Please review the details in Dynamics 365.\\n\\nBest regards,\\nAutomated System\"\n    \n    # Send email via Outlook\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages(\n        to=\"manager@example.com\",\n        subject=\"Sales Data Summary\",\n        body=email_body\n    )\n    \n    # Optional: Send notification to Slack\n    Slack_message__3_0_0__create_message(\n        channel=\"#sales-updates\",\n        text=\"Email sent to manager with sales data summary.\"\n    )"
+}

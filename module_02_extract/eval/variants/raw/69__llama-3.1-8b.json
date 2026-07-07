@@ -1,0 +1,51 @@
+{
+  "uid": 69,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "b8bfccac5b629487d7472d0b9f773b7a6343ae0dde76e7e6cc056f75175f63d3",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-f16b487c-e8fc-4971-b92a-5b2ada3edc82",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(dms_messages_0: str, dms_messages_1: str):\n    search_term = \"401k\"\n    result = Slack_im__3_0_0__retrievewithwhere_im(dms_messages_0=dms_messages_0, dms_messages_1=dms_messages_1)\n    if result:\n        return user_task(label=\"Slack DMs containing '{}'\".format(search_term), content=result)\n    else:\n        return user_task(label=\"No Slack DMs containing '{}' found\".format(search_term))",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783441136,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 213,
+      "completion_tokens": 112,
+      "total_tokens": 325,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783441136976,
+        "prefill_wait_time_ms": 0.726984,
+        "prefill_time_ms": 67.641484,
+        "ttft_ms": 68.36846800000001,
+        "total_time_ms": 1207.0868189999999,
+        "kv_hit_rate": 0.07142857142857142,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(dms_messages_0: str, dms_messages_1: str):\n    search_term = \"401k\"\n    result = Slack_im__3_0_0__retrievewithwhere_im(dms_messages_0=dms_messages_0, dms_messages_1=dms_messages_1)\n    if result:\n        return user_task(label=\"Slack DMs containing '{}'\".format(search_term), content=result)\n    else:\n        return user_task(label=\"No Slack DMs containing '{}' found\".format(search_term))"
+}

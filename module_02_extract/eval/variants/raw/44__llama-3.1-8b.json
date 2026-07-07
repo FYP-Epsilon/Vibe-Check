@@ -1,0 +1,51 @@
+{
+  "uid": 44,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "7d6d6e995e7dd5e587af4978b54715ab7194d5dfdc270b2d472fc6f35b22bbe1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-cbf531ca-a42c-44de-bfeb-d81ee3289331",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Retrieve invoices from Dynamics 365\n    invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n    \n    # Check if there are any invoices\n    if invoices:\n        # Create a message for Slack\n        Slack_message__3_0_0__create_message(\"New invoices received\")\n        \n        # Retrieve price levels from Dynamics 365\n        price_levels = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel()\n        \n        # Retrieve sales orders from Dynamics 365\n        sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n        \n        # Create an email message using Outlook\n        email_body = f\"Invoices: {invoices}\\nPrice Levels: {price_levels}\\nSales Orders: {sales_orders}\"\n        \n        # Send the email to the manager\n        Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages(\"Manager\", email_body)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396949,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 267,
+      "completion_tokens": 233,
+      "total_tokens": 500,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396949260,
+        "prefill_wait_time_ms": 1.132381,
+        "prefill_time_ms": 27.024395,
+        "ttft_ms": 28.156776,
+        "total_time_ms": 2699.120711,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Retrieve invoices from Dynamics 365\n    invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n    \n    # Check if there are any invoices\n    if invoices:\n        # Create a message for Slack\n        Slack_message__3_0_0__create_message(\"New invoices received\")\n        \n        # Retrieve price levels from Dynamics 365\n        price_levels = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel()\n        \n        # Retrieve sales orders from Dynamics 365\n        sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n        \n        # Create an email message using Outlook\n        email_body = f\"Invoices: {invoices}\\nPrice Levels: {price_levels}\\nSales Orders: {sales_orders}\"\n        \n        # Send the email to the manager\n        Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages(\"Manager\", email_body)"
+}

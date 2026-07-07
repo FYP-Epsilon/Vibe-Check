@@ -1,0 +1,51 @@
+{
+  "uid": 22,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "bb523442fbe6eed284db043b4dc73ececd7ce6931928f4a77b135b75286ee0d2",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-2aca67ff-4814-4d21-84ef-97855fbffbc7",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    repo = GitHub_Repository__3_0_0__create_Repository()\n    issue = GitHub_Issue__3_0_0__create_Issue(repo)\n    issue_id = issue.id\n    message = Slack_message__3_0_0__create_message(\"New issue created in repository \" + repo.name + \" with ID \" + str(issue_id))\n    return message",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395993,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 209,
+      "completion_tokens": 83,
+      "total_tokens": 292,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395993040,
+        "prefill_wait_time_ms": 0.89377,
+        "prefill_time_ms": 18.822322999999997,
+        "ttft_ms": 19.716093,
+        "total_time_ms": 426.54114999999996,
+        "kv_hit_rate": 0.07142857142857142,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    repo = GitHub_Repository__3_0_0__create_Repository()\n    issue = GitHub_Issue__3_0_0__create_Issue(repo)\n    issue_id = issue.id\n    message = Slack_message__3_0_0__create_message(\"New issue created in repository \" + repo.name + \" with ID \" + str(issue_id))\n    return message"
+}

@@ -1,0 +1,45 @@
+{
+  "uid": 48,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "b59fd4794ab43156071ead9bfddc1888e69bcdbdff5b58be5edbd4789506faa9",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b8ddb89732aa8a78",
+    "object": "chat.completion",
+    "created": 1783412692,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    issues = Jira_Issue__2_0_0__retrievewithwhere_Issue()\n    for issue in issues:\n        new_issue = Jira_Issue__2_0_0__create_Issue(issue)\n    message = Slack_message__3_0_0__create_message(\"Copied all issues successfully.\")\n    # Assuming Slack message sending is handled internally by create_message or a separate implied step\n    # Since no explicit send function is provided, we assume create_message triggers the delivery\n    return None",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 206,
+      "total_tokens": 318,
+      "completion_tokens": 112,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    issues = Jira_Issue__2_0_0__retrievewithwhere_Issue()\n    for issue in issues:\n        new_issue = Jira_Issue__2_0_0__create_Issue(issue)\n    message = Slack_message__3_0_0__create_message(\"Copied all issues successfully.\")\n    # Assuming Slack message sending is handled internally by create_message or a separate implied step\n    # Since no explicit send function is provided, we assume create_message triggers the delivery\n    return None"
+}

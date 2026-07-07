@@ -1,0 +1,51 @@
+{
+  "uid": 84,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "72324126d10b3d471c949c125351793e0561b04adb75b6b431e7ef6c02f6335a",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-d84d760f-caf5-4769-8b6f-e8f0b77dbeb3",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Retrieve employees and dependents from BambooHR\n    employees = bambooHR_employees__2_0_0__retrievewithwhere_employees()\n    dependents = bambooHR_dependents__2_0_0__retrievewithwhere_dependents()\n\n    # Iterate through employees and create Zendesk tickets\n    for employee in employees:\n        # Create a new Zendesk ticket for the employee\n        Zendesk_Service_Ticket__2_0_0__create_Ticket(employee)\n\n    # Iterate through dependents and create Zendesk tickets\n    for dependent in dependents:\n        # Create a new Zendesk ticket for the dependent\n        Zendesk_Service_Ticket__2_0_0__create_Ticket(dependent)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442525,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 232,
+      "completion_tokens": 157,
+      "total_tokens": 389,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442525666,
+        "prefill_wait_time_ms": 0.840326,
+        "prefill_time_ms": 22.856599,
+        "ttft_ms": 23.696925,
+        "total_time_ms": 1543.593631,
+        "kv_hit_rate": 0.06666666666666667,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Retrieve employees and dependents from BambooHR\n    employees = bambooHR_employees__2_0_0__retrievewithwhere_employees()\n    dependents = bambooHR_dependents__2_0_0__retrievewithwhere_dependents()\n\n    # Iterate through employees and create Zendesk tickets\n    for employee in employees:\n        # Create a new Zendesk ticket for the employee\n        Zendesk_Service_Ticket__2_0_0__create_Ticket(employee)\n\n    # Iterate through dependents and create Zendesk tickets\n    for dependent in dependents:\n        # Create a new Zendesk ticket for the dependent\n        Zendesk_Service_Ticket__2_0_0__create_Ticket(dependent)"
+}

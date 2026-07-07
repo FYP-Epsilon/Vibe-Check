@@ -1,0 +1,51 @@
+{
+  "uid": 33,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "52e9e27dd19bd2428f2261c577f0cebeeb869bb50e6eb96d605a1902cf0cca1e",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-42bbb559-f721-4c86-a6b9-2aab94622d41",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Retrieve ServiceNow sys_user records\n    users = ServiceNow_sys_user__5_0_0__retrievewithwhere_sys_user()\n    \n    # Retrieve ServiceNow ticket records\n    tickets = ServiceNow_ticket__5_0_0__retrievewithwhere_ticket()\n    \n    # Return both users and tickets\n    return users, tickets",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396561,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 188,
+      "completion_tokens": 78,
+      "total_tokens": 266,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396561688,
+        "prefill_wait_time_ms": 0.677425,
+        "prefill_time_ms": 19.344112,
+        "ttft_ms": 20.021537,
+        "total_time_ms": 383.87370599999997,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Retrieve ServiceNow sys_user records\n    users = ServiceNow_sys_user__5_0_0__retrievewithwhere_sys_user()\n    \n    # Retrieve ServiceNow ticket records\n    tickets = ServiceNow_ticket__5_0_0__retrievewithwhere_ticket()\n    \n    # Return both users and tickets\n    return users, tickets"
+}

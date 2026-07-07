@@ -1,0 +1,51 @@
+{
+  "uid": 47,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "3fde0d8fa398466aa20e9ec88c2c0f1c503982baf3f5e1f31c9feb2fa474acbd",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-188e599b-612c-4fe9-9c4f-622756b989ad",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    issues = Jira_Issue__2_0_0__retrievewithwhere_Issue()\n    projects = Jira_Project__2_0_0__retrievewithwhere_Project()\n    for issue in issues:\n        print(f\"Issue ID: {issue['id']}, Project: {issue['project']}\")\n        for project in projects:\n            if issue['project'] == project['id']:\n                print(f\"Project Name: {project['name']}\")\n    return issues, projects",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783412619,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 186,
+      "completion_tokens": 108,
+      "total_tokens": 294,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783412619582,
+        "prefill_wait_time_ms": 0.707701,
+        "prefill_time_ms": 17.174803999999998,
+        "ttft_ms": 17.882505,
+        "total_time_ms": 606.483486,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    issues = Jira_Issue__2_0_0__retrievewithwhere_Issue()\n    projects = Jira_Project__2_0_0__retrievewithwhere_Project()\n    for issue in issues:\n        print(f\"Issue ID: {issue['id']}, Project: {issue['project']}\")\n        for project in projects:\n            if issue['project'] == project['id']:\n                print(f\"Project Name: {project['name']}\")\n    return issues, projects"
+}

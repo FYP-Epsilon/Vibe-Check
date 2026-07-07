@@ -1,0 +1,45 @@
+{
+  "uid": 4,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "debf9664d91f02aef0c4e19c64244f4ffae409a7c1c6533fef293e4cad1044c9",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-85f52ae3ab04186e",
+    "object": "chat.completion",
+    "created": 1783395434,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(issues_priority\\_0: str, issues\\_priority\\_1: str):\n  # Retrieve all the issues from the Jira board\n  issues = Jira\\_Issue\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Issue(issues\\_priority\\_0, issues\\_priority\\_1)\n\n  # Loop through each issue\n  for issue in issues:\n    # Check the priority of the issue\n    if issue['priority'] == 'urgent':\n      # Create an Asana task\n      Asana\\_Tasks\\_\\_2\\_0\\_0\\_\\_create\\_Tasks(issue['title'], issue['description'])\n      # Send an email using gmail to everyone\n      Gmail\\_mail\\_\\_2\\_0\\_0\\_\\_create\\_mail(issue['title'], issue['description'], 'everyone')\n    elif issue['priority'] == 'low':\n      # Send a slack message\n      Slack\\_message\\_\\_3\\_0\\_0\\_\\_create\\_message(issue['title'], issue['description'])",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 301,
+      "total_tokens": 541,
+      "completion_tokens": 240,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(issues_priority\\_0: str, issues\\_priority\\_1: str):\n  # Retrieve all the issues from the Jira board\n  issues = Jira\\_Issue\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Issue(issues\\_priority\\_0, issues\\_priority\\_1)\n\n  # Loop through each issue\n  for issue in issues:\n    # Check the priority of the issue\n    if issue['priority'] == 'urgent':\n      # Create an Asana task\n      Asana\\_Tasks\\_\\_2\\_0\\_0\\_\\_create\\_Tasks(issue['title'], issue['description'])\n      # Send an email using gmail to everyone\n      Gmail\\_mail\\_\\_2\\_0\\_0\\_\\_create\\_mail(issue['title'], issue['description'], 'everyone')\n    elif issue['priority'] == 'low':\n      # Send a slack message\n      Slack\\_message\\_\\_3\\_0\\_0\\_\\_create\\_message(issue['title'], issue['description'])"
+}

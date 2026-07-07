@@ -1,0 +1,45 @@
+{
+  "uid": 9,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "dfc155be9d944ddff79c224212a8e266b1caa2f4d33fccf3f80fb6eb4c6fd6f1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8f84476ba019e09b",
+    "object": "chat.completion",
+    "created": 1783395617,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(comments_author_0: str, comments_author_1: str):\n    repos = GitHub_Repository__3_0_0__retrievewithwhere_Repository()\n    for repo in repos:\n        issues = GitHub_Issue__3_0_0__retrievewithwhere_Issue()\n        for issue in issues:\n            comments = GitHub_Comment__3_0_0__retrievewithwhere_Comment(comments_author_0=comments_author_0, comments_author_1=comments_author_1)\n            for comment in comments:\n                if comment.get(\"author\") in [comments_author_0, comments_author_1]:\n                    Slack_message__3_0_0__create_message()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 268,
+      "total_tokens": 419,
+      "completion_tokens": 151,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(comments_author_0: str, comments_author_1: str):\n    repos = GitHub_Repository__3_0_0__retrievewithwhere_Repository()\n    for repo in repos:\n        issues = GitHub_Issue__3_0_0__retrievewithwhere_Issue()\n        for issue in issues:\n            comments = GitHub_Comment__3_0_0__retrievewithwhere_Comment(comments_author_0=comments_author_0, comments_author_1=comments_author_1)\n            for comment in comments:\n                if comment.get(\"author\") in [comments_author_0, comments_author_1]:\n                    Slack_message__3_0_0__create_message()"
+}

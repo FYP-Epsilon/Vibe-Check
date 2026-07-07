@@ -1,0 +1,51 @@
+{
+  "uid": 96,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "c6f86339ed535bdb74ac38459c2fa6a22cd7e7497c0d824024d56876ae496eb7",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-643c609b-d2b0-4ec2-840a-2fe26125c894",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(folders_is_collaboration_restricted_to_enterprise_0: str, folders_is_collaboration_restricted_to_enterprise_1: str):\n    if folders_is_collaboration_restricted_to_enterprise_0 == \"true\" and folders_is_collaboration_restricted_to_enterprise_1 == \"true\":\n        Box_Folder__3_0_0__updatewithwhere_Folder()\n    elif folders_is_collaboration_restricted_to_enterprise_0 == \"true\":\n        Box_Folder__3_0_0__retrievewithwhere_Folder(folders_is_collaboration_restricted_to_enterprise_0, folders_is_collaboration_restricted_to_enterprise_1)\n    else:\n        Box_Folder__3_0_0__COPYFOLDER_Folder()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442672,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 271,
+      "completion_tokens": 169,
+      "total_tokens": 440,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442672584,
+        "prefill_wait_time_ms": 0.903242,
+        "prefill_time_ms": 117.541276,
+        "ttft_ms": 118.444518,
+        "total_time_ms": 1804.686386,
+        "kv_hit_rate": 0.058823529411764705,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(folders_is_collaboration_restricted_to_enterprise_0: str, folders_is_collaboration_restricted_to_enterprise_1: str):\n    if folders_is_collaboration_restricted_to_enterprise_0 == \"true\" and folders_is_collaboration_restricted_to_enterprise_1 == \"true\":\n        Box_Folder__3_0_0__updatewithwhere_Folder()\n    elif folders_is_collaboration_restricted_to_enterprise_0 == \"true\":\n        Box_Folder__3_0_0__retrievewithwhere_Folder(folders_is_collaboration_restricted_to_enterprise_0, folders_is_collaboration_restricted_to_enterprise_1)\n    else:\n        Box_Folder__3_0_0__COPYFOLDER_Folder()"
+}

@@ -1,0 +1,12 @@
+def Microsoft_Dynamics_365_for_Sales_Task__7_0_0__retrievewithwhere_Task(tasks_statuscode_0: str = None, tasks_statuscode_1: str = None):
+    return [{"statuscode": tasks_statuscode_0}, {"statuscode": tasks_statuscode_1}]
+
+
+def Microsoft_Dynamics_365_for_Sales_Task__7_0_0__deletewithwhere_Task():
+    return {}
+
+
+def workflow(tasks_statuscode_0: str, tasks_statuscode_1: str):
+    tasks = Microsoft_Dynamics_365_for_Sales_Task__7_0_0__retrievewithwhere_Task(tasks_statuscode_0, tasks_statuscode_1)
+    completed_tasks = [task for task in tasks if task['statuscode'] == 'Completed']
+    Microsoft_Dynamics_365_for_Sales_Task__7_0_0__deletewithwhere_Task()

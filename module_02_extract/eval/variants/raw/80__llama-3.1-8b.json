@@ -1,0 +1,51 @@
+{
+  "uid": 80,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "c55286409fe1726f3624fda0a4eca423421e814087014e9e286fb1f6404112bf",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-f4c63735-a5cc-4284-af53-9348595f7d59",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    print(\"No need to update ServiceNow incident.\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442183,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 183,
+      "completion_tokens": 15,
+      "total_tokens": 198,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442183534,
+        "prefill_wait_time_ms": 0.768053,
+        "prefill_time_ms": 25.574942999999998,
+        "ttft_ms": 26.342996,
+        "total_time_ms": 156.200699,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    print(\"No need to update ServiceNow incident.\")"
+}

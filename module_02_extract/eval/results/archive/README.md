@@ -4,6 +4,51 @@ These are kept, not deleted, because they're part of the documented
 finding trail — each was superseded by a specific fix, and the numbers
 themselves are evidence for what was broken.
 
+## `calibration_report_differential_pre_a1a2.md`, `e3_pairs_pre_a1a2.csv`, `e3_correlation_report_pre_a1a2.md`
+
+Session A (A1 + A2), before both fixes. Two backlog items from the
+mechanical-fixes session:
+
+1. **A1 — V2 masked V1 in differential mode.** `run_differential_verification`
+   composed the final score with the standard OR-composition
+   `1-(1-v1)(1-v2)`. In differential mode V1 has a real oracle (the base
+   WIR) but V2 does not — it symbolically explores the *mutant's own*
+   code with no actual/expected comparator, so its confidence isn't
+   "no bug found" evidence. On a stub-free scalar workflow this floored
+   `combined_confidence` at v2's self-referential 0.5 even when v1
+   detected with certainty (see
+   `eval/test_calibrate.py::test_value_only_guard_mutation_now_detected`).
+   Fixed by making `combined_confidence = v1_confidence` in differential
+   mode only (self-mode `/verify` composition is untouched); `v2_confidence`
+   stays in the certificate as telemetry.
+2. **A2 — constant-perturb undetected for a sampling reason.**
+   `RandomizedDifferentialTester`'s string pool came only from the
+   *mutant's own* source, so a constant-perturb mutant's pool held just
+   the mutated literal — random sampling often drew neither the original
+   nor mutated value in a 10-run budget, so the branch decision agreed
+   vacuously on both sides. Fixed by (a) seeding the pool with the BASE
+   program's own guard literals too (`extract_guard_string_literals`,
+   threaded via `extra_str_literals`), and (b) round-robin-first sampling
+   that guarantees every distinct pool literal is drawn at least once
+   before random sampling resumes.
+
+Post-fix: Youden's J 0.9017 → 0.9600, genuine-bug detection 0.9571 →
+0.9952, `constant-perturb` detection 0/9 → 8/9 (the 1 remaining straggler
+has a guard value fed by two independent `str` parameters sharing one
+round-robin queue — diagnosed in `calibration_report_differential.md`,
+not a numeric-literal case as anticipated going in). False-alarm rate is
+**unchanged** at 0.0588 — checked directly (clean pre-session worktree vs.
+this branch): `v2_confidence` is 0.0 for every base program in this
+container-heavy FLOW-BENCH corpus, so V2 contributed no OR-composition
+padding to the negative class before A1 and removing it had nothing to
+take away. E3's Pearson r/Spearman rho *recovered* (0.3653/0.5212 →
+0.4085/0.5400 full corpus) rather than dropping further, since A1 removes
+a saturating term and A2 restores graded signal for `constant-perturb`
+specifically. See `eval/results/calibration_report_differential.md`'s
+"Composition change (A1)" and "vs pre-A1/A2 baseline" sections, and
+`eval/results/e3_correlation_report.md`'s "recovered after Session A"
+section, for the full detail.
+
 ## `calibration_report_differential_pre_branch_decision.md`, `e3_pairs_pre_branch_decision.csv`, `e3_correlation_report_pre_branch_decision.md`
 
 Differential calibration and E3 correlation runs from before F2

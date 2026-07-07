@@ -1,0 +1,45 @@
+{
+  "uid": 49,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "588f2d11134a36235fd85a300e572975476a75ea54c3295bdf89d4dba45d659d",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9f0fbf253c16c68b",
+    "object": "chat.completion",
+    "created": 1783412714,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve the Jira project\n    jira\\_project = Jira\\_Project\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Project()\n\n    # Print the project name\n    user\\_task(f\"Project name: {jira\\_project['name']}\")\n\n    # Print the project key\n    user\\_task(f\"Project key: {jira\\_project['key']}\")\n\n    # Print the project description\n    user\\_task(f\"Project description: {jira\\_project['description']}\")\n\n    # Print the project URL\n    user\\_task(f\"Project URL: {jira\\_project['self']}\")\n\n    # Print the project lead\n    user\\_task(f\"Project lead: {jira\\_project['lead']['name']}\")\n\n    # Print the project components\n    user\\_task(\"Project components:\")\n    for component in jira\\_project['components']:\n        user\\_task(f\"- {component['name']} ({component['description']})\")\n\n    # Print the project versions\n    user\\_task(\"Project versions:\")\n    for version in jira\\_project['versions']:\n        user\\_task(f\"- {version['name']} ({version['description']})\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 173,
+      "total_tokens": 465,
+      "completion_tokens": 292,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the Jira project\n    jira\\_project = Jira\\_Project\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Project()\n\n    # Print the project name\n    user\\_task(f\"Project name: {jira\\_project['name']}\")\n\n    # Print the project key\n    user\\_task(f\"Project key: {jira\\_project['key']}\")\n\n    # Print the project description\n    user\\_task(f\"Project description: {jira\\_project['description']}\")\n\n    # Print the project URL\n    user\\_task(f\"Project URL: {jira\\_project['self']}\")\n\n    # Print the project lead\n    user\\_task(f\"Project lead: {jira\\_project['lead']['name']}\")\n\n    # Print the project components\n    user\\_task(\"Project components:\")\n    for component in jira\\_project['components']:\n        user\\_task(f\"- {component['name']} ({component['description']})\")\n\n    # Print the project versions\n    user\\_task(\"Project versions:\")\n    for version in jira\\_project['versions']:\n        user\\_task(f\"- {version['name']} ({version['description']})\")"
+}

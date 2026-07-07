@@ -1,0 +1,45 @@
+{
+  "uid": 80,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "c55286409fe1726f3624fda0a4eca423421e814087014e9e286fb1f6404112bf",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-913818058fc30219",
+    "object": "chat.completion",
+    "created": 1783442184,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    incident = ServiceNow_incident__4\\_0\\_0__create\\_incident()\n    attachment\\_data = \"This is the attachment data\"\n    attachment\\_name = \"example.txt\"\n    attachment = ServiceNow_sys\\_attachment__4\\_0\\_0__create\\_sys\\_attachment(\n        incident, attachment\\_data, attachment\\_name)\n\n    # Add logic to avoid updating the attachment if it already exists\n    existing\\_attachments = incident.get\\_attachments()\n    if attachment.number not in [existing\\_attachment.number for existing\\_attachment in existing\\_attachments]:\n        attachment.upload()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 184,
+      "total_tokens": 328,
+      "completion_tokens": 144,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    incident = ServiceNow_incident__4\\_0\\_0__create\\_incident()\n    attachment\\_data = \"This is the attachment data\"\n    attachment\\_name = \"example.txt\"\n    attachment = ServiceNow_sys\\_attachment__4\\_0\\_0__create\\_sys\\_attachment(\n        incident, attachment\\_data, attachment\\_name)\n\n    # Add logic to avoid updating the attachment if it already exists\n    existing\\_attachments = incident.get\\_attachments()\n    if attachment.number not in [existing\\_attachment.number for existing\\_attachment in existing\\_attachments]:\n        attachment.upload()"
+}

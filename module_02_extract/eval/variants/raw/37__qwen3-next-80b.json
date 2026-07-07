@@ -1,0 +1,45 @@
+{
+  "uid": 37,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "6a14d8eb0783acfbd3e80d8ecc473b4427abce23552a1a761dd28e87f2a54195",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9a59bac3cf77c3d2",
+    "object": "chat.completion",
+    "created": 1783396722,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    # Create a new asset\n    asset_id = Zendesk_Service_asset__3_0_0__create_asset()\n    \n    # Create a new product\n    product_id = Zendesk_Service_product__3_0_0__create_product()\n    \n    # Update product details with the new asset reference\n    Zendesk_Service_product__3_0_0__updatewithwhere_product(product_id, {\"asset_id\": asset_id})",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 183,
+      "total_tokens": 276,
+      "completion_tokens": 93,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new asset\n    asset_id = Zendesk_Service_asset__3_0_0__create_asset()\n    \n    # Create a new product\n    product_id = Zendesk_Service_product__3_0_0__create_product()\n    \n    # Update product details with the new asset reference\n    Zendesk_Service_product__3_0_0__updatewithwhere_product(product_id, {\"asset_id\": asset_id})"
+}

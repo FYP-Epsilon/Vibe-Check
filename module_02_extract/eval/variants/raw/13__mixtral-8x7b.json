@@ -1,0 +1,45 @@
+{
+  "uid": 13,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "2112a344715ffc2dd21f3753240b0bff77d9a8c9d9a269e1f9ee3068fc57ccf4",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b3741536d5db0f93",
+    "object": "chat.completion",
+    "created": 1783395685,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(issues_fields_0, issues_fields_1):\n    # Create a new Asana task\n    task = Asana_Tasks__2_0_0__create_Tasks()\n\n    # After creating the task, add an attachment to it\n    Asana_Attachments__2_0_0__create_Attachments(task)\n\n    # You can also add additional actions after creating the attachment, like sending a Slack message\n    Slack_message__3_0_0__create_message(f\"A new Asana task with attachment has been created: {task}\")\n\n    # To demonstrate the use of the other helper functions, let's create a Jira issue and a Gmail message\n    Jira_Issue__2_0_0__retrievewithwhere_Issue(issues_fields_0, issues_fields_1)\n    Gmail_mail__2_0_0__create_mail()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 286,
+      "total_tokens": 500,
+      "completion_tokens": 214,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(issues_fields_0, issues_fields_1):\n    # Create a new Asana task\n    task = Asana_Tasks__2_0_0__create_Tasks()\n\n    # After creating the task, add an attachment to it\n    Asana_Attachments__2_0_0__create_Attachments(task)\n\n    # You can also add additional actions after creating the attachment, like sending a Slack message\n    Slack_message__3_0_0__create_message(f\"A new Asana task with attachment has been created: {task}\")\n\n    # To demonstrate the use of the other helper functions, let's create a Jira issue and a Gmail message\n    Jira_Issue__2_0_0__retrievewithwhere_Issue(issues_fields_0, issues_fields_1)\n    Gmail_mail__2_0_0__create_mail()"
+}

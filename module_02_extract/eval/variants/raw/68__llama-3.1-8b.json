@@ -1,0 +1,51 @@
+{
+  "uid": 68,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "b5b1be63a7b54216bcd00f72746332ecf42e8b863b6253a2e38832f9d7e72961",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b1e54e94-81d9-40e0-9fef-42143c85c362",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Get the candidate name from the user\n    candidate_name = user_task(label='Enter candidate name')\n\n    # Retrieve the resume from Dropbox\n    resume = Dropbox_files__3_0_0__retrievewithwhere_files()\n\n    # Return the candidate name and resume\n    return candidate_name, resume",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783441046,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 179,
+      "completion_tokens": 68,
+      "total_tokens": 247,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783441046374,
+        "prefill_wait_time_ms": 0.659264,
+        "prefill_time_ms": 26.147654,
+        "ttft_ms": 26.806918,
+        "total_time_ms": 782.743316,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Get the candidate name from the user\n    candidate_name = user_task(label='Enter candidate name')\n\n    # Retrieve the resume from Dropbox\n    resume = Dropbox_files__3_0_0__retrievewithwhere_files()\n\n    # Return the candidate name and resume\n    return candidate_name, resume"
+}
