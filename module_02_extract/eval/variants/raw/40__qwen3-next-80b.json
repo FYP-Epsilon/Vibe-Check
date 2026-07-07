@@ -1,0 +1,45 @@
+{
+  "uid": 40,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "42ae7792c7a5702ef65ccbaf5bd63f02b5e7249087b6df3981e7ef2eeb2e014c",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-ae73f31f5b9dcd5d",
+    "object": "chat.completion",
+    "created": 1783396820,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    Microsoft_Exchange_Events__2_0_0__deletewithwhere_Events()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 143,
+      "total_tokens": 167,
+      "completion_tokens": 24,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    Microsoft_Exchange_Events__2_0_0__deletewithwhere_Events()"
+}

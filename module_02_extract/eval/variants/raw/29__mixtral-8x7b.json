@@ -1,0 +1,45 @@
+{
+  "uid": 29,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "7447f64c1f0bc9b01bce6aa42ba6357d72a8aa454c9722f9a26d466267865b68",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-96d80344eeef8cef",
+    "object": "chat.completion",
+    "created": 1783396237,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new Box folder\n    box_folder = Box\\_Folder__3\\_0\\_0\\_\\_create\\_Folder(\"New Contacts\")\n\n    # Create a new Salesforce contact\n    salesforce\\_contact = Salesforce\\_Contact\\_\\_5\\_0\\_0\\_\\_create\\_Contact(\n        first\\_name=\"John\", last\\_name=\"Doe\", email=\"johndoe@example.com\"\n    )\n\n    # Create a new file in the Box folder with the Salesforce contact's information\n    file\\_content = f\"First Name: {salesforce\\_contact['first\\_name']}\\nLast Name: {salesforce\\_contact['last\\_name']}\\nEmail: {salesforce\\_contact['email']}\"\n    box\\_file = Box\\_File__3\\_0\\_0\\_\\_create\\_File(\n        box\\_folder[\"id\"], \"contact\\_info.txt\", file\\_content.encode()\n    )\n\n    # Send an email using Gmail with a link to the new Box file\n    gmail\\_mail = Gmail\\_mail__2\\_0\\_0\\_\\_create\\_mail(\n        to=\"johndoe@example.com\",\n        subject=\"Your New Contact\",\n        body=f\"Here is the link to your new contact file: {box\\_file['permalink']}\",\n    )\n\n    # Send the email\n    Gmail\\_mail__2\\_0\\_0\\_\\_send\\_mail(gmail\\_mail)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 232,
+      "total_tokens": 576,
+      "completion_tokens": 344,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Box folder\n    box_folder = Box\\_Folder__3\\_0\\_0\\_\\_create\\_Folder(\"New Contacts\")\n\n    # Create a new Salesforce contact\n    salesforce\\_contact = Salesforce\\_Contact\\_\\_5\\_0\\_0\\_\\_create\\_Contact(\n        first\\_name=\"John\", last\\_name=\"Doe\", email=\"johndoe@example.com\"\n    )\n\n    # Create a new file in the Box folder with the Salesforce contact's information\n    file\\_content = f\"First Name: {salesforce\\_contact['first\\_name']}\\nLast Name: {salesforce\\_contact['last\\_name']}\\nEmail: {salesforce\\_contact['email']}\"\n    box\\_file = Box\\_File__3\\_0\\_0\\_\\_create\\_File(\n        box\\_folder[\"id\"], \"contact\\_info.txt\", file\\_content.encode()\n    )\n\n    # Send an email using Gmail with a link to the new Box file\n    gmail\\_mail = Gmail\\_mail__2\\_0\\_0\\_\\_create\\_mail(\n        to=\"johndoe@example.com\",\n        subject=\"Your New Contact\",\n        body=f\"Here is the link to your new contact file: {box\\_file['permalink']}\",\n    )\n\n    # Send the email\n    Gmail\\_mail__2\\_0\\_0\\_\\_send\\_mail(gmail\\_mail)"
+}

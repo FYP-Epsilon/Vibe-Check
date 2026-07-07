@@ -1,0 +1,45 @@
+{
+  "uid": 74,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "c47b792041b60e95275573153ad9d2dfa40c02969e6dfe5f0e23f2b89e9bbd70",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-ba1755f495b156bf",
+    "object": "chat.completion",
+    "created": 1783441610,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a Jira issue\n    jira_issue_id = Jira_Issue__2_0_0__create_Issue(\n        project_key=\"TEST\",\n        summary=\"Test issue from Python\",\n        description=\"This is a test issue created from Python.\",\n    )\n    print(f\"Created Jira issue: {jira_issue_id}\")\n\n    # Create a GitHub comment on the Jira issue's linked PR\n    github_comment = GitHub_Comment__3_0_0__create_Comment(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        issue_number=1,\n        body=\"This is a test comment from Python.\",\n    )\n    print(f\"Created GitHub comment: {github_comment['id']}\")\n\n    # Create a GitHub pull request with the Jira issue as a reference\n    github_pullrequest_id = GitHub_Pullrequest__3_0_0__create_Pullrequest(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        title=\"Test pull request from Python\",\n        body=\"This is a test pull request created from Python.\",\n        issue_number=1,\n    )\n    print(f\"Created GitHub pull request: {github_pullrequest_id}\")\n\n    # Close the Jira issue\n    Jira_Issue__2_0_0__update_Issue(\n        issue_id=jira_issue_id,\n        fields={\n            \"status\": {\n                \"name\": \"Closed\",\n            },\n        },\n    )\n    print(f\"Closed Jira issue: {jira_issue_id}\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 228,
+      "total_tokens": 625,
+      "completion_tokens": 397,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a Jira issue\n    jira_issue_id = Jira_Issue__2_0_0__create_Issue(\n        project_key=\"TEST\",\n        summary=\"Test issue from Python\",\n        description=\"This is a test issue created from Python.\",\n    )\n    print(f\"Created Jira issue: {jira_issue_id}\")\n\n    # Create a GitHub comment on the Jira issue's linked PR\n    github_comment = GitHub_Comment__3_0_0__create_Comment(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        issue_number=1,\n        body=\"This is a test comment from Python.\",\n    )\n    print(f\"Created GitHub comment: {github_comment['id']}\")\n\n    # Create a GitHub pull request with the Jira issue as a reference\n    github_pullrequest_id = GitHub_Pullrequest__3_0_0__create_Pullrequest(\n        owner=\"octocat\",\n        repo=\"Hello-World\",\n        title=\"Test pull request from Python\",\n        body=\"This is a test pull request created from Python.\",\n        issue_number=1,\n    )\n    print(f\"Created GitHub pull request: {github_pullrequest_id}\")\n\n    # Close the Jira issue\n    Jira_Issue__2_0_0__update_Issue(\n        issue_id=jira_issue_id,\n        fields={\n            \"status\": {\n                \"name\": \"Closed\",\n            },\n        },\n    )\n    print(f\"Closed Jira issue: {jira_issue_id}\")"
+}

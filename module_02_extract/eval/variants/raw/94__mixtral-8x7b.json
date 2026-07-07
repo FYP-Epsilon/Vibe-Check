@@ -1,0 +1,45 @@
+{
+  "uid": 94,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "275b22f953c6ea0b1e38683567559c223570291cd38b301167a2d8b1424444d5",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-85133643cb2ee24e",
+    "object": "chat.completion",
+    "created": 1783442653,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(folders_item_status_0: str, folders_item_status_1: str):\n    items = Box_Folder__3_0_0__retrievewithwhere_Folder(folders_item_status_0, folders_item_status_1)\n    if not items:\n        return\n    for item in items:\n        if item['status'] == 'empty':\n            Box_Folder__3_0_0__updatewithwhere_Folder(item['id'], {'status': 'removed'})\n            Amazon_SNS_Topic__3_0_0__PUBLISHMESSAGEONTOPIC_Topic(f\"Folder {item['name']} removed\")\n    Box_Folder__3_0_0__updatewithwhere_Folder(folders_item_status_0, {'status': 'cleaned'})\n    Amazon_SNS_Topic__3_0_0__PUBLISHMESSAGEONTOPIC_Topic(f\"Folders with status '{folders_item_status_0}' cleaned\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 258,
+      "total_tokens": 497,
+      "completion_tokens": 239,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(folders_item_status_0: str, folders_item_status_1: str):\n    items = Box_Folder__3_0_0__retrievewithwhere_Folder(folders_item_status_0, folders_item_status_1)\n    if not items:\n        return\n    for item in items:\n        if item['status'] == 'empty':\n            Box_Folder__3_0_0__updatewithwhere_Folder(item['id'], {'status': 'removed'})\n            Amazon_SNS_Topic__3_0_0__PUBLISHMESSAGEONTOPIC_Topic(f\"Folder {item['name']} removed\")\n    Box_Folder__3_0_0__updatewithwhere_Folder(folders_item_status_0, {'status': 'cleaned'})\n    Amazon_SNS_Topic__3_0_0__PUBLISHMESSAGEONTOPIC_Topic(f\"Folders with status '{folders_item_status_0}' cleaned\")"
+}

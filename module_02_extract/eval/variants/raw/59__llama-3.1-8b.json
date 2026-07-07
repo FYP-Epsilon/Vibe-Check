@@ -1,0 +1,51 @@
+{
+  "uid": 59,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "ee9e685a8581dc75e8a8afcf8d9c76f86dcef8e032958b2f9687515e5c79b819",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-ae9937d9-ccd5-4288-9d9e-65873f6fa916",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create a new active directory domain on Azure\n    user_task(label=\"Creating Active Directory Domain\")\n    Microsoft_Entra_ID_Domains__4_0_0__create_Domains()\n    \n    # Get the newly created domain's details\n    domain_details = get_domain_details()\n    \n    # Get the device details to be added to the domain\n    device_details = get_device_details()\n    \n    # Add the device to the domain\n    user_task(label=\"Adding Device to Domain\")\n    add_device_to_domain(domain_details, device_details)\n    \n    # Authenticate the device\n    user_task(label=\"Authenticating Device\")\n    authenticate_device(device_details)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783440200,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 189,
+      "completion_tokens": 141,
+      "total_tokens": 330,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783440200818,
+        "prefill_wait_time_ms": 0.800918,
+        "prefill_time_ms": 740.04733,
+        "ttft_ms": 740.848248,
+        "total_time_ms": 2342.3082539999996,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create a new active directory domain on Azure\n    user_task(label=\"Creating Active Directory Domain\")\n    Microsoft_Entra_ID_Domains__4_0_0__create_Domains()\n    \n    # Get the newly created domain's details\n    domain_details = get_domain_details()\n    \n    # Get the device details to be added to the domain\n    device_details = get_device_details()\n    \n    # Add the device to the domain\n    user_task(label=\"Adding Device to Domain\")\n    add_device_to_domain(domain_details, device_details)\n    \n    # Authenticate the device\n    user_task(label=\"Authenticating Device\")\n    authenticate_device(device_details)"
+}

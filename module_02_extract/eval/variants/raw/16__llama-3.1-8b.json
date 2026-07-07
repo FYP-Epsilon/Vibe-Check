@@ -1,0 +1,51 @@
+{
+  "uid": 16,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "b3cc4f6e087037a2a1ff2312adc4c228374e697b3dce279c20a756dbba3b9fe6",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-78cdf1a9-11ab-484f-ad3e-9b05fe08de49",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(teams_name_0: str, teams_name_1: str):\n    Trello_Organization__2_0_0__retrievewithwhere_Organization(teams_name_0=teams_name_0, teams_name_1=teams_name_1)\n    Marketo_leads__3_0_0__create_leads()\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395770,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 234,
+      "completion_tokens": 93,
+      "total_tokens": 327,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395770873,
+        "prefill_wait_time_ms": 1.121961,
+        "prefill_time_ms": 17.962476000000002,
+        "ttft_ms": 19.084436999999998,
+        "total_time_ms": 468.395844,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(teams_name_0: str, teams_name_1: str):\n    Trello_Organization__2_0_0__retrievewithwhere_Organization(teams_name_0=teams_name_0, teams_name_1=teams_name_1)\n    Marketo_leads__3_0_0__create_leads()\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()"
+}

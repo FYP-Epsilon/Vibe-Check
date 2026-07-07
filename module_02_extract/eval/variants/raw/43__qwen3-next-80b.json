@@ -1,0 +1,45 @@
+{
+  "uid": 43,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "43177cb4d27d3bcb0445a20ecb2923d84292285b3eaff2807f876d7c36d5775b",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8b86e3850a788230",
+    "object": "chat.completion",
+    "created": 1783396946,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n    price_lists = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel()\n    invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n    \n    message_content = f\"Sales Orders: {len(sales_orders)}\\nPrice Lists: {len(price_lists)}\\nInvoices: {len(invoices)}\"\n    \n    Slack_message__3_0_0__create_message(message_content)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 237,
+      "total_tokens": 387,
+      "completion_tokens": 150,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n    price_lists = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel()\n    invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n    \n    message_content = f\"Sales Orders: {len(sales_orders)}\\nPrice Lists: {len(price_lists)}\\nInvoices: {len(invoices)}\"\n    \n    Slack_message__3_0_0__create_message(message_content)"
+}

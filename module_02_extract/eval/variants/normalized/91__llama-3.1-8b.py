@@ -1,0 +1,12 @@
+def Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket():
+    return [{'value': 0}, {'value': 1}]
+
+
+def Amazon_SNS_Topic__3_0_0__PUBLISHMESSAGEONTOPIC_Topic():
+    return {}
+
+
+def workflow():
+    data = Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()
+    for item in data:
+        Amazon_SNS_Topic__3_0_0__PUBLISHMESSAGEONTOPIC_Topic(item)

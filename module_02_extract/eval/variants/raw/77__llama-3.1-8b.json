@@ -1,0 +1,51 @@
+{
+  "uid": 77,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "2654461000453315e3a954b3d07a74d245b6218f1f4b700b97200e9dc7ecf569",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-1dff6f3d-0618-4c3d-9e3e-7551c3cfca34",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket(\"my_bucket\")  # retrieve bucket\n    # create a new object, but do not copy the existing object\n    # we can do this by passing the bucket, key and metadata of the new object\n    # and then upload the new object to the bucket\n    Amazon_S3_object__2_0_0__create_object(\"my_bucket\", \"my_key\", {\"metadata\": \"new object\"})",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783441905,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 186,
+      "completion_tokens": 106,
+      "total_tokens": 292,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783441905291,
+        "prefill_wait_time_ms": 0.829149,
+        "prefill_time_ms": 18.945878,
+        "ttft_ms": 19.775027,
+        "total_time_ms": 625.7084600000001,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket(\"my_bucket\")  # retrieve bucket\n    # create a new object, but do not copy the existing object\n    # we can do this by passing the bucket, key and metadata of the new object\n    # and then upload the new object to the bucket\n    Amazon_S3_object__2_0_0__create_object(\"my_bucket\", \"my_key\", {\"metadata\": \"new object\"})"
+}

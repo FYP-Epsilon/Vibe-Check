@@ -1,0 +1,45 @@
+{
+  "uid": 24,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "4b6c071f7116e92e055f78d3bdf9a2c178a434fdfb6a8ca59dbb591a48cbf985",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-bb51a1847334b538",
+    "object": "chat.completion",
+    "created": 1783396066,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve tasks from Asana\n    asana\\_tasks = Asana\\_Tasks\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Tasks()\n\n    # Iterate through tasks\n    for task in asana\\_tasks:\n        # Extract task info\n        name = task['name']\n        notes = task['notes']\n\n        # Prepare message for Slack\n        slack\\_message = {\n            \"channel\": \"#general\",\n            \"text\": f\"New task in Asana: {name}\\nNotes: {notes}\"\n        }\n\n        # Send message to Slack\n        Slack\\_message\\_\\_3\\_0\\_0\\_\\_create\\_message(slack\\_message)\n\n        # Prepare message for Twilio\n        twilio\\_message = f\"New task in Asana: {name}\\nNotes: {notes}\"\n\n        # Send message via Twilio\n        Twilio\\_postMessagesjsonByFromphone\\_model\\_\\_2\\_0\\_0\\_\\_postMessagesjsonByFromphone\\_postMessagesjsonByFromphone\\_model(twilio\\_message)\n\n    return \"Tasks sent to Slack and Twilio\"",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 234,
+      "total_tokens": 508,
+      "completion_tokens": 274,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve tasks from Asana\n    asana\\_tasks = Asana\\_Tasks\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Tasks()\n\n    # Iterate through tasks\n    for task in asana\\_tasks:\n        # Extract task info\n        name = task['name']\n        notes = task['notes']\n\n        # Prepare message for Slack\n        slack\\_message = {\n            \"channel\": \"#general\",\n            \"text\": f\"New task in Asana: {name}\\nNotes: {notes}\"\n        }\n\n        # Send message to Slack\n        Slack\\_message\\_\\_3\\_0\\_0\\_\\_create\\_message(slack\\_message)\n\n        # Prepare message for Twilio\n        twilio\\_message = f\"New task in Asana: {name}\\nNotes: {notes}\"\n\n        # Send message via Twilio\n        Twilio\\_postMessagesjsonByFromphone\\_model\\_\\_2\\_0\\_0\\_\\_postMessagesjsonByFromphone\\_postMessagesjsonByFromphone\\_model(twilio\\_message)\n\n    return \"Tasks sent to Slack and Twilio\""
+}

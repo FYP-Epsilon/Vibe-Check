@@ -1,0 +1,51 @@
+{
+  "uid": 34,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "660179451a8f1086f99fab16b644dea02952d27e103d129b0a7a21562b41359d",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-cfb0ceb1-5e48-41f7-b656-c0f9eea8209e",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    Microsoft_SharePoint_Folder__204_0_0__create_Folder()\n    Microsoft_SharePoint_File__204_0_0__create_File()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396583,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 189,
+      "completion_tokens": 38,
+      "total_tokens": 227,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396583604,
+        "prefill_wait_time_ms": 0.772916,
+        "prefill_time_ms": 62.346661,
+        "ttft_ms": 63.119577,
+        "total_time_ms": 234.887912,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    Microsoft_SharePoint_Folder__204_0_0__create_Folder()\n    Microsoft_SharePoint_File__204_0_0__create_File()"
+}

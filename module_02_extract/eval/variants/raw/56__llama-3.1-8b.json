@@ -1,0 +1,51 @@
+{
+  "uid": 56,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "94d9f0c030734acaec291bccd9459c73d054922507f771fd35397c8a57418d7f",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-ed506ca5-c85d-45c2-a36e-9a1dae56a2ae",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create a lead in Salesforce\n    lead = Salesforce_Lead__5_0_0__create_Lead()\n\n    # Retrieve leads from Marketo with specific conditions\n    leads = Marketo_leads__3_0_0__retrievewithwhere_leads()\n\n    # Assuming the lead from Salesforce is the one we're interested in\n    if lead in leads:\n        # Create a message in Microsoft Teams\n        message = Microsoft_Teams_Message__2_0_0__create_Message()\n        \n        # Send the message\n        # For simplicity, let's assume the message is sent successfully\n        print(\"Message sent to Microsoft Teams\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783439892,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 202,
+      "completion_tokens": 140,
+      "total_tokens": 342,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783439892572,
+        "prefill_wait_time_ms": 0.761011,
+        "prefill_time_ms": 50.18955,
+        "ttft_ms": 50.950561,
+        "total_time_ms": 1130.638376,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create a lead in Salesforce\n    lead = Salesforce_Lead__5_0_0__create_Lead()\n\n    # Retrieve leads from Marketo with specific conditions\n    leads = Marketo_leads__3_0_0__retrievewithwhere_leads()\n\n    # Assuming the lead from Salesforce is the one we're interested in\n    if lead in leads:\n        # Create a message in Microsoft Teams\n        message = Microsoft_Teams_Message__2_0_0__create_Message()\n        \n        # Send the message\n        # For simplicity, let's assume the message is sent successfully\n        print(\"Message sent to Microsoft Teams\")"
+}

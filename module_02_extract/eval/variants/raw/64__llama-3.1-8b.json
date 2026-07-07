@@ -1,0 +1,51 @@
+{
+  "uid": 64,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "8e71ba8aacec5ea0b19ca2ef657519334a841808a1ec9fd0c7b87b475542149b",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-c21e9cca-3e5e-4ffd-a813-cdc79db73b69",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    calculator = lambda x, y: x + y\n    result = calculator(5, 10)\n    user_task(label=\"Calculator invoked with result: \" + str(result))\n    AWS_Lambda_function__2_0_0__INVOKEFUNCTION_function()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783440675,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 180,
+      "completion_tokens": 58,
+      "total_tokens": 238,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783440675818,
+        "prefill_wait_time_ms": 0.83551,
+        "prefill_time_ms": 23.590148,
+        "ttft_ms": 24.425658,
+        "total_time_ms": 460.38635100000005,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    calculator = lambda x, y: x + y\n    result = calculator(5, 10)\n    user_task(label=\"Calculator invoked with result: \" + str(result))\n    AWS_Lambda_function__2_0_0__INVOKEFUNCTION_function()"
+}

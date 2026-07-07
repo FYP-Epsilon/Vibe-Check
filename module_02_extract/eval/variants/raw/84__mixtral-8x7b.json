@@ -1,0 +1,45 @@
+{
+  "uid": 84,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "72324126d10b3d471c949c125351793e0561b04adb75b6b431e7ef6c02f6335a",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a41ded47ba1b398d",
+    "object": "chat.completion",
+    "created": 1783442527,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve the employee information from BambooHR\n    employees = bambooHR_employees__2_0_0__retrievewithwhere_employees()\n\n    # Check if any employees were returned\n    if employees:\n        # Loop through each employee\n        for employee in employees:\n            # Check if the employee has any dependents\n            dependents = bambooHR_dependents__2_0_0__retrievewithwhere_dependents(employee_id=employee['id'])\n            if dependents:\n                # Create a Zendesk ticket for the employee with dependents\n                Zendesk_Service_Ticket__2_0_0__create_Ticket(\n                    subject=f\"Employee {employee['firstName']} {employee['lastName']} has dependents\",\n                    description=f\"Employee ID: {employee['id']}\\n\"\n                                f\"First Name: {employee['firstName']}\\n\"\n                                f\"Last Name: {employee['lastName']}\\n\"\n                                f\"Dependents:\\n\",\n                    custom_fields={\n                        \"requester_id\": employee[\"id\"],\n                        \"requester_name\": f\"{employee['firstName']} {employee['lastName']}\",\n                    },\n                )\n\n                # Create a Microsoft Teams chat message notifying of the created ticket\n                Microsoft_Teams_ChatMessage__2_0_0__create_ChatMessage(\n                    text=f\"A new Zendesk ticket has been created for employee {employee['firstName']} {employee['lastName']} with dependents.\",\n                )\n\n    else:\n        # If no employees were returned, log a message\n        print(\"No employees found.\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 242,
+      "total_tokens": 669,
+      "completion_tokens": 427,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the employee information from BambooHR\n    employees = bambooHR_employees__2_0_0__retrievewithwhere_employees()\n\n    # Check if any employees were returned\n    if employees:\n        # Loop through each employee\n        for employee in employees:\n            # Check if the employee has any dependents\n            dependents = bambooHR_dependents__2_0_0__retrievewithwhere_dependents(employee_id=employee['id'])\n            if dependents:\n                # Create a Zendesk ticket for the employee with dependents\n                Zendesk_Service_Ticket__2_0_0__create_Ticket(\n                    subject=f\"Employee {employee['firstName']} {employee['lastName']} has dependents\",\n                    description=f\"Employee ID: {employee['id']}\\n\"\n                                f\"First Name: {employee['firstName']}\\n\"\n                                f\"Last Name: {employee['lastName']}\\n\"\n                                f\"Dependents:\\n\",\n                    custom_fields={\n                        \"requester_id\": employee[\"id\"],\n                        \"requester_name\": f\"{employee['firstName']} {employee['lastName']}\",\n                    },\n                )\n\n                # Create a Microsoft Teams chat message notifying of the created ticket\n                Microsoft_Teams_ChatMessage__2_0_0__create_ChatMessage(\n                    text=f\"A new Zendesk ticket has been created for employee {employee['firstName']} {employee['lastName']} with dependents.\",\n                )\n\n    else:\n        # If no employees were returned, log a message\n        print(\"No employees found.\")"
+}

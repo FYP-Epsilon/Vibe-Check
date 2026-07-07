@@ -1,0 +1,45 @@
+{
+  "uid": 23,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "6e563146c88e7c4d78755971bf12428f3c227c86142e464468906ea6332e14c3",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9672275755ed9439",
+    "object": "chat.completion",
+    "created": 1783396056,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    # Create a new Zendesk ticket\n    zendesk_ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Extract ticket ID or relevant details for task description\n    ticket_id = zendesk_ticket.get('id', 'Unknown')\n    ticket_subject = zendesk_ticket.get('subject', 'New Support Ticket')\n    \n    # Create a corresponding task in the default Microsoft To Do list\n    # Assuming the default list ID is known or retrieved elsewhere; using placeholder for now\n    # In practice, you may need to fetch the default list ID via another API call\n    # For this implementation, we assume a default list ID of 'default_list_id' as per context\n    task_payload = {\n        \"title\": f\"Follow up on Zendesk Ticket #{ticket_id}: {ticket_subject}\",\n        \"body\": {\n            \"contentType\": \"text\",\n            \"content\": f\"Related Zendesk ticket: {ticket_subject}\\nTicket ID: {ticket_id}\"\n        }\n    }\n    \n    # Post the task to the default Microsoft To Do list\n    Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model(\n        todoTaskListId=\"default_list_id\",\n        body=task_payload\n    )\n    \n    # Return the created ticket for reference (optional)\n    return zendesk_ticket",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 204,
+      "total_tokens": 518,
+      "completion_tokens": 314,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Zendesk ticket\n    zendesk_ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Extract ticket ID or relevant details for task description\n    ticket_id = zendesk_ticket.get('id', 'Unknown')\n    ticket_subject = zendesk_ticket.get('subject', 'New Support Ticket')\n    \n    # Create a corresponding task in the default Microsoft To Do list\n    # Assuming the default list ID is known or retrieved elsewhere; using placeholder for now\n    # In practice, you may need to fetch the default list ID via another API call\n    # For this implementation, we assume a default list ID of 'default_list_id' as per context\n    task_payload = {\n        \"title\": f\"Follow up on Zendesk Ticket #{ticket_id}: {ticket_subject}\",\n        \"body\": {\n            \"contentType\": \"text\",\n            \"content\": f\"Related Zendesk ticket: {ticket_subject}\\nTicket ID: {ticket_id}\"\n        }\n    }\n    \n    # Post the task to the default Microsoft To Do list\n    Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model(\n        todoTaskListId=\"default_list_id\",\n        body=task_payload\n    )\n    \n    # Return the created ticket for reference (optional)\n    return zendesk_ticket"
+}

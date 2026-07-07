@@ -1,0 +1,51 @@
+{
+  "uid": 79,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "bb17d466971ec86986d7f5b9cb933392f2e74462ba4c8792a0608a830e191230",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-31a65905-f0c7-458d-bd8e-a0cea873e9c0",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Retrieve the case history with the given where clause\n    case_history = Salesforce_CaseHistory__7_0_0__retrievewithwhere_CaseHistory()\n    \n    # Check if the case history contains any comments\n    if \"comments\" in case_history:\n        # Iterate over each comment in the case history\n        for comment in case_history[\"comments\"]:\n            # Check if the comment is not an update to an existing comment\n            if \"isUpdatedComment\" not in comment or not comment[\"isUpdatedComment\"]:\n                # Check if the comment does not update the case\n                if \"isCaseUpdated\" not in comment or not comment[\"isCaseUpdated\"]:\n                    # Create a new case comment\n                    new_comment = Salesforce_CaseComment__7_0_0__create_CaseComment(comment[\"body\"])",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442094,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 187,
+      "completion_tokens": 175,
+      "total_tokens": 362,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442094034,
+        "prefill_wait_time_ms": 0.819375,
+        "prefill_time_ms": 90.561108,
+        "ttft_ms": 91.380483,
+        "total_time_ms": 1540.850363,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the case history with the given where clause\n    case_history = Salesforce_CaseHistory__7_0_0__retrievewithwhere_CaseHistory()\n    \n    # Check if the case history contains any comments\n    if \"comments\" in case_history:\n        # Iterate over each comment in the case history\n        for comment in case_history[\"comments\"]:\n            # Check if the comment is not an update to an existing comment\n            if \"isUpdatedComment\" not in comment or not comment[\"isUpdatedComment\"]:\n                # Check if the comment does not update the case\n                if \"isCaseUpdated\" not in comment or not comment[\"isCaseUpdated\"]:\n                    # Create a new case comment\n                    new_comment = Salesforce_CaseComment__7_0_0__create_CaseComment(comment[\"body\"])"
+}

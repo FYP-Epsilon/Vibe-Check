@@ -1,0 +1,45 @@
+{
+  "uid": 15,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "60eb59e2644c0a7e90544d867ba309acaec824d6953b460f97a4ff5e00732a2e",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-bba982551e527309",
+    "object": "chat.completion",
+    "created": 1783395750,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(teams_name_0: str, teams_name_1: str):\n  organization = Trello\\_Organization\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Organization(teams\\_name\\_0, teams\\_name\\_1)\n\n  if organization.get('name').lower() == 'internal':\n    email\\_data = {\n      'to': 'example@example.com',\n      'subject': 'Team is Internal',\n      'body': 'The team name is internal, please send an email notification.'\n    }\n    Gmail\\_mail\\_\\_2\\_0\\_0\\_\\_create\\_mail(**email\\_data)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 252,
+      "total_tokens": 408,
+      "completion_tokens": 156,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(teams_name_0: str, teams_name_1: str):\n  organization = Trello\\_Organization\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_Organization(teams\\_name\\_0, teams\\_name\\_1)\n\n  if organization.get('name').lower() == 'internal':\n    email\\_data = {\n      'to': 'example@example.com',\n      'subject': 'Team is Internal',\n      'body': 'The team name is internal, please send an email notification.'\n    }\n    Gmail\\_mail\\_\\_2\\_0\\_0\\_\\_create\\_mail(**email\\_data)"
+}

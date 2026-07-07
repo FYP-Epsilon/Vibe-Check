@@ -1,0 +1,45 @@
+{
+  "uid": 17,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "274324be9a9374839ef7eaa1aee3c6969032b864a65cc717266fa121484bcd51",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-851691df12927e8c",
+    "object": "chat.completion",
+    "created": 1783395836,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(topics_topicarn_0: str, topics_topicarn_1: str):\n    Amazon_SNS_Topic__3_0_0__retrievewithwhere_Topic(topics_topicarn_0, topics_topicarn_1)\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 201,
+      "total_tokens": 273,
+      "completion_tokens": 72,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(topics_topicarn_0: str, topics_topicarn_1: str):\n    Amazon_SNS_Topic__3_0_0__retrievewithwhere_Topic(topics_topicarn_0, topics_topicarn_1)\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()"
+}

@@ -1,0 +1,51 @@
+{
+  "uid": 38,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "cf9f0698a6c0aa688bde55bd3f566982d41d66f536251bb5e0540b2327dbf578",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-6eba5de0-379c-4f5a-8447-af68ffba4cf5",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(userId, todoTaskListId):\n    taskList = Microsoft_To_Do_getUsersByUserIdTodoListsByTodoTaskListId_model__1_0_0__getUsersByUserIdTodoListsByTodoTaskListId_getUsersByUserIdTodoListsByTodoTaskListId_model()(userId, todoTaskListId)\n    if taskList:\n        return taskList\n    else:\n        newTask = Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model()(userId, todoTaskListId)\n        return newTask",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396725,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 253,
+      "completion_tokens": 144,
+      "total_tokens": 397,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396725854,
+        "prefill_wait_time_ms": 0.662053,
+        "prefill_time_ms": 15.048921,
+        "ttft_ms": 15.710973999999998,
+        "total_time_ms": 657.385771,
+        "kv_hit_rate": 0.0625,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(userId, todoTaskListId):\n    taskList = Microsoft_To_Do_getUsersByUserIdTodoListsByTodoTaskListId_model__1_0_0__getUsersByUserIdTodoListsByTodoTaskListId_getUsersByUserIdTodoListsByTodoTaskListId_model()(userId, todoTaskListId)\n    if taskList:\n        return taskList\n    else:\n        newTask = Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model()(userId, todoTaskListId)\n        return newTask"
+}

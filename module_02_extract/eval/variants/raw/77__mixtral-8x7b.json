@@ -1,0 +1,45 @@
+{
+  "uid": 77,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "2654461000453315e3a954b3d07a74d245b6218f1f4b700b97200e9dc7ecf569",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-96558724085e90e2",
+    "object": "chat.completion",
+    "created": 1783441906,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new S3 object\n    s3_obj = Amazon_S3_object__2_0_0__create_object()\n\n    # Set the bucket name (you can change this to any existing bucket)\n    bucket_name = Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()['Name']\n\n    # Assign a random key to the object\n    import random\n    key = 'workflow-object-' + str(random.randint(0, 1000000))\n\n    # Set the object's metadata (this is just an example)\n    metadata = {\n        'created_by': 'workflow',\n        'description': 'This object was created by the workflow function',\n    }\n\n    # Set the object's content (this is just an example)\n    content = b'This is the content of the object created by the workflow function.'\n\n    # Set the object's key, content, and metadata\n    s3_obj.key = key\n    s3_obj.content = content\n    s3_obj.metadata = metadata\n\n    # Do NOT call s3_obj.commit() here, because that would save the object to the S3 bucket\n\n    # Return the object and bucket information\n    return {\n        's3_object': s3_obj,\n        'bucket_name': bucket_name,\n    }",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 186,
+      "total_tokens": 519,
+      "completion_tokens": 333,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new S3 object\n    s3_obj = Amazon_S3_object__2_0_0__create_object()\n\n    # Set the bucket name (you can change this to any existing bucket)\n    bucket_name = Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()['Name']\n\n    # Assign a random key to the object\n    import random\n    key = 'workflow-object-' + str(random.randint(0, 1000000))\n\n    # Set the object's metadata (this is just an example)\n    metadata = {\n        'created_by': 'workflow',\n        'description': 'This object was created by the workflow function',\n    }\n\n    # Set the object's content (this is just an example)\n    content = b'This is the content of the object created by the workflow function.'\n\n    # Set the object's key, content, and metadata\n    s3_obj.key = key\n    s3_obj.content = content\n    s3_obj.metadata = metadata\n\n    # Do NOT call s3_obj.commit() here, because that would save the object to the S3 bucket\n\n    # Return the object and bucket information\n    return {\n        's3_object': s3_obj,\n        'bucket_name': bucket_name,\n    }"
+}

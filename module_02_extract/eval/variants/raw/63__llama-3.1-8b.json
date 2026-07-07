@@ -1,0 +1,51 @@
+{
+  "uid": 63,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "072e66a4a4ba78694361d49eafd19dc23a725a6eeec5419ed7a01bc300582331",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-7b1b46dd-f119-43b8-8189-88dae5e6a694",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    Amazon_SNS_Subscription__3_0_0__create_Subscription(\"dogs\", \"http://example.com/dogs\")\n    subscriptions = Amazon_SNS_Subscription__3_0_0__retrievewithwhere_Subscription(\"all\")\n    for subscription in subscriptions:\n        if subscription != \"dogs\":\n            print(subscription)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783440585,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 199,
+      "completion_tokens": 74,
+      "total_tokens": 273,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783440585639,
+        "prefill_wait_time_ms": 0.7240449999999999,
+        "prefill_time_ms": 24.767041,
+        "ttft_ms": 25.491086,
+        "total_time_ms": 501.25316499999997,
+        "kv_hit_rate": 0.07692307692307693,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    Amazon_SNS_Subscription__3_0_0__create_Subscription(\"dogs\", \"http://example.com/dogs\")\n    subscriptions = Amazon_SNS_Subscription__3_0_0__retrievewithwhere_Subscription(\"all\")\n    for subscription in subscriptions:\n        if subscription != \"dogs\":\n            print(subscription)"
+}

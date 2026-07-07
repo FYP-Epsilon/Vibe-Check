@@ -1,0 +1,51 @@
+{
+  "uid": 42,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "2d5c14fe464b845422abd36ecb0067cf3b8ef85839b1ef4420a130ae581465de",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-c7c1555d-713e-46d5-8c30-b50b90e27535",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create a new calendar event using Microsoft Exchange Events API\n    event_id = Microsoft_Exchange_Events__2_0_0__create_Events()\n    \n    # Get the scheduling link for the newly created event\n    scheduling_link = Calendly_schedulingLink__1_0_0__create_schedulingLink()\n    \n    # Share the link of the new calendar event\n    print(f\"Shared calendar event link: {scheduling_link}\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396854,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 189,
+      "completion_tokens": 98,
+      "total_tokens": 287,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396854159,
+        "prefill_wait_time_ms": 0.860742,
+        "prefill_time_ms": 23.940123,
+        "ttft_ms": 24.800864999999998,
+        "total_time_ms": 737.099693,
+        "kv_hit_rate": 0.08333333333333333,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create a new calendar event using Microsoft Exchange Events API\n    event_id = Microsoft_Exchange_Events__2_0_0__create_Events()\n    \n    # Get the scheduling link for the newly created event\n    scheduling_link = Calendly_schedulingLink__1_0_0__create_schedulingLink()\n    \n    # Share the link of the new calendar event\n    print(f\"Shared calendar event link: {scheduling_link}\")"
+}

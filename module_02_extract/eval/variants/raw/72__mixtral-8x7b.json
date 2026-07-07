@@ -1,0 +1,45 @@
+{
+  "uid": 72,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "66a2c0ced9375c408e22bebb3e8557c61b0398f445368cf14f863dd3f05cbaa7",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a06af10623f61656",
+    "object": "chat.completion",
+    "created": 1783441422,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " Here's the implementation for the `workflow` function:\n\n```python\ndef workflow():\n    # Retrieve existing suppliers\n    existing_suppliers = Coupa_suppliers__4_0_0__retrievewithwhere_suppliers(where=\"1=1\")\n\n    # Define new supplier data\n    new_supplier_data = {\n        \"name\": \"New Supplier\",\n        \"addressLine1\": \"123 Main St\",\n        \"city\": \"Anytown\",\n        \"region\": \"CA\",\n        \"country\": \"US\",\n        \"postalCode\": \"12345\"\n    }\n\n    # Create new supplier\n    created_supplier = Coupa_suppliers__4_0_0__create_suppliers(new_supplier_data)\n\n    # Check if the supplier was created successfully\n    if created_supplier:\n        print(f\"Successfully created new supplier with ID: {created_supplier['id']}\")\n    else:\n        print(\"Failed to create a new supplier\")\n```\n\nThis `workflow` function first retrieves all existing suppliers and then defines the data for a new supplier. Then, it calls the `Coupa_suppliers__4_0_0__create_suppliers` function to create the new supplier. Finally, it checks if the supplier was created successfully and prints the corresponding message.",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 236,
+      "total_tokens": 553,
+      "completion_tokens": 317,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve existing suppliers\n    existing_suppliers = Coupa_suppliers__4_0_0__retrievewithwhere_suppliers(where=\"1=1\")\n\n    # Define new supplier data\n    new_supplier_data = {\n        \"name\": \"New Supplier\",\n        \"addressLine1\": \"123 Main St\",\n        \"city\": \"Anytown\",\n        \"region\": \"CA\",\n        \"country\": \"US\",\n        \"postalCode\": \"12345\"\n    }\n\n    # Create new supplier\n    created_supplier = Coupa_suppliers__4_0_0__create_suppliers(new_supplier_data)\n\n    # Check if the supplier was created successfully\n    if created_supplier:\n        print(f\"Successfully created new supplier with ID: {created_supplier['id']}\")\n    else:\n        print(\"Failed to create a new supplier\")"
+}

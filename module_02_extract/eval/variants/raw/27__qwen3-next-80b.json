@@ -1,0 +1,45 @@
+{
+  "uid": 27,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "f18d005c9bdb00f14cceb5b27e712c9b17965e6c9724e464c816d3950a5627be",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8bab78e069d73886",
+    "object": "chat.completion",
+    "created": 1783396208,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    # Create an offboarding Zendesk ticket\n    ticket_id = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Retrieve the user's OneDrive folder (assuming ticket_id or some user identifier is used to locate the folder)\n    # In practice, you'd extract user info from the ticket or context; here we assume ticket_id correlates to user\n    folder = Microsoft_OneDrive_for_Business_Folder__4_0_0__retrievewithwhere_Folder(where={\"owner_id\": ticket_id})\n    \n    # If folder exists, delete it\n    if folder:\n        Microsoft_OneDrive_for_Business_Folder__4_0_0__deletewithwhere_Folder(where={\"owner_id\": ticket_id})\n    \n    # Return or log success (implicit return None is fine per task)\n    pass",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 206,
+      "total_tokens": 385,
+      "completion_tokens": 179,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create an offboarding Zendesk ticket\n    ticket_id = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Retrieve the user's OneDrive folder (assuming ticket_id or some user identifier is used to locate the folder)\n    # In practice, you'd extract user info from the ticket or context; here we assume ticket_id correlates to user\n    folder = Microsoft_OneDrive_for_Business_Folder__4_0_0__retrievewithwhere_Folder(where={\"owner_id\": ticket_id})\n    \n    # If folder exists, delete it\n    if folder:\n        Microsoft_OneDrive_for_Business_Folder__4_0_0__deletewithwhere_Folder(where={\"owner_id\": ticket_id})\n    \n    # Return or log success (implicit return None is fine per task)\n    pass"
+}
