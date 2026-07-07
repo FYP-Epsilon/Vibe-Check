@@ -177,10 +177,12 @@ def run_c5b(admitted: list[dict[str, Any]], corpus_manifest: dict[int, dict[str,
     # exclude variants whose base is pre-flagged from the "controlled" FA
     # rate, so the two numbers can be told apart.
     base_flagged: dict[int, bool] = {}
+    base_combined: dict[int, float] = {}
     for uid in sorted({r["uid"] for r in admitted}):
         base_source, base_func_wir = _base_wir_cache_get(uid, corpus_manifest, cache)
         base_cert = run_differential_verification(base_source, base_func_wir, base_source=base_source)
-        base_flagged[uid] = base_cert.get("combined_confidence", 0.0) < TAU
+        base_combined[uid] = base_cert.get("combined_confidence", 0.0)
+        base_flagged[uid] = base_combined[uid] < TAU
 
     for rec in admitted:
         uid = rec["uid"]
@@ -190,6 +192,7 @@ def run_c5b(admitted: list[dict[str, Any]], corpus_manifest: dict[int, dict[str,
         cert = run_differential_verification(variant_source, base_func_wir, base_source=base_source)
         combined = cert.get("combined_confidence", 0.0)
         is_false_alarm = combined < TAU
+        div: Counter = Counter()
         if is_false_alarm:
             flagged += 1
             div = _diagnose_divergence_sources(variant_source, base_source, base_func_wir)
@@ -198,6 +201,9 @@ def run_c5b(admitted: list[dict[str, Any]], corpus_manifest: dict[int, dict[str,
         per_variant.append({
             "variant_id": rec["variant_id"], "uid": uid, "combined_confidence": combined,
             "flagged": is_false_alarm, "base_flagged": base_flagged[uid],
+            "base_combined_confidence": base_combined[uid],
+            "divergence_breakdown": dict(div) if is_false_alarm else None,
+            "has_exception": (div.get("exception", 0) > 0) if is_false_alarm else None,
         })
 
     fa_rate = flagged / n if n else None
@@ -382,8 +388,54 @@ def render_report(c5a: dict[str, Any], c5b: dict[str, Any], c5c: dict[str, Any],
         "false alarms, not inherited base-coverage weakness.",
         "",
         f"- Divergence-source breakdown across flagged variants' failing "
-        f"runs (comparator `divergence_points` event-type tallies): "
+        f"runs (comparator `divergence_points` event-type tallies, pooled "
+        f"across all flagged variants' runs): "
         f"{json.dumps(c5b['divergence_source_breakdown'])}",
+        "",
+        "That pooled tally includes `exception` divergences (20/90), which "
+        "are NOT branch-structure differences -- they mean a flagged "
+        "variant crashed on one of C5b's 10 sampled inputs (seed=42), a "
+        "case the N=100 admission check in C3 may simply not have sampled. "
+        "The pooled number alone cannot say whether the 5 flagged variants "
+        "are uniformly \"style-punished\" or whether some are admission-N "
+        "gaps. Per-variant breakdown:",
+        "",
+        "| variant | uid | variant combined | base combined | has exception? |",
+        "|---|---|---|---|---|",
+    ]
+    flagged_variants = sorted(
+        (pv for pv in c5b["per_variant"] if pv["flagged"]),
+        key=lambda pv: pv["uid"],
+    )
+    for pv in flagged_variants:
+        lines.append(
+            f"| {pv['variant_id']} | {pv['uid']} | {pv['combined_confidence']:.4f} | "
+            f"{pv['base_combined_confidence']:.4f} | {'yes' if pv['has_exception'] else 'no'} |"
+        )
+    n_clear_style = sum(
+        1 for pv in flagged_variants
+        if not pv["has_exception"] and pv["base_combined_confidence"] >= 2 * TAU
+    )
+    n_marginal = len(flagged_variants) - n_clear_style
+    lines += [
+        "",
+        f"Reading the split: bases sit at 0.1-0.8 combined confidence, not "
+        f"uniformly at a healthy score -- two of the five flagged variants "
+        f"(uids scoring 0.1 on their own base) sit on the Session-A "
+        f"threshold floor themselves, where base and variant are both weak "
+        f"and the flag is marginal rather than a clean style penalty. The "
+        f"honest read is **{n_clear_style}/{len(flagged_variants)} are "
+        f"clear implementation-freedom false alarms** (variant collapses "
+        f"well below a non-degenerate base, no exception involved) and "
+        f"**{n_marginal}/{len(flagged_variants)} are marginal / "
+        f"exception-driven** (either the base itself is already near the "
+        f"floor, or the divergence is a crash the N=100 admission check "
+        f"didn't happen to sample, not a pure branch-structure penalty). "
+        f"The headline (\"the certificate does not tolerate implementation "
+        f"freedom for this corpus\") still holds directionally, but "
+        f"\"branch-structure specifically\" is too strong a claim for the "
+        f"full set of 5 -- it applies cleanly to the clear-style subset "
+        f"only.",
         "",
         "Backlog (named, not implemented this session, per mandate): a "
         "cross-implementation comparison mode that aligns on task events "
