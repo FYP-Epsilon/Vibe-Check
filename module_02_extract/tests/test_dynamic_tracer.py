@@ -546,6 +546,95 @@ class TestDifferentialComparator:
         assert diff_result["similarity_score"] < 1.0
 
 
+class TestComparisonModeTaskOnly:
+    """D1: cross-implementation comparison mode -- branch_point events are
+    dropped entirely in task_only mode (style noise between independently
+    written but behaviorally equivalent programs), unlike strict mode where
+    they're signal (same-lineage comparison)."""
+
+    def test_normalise_drops_branch_point_in_task_only_mode(self):
+        trace = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "branch_point", "task": "foo", "taken_branch": True},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        strict_seq = DifferentialComparator._normalise(trace, use_taken=False, mode="strict")
+        task_only_seq = DifferentialComparator._normalise(trace, use_taken=False, mode="task_only")
+        assert strict_seq == [("task_entry", "foo"), ("branch_point",), ("task_exit", "foo")]
+        assert task_only_seq == [("task_entry", "foo"), ("task_exit", "foo")]
+
+    def test_default_mode_is_strict(self):
+        trace = [{"event": "branch_point", "task": "foo"}]
+        assert DifferentialComparator._normalise(trace) == [("branch_point",)]
+
+    def test_task_only_ignores_exception_and_task_events(self):
+        """Only branch_point is dropped -- task and exception events still
+        compare identically in both modes."""
+        trace = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "exception", "exception_type": "KeyError"},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        strict_seq = DifferentialComparator._normalise(trace, mode="strict")
+        task_only_seq = DifferentialComparator._normalise(trace, mode="task_only")
+        assert strict_seq == task_only_seq
+
+    def test_different_branch_structure_same_tasks_matches_in_task_only_not_strict(self):
+        """The core D1 claim: two traces that agree on every task/exception
+        event but differ in branch-point COUNT (extra guard on one side --
+        genuine implementation-style variation, not a task_entry/task_exit
+        mismatch) score 1.0 under task_only and < 1.0 under strict."""
+        actual = [
+            {"event": "task_entry", "function": "foo"},
+            {"event": "branch_point", "function": "foo", "taken_branch": True},
+            {"event": "branch_point", "function": "foo", "taken_branch": False},  # extra guard
+            {"event": "task_exit", "function": "foo"},
+        ]
+        expected = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "branch_point", "task": "foo", "taken_branch": True},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        strict_result = DifferentialComparator(actual, expected, mode="strict").compare()
+        task_only_result = DifferentialComparator(actual, expected, mode="task_only").compare()
+        assert strict_result["similarity_score"] < 1.0
+        assert task_only_result["similarity_score"] == 1.0
+        assert task_only_result["passed"] is True
+
+    def test_task_only_still_detects_task_sequence_divergence(self):
+        """task_only isn't a rubber stamp -- a real task_entry/task_exit
+        mismatch (different stub called) still diverges."""
+        actual = [
+            {"event": "task_entry", "function": "foo"},
+            {"event": "task_exit", "function": "foo"},
+        ]
+        expected = [
+            {"event": "task_entry", "task": "bar"},
+            {"event": "task_exit", "task": "bar"},
+        ]
+        result = DifferentialComparator(actual, expected, mode="task_only").compare()
+        assert result["similarity_score"] == 0.0
+        assert result["passed"] is False
+
+    def test_strict_mode_regression_unaffected_by_mode_param(self):
+        """Existing strict-mode behavior (default) is byte-identical to
+        pre-D1: this reproduces test_branch_decision_compared_when_present_on_both_sides
+        but via the explicit mode= kwarg to prove the new param doesn't
+        change strict-mode's decision-comparison path."""
+        actual = [
+            {"event": "task_entry", "function": "foo"},
+            {"event": "branch_point", "function": "foo", "taken_branch": True},
+            {"event": "task_exit", "function": "foo"},
+        ]
+        expected_diff = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "branch_point", "task": "foo", "taken_branch": False},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        result = DifferentialComparator(actual, expected_diff, mode="strict").compare()
+        assert result["similarity_score"] < 1.0
+
+
 # ----------------------------------------------------------------------
 # P3.4 -- RandomizedDifferentialTester
 # ----------------------------------------------------------------------
@@ -578,6 +667,49 @@ def classify(x, y):
         assert cert["version"] == "V1"
         assert 0 <= cert["confidence"] <= 1.0
         assert cert["total_runs"] == 10
+
+    def test_comparison_mode_threads_from_tester_to_comparator(self):
+        """D1 integration: comparison_mode actually reaches the
+        DifferentialComparator inside run() -- an actual source with a
+        genuine extra branch (implementation-style variation, same
+        task-observable behavior) matches perfectly in task_only mode and
+        imperfectly in strict mode."""
+        from ast_extractor import CFGExtractor
+        base_source = (
+            "def classify(x):\n"
+            "    if x > 0:\n"
+            "        return 'pos'\n"
+            "    return 'neg'\n"
+        )
+        actual_source = (
+            "def classify(x):\n"
+            "    if x > 0:\n"
+            "        if x > 1000000:\n"
+            "            return 'pos'\n"
+            "        return 'pos'\n"
+            "    return 'neg'\n"
+        )
+        base_func_wir = CFGExtractor().extract(base_source)["functions"]["classify"]
+
+        def _run(mode):
+            tester = RandomizedDifferentialTester(
+                source=actual_source,
+                function_name="classify",
+                wir=base_func_wir,
+                task_patterns=["classify"],
+                branch_lines={2, 3},
+                control_variables=["x"],
+                n_runs=20,
+                seed=1,
+                comparison_mode=mode,
+            )
+            return tester.run()
+
+        task_only_cert = _run("task_only")
+        strict_cert = _run("strict")
+
+        assert task_only_cert["matching_traces"] == task_only_cert["total_runs"]
+        assert strict_cert["matching_traces"] < strict_cert["total_runs"]
 
     def test_input_coverage_score(self):
         source = "def foo(x):\n    return x"
