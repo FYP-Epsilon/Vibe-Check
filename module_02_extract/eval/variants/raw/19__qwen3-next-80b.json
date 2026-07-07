@@ -1,0 +1,45 @@
+{
+  "uid": 19,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "a1827f201ef24089e579f1c565628dbcf746ec21e13b9b3daceeab45370f724e",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b486e03d2dc1b599",
+    "object": "chat.completion",
+    "created": 1783395922,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(topics_topicarn_0: str, topics_topicarn_1: str):\n    # Retrieve topic information using the provided helper function\n    topic_data = Amazon_SNS_Topic__3_0_0__retrievewithwhere_Topic(topics_topicarn_0, topics_topicarn_1)\n    \n    # Create a ServiceNow incident\n    servicenow_incident = ServiceNow_incident__4_0_0__create_incident()\n    \n    # Create a Zendesk ticket\n    zendesk_ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Send an email notification via Microsoft Exchange\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()\n    \n    # Return None as no specific return value is required by the task\n    return None",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 240,
+      "total_tokens": 417,
+      "completion_tokens": 177,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(topics_topicarn_0: str, topics_topicarn_1: str):\n    # Retrieve topic information using the provided helper function\n    topic_data = Amazon_SNS_Topic__3_0_0__retrievewithwhere_Topic(topics_topicarn_0, topics_topicarn_1)\n    \n    # Create a ServiceNow incident\n    servicenow_incident = ServiceNow_incident__4_0_0__create_incident()\n    \n    # Create a Zendesk ticket\n    zendesk_ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    \n    # Send an email notification via Microsoft Exchange\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()\n    \n    # Return None as no specific return value is required by the task\n    return None"
+}

@@ -1,0 +1,45 @@
+{
+  "uid": 39,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "3f36087f60b862bc80be57e2ae9d748aea3dbd1ca2ceb3833edd45f980ba50c1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9004abf96b8ed3bc",
+    "object": "chat.completion",
+    "created": 1783396774,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve calendars\n    calendars = Microsoft_Exchange_Calendars__2_0_0__retrievewithwhere_Calendars()\n\n    # Choose the first calendar\n    calendar = calendars['value'][0]\n\n    # Schedule a new meeting on the chosen calendar\n    Microsoft_Exchange_Events__2_0_0__create_Events(\n        subject=\"New Meeting\",\n        start=datetime.now(),\n        end=datetime.now() + timedelta(hours=1),\n        location=\"Online\",\n        attendees=[\"john.doe@example.com\"],\n        calendar_id=calendar['id']\n    )",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 190,
+      "total_tokens": 354,
+      "completion_tokens": 164,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve calendars\n    calendars = Microsoft_Exchange_Calendars__2_0_0__retrievewithwhere_Calendars()\n\n    # Choose the first calendar\n    calendar = calendars['value'][0]\n\n    # Schedule a new meeting on the chosen calendar\n    Microsoft_Exchange_Events__2_0_0__create_Events(\n        subject=\"New Meeting\",\n        start=datetime.now(),\n        end=datetime.now() + timedelta(hours=1),\n        location=\"Online\",\n        attendees=[\"john.doe@example.com\"],\n        calendar_id=calendar['id']\n    )"
+}

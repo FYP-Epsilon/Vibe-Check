@@ -1,0 +1,51 @@
+{
+  "uid": 39,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "3f36087f60b862bc80be57e2ae9d748aea3dbd1ca2ceb3833edd45f980ba50c1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-4e9b4be9-11a1-4c32-9fed-da6e9aae974d",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Retrieve the user's calendar\n    calendars = Microsoft_Exchange_Calendars__2_0_0__retrievewithwhere_Calendars()\n    \n    # Get the first calendar found\n    calendar = calendars[0]\n    \n    # Create a new meeting event\n    event = Microsoft_Exchange_Events__2_0_0__create_Events()\n    \n    # Set the event's subject, start, and end times\n    event.Subject = \"New Meeting\"\n    event.Start = \"2024-01-01T10:00:00\"\n    event.End = \"2024-01-01T11:00:00\"\n    \n    # Add the new event to the calendar\n    calendar.Events.append(event)\n    \n    # Save the updated calendar\n    Microsoft_Exchange_Calendars__2_0_0__update_Calendars(calendar)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396772,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 192,
+      "completion_tokens": 185,
+      "total_tokens": 377,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396772553,
+        "prefill_wait_time_ms": 0.736244,
+        "prefill_time_ms": 24.804230999999998,
+        "ttft_ms": 25.540475,
+        "total_time_ms": 1230.4115419999998,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the user's calendar\n    calendars = Microsoft_Exchange_Calendars__2_0_0__retrievewithwhere_Calendars()\n    \n    # Get the first calendar found\n    calendar = calendars[0]\n    \n    # Create a new meeting event\n    event = Microsoft_Exchange_Events__2_0_0__create_Events()\n    \n    # Set the event's subject, start, and end times\n    event.Subject = \"New Meeting\"\n    event.Start = \"2024-01-01T10:00:00\"\n    event.End = \"2024-01-01T11:00:00\"\n    \n    # Add the new event to the calendar\n    calendar.Events.append(event)\n    \n    # Save the updated calendar\n    Microsoft_Exchange_Calendars__2_0_0__update_Calendars(calendar)"
+}

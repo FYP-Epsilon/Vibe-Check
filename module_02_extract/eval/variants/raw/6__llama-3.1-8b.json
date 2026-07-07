@@ -1,0 +1,51 @@
+{
+  "uid": 6,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "892348d25aeeda5d0245ec2f6ae6cd213cf2754b6c050f2c2ff8530cedfb242a",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b349663c-86ef-4d69-b74c-352f74968815",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    Box_Folder__3_0_0__create_Folder()\n    Slack_message__3_0_0__create_message()\n    user_task(label='Team Status')",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395550,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 196,
+      "completion_tokens": 40,
+      "total_tokens": 236,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395550337,
+        "prefill_wait_time_ms": 0.723241,
+        "prefill_time_ms": 23.344303,
+        "ttft_ms": 24.067543999999998,
+        "total_time_ms": 277.302025,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    Box_Folder__3_0_0__create_Folder()\n    Slack_message__3_0_0__create_message()\n    user_task(label='Team Status')"
+}

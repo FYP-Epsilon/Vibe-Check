@@ -1,0 +1,45 @@
+{
+  "uid": 42,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "2d5c14fe464b845422abd36ecb0067cf3b8ef85839b1ef4420a130ae581465de",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a6fe319141ee0847",
+    "object": "chat.completion",
+    "created": 1783396856,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new calendar event using Microsoft Exchange\n    event = Microsoft_Exchange_Events__2_0_0__create_Events(\n        subject=\"New Event\",\n        start=\"2023-03-01T09:00:00\",\n        end=\"2023-03-01T10:00:00\",\n    )\n\n    # Get the event's ID\n    event_id = event[\"Id\"]\n\n    # Create a Calendly scheduling link for the event\n    scheduling_link = Calendly_schedulingLink__1_0_0__create_schedulingLink(\n        event_ids=[event_id],\n        event_type=\"one-on-one\",\n        duration=\"01:00\",\n    )\n\n    # Return the scheduling link for the new calendar event\n    return scheduling_link[\"url\"]",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 189,
+      "total_tokens": 407,
+      "completion_tokens": 218,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new calendar event using Microsoft Exchange\n    event = Microsoft_Exchange_Events__2_0_0__create_Events(\n        subject=\"New Event\",\n        start=\"2023-03-01T09:00:00\",\n        end=\"2023-03-01T10:00:00\",\n    )\n\n    # Get the event's ID\n    event_id = event[\"Id\"]\n\n    # Create a Calendly scheduling link for the event\n    scheduling_link = Calendly_schedulingLink__1_0_0__create_schedulingLink(\n        event_ids=[event_id],\n        event_type=\"one-on-one\",\n        duration=\"01:00\",\n    )\n\n    # Return the scheduling link for the new calendar event\n    return scheduling_link[\"url\"]"
+}

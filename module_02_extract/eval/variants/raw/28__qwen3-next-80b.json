@@ -1,0 +1,45 @@
+{
+  "uid": 28,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "6d15b19006b10be967fabc715fac37bb7f9babf3fedf243951b90223aeda5209",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-87cf8ede7bdd64ca",
+    "object": "chat.completion",
+    "created": 1783396230,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(leads_rating_0: str, leads_rating_1: str):\n    leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead(leads_rating_0, leads_rating_1)\n    for lead in leads:\n        if lead.get('rating') == 'hot':\n            Jira_Issue__2_0_0__create_Issue()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 206,
+      "total_tokens": 288,
+      "completion_tokens": 82,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(leads_rating_0: str, leads_rating_1: str):\n    leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead(leads_rating_0, leads_rating_1)\n    for lead in leads:\n        if lead.get('rating') == 'hot':\n            Jira_Issue__2_0_0__create_Issue()"
+}

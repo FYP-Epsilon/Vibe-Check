@@ -1,0 +1,51 @@
+{
+  "uid": 87,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "8b8c3377fc5e2cddf87d7259f6e8b00722d43f0f05fe4289ed21a53a5f2631ce",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-e7f0d6ce-81c1-4d42-98b4-5e3568a227b8",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(devices_isCompliant_0: bool, devices_isCompliant_1: bool):\n    # First, retrieve devices based on the compliance status\n    devices = Microsoft_Entra_ID_Devices__4_0_0__retrievewithwhere_Devices(devices_isCompliant_0=devices_isCompliant_0, devices_isCompliant_1=devices_isCompliant_1)\n    \n    # Then, send an email to the users of the compliant devices\n    for device in devices:\n        if device.is_compliant:\n            Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()  # Send an email to the device's user",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442583,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 236,
+      "completion_tokens": 147,
+      "total_tokens": 383,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442583698,
+        "prefill_wait_time_ms": 0.7769199999999999,
+        "prefill_time_ms": 26.097068,
+        "ttft_ms": 26.873988,
+        "total_time_ms": 1203.066916,
+        "kv_hit_rate": 0.06666666666666667,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(devices_isCompliant_0: bool, devices_isCompliant_1: bool):\n    # First, retrieve devices based on the compliance status\n    devices = Microsoft_Entra_ID_Devices__4_0_0__retrievewithwhere_Devices(devices_isCompliant_0=devices_isCompliant_0, devices_isCompliant_1=devices_isCompliant_1)\n    \n    # Then, send an email to the users of the compliant devices\n    for device in devices:\n        if device.is_compliant:\n            Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()  # Send an email to the device's user"
+}

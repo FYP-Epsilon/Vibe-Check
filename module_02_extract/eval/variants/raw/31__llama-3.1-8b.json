@@ -1,0 +1,51 @@
+{
+  "uid": 31,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "de478d6e493d85b0f65db737415c6979c904c87a042bf12f9aeb090d00e314ff",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-db94cca7-2453-4475-8707-8fd5b43ef9e5",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create a new GitHub repository\n    repo = GitHub_Repository__3_0_0__create_Repository()\n    \n    # Get approval from the supervisor\n    approval = user_task(label='Repository Approval')\n    \n    # If the supervisor does not approve, send a Slack message\n    if not approval:\n        Slack_message__3_0_0__create_message()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396481,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 202,
+      "completion_tokens": 81,
+      "total_tokens": 283,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396481387,
+        "prefill_wait_time_ms": 0.788443,
+        "prefill_time_ms": 18.721504,
+        "ttft_ms": 19.509947,
+        "total_time_ms": 372.313511,
+        "kv_hit_rate": 0.07692307692307693,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create a new GitHub repository\n    repo = GitHub_Repository__3_0_0__create_Repository()\n    \n    # Get approval from the supervisor\n    approval = user_task(label='Repository Approval')\n    \n    # If the supervisor does not approve, send a Slack message\n    if not approval:\n        Slack_message__3_0_0__create_message()"
+}

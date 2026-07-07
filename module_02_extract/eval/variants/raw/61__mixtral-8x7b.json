@@ -1,0 +1,45 @@
+{
+  "uid": 61,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "82e2c85e40f2848c0a5d0f12b898b53a2ee7fcce50e4f338b51f45a7977cb1a1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b5ac4ef030bfae7b",
+    "object": "chat.completion",
+    "created": 1783440394,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new workspace\n    workspace = Microsoft_Power_BI_Workspace__2_0_0__create_Workspace(\"New Dashboard\")\n\n    # Retrieve all dataflows\n    dataflows = Microsoft_Power_BI_Dataflow__2_0_0__retrievewithwhere_Dataflow(None, None, None, None, None, None, None)\n\n    # Iterate through each dataflow and add it to the new workspace\n    for dataflow in dataflows[\"value\"]:\n        Microsoft_Power_BI_Dataflow__2_0_0__addtoworkspace(dataflow[\"id\"], workspace[\"id\"])\n\n    # Retrieve all datasets\n    datasets = Microsoft_Power_BI_Dataset__2_0_0__retrievewithwhere_Dataset(None, None, None, None, None)\n\n    # Iterate through each dataset and add it to the new workspace\n    for dataset in datasets[\"value\"]:\n        Microsoft_Power_BI_Dataset__2_0_0__addtoworkspace(dataset[\"id\"], workspace[\"id\"])\n\n    # Retrieve all goals\n    goals = Microsoft_Power_BI_Goal__2_0_0__retrievewithwhere_Goal(None, None, None, None)\n\n    # Iterate through each goal and add it to the new workspace\n    for goal in goals[\"value\"]:\n        Microsoft_Power_BI_Goal__2_0_0__addtoworkspace(goal[\"id\"], workspace[\"id\"])\n\n    return \"New dashboard created with all dataflows, datasets, and goals.\"",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 259,
+      "total_tokens": 632,
+      "completion_tokens": 373,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new workspace\n    workspace = Microsoft_Power_BI_Workspace__2_0_0__create_Workspace(\"New Dashboard\")\n\n    # Retrieve all dataflows\n    dataflows = Microsoft_Power_BI_Dataflow__2_0_0__retrievewithwhere_Dataflow(None, None, None, None, None, None, None)\n\n    # Iterate through each dataflow and add it to the new workspace\n    for dataflow in dataflows[\"value\"]:\n        Microsoft_Power_BI_Dataflow__2_0_0__addtoworkspace(dataflow[\"id\"], workspace[\"id\"])\n\n    # Retrieve all datasets\n    datasets = Microsoft_Power_BI_Dataset__2_0_0__retrievewithwhere_Dataset(None, None, None, None, None)\n\n    # Iterate through each dataset and add it to the new workspace\n    for dataset in datasets[\"value\"]:\n        Microsoft_Power_BI_Dataset__2_0_0__addtoworkspace(dataset[\"id\"], workspace[\"id\"])\n\n    # Retrieve all goals\n    goals = Microsoft_Power_BI_Goal__2_0_0__retrievewithwhere_Goal(None, None, None, None)\n\n    # Iterate through each goal and add it to the new workspace\n    for goal in goals[\"value\"]:\n        Microsoft_Power_BI_Goal__2_0_0__addtoworkspace(goal[\"id\"], workspace[\"id\"])\n\n    return \"New dashboard created with all dataflows, datasets, and goals.\""
+}

@@ -1,0 +1,51 @@
+{
+  "uid": 9,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "dfc155be9d944ddff79c224212a8e266b1caa2f4d33fccf3f80fb6eb4c6fd6f1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-c96cb344-87ef-4b3f-9145-e4357978ac12",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(comments_author_0: str, comments_author_1: str):\n    repositories = GitHub_Repository__3_0_0__retrievewithwhere_Repository()\n    for repository in repositories:\n        issues = GitHub_Issue__3_0_0__retrievewithwhere_Issue(repository)\n        for issue in issues:\n            comments = GitHub_Comment__3_0_0__retrievewithwhere_Comment(issue)\n            for comment in comments:\n                if comment in [comments_author_0, comments_author_1]:\n                    Slack_message__3_0_0__create_message()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395601,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 291,
+      "completion_tokens": 129,
+      "total_tokens": 420,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395601321,
+        "prefill_wait_time_ms": 1.0928680000000002,
+        "prefill_time_ms": 33.367267999999996,
+        "ttft_ms": 34.460136000000006,
+        "total_time_ms": 1098.8370439999999,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(comments_author_0: str, comments_author_1: str):\n    repositories = GitHub_Repository__3_0_0__retrievewithwhere_Repository()\n    for repository in repositories:\n        issues = GitHub_Issue__3_0_0__retrievewithwhere_Issue(repository)\n        for issue in issues:\n            comments = GitHub_Comment__3_0_0__retrievewithwhere_Comment(issue)\n            for comment in comments:\n                if comment in [comments_author_0, comments_author_1]:\n                    Slack_message__3_0_0__create_message()"
+}

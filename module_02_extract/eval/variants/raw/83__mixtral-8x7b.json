@@ -1,0 +1,45 @@
+{
+  "uid": 83,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "5e64fbb21dd6df13dafeb26eb6de7df6ad3daab7aec185c9ae37b7adae05bb23",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-98bf0424775d235b",
+    "object": "chat.completion",
+    "created": 1783442508,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new SharePoint file\n    sharepoint\\_file = Microsoft\\_SharePoint\\_File\\_\\_204\\_0\\_0\\_\\_create\\_File()\n\n    # Get Twilio services\n    services = Twilio\\_getServices\\_model\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_getServices\\_model()\n\n    # Filter Twilio services by friendly name\n    twilio\\_service = next((s for s in services if s['friendlyName'] == 'My Twilio Service'), None)\n\n    if not twilio\\_service:\n        print('Could not find Twilio service with friendly name \"My Twilio Service\"')\n        return\n\n    # Get Twilio incoming phone numbers\n    incoming\\_phone\\_numbers = Twilio\\_getIncomingPhoneNumbersjson\\_model\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_getIncomingPhoneNumbersjson\\_model(twilio\\_service['sid'])\n\n    # Filter Twilio incoming phone numbers by phone number\n    incoming\\_phone\\_number = next((pn for pn in incoming\\_phone\\_numbers if pn['phoneNumber'] == '+1234567890'), None)\n\n    if not incoming\\_phone\\_number:\n        print('Could not find Twilio incoming phone number with phone number +1234567890')\n        return\n\n    # Update the SharePoint file with the Twilio incoming phone number\n    sharepoint\\_file['properties']['TwilioIncomingPhoneNumber'] = incoming\\_phone\\_number\n\n    # Update the SharePoint file\n    updated\\_sharepoint\\_file = Microsoft\\_SharePoint\\_File\\_\\_204\\_0\\_0\\_\\_create\\_File(sharepoint\\_file)\n\n    print('Updated SharePoint file with Twilio incoming phone number:', updated\\_sharepoint\\_file['properties']['TwilioIncomingPhoneNumber']['phoneNumber'])",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 230,
+      "total_tokens": 669,
+      "completion_tokens": 439,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new SharePoint file\n    sharepoint\\_file = Microsoft\\_SharePoint\\_File\\_\\_204\\_0\\_0\\_\\_create\\_File()\n\n    # Get Twilio services\n    services = Twilio\\_getServices\\_model\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_getServices\\_model()\n\n    # Filter Twilio services by friendly name\n    twilio\\_service = next((s for s in services if s['friendlyName'] == 'My Twilio Service'), None)\n\n    if not twilio\\_service:\n        print('Could not find Twilio service with friendly name \"My Twilio Service\"')\n        return\n\n    # Get Twilio incoming phone numbers\n    incoming\\_phone\\_numbers = Twilio\\_getIncomingPhoneNumbersjson\\_model\\_\\_2\\_0\\_0\\_\\_retrievewithwhere\\_getIncomingPhoneNumbersjson\\_model(twilio\\_service['sid'])\n\n    # Filter Twilio incoming phone numbers by phone number\n    incoming\\_phone\\_number = next((pn for pn in incoming\\_phone\\_numbers if pn['phoneNumber'] == '+1234567890'), None)\n\n    if not incoming\\_phone\\_number:\n        print('Could not find Twilio incoming phone number with phone number +1234567890')\n        return\n\n    # Update the SharePoint file with the Twilio incoming phone number\n    sharepoint\\_file['properties']['TwilioIncomingPhoneNumber'] = incoming\\_phone\\_number\n\n    # Update the SharePoint file\n    updated\\_sharepoint\\_file = Microsoft\\_SharePoint\\_File\\_\\_204\\_0\\_0\\_\\_create\\_File(sharepoint\\_file)\n\n    print('Updated SharePoint file with Twilio incoming phone number:', updated\\_sharepoint\\_file['properties']['TwilioIncomingPhoneNumber']['phoneNumber'])"
+}

@@ -1,0 +1,51 @@
+{
+  "uid": 78,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "f7bfc1cb81f9efe36b0b7d67df96e1c94a076d1233f208d121aa2102a4e3195e",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-e7f0edde-f8e4-4830-8309-1fbf2392129d",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    Dropbox_files__3_0_0__create_files()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442005,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 161,
+      "completion_tokens": 17,
+      "total_tokens": 178,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442005097,
+        "prefill_wait_time_ms": 0.5392720000000001,
+        "prefill_time_ms": 21.109779,
+        "ttft_ms": 21.649051,
+        "total_time_ms": 140.753746,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    Dropbox_files__3_0_0__create_files()"
+}

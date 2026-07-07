@@ -1,0 +1,51 @@
+{
+  "uid": 53,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "66373b1da8fe76351c3962f8ba39beb13567a55fa8b4d262f6206abdf2b13b8c",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8f2a0e14-4f96-42a9-a8b6-e9d2c4b94082",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(folder_items_itemType_0: str, folder_items_itemType_1: str):\n    if folder_items_itemType_0 == \"confidential\":\n        print(\"File type is confidential, skipping copy\")\n    else:\n        Box_File__3_0_0__COPYFILE_File()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783438878,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 272,
+      "completion_tokens": 62,
+      "total_tokens": 334,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783438878711,
+        "prefill_wait_time_ms": 0.799974,
+        "prefill_time_ms": 25.347189999999998,
+        "ttft_ms": 26.147164,
+        "total_time_ms": 375.705898,
+        "kv_hit_rate": 0.058823529411764705,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(folder_items_itemType_0: str, folder_items_itemType_1: str):\n    if folder_items_itemType_0 == \"confidential\":\n        print(\"File type is confidential, skipping copy\")\n    else:\n        Box_File__3_0_0__COPYFILE_File()"
+}

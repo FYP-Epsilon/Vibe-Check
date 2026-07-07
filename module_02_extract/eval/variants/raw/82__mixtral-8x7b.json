@@ -1,0 +1,45 @@
+{
+  "uid": 82,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "1562ed0cef82cea8af410224414017719ce16cb96f458d703c5ad39189ecee8b",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-823964e02c66a5d9",
+    "object": "chat.completion",
+    "created": 1783442491,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new Trello board\n    board = Trello\\_Board\\_\\_2\\_0\\_0\\_\\_create\\_Board()\n\n    # Create a new Trello member\n    member = Trello\\_Member\\_\\_2\\_0\\_0\\_\\_create\\_Member()\n\n    # Add the new Trello member to the board\n    Trello\\_Board\\_\\_2\\_0\\_0\\_\\_updatewithwhere\\_Board(board['id'], {'idMembers': [member['id']]})\n\n    # Create a new Trello card\n    card = Trello\\_Card\\_\\_2\\_0\\_0\\_\\_create\\_Card(name=\"Send email using Outlook\", idBoard=board['id'])\n\n    # Send an email using Outlook\n    Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n        subject=\"Trello card created\",\n        body=\"A new Trello card has been created. Please check it out.\",\n        toRecipients=[member['email']],\n        isHTML=False\n    )\n\n    # Update the Trello card with the email details\n    Trello\\_Card\\_\\_2\\_0\\_0\\_\\_update\\_Card(card['id'], {'name': \"Sent email using Outlook\"})",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 250,
+      "total_tokens": 565,
+      "completion_tokens": 315,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Trello board\n    board = Trello\\_Board\\_\\_2\\_0\\_0\\_\\_create\\_Board()\n\n    # Create a new Trello member\n    member = Trello\\_Member\\_\\_2\\_0\\_0\\_\\_create\\_Member()\n\n    # Add the new Trello member to the board\n    Trello\\_Board\\_\\_2\\_0\\_0\\_\\_updatewithwhere\\_Board(board['id'], {'idMembers': [member['id']]})\n\n    # Create a new Trello card\n    card = Trello\\_Card\\_\\_2\\_0\\_0\\_\\_create\\_Card(name=\"Send email using Outlook\", idBoard=board['id'])\n\n    # Send an email using Outlook\n    Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n        subject=\"Trello card created\",\n        body=\"A new Trello card has been created. Please check it out.\",\n        toRecipients=[member['email']],\n        isHTML=False\n    )\n\n    # Update the Trello card with the email details\n    Trello\\_Card\\_\\_2\\_0\\_0\\_\\_update\\_Card(card['id'], {'name': \"Sent email using Outlook\"})"
+}

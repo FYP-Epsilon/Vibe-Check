@@ -1,0 +1,45 @@
+{
+  "uid": 18,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "054b50d9eab9e85d238ff90aea5bec1082ae669abbfb65ff3445bbb483561da3",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8ec0c65a3676dd54",
+    "object": "chat.completion",
+    "created": 1783395845,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(topics_topicarn_0: str, topics_topicarn_1: str):\n    # Retrieve the topic information using the provided helper function\n    sns\\_topic\\_info = Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Topic(topics\\_topicarn\\_0, topics\\_topicarn\\_1)\n\n    # Extract the relevant information from the SNS topic\n    subject = sns\\_topic\\_info['topics\\_subject']\n    description = sns\\_topic\\_info['topics\\_description']\n\n    # Create a new Zendesk service ticket using the provided helper function\n    zendesk\\_ticket = Zendesk\\_Service\\_Ticket\\_\\_2\\_0\\_0\\_\\_create\\_Ticket(\n        subject=subject,\n        description=description,\n        priority='normal',\n        source='API',\n        tags=['sns']\n    )\n\n    # Send an email notification using the provided helper function\n    Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n        recipient\\_emails=['support@example.com'],\n        subject=f\"New Zendesk Ticket from SNS: {subject}\",\n        body=f\"A new Zendesk ticket has been created from an SNS topic.\\n\\nSubject: {subject}\\nDescription: {description}\"\n    )\n\n    # Return the created Zendesk ticket\n    return zendesk\\_ticket",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 260,
+      "total_tokens": 607,
+      "completion_tokens": 347,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(topics_topicarn_0: str, topics_topicarn_1: str):\n    # Retrieve the topic information using the provided helper function\n    sns\\_topic\\_info = Amazon\\_SNS\\_Topic\\_\\_3\\_0\\_0\\_\\_retrievewithwhere\\_Topic(topics\\_topicarn\\_0, topics\\_topicarn\\_1)\n\n    # Extract the relevant information from the SNS topic\n    subject = sns\\_topic\\_info['topics\\_subject']\n    description = sns\\_topic\\_info['topics\\_description']\n\n    # Create a new Zendesk service ticket using the provided helper function\n    zendesk\\_ticket = Zendesk\\_Service\\_Ticket\\_\\_2\\_0\\_0\\_\\_create\\_Ticket(\n        subject=subject,\n        description=description,\n        priority='normal',\n        source='API',\n        tags=['sns']\n    )\n\n    # Send an email notification using the provided helper function\n    Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n        recipient\\_emails=['support@example.com'],\n        subject=f\"New Zendesk Ticket from SNS: {subject}\",\n        body=f\"A new Zendesk ticket has been created from an SNS topic.\\n\\nSubject: {subject}\\nDescription: {description}\"\n    )\n\n    # Return the created Zendesk ticket\n    return zendesk\\_ticket"
+}

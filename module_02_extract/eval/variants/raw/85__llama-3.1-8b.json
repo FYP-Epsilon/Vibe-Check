@@ -1,0 +1,51 @@
+{
+  "uid": 85,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "33c65080cac6e437d9534df2f0fb2f32d4a0bf872c70c267a37d33d5787ea579",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-c0bfb840-0e1b-4b93-94dc-f1aaac4717e6",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create Trello board\n    Trello_Board__2_0_0__create_Board()\n\n    # Retrieve GitHub issues with where clause\n    issues = GitHub_Issue__3_0_0__retrievewithwhere_Issue()\n\n    # Create Jira issues\n    for issue in issues:\n        Jira_Issue__2_0_0__create_Issue(issue)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442544,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 203,
+      "completion_tokens": 87,
+      "total_tokens": 290,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442544762,
+        "prefill_wait_time_ms": 0.716638,
+        "prefill_time_ms": 32.362018,
+        "ttft_ms": 33.078655999999995,
+        "total_time_ms": 875.997539,
+        "kv_hit_rate": 0.07692307692307693,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create Trello board\n    Trello_Board__2_0_0__create_Board()\n\n    # Retrieve GitHub issues with where clause\n    issues = GitHub_Issue__3_0_0__retrievewithwhere_Issue()\n\n    # Create Jira issues\n    for issue in issues:\n        Jira_Issue__2_0_0__create_Issue(issue)"
+}

@@ -1,0 +1,51 @@
+{
+  "uid": 8,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "982f3907135579824d58135d0d078385928d6d94a9a773cf90794b1a863dcf0f",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a7d2aad4-37e8-46f2-aa7d-3c27d43dcc44",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create two new marketo leads\n    leads = Marketo_leads__3_0_0__create_leads()\n    \n    # Send a slack message\n    Slack_message__3_0_0__create_message(leads)\n    \n    # Connect with stakeholders\n    user_task(label=\"Stakeholder Connect\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395585,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 196,
+      "completion_tokens": 71,
+      "total_tokens": 267,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395585241,
+        "prefill_wait_time_ms": 0.778451,
+        "prefill_time_ms": 16.543619,
+        "ttft_ms": 17.32207,
+        "total_time_ms": 321.371969,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create two new marketo leads\n    leads = Marketo_leads__3_0_0__create_leads()\n    \n    # Send a slack message\n    Slack_message__3_0_0__create_message(leads)\n    \n    # Connect with stakeholders\n    user_task(label=\"Stakeholder Connect\")"
+}

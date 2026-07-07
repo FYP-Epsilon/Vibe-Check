@@ -1,0 +1,45 @@
+{
+  "uid": 16,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "b3cc4f6e087037a2a1ff2312adc4c228374e697b3dce279c20a756dbba3b9fe6",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-851506508ff52b41",
+    "object": "chat.completion",
+    "created": 1783395798,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(teams_name_0: str, teams_name_1: str):\n    org_data = Trello_Organization__2_0_0__retrievewithwhere_Organization(teams_name_0, teams_name_1)\n    Marketo_leads__3_0_0__create_leads()\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 210,
+      "total_tokens": 296,
+      "completion_tokens": 86,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(teams_name_0: str, teams_name_1: str):\n    org_data = Trello_Organization__2_0_0__retrievewithwhere_Organization(teams_name_0, teams_name_1)\n    Marketo_leads__3_0_0__create_leads()\n    Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()"
+}

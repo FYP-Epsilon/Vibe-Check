@@ -1,0 +1,16 @@
+def GitHub_Comment__3_0_0__create_Comment():
+    return {}
+
+
+def Jira_Issue__2_0_0__retrievewithwhere_Issue():
+    return {}
+
+
+def Jira_Status__2_0_0__retrievewithwhere_Status():
+    return {}
+
+
+def workflow():
+    GitHub_Comment__3_0_0__create_Comment()
+    Jira_Issue__2_0_0__retrievewithwhere_Issue()
+    Jira_Status__2_0_0__retrievewithwhere_Status()

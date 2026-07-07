@@ -1,0 +1,51 @@
+{
+  "uid": 4,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "debf9664d91f02aef0c4e19c64244f4ffae409a7c1c6533fef293e4cad1044c9",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9c7b370f-904a-4881-a3ac-b27c99524f28",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(issues_priority_0: str, issues_priority_1: str):\n    issues = Jira_Issue__2_0_0__retrievewithwhere_Issue(issues_priority_0, issues_priority_1)\n    for issue in issues:\n        if issue.priority == 'urgent':\n            Asana_Tasks__2_0_0__create_Tasks()\n            recipients = [user.email for user in issue.assignees]\n            mail = Gmail_mail__2_0_0__create_mail(issue.subject, issue.description, recipients)\n            mail.send()\n        elif issue.priority == 'low':\n            message = Slack_message__3_0_0__create_message(issue.subject, issue.description)\n            message.send_to(channel='general')",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395432,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 285,
+      "completion_tokens": 155,
+      "total_tokens": 440,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395432906,
+        "prefill_wait_time_ms": 0.962399,
+        "prefill_time_ms": 16.884537,
+        "ttft_ms": 17.846936,
+        "total_time_ms": 744.68697,
+        "kv_hit_rate": 0.05555555555555555,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(issues_priority_0: str, issues_priority_1: str):\n    issues = Jira_Issue__2_0_0__retrievewithwhere_Issue(issues_priority_0, issues_priority_1)\n    for issue in issues:\n        if issue.priority == 'urgent':\n            Asana_Tasks__2_0_0__create_Tasks()\n            recipients = [user.email for user in issue.assignees]\n            mail = Gmail_mail__2_0_0__create_mail(issue.subject, issue.description, recipients)\n            mail.send()\n        elif issue.priority == 'low':\n            message = Slack_message__3_0_0__create_message(issue.subject, issue.description)\n            message.send_to(channel='general')"
+}

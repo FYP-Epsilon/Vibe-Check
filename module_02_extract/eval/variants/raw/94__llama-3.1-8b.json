@@ -1,0 +1,51 @@
+{
+  "uid": 94,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "275b22f953c6ea0b1e38683567559c223570291cd38b301167a2d8b1424444d5",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b4fc28d1-dcff-4a54-8c61-4551cae6360e",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(folders_item_status_0: str, folders_item_status_1: str):\n    if folders_item_status_0 == \"empty\" or folders_item_status_1 == \"empty\":\n        Box_Folder__3_0_0__retrievewithwhere_Folder(folders_item_status_0=folders_item_status_0, folders_item_status_1=folders_item_status_1)\n        return []\n    else:\n        # Rest of the workflow logic here\n        # For this example, we'll just call another helper function\n        Box_Folder__3_0_0__updatewithwhere_Folder()\n        # Rest of the workflow logic here\n        return []",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442651,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 245,
+      "completion_tokens": 142,
+      "total_tokens": 387,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442651463,
+        "prefill_wait_time_ms": 0.751436,
+        "prefill_time_ms": 25.909793,
+        "ttft_ms": 26.661229000000002,
+        "total_time_ms": 1586.2227249999999,
+        "kv_hit_rate": 0.0625,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(folders_item_status_0: str, folders_item_status_1: str):\n    if folders_item_status_0 == \"empty\" or folders_item_status_1 == \"empty\":\n        Box_Folder__3_0_0__retrievewithwhere_Folder(folders_item_status_0=folders_item_status_0, folders_item_status_1=folders_item_status_1)\n        return []\n    else:\n        # Rest of the workflow logic here\n        # For this example, we'll just call another helper function\n        Box_Folder__3_0_0__updatewithwhere_Folder()\n        # Rest of the workflow logic here\n        return []"
+}

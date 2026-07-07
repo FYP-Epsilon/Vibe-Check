@@ -1,0 +1,45 @@
+{
+  "uid": 79,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "bb17d466971ec86986d7f5b9cb933392f2e74462ba4c8792a0608a830e191230",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-892ad826a00d6dcc",
+    "object": "chat.completion",
+    "created": 1783442096,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    case\\_history = Salesforce\\_CaseHistory\\_\\_7\\_0\\_0\\_\\_retrievewithwhere\\_CaseHistory()\n\n    for history\\_item in case\\_history:\n        case\\_id = history\\_item['CaseId']\n        comment\\_body = f'Case {case\\_id} was updated {history_item[\"Changes\"]} times.'\n        Salesforce\\_CaseComment\\_\\_7\\_0\\_0\\_\\_create\\_CaseComment(case\\_id=case\\_id, comment\\_body=comment\\_body)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 183,
+      "total_tokens": 308,
+      "completion_tokens": 125,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    case\\_history = Salesforce\\_CaseHistory\\_\\_7\\_0\\_0\\_\\_retrievewithwhere\\_CaseHistory()\n\n    for history\\_item in case\\_history:\n        case\\_id = history\\_item['CaseId']\n        comment\\_body = f'Case {case\\_id} was updated {history_item[\"Changes\"]} times.'\n        Salesforce\\_CaseComment\\_\\_7\\_0\\_0\\_\\_create\\_CaseComment(case\\_id=case\\_id, comment\\_body=comment\\_body)"
+}

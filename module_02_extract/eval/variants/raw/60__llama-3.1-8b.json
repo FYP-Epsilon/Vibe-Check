@@ -1,0 +1,51 @@
+{
+  "uid": 60,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "00993eaa5d6308fd9f9dfeb2b0b064684fb04556397af6a34aa945b5ead92102",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-756f3b17-757d-42a1-9c2d-4057247202d4",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    department_id = input(\"Enter the department ID: \")\n    bucket_name = f\"department-{department_id}-model-checkpoint\"\n    acl = IBM_Cloud_Object_Storage_S3_bucketAcl__4_0_0__CREATE_STANDARD_ACL_FOR_BUCKET_bucketAcl()\n    IBM_Cloud_Object_Storage_S3_bucket__4_0_0__create_bucket(bucket_name, acl)\n    checkpoint_name = input(\"Enter the checkpoint name: \")\n    IBM_Cloud_Object_Storage_S3_object__4_0_0__create_object(bucket_name, checkpoint_name, \"model-checkpoint.zip\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783440296,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 232,
+      "completion_tokens": 128,
+      "total_tokens": 360,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783440296023,
+        "prefill_wait_time_ms": 0.895153,
+        "prefill_time_ms": 19.975577,
+        "ttft_ms": 20.870730000000002,
+        "total_time_ms": 869.092125,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    department_id = input(\"Enter the department ID: \")\n    bucket_name = f\"department-{department_id}-model-checkpoint\"\n    acl = IBM_Cloud_Object_Storage_S3_bucketAcl__4_0_0__CREATE_STANDARD_ACL_FOR_BUCKET_bucketAcl()\n    IBM_Cloud_Object_Storage_S3_bucket__4_0_0__create_bucket(bucket_name, acl)\n    checkpoint_name = input(\"Enter the checkpoint name: \")\n    IBM_Cloud_Object_Storage_S3_object__4_0_0__create_object(bucket_name, checkpoint_name, \"model-checkpoint.zip\")"
+}

@@ -1,0 +1,45 @@
+{
+  "uid": 99,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "76bdb61c574974b3c2c3100440fb51da99e60c48116d73dea35dfb139c3fcfa6",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-bfac444d9bc25e29",
+    "object": "chat.completion",
+    "created": 1783442698,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(tasks_completed_0: str, tasks_completed_1: str):\n    Asana_Tasks__2_0_0__retrievewithwhere_Tasks(tasks_completed_0, tasks_completed_1)\n    Box_File__3_0_0__retrievewithwhere_File()\n    Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()\n    GitHub_Issue__3_0_0__retrievewithwhere_Issue()\n\n    # Replace all the create skills with retrieve skills\n    # Add your logic here to replace create skills with retrieve skills\n    ...\n\n    # For example, you can replace 'create' with 'retrieve' in the function names\n    # This is just an example, you will need to implement the actual logic\n    Asana_Tasks__2_0_0__retrieveskills(tasks_completed_0, tasks_completed_1)\n    Box_File__3_0_0__retrieveskills()\n    Amazon_S3_bucket__2_0_0__retrieveskills()\n    GitHub_Issue__3_0_0__retrieveskills()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 273,
+      "total_tokens": 550,
+      "completion_tokens": 277,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(tasks_completed_0: str, tasks_completed_1: str):\n    Asana_Tasks__2_0_0__retrievewithwhere_Tasks(tasks_completed_0, tasks_completed_1)\n    Box_File__3_0_0__retrievewithwhere_File()\n    Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()\n    GitHub_Issue__3_0_0__retrievewithwhere_Issue()\n\n    # Replace all the create skills with retrieve skills\n    # Add your logic here to replace create skills with retrieve skills\n    ...\n\n    # For example, you can replace 'create' with 'retrieve' in the function names\n    # This is just an example, you will need to implement the actual logic\n    Asana_Tasks__2_0_0__retrieveskills(tasks_completed_0, tasks_completed_1)\n    Box_File__3_0_0__retrieveskills()\n    Amazon_S3_bucket__2_0_0__retrieveskills()\n    GitHub_Issue__3_0_0__retrieveskills()"
+}

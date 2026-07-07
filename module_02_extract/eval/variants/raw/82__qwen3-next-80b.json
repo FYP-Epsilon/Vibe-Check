@@ -1,0 +1,8 @@
+{
+  "uid": 82,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "1562ed0cef82cea8af410224414017719ce16cb96f458d703c5ad39189ecee8b",
+  "temperature": 0.7,
+  "error": "[WinError 10054] An existing connection was forcibly closed by the remote host"
+}

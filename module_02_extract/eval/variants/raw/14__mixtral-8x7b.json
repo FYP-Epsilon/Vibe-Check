@@ -1,0 +1,45 @@
+{
+  "uid": 14,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "b77ed8893d5d89e7d44b878eb11029a3ff6cf9077b6215406d9258d6b8fa5f8d",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a14f69b0035933a5",
+    "object": "chat.completion",
+    "created": 1783395717,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(campaigns_type_0, campaigns_type_1):\n    # Check if the campaign type is Finance\n    if campaigns_type_0 == \"Finance\" or campaigns_type_1 == \"Finance\":\n        # Create a new board in Monday.com\n        monday_com_Board__2_0_0__create_Board()\n\n        # If either campaign type is Finance, retrieve the applicant from Microsoft Dynamics 365 for Finance and Operations\n        Microsoft_Dynamics_365_for_Finance_and_Operations_Applicant__2_0_0__retrievewithwhere_Applicant()\n\n        # Retrieve campaigns from Marketo if the campaign type is Finance\n        Marketo_campaigns__3_0_0__retrievewithwhere_campaigns(campaigns_type_0)\n        Marketo_campaigns__3_0_0__retrievewithwhere_campaigns(campaigns_type_1)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 279,
+      "total_tokens": 508,
+      "completion_tokens": 229,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(campaigns_type_0, campaigns_type_1):\n    # Check if the campaign type is Finance\n    if campaigns_type_0 == \"Finance\" or campaigns_type_1 == \"Finance\":\n        # Create a new board in Monday.com\n        monday_com_Board__2_0_0__create_Board()\n\n        # If either campaign type is Finance, retrieve the applicant from Microsoft Dynamics 365 for Finance and Operations\n        Microsoft_Dynamics_365_for_Finance_and_Operations_Applicant__2_0_0__retrievewithwhere_Applicant()\n\n        # Retrieve campaigns from Marketo if the campaign type is Finance\n        Marketo_campaigns__3_0_0__retrievewithwhere_campaigns(campaigns_type_0)\n        Marketo_campaigns__3_0_0__retrievewithwhere_campaigns(campaigns_type_1)"
+}

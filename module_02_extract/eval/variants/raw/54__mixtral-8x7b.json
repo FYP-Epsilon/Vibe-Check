@@ -1,0 +1,45 @@
+{
+  "uid": 54,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "0b6106053023fec37469eb46d23c19b6e385e230c789b4c06efc2dd013c07534",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b5976919b1f66e9c",
+    "object": "chat.completion",
+    "created": 1783439088,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    timesheet = bambooHR_timetracking__2_0_0__retrievewithwhere_timetracking()\n    total\\_hours = 0\n    for entry in timesheet:\n        if entry['date'] < '2022-01-01':\n            user\\_task(f\"WARNING: {entry['employee_name']} has entered time before the new year!\")\n        if entry['hours'] > 8:\n            user\\_task(f\"WARNING: {entry['employee_name']} has entered more than 8 hours on {entry['date']}.\")\n        total\\_hours += entry['hours']\n\n    if total\\_hours < 160:\n        user\\_task(\"ERROR: Total hours worked in Jan 2022 is less than 160. Check the timesheet!\")\n    elif total\\_hours > 180:\n        user\\_task(\"WARNING: Total hours worked in Jan 2022 is more than 180. Check the timesheet!\")\n    else:\n        user\\_task(\"Timesheet looks good!\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 181,
+      "total_tokens": 444,
+      "completion_tokens": 263,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    timesheet = bambooHR_timetracking__2_0_0__retrievewithwhere_timetracking()\n    total\\_hours = 0\n    for entry in timesheet:\n        if entry['date'] < '2022-01-01':\n            user\\_task(f\"WARNING: {entry['employee_name']} has entered time before the new year!\")\n        if entry['hours'] > 8:\n            user\\_task(f\"WARNING: {entry['employee_name']} has entered more than 8 hours on {entry['date']}.\")\n        total\\_hours += entry['hours']\n\n    if total\\_hours < 160:\n        user\\_task(\"ERROR: Total hours worked in Jan 2022 is less than 160. Check the timesheet!\")\n    elif total\\_hours > 180:\n        user\\_task(\"WARNING: Total hours worked in Jan 2022 is more than 180. Check the timesheet!\")\n    else:\n        user\\_task(\"Timesheet looks good!\")"
+}

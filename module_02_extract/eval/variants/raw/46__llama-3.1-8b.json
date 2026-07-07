@@ -1,0 +1,51 @@
+{
+  "uid": 46,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "8b18495c2b440a3a4c449db31ec589d331ae85940dbf2fe0c46a6c69bd7d15c1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-61270513-f8c8-46b7-9970-424eeca53750",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    print(\"Existing branches:\")\n    GitLab_Branch__5_0_0__retrievewithwhere_Branch()\n    print(\"\\nIssues:\")\n    GitLab_Issue__5_0_0__retrievewithwhere_Issue()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783439448,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 212,
+      "completion_tokens": 58,
+      "total_tokens": 270,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783439448718,
+        "prefill_wait_time_ms": 0.911494,
+        "prefill_time_ms": 19.837185,
+        "ttft_ms": 20.748679,
+        "total_time_ms": 412.665579,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    print(\"Existing branches:\")\n    GitLab_Branch__5_0_0__retrievewithwhere_Branch()\n    print(\"\\nIssues:\")\n    GitLab_Issue__5_0_0__retrievewithwhere_Issue()"
+}

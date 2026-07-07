@@ -1,0 +1,45 @@
+{
+  "uid": 11,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "bc540a2e7bcc848e7461131f09a7d821b5018fdcd134f4b6c9c0b8850a0b8b6d",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a259991784814093",
+    "object": "chat.completion",
+    "created": 1783395647,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(incident\\_priority: str):\n    # Check if the incident priority is critical\n    if incident\\_priority.upper() == \"CRITICAL\":\n        # If critical, send an email using Outlook instead of a Slack message\n        Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n            to=\"it-team@example.com\",\n            subject=\"CRITICAL Incident: Please Address Immediately\",\n            body=\"A critical incident has been reported in ServiceNow. Please tend to it immediately.\",\n        )\n    else:\n        # For non-critical incidents, create a Jira issue\n        Jira\\_Issue\\_\\_2\\_0\\_0\\_\\_create\\_Issue(\n            summary=\"Incident Reported in ServiceNow\",\n            description=f\"Incident Priority: {incident\\_priority}\",\n        )\n\n        # And create a GitHub issue\n        GitHub\\_Issue\\_\\_3\\_0\\_0\\_\\_create\\_Issue(\n            title=f\"ServiceNow Incident: {incident\\_priority}\",\n            body=\"An incident has been reported in ServiceNow. Please review and address as needed.\",\n        )",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 252,
+      "total_tokens": 534,
+      "completion_tokens": 282,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(incident\\_priority: str):\n    # Check if the incident priority is critical\n    if incident\\_priority.upper() == \"CRITICAL\":\n        # If critical, send an email using Outlook instead of a Slack message\n        Microsoft\\_Exchange\\_Messages\\_\\_2\\_0\\_0\\_\\_SENDOUTLOOK\\_Messages(\n            to=\"it-team@example.com\",\n            subject=\"CRITICAL Incident: Please Address Immediately\",\n            body=\"A critical incident has been reported in ServiceNow. Please tend to it immediately.\",\n        )\n    else:\n        # For non-critical incidents, create a Jira issue\n        Jira\\_Issue\\_\\_2\\_0\\_0\\_\\_create\\_Issue(\n            summary=\"Incident Reported in ServiceNow\",\n            description=f\"Incident Priority: {incident\\_priority}\",\n        )\n\n        # And create a GitHub issue\n        GitHub\\_Issue\\_\\_3\\_0\\_0\\_\\_create\\_Issue(\n            title=f\"ServiceNow Incident: {incident\\_priority}\",\n            body=\"An incident has been reported in ServiceNow. Please review and address as needed.\",\n        )"
+}

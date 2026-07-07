@@ -1,0 +1,45 @@
+{
+  "uid": 46,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "8b18495c2b440a3a4c449db31ec589d331ae85940dbf2fe0c46a6c69bd7d15c1",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-a23d3afd1ebf8574",
+    "object": "chat.completion",
+    "created": 1783412571,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve all issues\n    issues = GitLab_Issue__5_0_0__retrievewithwhere_Issue(where=\"state:opened\")\n\n    # List all the issues\n    for issue in issues:\n        print(f\"Issue: {issue['id']} - {issue['title']}\")\n\n    # Retrieve all existing branches\n    branches = GitLab_Branch__5_0_0__retrievewithwhere_Branch(where=\"ref:refs/heads/*\")\n\n    # List all the existing branches\n    for branch in branches:\n        print(f\"Branch: {branch['name']}\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 208,
+      "total_tokens": 361,
+      "completion_tokens": 153,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve all issues\n    issues = GitLab_Issue__5_0_0__retrievewithwhere_Issue(where=\"state:opened\")\n\n    # List all the issues\n    for issue in issues:\n        print(f\"Issue: {issue['id']} - {issue['title']}\")\n\n    # Retrieve all existing branches\n    branches = GitLab_Branch__5_0_0__retrievewithwhere_Branch(where=\"ref:refs/heads/*\")\n\n    # List all the existing branches\n    for branch in branches:\n        print(f\"Branch: {branch['name']}\")"
+}

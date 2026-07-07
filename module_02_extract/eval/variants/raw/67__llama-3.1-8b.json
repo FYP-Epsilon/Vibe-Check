@@ -1,0 +1,51 @@
+{
+  "uid": 67,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "304a6a9dcd6a72b54ecc3bb9ea9b35f7f0b2912f3f435889285dcdeaa7069f3e",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-853fd67c-6b2a-44d3-b4fc-f358d53c8f4b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    board1 = Trello_Board__2_0_0__create_Board()\n    board2 = Trello_Board__2_0_0__create_Board()\n    \n    Trello_Card__2_0_0__create_Card(board1, \"Card 1\", \"Description 1\")\n    Trello_Card__2_0_0__create_Card(board1, \"Card 2\", \"Description 2\")\n    Trello_Card__2_0_0__create_Card(board2, \"Card 3\", \"Description 3\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783440955,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 197,
+      "completion_tokens": 127,
+      "total_tokens": 324,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783440955655,
+        "prefill_wait_time_ms": 0.782827,
+        "prefill_time_ms": 70.451087,
+        "ttft_ms": 71.233914,
+        "total_time_ms": 1822.05847,
+        "kv_hit_rate": 0.07692307692307693,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    board1 = Trello_Board__2_0_0__create_Board()\n    board2 = Trello_Board__2_0_0__create_Board()\n    \n    Trello_Card__2_0_0__create_Card(board1, \"Card 1\", \"Description 1\")\n    Trello_Card__2_0_0__create_Card(board1, \"Card 2\", \"Description 2\")\n    Trello_Card__2_0_0__create_Card(board2, \"Card 3\", \"Description 3\")"
+}
