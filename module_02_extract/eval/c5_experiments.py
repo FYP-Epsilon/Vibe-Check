@@ -91,7 +91,9 @@ def run_c5a(admitted: list[dict[str, Any]]) -> dict[str, Any]:
 # non-src diagnostic replay for divergence-source breakdown.
 # ----------------------------------------------------------------------
 
-def _diagnose_divergence_sources(mutant_source: str, base_source: str, base_func_wir: dict[str, Any]) -> Counter:
+def _diagnose_divergence_sources(
+    mutant_source: str, base_source: str, base_func_wir: dict[str, Any], comparison_mode: str = "strict",
+) -> Counter:
     """Replicate ONE flagged variant's differential run (same setup as
     calibrate.py::run_differential_verification) to categorize each
     failing run's comparator divergence_points by event type. Read-only
@@ -128,6 +130,7 @@ def _diagnose_divergence_sources(mutant_source: str, base_source: str, base_func
         compiled_ns=local_env,
         branch_arms=mutant_v1_params["branch_arms"],
         extra_str_literals=extra_str_literals,
+        comparison_mode=comparison_mode,
     )
 
     counter: Counter = Counter()
@@ -139,7 +142,7 @@ def _diagnose_divergence_sources(mutant_source: str, base_source: str, base_func
         except Exception:
             counter["harness_error"] += 1
             continue
-        result = DifferentialComparator(actual, expected).compare()
+        result = DifferentialComparator(actual, expected, mode=comparison_mode).compare()
         if not result["passed"]:
             for dp in result["divergence_points"]:
                 counter[dp["item"][0]] += 1
@@ -162,7 +165,11 @@ def _base_wir_cache_get(uid: int, corpus_manifest: dict[int, dict[str, Any]], ca
 # C5b -- implementation-freedom specificity (the headline)
 # ----------------------------------------------------------------------
 
-def run_c5b(admitted: list[dict[str, Any]], corpus_manifest: dict[int, dict[str, Any]]) -> dict[str, Any]:
+def run_c5b(
+    admitted: list[dict[str, Any]],
+    corpus_manifest: dict[int, dict[str, Any]],
+    comparison_mode: str = "strict",
+) -> dict[str, Any]:
     n = len(admitted)
     flagged = 0  # false alarms: admitted (=correct) variants scoring below tau
     divergence_totals: Counter = Counter()
@@ -180,7 +187,9 @@ def run_c5b(admitted: list[dict[str, Any]], corpus_manifest: dict[int, dict[str,
     base_combined: dict[int, float] = {}
     for uid in sorted({r["uid"] for r in admitted}):
         base_source, base_func_wir = _base_wir_cache_get(uid, corpus_manifest, cache)
-        base_cert = run_differential_verification(base_source, base_func_wir, base_source=base_source)
+        base_cert = run_differential_verification(
+            base_source, base_func_wir, base_source=base_source, comparison_mode=comparison_mode,
+        )
         base_combined[uid] = base_cert.get("combined_confidence", 0.0)
         base_flagged[uid] = base_combined[uid] < TAU
 
@@ -189,13 +198,15 @@ def run_c5b(admitted: list[dict[str, Any]], corpus_manifest: dict[int, dict[str,
         base_source, base_func_wir = _base_wir_cache_get(uid, corpus_manifest, cache)
         variant_source = (EVAL_DIR / rec["source_file"]).read_text(encoding="utf-8")
 
-        cert = run_differential_verification(variant_source, base_func_wir, base_source=base_source)
+        cert = run_differential_verification(
+            variant_source, base_func_wir, base_source=base_source, comparison_mode=comparison_mode,
+        )
         combined = cert.get("combined_confidence", 0.0)
         is_false_alarm = combined < TAU
         div: Counter = Counter()
         if is_false_alarm:
             flagged += 1
-            div = _diagnose_divergence_sources(variant_source, base_source, base_func_wir)
+            div = _diagnose_divergence_sources(variant_source, base_source, base_func_wir, comparison_mode=comparison_mode)
             divergence_totals.update(div)
 
         per_variant.append({
@@ -247,7 +258,11 @@ def _is_exception_class(rec: dict[str, Any]) -> bool:
     return (isinstance(vr, str) and vr.startswith("__exception__:")) or (isinstance(br, str) and br.startswith("__exception__:"))
 
 
-def run_c5c(rejected: list[dict[str, Any]], corpus_manifest: dict[int, dict[str, Any]]) -> dict[str, Any]:
+def run_c5c(
+    rejected: list[dict[str, Any]],
+    corpus_manifest: dict[int, dict[str, Any]],
+    comparison_mode: str = "strict",
+) -> dict[str, Any]:
     n = len(rejected)
     detected = 0
     cache: dict[int, tuple[str, dict[str, Any]]] = {}
@@ -259,7 +274,9 @@ def run_c5c(rejected: list[dict[str, Any]], corpus_manifest: dict[int, dict[str,
         base_source, base_func_wir = _base_wir_cache_get(uid, corpus_manifest, cache)
         variant_source = (EVAL_DIR / rec["source_file"]).read_text(encoding="utf-8")
 
-        cert = run_differential_verification(variant_source, base_func_wir, base_source=base_source)
+        cert = run_differential_verification(
+            variant_source, base_func_wir, base_source=base_source, comparison_mode=comparison_mode,
+        )
         combined = cert.get("combined_confidence", 0.0)
         is_detected = combined < TAU
         if is_detected:
