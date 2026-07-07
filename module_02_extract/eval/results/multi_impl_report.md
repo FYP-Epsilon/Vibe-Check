@@ -34,7 +34,19 @@ V3 (`run_v3_pipeline`) run on every ADMITTED variant (the same set C5b verifies)
 **Confound check**: an admitted variant of a base program that is ITSELF already flagged (scores below tau against its own WIR -- the 0.0588 base false-alarm class from Session A) would inherit that flagged status regardless of style -- that would be the base's own coverage weakness showing through, not the certificate punishing implementation freedom. Checked directly: of the 13 distinct base programs underlying these 20 admitted variants, **0 are pre-flagged**. Base-controlled false-alarm rate (excluding variants of a pre-flagged base): 0.2500 (95% CI [0.087, 0.491], 5/20).
 The controlled rate equals the raw rate exactly here (zero pre-flagged bases in this sample) -- the confound does not apply; these 5 flags are genuine implementation-freedom false alarms, not inherited base-coverage weakness.
 
-- Divergence-source breakdown across flagged variants' failing runs (comparator `divergence_points` event-type tallies): {"exception": 20, "branch_point": 70}
+- Divergence-source breakdown across flagged variants' failing runs (comparator `divergence_points` event-type tallies, pooled across all flagged variants' runs): {"exception": 20, "branch_point": 70}
+
+That pooled tally includes `exception` divergences (20/90), which are NOT branch-structure differences -- they mean a flagged variant crashed on one of C5b's 10 sampled inputs (seed=42), a case the N=100 admission check in C3 may simply not have sampled. The pooled number alone cannot say whether the 5 flagged variants are uniformly "style-punished" or whether some are admission-N gaps. Per-variant breakdown:
+
+| variant | uid | variant combined | base combined | has exception? |
+|---|---|---|---|---|
+| 1__mixtral-8x7b | 1 | 0.0000 | 0.1000 | yes |
+| 2__llama-3.1-8b | 2 | 0.0000 | 0.5000 | no |
+| 3__qwen3-next-80b | 3 | 0.0000 | 0.3000 | no |
+| 4__qwen3-next-80b | 4 | 0.0000 | 0.8000 | no |
+| 42__llama-3.1-8b | 42 | 0.0000 | 0.1000 | yes |
+
+Reading the split: bases sit at 0.1-0.8 combined confidence, not uniformly at a healthy score -- two of the five flagged variants (uids scoring 0.1 on their own base) sit on the Session-A threshold floor themselves, where base and variant are both weak and the flag is marginal rather than a clean style penalty. The honest read is **3/5 are clear implementation-freedom false alarms** (variant collapses well below a non-degenerate base, no exception involved) and **2/5 are marginal / exception-driven** (either the base itself is already near the floor, or the divergence is a crash the N=100 admission check didn't happen to sample, not a pure branch-structure penalty). The headline ("the certificate does not tolerate implementation freedom for this corpus") still holds directionally, but "branch-structure specifically" is too strong a claim for the full set of 5 -- it applies cleanly to the clear-style subset only.
 
 Backlog (named, not implemented this session, per mandate): a cross-implementation comparison mode that aligns on task events only (ignoring branch-decision divergence) would likely recover most of this false-alarm rate for implementation-freedom cases specifically, without touching the mutation-detection numbers (which need branch-decision sensitivity, per Session A/F2). Not built here -- comparator was not weakened to improve this number, per explicit instruction.
 
