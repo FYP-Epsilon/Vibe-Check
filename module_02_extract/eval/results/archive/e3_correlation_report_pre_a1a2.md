@@ -29,21 +29,13 @@ are indistinguishable at this sample size," not an exact count.
 ## Correlation: 1 - combined_confidence vs semantic_diff_rate
 
 - n = 427 mutants scored (execution failed: 0)
-- Pearson r = 0.4085, 95% CI [0.3262, 0.4846]
-- Spearman rho = 0.5400
+- Pearson r = 0.3653, 95% CI [0.2801, 0.4448]
+- Spearman rho = 0.5212
 
 ### Restricted to semantic_diff_rate > 0 (n=416)
 
-- Pearson r = 0.5580, 95% CI [0.4880, 0.6208]
-- Spearman rho = 0.5988
-
-### r and rho dropped after F2 (mechanical-fixes session) -- investigated, not a regression
-
-Pre-F2 (archived `archive/e3_correlation_report_pre_branch_decision.md`): Pearson r = 0.4359 (0.6493 restricted), Spearman rho = 0.6774 (0.7632 restricted). F2 gave the actual-side collector a `taken_branch` field (PEP 669 BRANCH events, settrace next-line fallback), so a mismatched branch decision now fails a run's trace comparison the same way a mismatched task sequence always did. Checked directly (`e3_pairs.csv` diffed pre/post): every `negate-guard` mutant's `combined_confidence` collapsed to exactly 0.0 regardless of its `semantic_diff_rate` (previously graded 0.1-0.32, loosely tracking severity), and most `constant-perturb` mutants dropped from 0.8 to a shared 0.32 floor. This is score *saturation*, not noise: F2 makes the certificate a sharper pass/fail detector (see the three-figure calibration report's Youden's J moving 0.8532 -> 0.9017 and `negate-guard` detection 8/14 -> 14/14), which flattens the graded relationship this correlation measures. The ground-truth side is untouched -- the equivalent-mutant table below is byte-identical to the pre-F2 run (11/427, same per-operator breakdown), confirming the shift is entirely on the certificate side, exactly where F2 touched.
-
-### r and rho recovered after Session A (A1 composition + A2 literal coverage)
-
-Pre-Session-A (archived `archive/e3_correlation_report_pre_a1a2.md`): Pearson r = 0.3653 (0.5326 restricted), Spearman rho = 0.5212 (0.5784 restricted). This run: Pearson r = 0.4085 (0.5580 restricted), Spearman rho = 0.5400 (0.5988 restricted) -- both correlations moved back up, not down. A1 (differential verdict = v1_confidence alone, no V2 OR-padding) removes a saturating term that flattened graded scores toward 0 or 1 regardless of severity; A2 (round-robin string-pool + base-guard-literal seeding) additionally moved `constant-perturb` off its 0.32 floor for 8/9 mutants (see the calibration report), restoring a graded relationship for exactly the operator F2 had flattened hardest. The equivalent-mutant count (11/427) is unchanged -- ground truth is untouched, confirming the shift is entirely on the certificate side, same as the F2 transition above.
+- Pearson r = 0.5326, 95% CI [0.4600, 0.5981]
+- Spearman rho = 0.5784
 
 ## Equivalent mutants (semantic_diff_rate == 0 at N=25): 11 / 427
 

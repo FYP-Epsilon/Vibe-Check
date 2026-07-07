@@ -628,6 +628,40 @@ def classify(x, y):
         cert = tester.run()
         assert cert["input_coverage_score"] > 1 / 20
 
+    def test_extra_str_literals_and_round_robin_cover_both_pool_values(self):
+        """A2: a mutant's own pool has only the MUTATED literal
+        ("high_MUTATED"); extra_str_literals (as calibrate.py's
+        differential mode supplies from the base program) unions in the
+        ORIGINAL ("high"). Round-robin-first sampling must then guarantee
+        both appear within a run budget covering the pool size, instead of
+        leaving either to chance."""
+        source = (
+            'def classify(status: str) -> str:\n'
+            '    if status == "high_MUTATED":\n'
+            '        return "A"\n'
+            '    return "B"\n'
+        )
+        from ast_extractor import CFGExtractor
+        wir = CFGExtractor().extract(source)
+        func_wir = wir["functions"]["classify"]
+
+        tester = RandomizedDifferentialTester(
+            source=source,
+            function_name="classify",
+            wir=func_wir,
+            task_patterns=["classify"],
+            branch_lines={2},
+            control_variables=["status"],
+            n_runs=10,
+            seed=7,
+            extra_str_literals=["high"],
+        )
+        assert tester._string_pool == ["high", "high_MUTATED"]
+
+        seen = {tester._generate_random_inputs()["status"] for _ in range(10)}
+        assert "high" in seen
+        assert "high_MUTATED" in seen
+
 
 # ----------------------------------------------------------------------
 # P3.5 -- MultiModalCertificateComposer
