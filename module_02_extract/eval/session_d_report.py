@@ -161,12 +161,21 @@ def render_report(c5b_task_only: dict[str, Any], c5c_task_only: dict[str, Any], 
         "sequence) become invisible when branch structure is excluded. "
         "Even exception-class detection drops slightly "
         f"({STRICT_C5C_BASELINE['exception']['rate']:.4f} -> "
-        f"{c5c_task_only['by_class']['exception']['rate']:.4f}) -- a "
-        "handful of natural bugs manifest partly as a branch-structure "
-        "difference alongside the eventual exception. task_only trades "
-        "this sensitivity for style tolerance; D2's C5b result above is "
-        "the return on that trade, and D3 below quantifies it further on "
-        "synthetic mutations where the trade is starkest.",
+        f"{c5c_task_only['by_class']['exception']['rate']:.4f}) -- checked "
+        "directly (the 4 variants that flip from strict-detected to "
+        "task_only-missed: `10__qwen3-next-80b`, `20__llama-3.1-8b`, "
+        "`30__qwen3-next-80b`, `99__llama-3.1-8b`): all 4 are "
+        "branch_point-dominated in strict mode's own divergence-source "
+        "breakdown (28-50 `branch_point` events vs. 0-6 task/exception "
+        "events each). C5c's own N=10, seed=42 sampled inputs caught these "
+        "via branch-decision divergence on those specific inputs, not by "
+        "independently triggering the admission-recorded exception (which "
+        "came from a *different*, N=100 input set) on the same inputs -- "
+        "task_only correctly can't see that signal once branch_point is "
+        "dropped. task_only trades this sensitivity for style tolerance; "
+        "D2's C5b result above is the return on that trade, and D3 below "
+        "quantifies it further on synthetic mutations where the trade is "
+        "starkest.",
         "",
         "### The 6 strict-mode logic-class misses (68 logic, 62 detected)",
         "",
