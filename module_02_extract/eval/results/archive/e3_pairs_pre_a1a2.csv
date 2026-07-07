@@ -1,0 +1,428 @@
+mutant_id,operator,base_uid,semantic_diff_rate,combined_confidence
+1__drop-step__stmt@line10,drop-step,1,1.0,0.0
+1__reorder-steps__stmts@lines10-11,reorder-steps,1,1.0,0.0
+2__negate-guard__if@line19,negate-guard,2,1.0,0.0
+2__swap-branches__if@line19,swap-branches,2,1.0,0.0
+2__drop-step__stmt@line18,drop-step,2,1.0,0.0
+2__reorder-steps__stmts@lines18-19,reorder-steps,2,1.0,0.0
+2__wrong-variable__name@line19 (incident->issue),wrong-variable,2,1.0,0.0
+2__corrupt-container-op__subscript@line19 (key='impact'),corrupt-container-op,2,1.0,0.0
+2__constant-perturb__compare@line19 ('high'->'high_MUTATED'),constant-perturb,2,0.36,0.19999999999999996
+3__negate-guard__if@line16,negate-guard,3,1.0,0.0
+3__drop-step__stmt@line14,drop-step,3,1.0,0.0
+3__reorder-steps__stmts@lines14-15,reorder-steps,3,1.0,0.0
+3__corrupt-container-op__subscript@line16 (key='name'),corrupt-container-op,3,1.0,0.0
+4__negate-guard__if@line20,negate-guard,4,0.68,0.0
+4__drop-step__stmt@line18,drop-step,4,1.0,0.0
+4__reorder-steps__stmts@lines18-19,reorder-steps,4,1.0,0.0
+4__wrong-variable__name@line19 (issues->issue),wrong-variable,4,1.0,0.0
+4__corrupt-container-op__subscript@line20 (key='priority'),corrupt-container-op,4,1.0,0.0
+4__constant-perturb__compare@line20 ('urgent'->'urgent_MUTATED'),constant-perturb,4,0.44,0.4
+5__drop-step__stmt@line14,drop-step,5,1.0,0.0
+5__reorder-steps__stmts@lines14-15,reorder-steps,5,1.0,0.0
+6__drop-step__stmt@line14,drop-step,6,1.0,0.0
+6__reorder-steps__stmts@lines14-15,reorder-steps,6,1.0,0.0
+7__drop-step__stmt@line14,drop-step,7,1.0,0.0
+7__reorder-steps__stmts@lines14-15,reorder-steps,7,1.0,0.0
+7__wrong-variable__name@line15 (channels->channel),wrong-variable,7,1.0,0.0
+8__drop-step__stmt@line14,drop-step,8,1.0,0.0
+8__reorder-steps__stmts@lines14-15,reorder-steps,8,0.0,0.09999999999999998
+9__negate-guard__if@line24,negate-guard,9,0.48,0.0
+9__drop-step__stmt@line18,drop-step,9,1.0,0.0
+9__reorder-steps__stmts@lines18-19,reorder-steps,9,1.0,0.0
+9__wrong-variable__name@line19 (repositories->repository),wrong-variable,9,1.0,0.0
+9__corrupt-container-op__subscript@line24 (key='author'),corrupt-container-op,9,1.0,0.0
+9__constant-perturb__compare@line24 ('abc'->'abc_MUTATED'),constant-perturb,9,0.6,0.32000000000000006
+10__negate-guard__if@line22,negate-guard,10,0.0,0.0
+10__boundary-shift__compare@line22,boundary-shift,10,0.0,0.0
+10__drop-step__stmt@line18,drop-step,10,1.0,0.0
+10__reorder-steps__stmts@lines18-19,reorder-steps,10,1.0,0.0
+10__corrupt-container-op__subscript@line22 (key='size'),corrupt-container-op,10,0.0,0.0
+10__constant-perturb__compare@line22 (100->1100),constant-perturb,10,0.0,0.0
+11__negate-guard__if@line19,negate-guard,11,1.0,0.0
+11__swap-branches__if@line19,swap-branches,11,1.0,0.0
+11__drop-step__stmt@line18,drop-step,11,1.0,0.0
+11__reorder-steps__stmts@lines18-19,reorder-steps,11,1.0,0.0
+11__wrong-variable__name@line19 (incident->issue),wrong-variable,11,1.0,0.0
+11__corrupt-container-op__subscript@line19 (key='priority'),corrupt-container-op,11,1.0,0.0
+11__constant-perturb__compare@line19 ('high'->'high_MUTATED'),constant-perturb,11,0.28,0.19999999999999996
+12__negate-guard__if@line20,negate-guard,12,1.0,0.0
+12__swap-branches__if@line20,swap-branches,12,1.0,0.0
+12__drop-step__stmt@line18,drop-step,12,1.0,0.0
+12__reorder-steps__stmts@lines18-19,reorder-steps,12,1.0,0.0
+12__corrupt-container-op__subscript@line20 (key='name'),corrupt-container-op,12,1.0,0.0
+13__negate-guard__if@line24,negate-guard,13,1.0,0.0
+13__swap-branches__if@line24,swap-branches,13,1.0,0.0
+13__drop-step__stmt@line22,drop-step,13,1.0,0.0
+13__reorder-steps__stmts@lines22-23,reorder-steps,13,1.0,0.0
+13__wrong-variable__name@line23 (issues->issue),wrong-variable,13,1.0,0.0
+13__corrupt-container-op__subscript@line24 (key='fields'),corrupt-container-op,13,1.0,0.0
+14__negate-guard__if@line16,negate-guard,14,0.52,0.0
+14__drop-step__stmt@line14,drop-step,14,1.0,0.0
+14__reorder-steps__stmts@lines14-15,reorder-steps,14,1.0,0.0
+14__wrong-variable__name@line15 (campaigns->campaign),wrong-variable,14,1.0,0.0
+14__corrupt-container-op__subscript@line16 (key='type'),corrupt-container-op,14,1.0,0.0
+14__constant-perturb__compare@line16 ('Finance'->'Finance_MUTATED'),constant-perturb,14,0.6,0.32000000000000006
+15__negate-guard__if@line16,negate-guard,15,0.68,0.0
+15__drop-step__stmt@line14,drop-step,15,1.0,0.0
+15__reorder-steps__stmts@lines14-15,reorder-steps,15,1.0,0.0
+15__wrong-variable__name@line15 (teams->team),wrong-variable,15,1.0,0.0
+15__corrupt-container-op__subscript@line16 (key='name'),corrupt-container-op,15,1.0,0.0
+15__constant-perturb__compare@line16 ('customer'->'customer_MUTATED'),constant-perturb,15,0.4,0.24
+16__negate-guard__if@line16,negate-guard,16,0.88,0.0
+16__drop-step__stmt@line14,drop-step,16,1.0,0.0
+16__reorder-steps__stmts@lines14-15,reorder-steps,16,1.0,0.0
+16__wrong-variable__name@line15 (teams->team),wrong-variable,16,1.0,0.0
+16__corrupt-container-op__subscript@line16 (key='name'),corrupt-container-op,16,1.0,0.0
+16__constant-perturb__compare@line16 ('customer'->'customer_MUTATED'),constant-perturb,16,0.28,0.24
+17__negate-guard__if@line12,negate-guard,17,0.56,0.0
+17__drop-step__stmt@line10,drop-step,17,1.0,0.0
+17__reorder-steps__stmts@lines10-11,reorder-steps,17,1.0,0.0
+17__wrong-variable__name@line11 (topics->topic),wrong-variable,17,1.0,0.0
+17__corrupt-container-op__subscript@line12 (key='topicarn'),corrupt-container-op,17,1.0,0.0
+17__constant-perturb__compare@line12 ('critical'->'critical_MUTATED'),constant-perturb,17,0.56,0.32000000000000006
+18__negate-guard__if@line16,negate-guard,18,0.56,0.0
+18__drop-step__stmt@line14,drop-step,18,1.0,0.0
+18__reorder-steps__stmts@lines14-15,reorder-steps,18,1.0,0.0
+18__wrong-variable__name@line15 (topics->topic),wrong-variable,18,1.0,0.0
+18__corrupt-container-op__subscript@line16 (key='topicarn'),corrupt-container-op,18,1.0,0.0
+18__constant-perturb__compare@line16 ('critical'->'critical_MUTATED'),constant-perturb,18,0.64,0.32000000000000006
+19__negate-guard__if@line20,negate-guard,19,0.56,0.0
+19__drop-step__stmt@line18,drop-step,19,1.0,0.0
+19__reorder-steps__stmts@lines18-19,reorder-steps,19,1.0,0.0
+19__wrong-variable__name@line19 (topics->topic),wrong-variable,19,1.0,0.0
+19__corrupt-container-op__subscript@line20 (key='topicarn'),corrupt-container-op,19,1.0,0.0
+19__constant-perturb__compare@line20 ('critical'->'critical_MUTATED'),constant-perturb,19,0.56,0.32000000000000006
+20__negate-guard__if@line12,negate-guard,20,0.4,0.0
+20__drop-step__stmt@line10,drop-step,20,1.0,0.0
+20__reorder-steps__stmts@lines10-11,reorder-steps,20,1.0,0.0
+20__wrong-variable__name@line11 (teams->team),wrong-variable,20,1.0,0.0
+20__corrupt-container-op__subscript@line12 (key='type'),corrupt-container-op,20,1.0,0.0
+20__constant-perturb__compare@line12 ('customer'->'customer_MUTATED'),constant-perturb,20,0.72,0.32000000000000006
+21__negate-guard__if@line16,negate-guard,21,0.44,0.0
+21__drop-step__stmt@line14,drop-step,21,1.0,0.0
+21__reorder-steps__stmts@lines14-15,reorder-steps,21,1.0,0.0
+21__wrong-variable__name@line15 (topics->topic),wrong-variable,21,1.0,0.0
+21__corrupt-container-op__subscript@line16 (key='type'),corrupt-container-op,21,1.0,0.0
+21__constant-perturb__compare@line16 ('critical'->'critical_MUTATED'),constant-perturb,21,0.68,0.32000000000000006
+22__drop-step__stmt@line14,drop-step,22,1.0,0.0
+22__reorder-steps__stmts@lines14-15,reorder-steps,22,1.0,0.0
+23__drop-step__stmt@line10,drop-step,23,1.0,0.0
+23__reorder-steps__stmts@lines10-11,reorder-steps,23,1.0,0.0
+24__drop-step__stmt@line14,drop-step,24,1.0,0.0
+24__reorder-steps__stmts@lines14-15,reorder-steps,24,1.0,0.0
+25__drop-step__stmt@line10,drop-step,25,1.0,0.0
+25__reorder-steps__stmts@lines10-11,reorder-steps,25,1.0,0.0
+25__wrong-variable__name@line11 (tasks->task),wrong-variable,25,1.0,0.0
+26__drop-step__stmt@line10,drop-step,26,1.0,0.0
+26__reorder-steps__stmts@lines10-11,reorder-steps,26,1.0,0.0
+26__wrong-variable__name@line11 (leads->lead),wrong-variable,26,1.0,0.0
+27__drop-step__stmt@line14,drop-step,27,1.0,0.0
+27__reorder-steps__stmts@lines14-15,reorder-steps,27,1.0,0.0
+28__negate-guard__if@line12,negate-guard,28,0.56,0.0
+28__drop-step__stmt@line10,drop-step,28,1.0,0.0
+28__reorder-steps__stmts@lines10-11,reorder-steps,28,1.0,0.0
+28__wrong-variable__name@line11 (leads->lead),wrong-variable,28,1.0,0.0
+28__corrupt-container-op__subscript@line12 (key='rating'),corrupt-container-op,28,1.0,0.0
+28__constant-perturb__compare@line12 ('hot'->'hot_MUTATED'),constant-perturb,28,0.48,0.32000000000000006
+29__drop-step__stmt@line18,drop-step,29,1.0,0.0
+29__reorder-steps__stmts@lines18-19,reorder-steps,29,1.0,0.0
+30__negate-guard__if@line16,negate-guard,30,0.0,0.0
+30__drop-step__stmt@line14,drop-step,30,1.0,0.0
+30__reorder-steps__stmts@lines14-15,reorder-steps,30,1.0,0.0
+30__wrong-variable__name@line15 (files->file),wrong-variable,30,1.0,0.0
+30__corrupt-container-op__subscript@line16 (key='owned_by'),corrupt-container-op,30,1.0,0.0
+31__negate-guard__if@line16,negate-guard,31,1.0,0.0
+31__drop-step__stmt@line14,drop-step,31,1.0,0.0
+31__reorder-steps__stmts@lines14-15,reorder-steps,31,1.0,0.0
+32__drop-step__stmt@line14,drop-step,32,1.0,0.0
+32__reorder-steps__stmts@lines14-15,reorder-steps,32,1.0,0.0
+33__drop-step__stmt@line10,drop-step,33,1.0,0.0
+33__reorder-steps__stmts@lines10-11,reorder-steps,33,1.0,0.0
+34__drop-step__stmt@line10,drop-step,34,1.0,0.0
+34__reorder-steps__stmts@lines10-11,reorder-steps,34,1.0,0.0
+35__drop-step__stmt@line14,drop-step,35,1.0,0.0
+35__reorder-steps__stmts@lines14-15,reorder-steps,35,1.0,0.0
+36__drop-step__stmt@line10,drop-step,36,1.0,0.0
+36__reorder-steps__stmts@lines10-11,reorder-steps,36,1.0,0.0
+37__drop-step__stmt@line14,drop-step,37,1.0,0.0
+37__reorder-steps__stmts@lines14-15,reorder-steps,37,1.0,0.0
+38__drop-step__stmt@line10,drop-step,38,1.0,0.0
+38__reorder-steps__stmts@lines10-11,reorder-steps,38,1.0,0.0
+39__drop-step__stmt@line10,drop-step,39,1.0,0.0
+39__reorder-steps__stmts@lines10-11,reorder-steps,39,1.0,0.0
+40__drop-step__stmt@line6,drop-step,40,1.0,0.0
+41__drop-step__stmt@line14,drop-step,41,1.0,0.0
+41__reorder-steps__stmts@lines14-15,reorder-steps,41,1.0,0.0
+42__drop-step__stmt@line10,drop-step,42,1.0,0.0
+42__reorder-steps__stmts@lines10-11,reorder-steps,42,1.0,0.0
+43__drop-step__stmt@line18,drop-step,43,1.0,0.0
+43__reorder-steps__stmts@lines18-19,reorder-steps,43,1.0,0.0
+44__drop-step__stmt@line22,drop-step,44,1.0,0.0
+44__reorder-steps__stmts@lines22-23,reorder-steps,44,1.0,0.0
+45__drop-step__stmt@line14,drop-step,45,1.0,0.0
+45__reorder-steps__stmts@lines14-15,reorder-steps,45,1.0,0.0
+46__drop-step__stmt@line14,drop-step,46,1.0,0.0
+46__reorder-steps__stmts@lines14-15,reorder-steps,46,1.0,0.0
+47__drop-step__stmt@line10,drop-step,47,1.0,0.0
+47__reorder-steps__stmts@lines10-11,reorder-steps,47,1.0,0.0
+48__drop-step__stmt@line18,drop-step,48,1.0,0.0
+48__reorder-steps__stmts@lines18-19,reorder-steps,48,1.0,0.0
+49__drop-step__stmt@line10,drop-step,49,1.0,0.0
+49__reorder-steps__stmts@lines10-11,reorder-steps,49,1.0,0.0
+50__drop-step__stmt@line14,drop-step,50,1.0,0.0
+50__reorder-steps__stmts@lines14-15,reorder-steps,50,1.0,0.0
+51__drop-step__stmt@line10,drop-step,51,1.0,0.0
+51__reorder-steps__stmts@lines10-11,reorder-steps,51,1.0,0.0
+52__drop-step__stmt@line18,drop-step,52,1.0,0.0
+52__reorder-steps__stmts@lines18-19,reorder-steps,52,1.0,0.0
+53__negate-guard__if@line22,negate-guard,53,0.64,0.0
+53__drop-step__stmt@line18,drop-step,53,1.0,0.0
+53__reorder-steps__stmts@lines18-19,reorder-steps,53,1.0,0.0
+53__corrupt-container-op__subscript@line22 (key='itemType'),corrupt-container-op,53,1.0,0.0
+53__constant-perturb__compare@line22 ('confidential'->'confidential_MUTATED'),constant-perturb,53,0.6,0.32000000000000006
+54__drop-step__stmt@line10,drop-step,54,1.0,0.0
+54__reorder-steps__stmts@lines10-11,reorder-steps,54,1.0,0.0
+55__drop-step__stmt@line10,drop-step,55,1.0,0.0
+55__reorder-steps__stmts@lines10-11,reorder-steps,55,1.0,0.0
+55__wrong-variable__name@line11 (leads->lead),wrong-variable,55,1.0,0.0
+56__drop-step__stmt@line14,drop-step,56,1.0,0.0
+56__reorder-steps__stmts@lines14-15,reorder-steps,56,1.0,0.0
+56__wrong-variable__name@line15 (leads->lead),wrong-variable,56,1.0,0.0
+57__drop-step__stmt@line18,drop-step,57,1.0,0.0
+57__reorder-steps__stmts@lines18-19,reorder-steps,57,1.0,0.0
+58__drop-step__stmt@line14,drop-step,58,1.0,0.0
+58__reorder-steps__stmts@lines14-15,reorder-steps,58,1.0,0.0
+59__drop-step__stmt@line10,drop-step,59,1.0,0.0
+59__reorder-steps__stmts@lines10-11,reorder-steps,59,1.0,0.0
+60__drop-step__stmt@line14,drop-step,60,1.0,0.0
+60__reorder-steps__stmts@lines14-15,reorder-steps,60,1.0,0.0
+61__drop-step__stmt@line18,drop-step,61,1.0,0.0
+61__reorder-steps__stmts@lines18-19,reorder-steps,61,1.0,0.0
+62__drop-step__stmt@line14,drop-step,62,1.0,0.0
+62__reorder-steps__stmts@lines14-15,reorder-steps,62,1.0,0.0
+63__drop-step__stmt@line10,drop-step,63,1.0,0.0
+63__reorder-steps__stmts@lines10-11,reorder-steps,63,1.0,0.0
+64__drop-step__stmt@line10,drop-step,64,1.0,0.0
+64__reorder-steps__stmts@lines10-11,reorder-steps,64,1.0,0.0
+65__drop-step__stmt@line14,drop-step,65,1.0,0.0
+65__reorder-steps__stmts@lines14-15,reorder-steps,65,1.0,0.0
+66__drop-step__stmt@line14,drop-step,66,1.0,0.0
+66__reorder-steps__stmts@lines14-15,reorder-steps,66,1.0,0.0
+67__drop-step__stmt@line10,drop-step,67,1.0,0.0
+67__reorder-steps__stmts@lines10-11,reorder-steps,67,1.0,0.0
+68__drop-step__stmt@line10,drop-step,68,1.0,0.0
+68__reorder-steps__stmts@lines10-11,reorder-steps,68,1.0,0.0
+69__negate-guard__if@line12,negate-guard,69,0.52,0.0
+69__drop-step__stmt@line10,drop-step,69,1.0,0.0
+69__reorder-steps__stmts@lines10-11,reorder-steps,69,1.0,0.0
+69__wrong-variable__name@line11 (dms->dm),wrong-variable,69,1.0,0.0
+69__corrupt-container-op__subscript@line12 (key='messages'),corrupt-container-op,69,1.0,0.0
+70__drop-step__stmt@line10,drop-step,70,1.0,0.0
+70__reorder-steps__stmts@lines10-11,reorder-steps,70,1.0,0.0
+71__drop-step__stmt@line18,drop-step,71,1.0,0.0
+71__reorder-steps__stmts@lines18-19,reorder-steps,71,1.0,0.0
+72__drop-step__stmt@line18,drop-step,72,1.0,0.0
+72__reorder-steps__stmts@lines18-19,reorder-steps,72,1.0,0.0
+73__drop-step__stmt@line18,drop-step,73,1.0,0.0
+73__reorder-steps__stmts@lines18-19,reorder-steps,73,1.0,0.0
+74__drop-step__stmt@line18,drop-step,74,1.0,0.0
+74__reorder-steps__stmts@lines18-19,reorder-steps,74,1.0,0.0
+75__drop-step__stmt@line18,drop-step,75,1.0,0.0
+75__reorder-steps__stmts@lines18-19,reorder-steps,75,1.0,0.0
+76__drop-step__stmt@line14,drop-step,76,1.0,0.0
+76__reorder-steps__stmts@lines14-15,reorder-steps,76,1.0,0.0
+77__drop-step__stmt@line10,drop-step,77,1.0,0.0
+77__reorder-steps__stmts@lines10-11,reorder-steps,77,1.0,0.0
+78__drop-step__stmt@line6,drop-step,78,1.0,0.0
+79__drop-step__stmt@line10,drop-step,79,1.0,0.0
+79__reorder-steps__stmts@lines10-11,reorder-steps,79,1.0,0.0
+80__drop-step__stmt@line10,drop-step,80,1.0,0.0
+80__reorder-steps__stmts@lines10-11,reorder-steps,80,1.0,0.0
+81__drop-step__stmt@line10,drop-step,81,1.0,0.0
+81__reorder-steps__stmts@lines10-11,reorder-steps,81,1.0,0.0
+82__drop-step__stmt@line22,drop-step,82,1.0,0.0
+82__reorder-steps__stmts@lines22-23,reorder-steps,82,1.0,0.0
+83__drop-step__stmt@line14,drop-step,83,1.0,0.0
+83__reorder-steps__stmts@lines14-15,reorder-steps,83,1.0,0.0
+84__drop-step__stmt@line18,drop-step,84,1.0,0.0
+84__reorder-steps__stmts@lines18-19,reorder-steps,84,1.0,0.0
+85__drop-step__stmt@line14,drop-step,85,1.0,0.0
+85__reorder-steps__stmts@lines14-15,reorder-steps,85,1.0,0.0
+86__drop-step__stmt@line18,drop-step,86,1.0,0.0
+86__reorder-steps__stmts@lines18-19,reorder-steps,86,1.0,0.0
+87__negate-guard__if@line12,negate-guard,87,0.64,0.0
+87__drop-step__stmt@line10,drop-step,87,1.0,0.0
+87__reorder-steps__stmts@lines10-11,reorder-steps,87,1.0,0.0
+87__wrong-variable__name@line11 (devices->device),wrong-variable,87,1.0,0.0
+87__corrupt-container-op__subscript@line12 (key='isCompliant'),corrupt-container-op,87,1.0,0.0
+88__negate-guard__if@line11,negate-guard,88,0.0,0.0
+88__drop-step__stmt@line10,drop-step,88,1.0,0.0
+88__reorder-steps__stmts@lines10-11,reorder-steps,88,1.0,0.0
+88__wrong-variable__name@line11 (buckets->objects),wrong-variable,88,1.0,0.0
+89__drop-step__stmt@line10,drop-step,89,1.0,0.0
+89__reorder-steps__stmts@lines10-11,reorder-steps,89,1.0,0.0
+89__wrong-variable__name@line11 (repositories->repo),wrong-variable,89,1.0,0.0
+90__negate-guard__if@line12,negate-guard,90,0.32,0.0
+90__drop-step__stmt@line10,drop-step,90,1.0,0.0
+90__reorder-steps__stmts@lines10-11,reorder-steps,90,1.0,0.0
+90__wrong-variable__name@line11 (repositories->repo),wrong-variable,90,1.0,0.0
+90__corrupt-container-op__subscript@line12 (key='has_projects'),corrupt-container-op,90,1.0,0.0
+91__drop-step__stmt@line10,drop-step,91,1.0,0.0
+91__reorder-steps__stmts@lines10-11,reorder-steps,91,1.0,0.0
+91__wrong-variable__name@line11 (buckets->bucket),wrong-variable,91,1.0,0.0
+92__negate-guard__if@line16,negate-guard,92,1.0,0.0
+92__swap-branches__if@line16,swap-branches,92,1.0,0.0
+92__drop-step__stmt@line14,drop-step,92,1.0,0.0
+92__reorder-steps__stmts@lines14-15,reorder-steps,92,1.0,0.0
+92__wrong-variable__name@line15 (buckets->bucket),wrong-variable,92,1.0,0.0
+92__corrupt-container-op__subscript@line16 (key='name'),corrupt-container-op,92,1.0,0.0
+92__constant-perturb__compare@line16 ('non-compliant'->'non-compliant_MUTATED'),constant-perturb,92,0.36,0.32000000000000006
+93__negate-guard__if@line16,negate-guard,93,0.52,0.0
+93__drop-step__stmt@line14,drop-step,93,1.0,0.0
+93__reorder-steps__stmts@lines14-15,reorder-steps,93,1.0,0.0
+93__wrong-variable__name@line15 (roles->role),wrong-variable,93,1.0,0.0
+93__corrupt-container-op__subscript@line16 (key='name'),corrupt-container-op,93,1.0,0.0
+93__constant-perturb__compare@line16 ('inactive'->'inactive_MUTATED'),constant-perturb,93,0.6,0.32000000000000006
+94__negate-guard__if@line16,negate-guard,94,0.72,0.0
+94__drop-step__stmt@line14,drop-step,94,1.0,0.0
+94__reorder-steps__stmts@lines14-15,reorder-steps,94,1.0,0.0
+94__wrong-variable__name@line15 (folders->folder),wrong-variable,94,1.0,0.0
+94__corrupt-container-op__subscript@line16 (key='item_status'),corrupt-container-op,94,1.0,0.0
+94__constant-perturb__compare@line16 ('empty'->'empty_MUTATED'),constant-perturb,94,0.4,0.32000000000000006
+95__negate-guard__if@line16,negate-guard,95,1.0,0.0
+95__swap-branches__if@line16,swap-branches,95,1.0,0.0
+95__drop-step__stmt@line14,drop-step,95,1.0,0.0
+95__reorder-steps__stmts@lines14-15,reorder-steps,95,1.0,0.0
+95__wrong-variable__name@line15 (contacts->contact),wrong-variable,95,1.0,0.0
+95__corrupt-container-op__subscript@line16 (key='CleanStatus'),corrupt-container-op,95,1.0,0.0
+95__constant-perturb__compare@line16 ('new'->'new_MUTATED'),constant-perturb,95,0.52,0.32000000000000006
+96__negate-guard__if@line16,negate-guard,96,0.0,0.0
+96__swap-branches__if@line16,swap-branches,96,0.0,0.0
+96__drop-step__stmt@line14,drop-step,96,1.0,0.0
+96__reorder-steps__stmts@lines14-15,reorder-steps,96,1.0,0.0
+96__wrong-variable__name@line15 (folders->folder),wrong-variable,96,1.0,0.0
+96__corrupt-container-op__subscript@line16 (key='is_collaboration_restricted_to_enterprise'),corrupt-container-op,96,1.0,0.0
+97__drop-step__stmt@line10,drop-step,97,1.0,0.0
+97__reorder-steps__stmts@lines10-11,reorder-steps,97,1.0,0.0
+97__wrong-variable__name@line11 (repositories->repo),wrong-variable,97,1.0,0.0
+98__negate-guard__if@line16,negate-guard,98,1.0,0.0
+98__swap-branches__if@line16,swap-branches,98,1.0,0.0
+98__drop-step__stmt@line14,drop-step,98,1.0,0.0
+98__reorder-steps__stmts@lines14-15,reorder-steps,98,1.0,0.0
+98__wrong-variable__name@line15 (leads->lead),wrong-variable,98,1.0,0.0
+98__corrupt-container-op__subscript@line16 (key='rating'),corrupt-container-op,98,1.0,0.0
+98__constant-perturb__compare@line16 ('high'->'high_MUTATED'),constant-perturb,98,0.52,0.32000000000000006
+99__negate-guard__if@line20,negate-guard,99,0.0,0.0
+99__drop-step__stmt@line18,drop-step,99,1.0,0.0
+99__reorder-steps__stmts@lines18-19,reorder-steps,99,1.0,0.0
+99__wrong-variable__name@line19 (tasks->task),wrong-variable,99,1.0,0.0
+99__corrupt-container-op__subscript@line20 (key='completed'),corrupt-container-op,99,1.0,0.0
+100__negate-guard__if@line12,negate-guard,100,0.6,0.0
+100__drop-step__stmt@line10,drop-step,100,1.0,0.0
+100__reorder-steps__stmts@lines10-11,reorder-steps,100,1.0,0.0
+100__wrong-variable__name@line11 (tasks->task),wrong-variable,100,1.0,0.0
+100__corrupt-container-op__subscript@line12 (key='statuscode'),corrupt-container-op,100,1.0,0.0
+100__constant-perturb__compare@line12 ('completed'->'completed_MUTATED'),constant-perturb,100,0.48,0.32000000000000006
+101__drop-step__stmt@line14,drop-step,101,1.0,0.0
+101__reorder-steps__stmts@lines14-15,reorder-steps,101,1.0,0.0
+101__wrong-variable__name@line15 (users->user),wrong-variable,101,1.0,0.0
+1__early-return__before_stmt@line11,early-return,1,1.0,0.0
+2__early-return__before_stmt@line19,early-return,2,1.0,0.0
+3__early-return__before_stmt@line16,early-return,3,0.0,0.0
+4__early-return__before_stmt@line19,early-return,4,0.68,0.0
+5__early-return__before_stmt@line16,early-return,5,1.0,0.0
+6__early-return__before_stmt@line15,early-return,6,1.0,0.0
+7__early-return__before_stmt@line15,early-return,7,1.0,0.0
+8__early-return__before_stmt@line17,early-return,8,1.0,0.0
+9__early-return__before_stmt@line19,early-return,9,1.0,0.0
+10__early-return__before_stmt@line19,early-return,10,1.0,0.0
+11__early-return__before_stmt@line19,early-return,11,1.0,0.0
+12__early-return__before_stmt@line19,early-return,12,1.0,0.0
+13__early-return__before_stmt@line23,early-return,13,1.0,0.0
+14__early-return__before_stmt@line15,early-return,14,0.6,0.0
+15__early-return__before_stmt@line15,early-return,15,0.72,0.0
+16__early-return__before_stmt@line15,early-return,16,0.68,0.0
+17__early-return__before_stmt@line11,early-return,17,0.56,0.0
+18__early-return__before_stmt@line15,early-return,18,0.64,0.0
+19__early-return__before_stmt@line19,early-return,19,0.56,0.0
+20__early-return__before_stmt@line11,early-return,20,0.72,0.0
+21__early-return__before_stmt@line15,early-return,21,0.68,0.0
+22__early-return__before_stmt@line15,early-return,22,1.0,0.0
+23__early-return__before_stmt@line11,early-return,23,1.0,0.0
+24__early-return__before_stmt@line15,early-return,24,1.0,0.0
+25__early-return__before_stmt@line11,early-return,25,1.0,0.0
+26__early-return__before_stmt@line11,early-return,26,1.0,0.0
+27__early-return__before_stmt@line16,early-return,27,1.0,0.0
+28__early-return__before_stmt@line11,early-return,28,0.48,0.0
+29__early-return__before_stmt@line20,early-return,29,1.0,0.0
+30__early-return__before_stmt@line15,early-return,30,1.0,0.0
+31__early-return__before_stmt@line15,early-return,31,1.0,0.0
+32__early-return__before_stmt@line16,early-return,32,1.0,0.0
+33__early-return__before_stmt@line11,early-return,33,1.0,0.0
+34__early-return__before_stmt@line11,early-return,34,1.0,0.0
+35__early-return__before_stmt@line16,early-return,35,1.0,0.0
+36__early-return__before_stmt@line11,early-return,36,1.0,0.0
+37__early-return__before_stmt@line15,early-return,37,1.0,0.0
+38__early-return__before_stmt@line11,early-return,38,1.0,0.0
+39__early-return__before_stmt@line11,early-return,39,1.0,0.0
+41__early-return__before_stmt@line16,early-return,41,1.0,0.0
+42__early-return__before_stmt@line11,early-return,42,1.0,0.0
+43__early-return__before_stmt@line21,early-return,43,1.0,0.0
+44__early-return__before_stmt@line25,early-return,44,1.0,0.0
+45__early-return__before_stmt@line16,early-return,45,1.0,0.0
+46__early-return__before_stmt@line15,early-return,46,1.0,0.0
+47__early-return__before_stmt@line11,early-return,47,1.0,0.0
+48__early-return__before_stmt@line19,early-return,48,1.0,0.0
+49__early-return__before_stmt@line11,early-return,49,1.0,0.0
+50__early-return__before_stmt@line16,early-return,50,1.0,0.0
+51__early-return__before_stmt@line11,early-return,51,1.0,0.0
+52__early-return__before_stmt@line19,early-return,52,1.0,0.0
+53__early-return__before_stmt@line21,early-return,53,0.76,0.0
+54__early-return__before_stmt@line11,early-return,54,1.0,0.0
+55__early-return__before_stmt@line11,early-return,55,1.0,0.0
+56__early-return__before_stmt@line15,early-return,56,1.0,0.0
+57__early-return__before_stmt@line20,early-return,57,1.0,0.0
+58__early-return__before_stmt@line15,early-return,58,1.0,0.0
+59__early-return__before_stmt@line11,early-return,59,1.0,0.0
+60__early-return__before_stmt@line15,early-return,60,1.0,0.0
+61__early-return__before_stmt@line19,early-return,61,1.0,0.0
+62__early-return__before_stmt@line15,early-return,62,1.0,0.0
+63__early-return__before_stmt@line11,early-return,63,1.0,0.0
+64__early-return__before_stmt@line11,early-return,64,1.0,0.0
+65__early-return__before_stmt@line16,early-return,65,1.0,0.0
+66__early-return__before_stmt@line15,early-return,66,1.0,0.0
+67__early-return__before_stmt@line13,early-return,67,1.0,0.0
+68__early-return__before_stmt@line11,early-return,68,1.0,0.0
+69__early-return__before_stmt@line11,early-return,69,0.6,0.0
+70__early-return__before_stmt@line11,early-return,70,1.0,0.0
+71__early-return__before_stmt@line19,early-return,71,1.0,0.0
+72__early-return__before_stmt@line20,early-return,72,1.0,0.0
+73__early-return__before_stmt@line20,early-return,73,1.0,0.0
+74__early-return__before_stmt@line21,early-return,74,1.0,0.0
+75__early-return__before_stmt@line19,early-return,75,1.0,0.0
+76__early-return__before_stmt@line15,early-return,76,1.0,0.0
+77__early-return__before_stmt@line11,early-return,77,1.0,0.0
+79__early-return__before_stmt@line11,early-return,79,1.0,0.0
+80__early-return__before_stmt@line11,early-return,80,1.0,0.0
+81__early-return__before_stmt@line11,early-return,81,1.0,0.0
+82__early-return__before_stmt@line26,early-return,82,1.0,0.0
+83__early-return__before_stmt@line16,early-return,83,1.0,0.0
+84__early-return__before_stmt@line21,early-return,84,1.0,0.0
+85__early-return__before_stmt@line16,early-return,85,1.0,0.0
+86__early-return__before_stmt@line20,early-return,86,1.0,0.0
+87__early-return__before_stmt@line11,early-return,87,0.64,0.0
+88__early-return__before_stmt@line11,early-return,88,1.0,0.8
+89__early-return__before_stmt@line11,early-return,89,1.0,0.0
+90__early-return__before_stmt@line11,early-return,90,0.84,0.0
+91__early-return__before_stmt@line11,early-return,91,1.0,0.0
+92__early-return__before_stmt@line15,early-return,92,1.0,0.0
+93__early-return__before_stmt@line15,early-return,93,0.88,0.0
+94__early-return__before_stmt@line15,early-return,94,0.88,0.0
+95__early-return__before_stmt@line15,early-return,95,1.0,0.0
+96__early-return__before_stmt@line15,early-return,96,1.0,0.0
+97__early-return__before_stmt@line11,early-return,97,1.0,0.0
+98__early-return__before_stmt@line15,early-return,98,1.0,0.0
+99__early-return__before_stmt@line19,early-return,99,1.0,0.0
+100__early-return__before_stmt@line11,early-return,100,0.48,0.0
+101__early-return__before_stmt@line15,early-return,101,1.0,0.0

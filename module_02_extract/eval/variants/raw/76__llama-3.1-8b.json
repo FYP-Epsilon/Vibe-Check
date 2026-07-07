@@ -1,0 +1,51 @@
+{
+  "uid": 76,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "34a533c4ad12855973817eace91d746214fb54b7cf6722a187a21f4fc4caaa9c",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b24013b5-4990-4a05-ad48-e5cbcb2751a4",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    GitHub_Comment__3_0_0__create_Comment()\n    Jira_Issue__2_0_0__retrievewithwhere_Issue()\n    Jira_Status__2_0_0__retrievewithwhere_Status()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783441802,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 204,
+      "completion_tokens": 57,
+      "total_tokens": 261,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783441802444,
+        "prefill_wait_time_ms": 0.60755,
+        "prefill_time_ms": 28.304631999999998,
+        "ttft_ms": 28.912182,
+        "total_time_ms": 584.423952,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    GitHub_Comment__3_0_0__create_Comment()\n    Jira_Issue__2_0_0__retrievewithwhere_Issue()\n    Jira_Status__2_0_0__retrievewithwhere_Status()"
+}

@@ -1,0 +1,45 @@
+{
+  "uid": 5,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "d154377afb63fcd7dab6de2868c49e8d579e309325522ecccf408946fa925b2b",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-835f8f7feeb00a87",
+    "object": "chat.completion",
+    "created": 1783395548,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    folder = Box_Folder__3_0_0__create_Folder()\n    accounts = Salesforce_Account__5_0_0__retrievewithwhere_Account()\n    for account in accounts:\n        Box_File__3_0_0__create_File(folder, account)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 187,
+      "total_tokens": 249,
+      "completion_tokens": 62,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    folder = Box_Folder__3_0_0__create_Folder()\n    accounts = Salesforce_Account__5_0_0__retrievewithwhere_Account()\n    for account in accounts:\n        Box_File__3_0_0__create_File(folder, account)"
+}

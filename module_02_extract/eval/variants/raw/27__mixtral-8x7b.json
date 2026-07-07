@@ -1,0 +1,45 @@
+{
+  "uid": 27,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "f18d005c9bdb00f14cceb5b27e712c9b17965e6c9724e464c816d3950a5627be",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-bf491ea7df24f955",
+    "object": "chat.completion",
+    "created": 1783396171,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Create a new Zendesk ticket for offboarding\n    zendesk_ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket(\n        subject=\"Offboarding Request\",\n        description=\"Please process this user's offboarding request.\",\n        requester_email=\"offboarding@example.com\",\n    )\n\n    # Retrieve the corresponding OneDrive folder\n    onedrive_folder = Microsoft_OneDrive_for_Business_Folder__4_0_0__retrievewithwhere_Folder(\n        where=\"name eq 'Offboarding_{{ticket.id}}'\"\n    )\n\n    if onedrive_folder:\n        # If the folder exists, delete it\n        Microsoft_OneDrive_for_Business_Folder__4_0_0__deletewithwhere_Folder(\n            where=\"id eq '{{onedrive_folder.id}}'\"\n        )\n        print(f\"Successfully deleted OneDrive folder: {{onedrive_folder.name}}\")\n    else:\n        print(\"No corresponding OneDrive folder found.\")\n\n    print(f\"Created Zendesk ticket: {{zendesk_ticket.id}}\")",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 239,
+      "total_tokens": 525,
+      "completion_tokens": 286,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Create a new Zendesk ticket for offboarding\n    zendesk_ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket(\n        subject=\"Offboarding Request\",\n        description=\"Please process this user's offboarding request.\",\n        requester_email=\"offboarding@example.com\",\n    )\n\n    # Retrieve the corresponding OneDrive folder\n    onedrive_folder = Microsoft_OneDrive_for_Business_Folder__4_0_0__retrievewithwhere_Folder(\n        where=\"name eq 'Offboarding_{{ticket.id}}'\"\n    )\n\n    if onedrive_folder:\n        # If the folder exists, delete it\n        Microsoft_OneDrive_for_Business_Folder__4_0_0__deletewithwhere_Folder(\n            where=\"id eq '{{onedrive_folder.id}}'\"\n        )\n        print(f\"Successfully deleted OneDrive folder: {{onedrive_folder.name}}\")\n    else:\n        print(\"No corresponding OneDrive folder found.\")\n\n    print(f\"Created Zendesk ticket: {{zendesk_ticket.id}}\")"
+}

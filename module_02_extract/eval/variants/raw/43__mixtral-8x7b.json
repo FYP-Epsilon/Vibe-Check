@@ -1,0 +1,45 @@
+{
+  "uid": 43,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "43177cb4d27d3bcb0445a20ecb2923d84292285b3eaff2807f876d7c36d5775b",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-bf42b93bd095b872",
+    "object": "chat.completion",
+    "created": 1783396890,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve sales orders\n    sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n\n    # Initialize message\n    message = Slack_message__3_0_0__create_message()\n\n    # Loop through sales orders\n    for so in sales_orders:\n        # Add sales order information to message\n        message['text'] += f\"Sales Order: {so['name']}\\n\"\n        message['text'] += f\"Customer: {so['customername']}\\n\"\n        message['text'] += f\"Total Amount: {so['totalamount']}\\n\"\n\n        # Retrieve associated price level\n        price_level = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel(so['pricelevelid'])\n\n        # Add price level information to message\n        message['text'] += f\"Price Level: {price_level['name']}\\n\"\n\n        # Retrieve associated invoices\n        invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice(so['salesorderid'])\n\n        # Loop through invoices\n        for invoice in invoices:\n            # Add invoice information to message\n            message['text'] += f\"Invoice: {invoice['name']}\\n\"\n            message['text'] += f\"Amount: {invoice['amount']}\\n\"\n\n        # Send message to Slack\n        Slack_message__3_0_0__create_message(message)\n\n        # Clear message for next sales order\n        message = Slack_message__3_0_0__create_message()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 279,
+      "total_tokens": 710,
+      "completion_tokens": 431,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve sales orders\n    sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n\n    # Initialize message\n    message = Slack_message__3_0_0__create_message()\n\n    # Loop through sales orders\n    for so in sales_orders:\n        # Add sales order information to message\n        message['text'] += f\"Sales Order: {so['name']}\\n\"\n        message['text'] += f\"Customer: {so['customername']}\\n\"\n        message['text'] += f\"Total Amount: {so['totalamount']}\\n\"\n\n        # Retrieve associated price level\n        price_level = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel(so['pricelevelid'])\n\n        # Add price level information to message\n        message['text'] += f\"Price Level: {price_level['name']}\\n\"\n\n        # Retrieve associated invoices\n        invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice(so['salesorderid'])\n\n        # Loop through invoices\n        for invoice in invoices:\n            # Add invoice information to message\n            message['text'] += f\"Invoice: {invoice['name']}\\n\"\n            message['text'] += f\"Amount: {invoice['amount']}\\n\"\n\n        # Send message to Slack\n        Slack_message__3_0_0__create_message(message)\n\n        # Clear message for next sales order\n        message = Slack_message__3_0_0__create_message()"
+}

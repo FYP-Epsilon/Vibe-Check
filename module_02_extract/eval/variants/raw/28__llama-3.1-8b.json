@@ -1,0 +1,51 @@
+{
+  "uid": 28,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "6d15b19006b10be967fabc715fac37bb7f9babf3fedf243951b90223aeda5209",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-bb272cd2-ea46-4f44-8c33-92fbf5a97978",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(leads_rating_0: str, leads_rating_1: str):\n    salesforce_leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead(leads_rating_0, leads_rating_1)\n    for lead in salesforce_leads:\n        if lead['Rating'] == 'Hot':\n            Jira_Issue__2_0_0__create_Issue()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396214,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 230,
+      "completion_tokens": 87,
+      "total_tokens": 317,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396214573,
+        "prefill_wait_time_ms": 0.746095,
+        "prefill_time_ms": 30.055755,
+        "ttft_ms": 30.801849999999998,
+        "total_time_ms": 926.6551840000001,
+        "kv_hit_rate": 0.06666666666666667,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(leads_rating_0: str, leads_rating_1: str):\n    salesforce_leads = Salesforce_Lead__5_0_0__retrievewithwhere_Lead(leads_rating_0, leads_rating_1)\n    for lead in salesforce_leads:\n        if lead['Rating'] == 'Hot':\n            Jira_Issue__2_0_0__create_Issue()"
+}

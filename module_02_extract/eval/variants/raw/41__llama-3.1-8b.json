@@ -1,0 +1,51 @@
+{
+  "uid": 41,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "96b2dac6e83f287219954da6d8d6b1a09539f4af48c7a2303c2e98f5f0c97272",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-695abba3-e364-45fc-8af5-e19cf527f01b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    branch = GitHub_Branch__3_0_0__retrievewithwhere_Branch()\n    pullrequest = GitHub_Pullrequest__3_0_0__create_Pullrequest(branch)\n    GitHub_Issue__3_0_0__create_Issue(pullrequest)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396821,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 214,
+      "completion_tokens": 66,
+      "total_tokens": 280,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396821856,
+        "prefill_wait_time_ms": 0.7870670000000001,
+        "prefill_time_ms": 106.501521,
+        "ttft_ms": 107.288588,
+        "total_time_ms": 516.290539,
+        "kv_hit_rate": 0.07142857142857142,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    branch = GitHub_Branch__3_0_0__retrievewithwhere_Branch()\n    pullrequest = GitHub_Pullrequest__3_0_0__create_Pullrequest(branch)\n    GitHub_Issue__3_0_0__create_Issue(pullrequest)"
+}

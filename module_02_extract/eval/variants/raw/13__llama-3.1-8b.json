@@ -1,0 +1,51 @@
+{
+  "uid": 13,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "2112a344715ffc2dd21f3753240b0bff77d9a8c9d9a269e1f9ee3068fc57ccf4",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8fc1d416-65b9-4a1c-a01d-fd29e70efc9e",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(issues_fields_0: str, issues_fields_1: str):\n    tasks = Asana_Tasks__2_0_0__create_Tasks()\n    for task in tasks:\n        Asana_Attachments__2_0_0__create_Attachments(task['id'])\n        # Since we can't modify the existing code, we will print the task to see the attachment creation\n        print(task)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395683,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 270,
+      "completion_tokens": 89,
+      "total_tokens": 359,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395683990,
+        "prefill_wait_time_ms": 0.739815,
+        "prefill_time_ms": 17.801849,
+        "ttft_ms": 18.541664,
+        "total_time_ms": 684.059718,
+        "kv_hit_rate": 0.058823529411764705,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(issues_fields_0: str, issues_fields_1: str):\n    tasks = Asana_Tasks__2_0_0__create_Tasks()\n    for task in tasks:\n        Asana_Attachments__2_0_0__create_Attachments(task['id'])\n        # Since we can't modify the existing code, we will print the task to see the attachment creation\n        print(task)"
+}

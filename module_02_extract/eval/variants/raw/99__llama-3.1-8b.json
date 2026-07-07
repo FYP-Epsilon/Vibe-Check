@@ -1,0 +1,51 @@
+{
+  "uid": 99,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "76bdb61c574974b3c2c3100440fb51da99e60c48116d73dea35dfb139c3fcfa6",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-3e468ad3-14ca-4f1c-88dc-c119adc3418c",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(tasks_completed_0: str, tasks_completed_1: str):\n    if tasks_completed_0 == \"Asana_Tasks__2_0_0__create\":\n        return Asana_Tasks__2_0_0__retrievewithwhere_Tasks(tasks_completed_0, tasks_completed_1)\n    elif tasks_completed_0 == \"Box_File__3_0_0__create\":\n        return Box_File__3_0_0__retrievewithwhere_File()\n    elif tasks_completed_0 == \"Amazon_S3_bucket__2_0_0__create\":\n        return Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()\n    elif tasks_completed_0 == \"GitHub_Issue__3_0_0__create\":\n        return GitHub_Issue__3_0_0__retrievewithwhere_Issue()\n    else:\n        return tasks_completed_0",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442696,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 257,
+      "completion_tokens": 195,
+      "total_tokens": 452,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442696126,
+        "prefill_wait_time_ms": 0.8228190000000001,
+        "prefill_time_ms": 23.34291,
+        "ttft_ms": 24.165729,
+        "total_time_ms": 1896.2752489999998,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(tasks_completed_0: str, tasks_completed_1: str):\n    if tasks_completed_0 == \"Asana_Tasks__2_0_0__create\":\n        return Asana_Tasks__2_0_0__retrievewithwhere_Tasks(tasks_completed_0, tasks_completed_1)\n    elif tasks_completed_0 == \"Box_File__3_0_0__create\":\n        return Box_File__3_0_0__retrievewithwhere_File()\n    elif tasks_completed_0 == \"Amazon_S3_bucket__2_0_0__create\":\n        return Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket()\n    elif tasks_completed_0 == \"GitHub_Issue__3_0_0__create\":\n        return GitHub_Issue__3_0_0__retrievewithwhere_Issue()\n    else:\n        return tasks_completed_0"
+}

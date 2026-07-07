@@ -1,0 +1,45 @@
+{
+  "uid": 10,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "5c321eaca09963b4fb38bc2b1b3d14e15c86da7b0a72e7c16dcf5c2016c53bff",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-ba2fbe66ac313336",
+    "object": "chat.completion",
+    "created": 1783395640,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(object_size: int):\n    # Create a new S3 bucket\n    Amazon_S3_bucket__2_0_0__create_bucket()\n    \n    # Retrieve all files from the Box folder\n    box_files = Box_File__3_0_0__retrievewithwhere_File()\n    \n    # For each file in the Box folder, create a new S3 object\n    for file in box_files:\n        Amazon_S3_object__2_0_0__create_object()\n        \n        # If the object size is larger than 100, delete it\n        if object_size > 100:\n            Amazon_S3_object__2_0_0__deletewithwhere_object(object_size=object_size)",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 231,
+      "total_tokens": 385,
+      "completion_tokens": 154,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(object_size: int):\n    # Create a new S3 bucket\n    Amazon_S3_bucket__2_0_0__create_bucket()\n    \n    # Retrieve all files from the Box folder\n    box_files = Box_File__3_0_0__retrievewithwhere_File()\n    \n    # For each file in the Box folder, create a new S3 object\n    for file in box_files:\n        Amazon_S3_object__2_0_0__create_object()\n        \n        # If the object size is larger than 100, delete it\n        if object_size > 100:\n            Amazon_S3_object__2_0_0__deletewithwhere_object(object_size=object_size)"
+}

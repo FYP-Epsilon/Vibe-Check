@@ -1,0 +1,45 @@
+{
+  "uid": 98,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "7bea0a762d06662021005327073feb9a8042606a43e51bc7e2c95fde729442e9",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-9c748911658e65fa",
+    "object": "chat.completion",
+    "created": 1783442689,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow(leads_rating_0: str, leads_rating_1: str):\n    # Retrieve existing campaigns\n    campaigns = Salesforce_Campaign__8_0_0__retrievewithwhere_Campaign()\n\n    # Filter leads_rating_0 and leads_rating_1 from the retrieved campaigns\n    existing_campaigns = [campaign for campaign in campaigns if leads_rating_0 in campaign or leads_rating_1 in campaign]\n\n    # If there are existing campaigns, return them; otherwise, return an empty list\n    if existing_campaigns:\n        return existing_campaigns\n    else:\n        return []",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 257,
+      "total_tokens": 407,
+      "completion_tokens": 150,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(leads_rating_0: str, leads_rating_1: str):\n    # Retrieve existing campaigns\n    campaigns = Salesforce_Campaign__8_0_0__retrievewithwhere_Campaign()\n\n    # Filter leads_rating_0 and leads_rating_1 from the retrieved campaigns\n    existing_campaigns = [campaign for campaign in campaigns if leads_rating_0 in campaign or leads_rating_1 in campaign]\n\n    # If there are existing campaigns, return them; otherwise, return an empty list\n    if existing_campaigns:\n        return existing_campaigns\n    else:\n        return []"
+}

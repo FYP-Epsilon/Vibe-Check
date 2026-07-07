@@ -1,0 +1,51 @@
+{
+  "uid": 37,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "6a14d8eb0783acfbd3e80d8ecc473b4427abce23552a1a761dd28e87f2a54195",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-95256113-28f1-40ab-8dd8-0f8f4b2f722d",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Create a new product\n    product_id = Zendesk_Service_product__3_0_0__create_product()\n    \n    # Create a new asset\n    asset_id = Zendesk_Service_asset__3_0_0__create_asset()\n    \n    # Update the product details with the new asset\n    Zendesk_Service_product__3_0_0__updatewithwhere_product(product_id, asset_id)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396696,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 206,
+      "completion_tokens": 89,
+      "total_tokens": 295,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 16
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440650,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440650,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396696314,
+        "prefill_wait_time_ms": 0.790006,
+        "prefill_time_ms": 21.882922,
+        "ttft_ms": 22.672928,
+        "total_time_ms": 488.52131199999997,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Create a new product\n    product_id = Zendesk_Service_product__3_0_0__create_product()\n    \n    # Create a new asset\n    asset_id = Zendesk_Service_asset__3_0_0__create_asset()\n    \n    # Update the product details with the new asset\n    Zendesk_Service_product__3_0_0__updatewithwhere_product(product_id, asset_id)"
+}

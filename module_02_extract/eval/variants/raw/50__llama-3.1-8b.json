@@ -1,0 +1,51 @@
+{
+  "uid": 50,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "165492b3350ed4b311e10ed7d23aa8bf856a0f5f2e65ebff50ef8e4d809851ab",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-78c31a91-14b3-44b6-b0e3-0798644a2197",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    new_person_id = Zendesk_Service_person__3_0_0__create_person()\n    new_ticket_id = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    Zendesk_Service_Ticket__2_0_0__add_requester_to_ticket(new_ticket_id, new_person_id)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783412818,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 199,
+      "completion_tokens": 70,
+      "total_tokens": 269,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783412818668,
+        "prefill_wait_time_ms": 0.6561699999999999,
+        "prefill_time_ms": 29.36286,
+        "ttft_ms": 30.019029999999997,
+        "total_time_ms": 578.78325,
+        "kv_hit_rate": 0.07692307692307693,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    new_person_id = Zendesk_Service_person__3_0_0__create_person()\n    new_ticket_id = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    Zendesk_Service_Ticket__2_0_0__add_requester_to_ticket(new_ticket_id, new_person_id)"
+}

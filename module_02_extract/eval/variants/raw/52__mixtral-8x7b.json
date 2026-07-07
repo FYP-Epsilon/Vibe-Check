@@ -1,0 +1,45 @@
+{
+  "uid": 52,
+  "model": "mistralai/mixtral-8x7b-instruct-v0.1",
+  "model_slug": "mixtral-8x7b",
+  "prompt_sha256": "6e025b09494fe71462bb18a37099ce38b1403cf031775cd07d9f607307c44db0",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b0ec5b19394591da",
+    "object": "chat.completion",
+    "created": 1783439544,
+    "model": "stg/mistralai/mixtral-8x7b-instruct-v0.1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": " def workflow():\n    # Retrieve the OneDrive folder\n    one_drive_folder = Microsoft_OneDrive_for_Business_FolderItem__4_0_0__retrievewithwhere_FolderItem()\n\n    # Create the Box folder\n    box_folder = Box_Folder__3_0_0__create_Folder()\n\n    # Iterate through the files in the OneDrive folder\n    for file_item in one_drive_folder[\"value\"]:\n        if \"file\" in file_item:\n            file = file_item[\"file\"]\n\n            # Copy the file to the Box folder\n            Box_File__3_0_0__COPYFILE_File(box_folder[\"id\"], file[\"name\"], file[\"@microsoft.graph.downloadUrl\"])\n\n    return \"Files copied from OneDrive to Box\"",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 250,
+      "total_tokens": 445,
+      "completion_tokens": 195,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Retrieve the OneDrive folder\n    one_drive_folder = Microsoft_OneDrive_for_Business_FolderItem__4_0_0__retrievewithwhere_FolderItem()\n\n    # Create the Box folder\n    box_folder = Box_Folder__3_0_0__create_Folder()\n\n    # Iterate through the files in the OneDrive folder\n    for file_item in one_drive_folder[\"value\"]:\n        if \"file\" in file_item:\n            file = file_item[\"file\"]\n\n            # Copy the file to the Box folder\n            Box_File__3_0_0__COPYFILE_File(box_folder[\"id\"], file[\"name\"], file[\"@microsoft.graph.downloadUrl\"])\n\n    return \"Files copied from OneDrive to Box\""
+}

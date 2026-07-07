@@ -1,0 +1,51 @@
+{
+  "uid": 86,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "67af0a75d03af9abf260c03ef3cfbff7f2e8cb8e32b7ef2018b0b51bce2850ee",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-df6c8bd3-1756-4274-a9f4-e52c1406bb45",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Send a notification using Gmail\n    subject = \"Slack Notification\"\n    body = \"This is a notification from Slack.\"\n    Gmail_mail__2_0_0__create_mail(subject, body)\n    # Comment out the following lines as they are for Zendesk\n    # ticketComment = Zendesk_Service_ticketComment__2_0_0__retrievewithwhere_ticketComment()\n    # Zendesk_Service_ticketComment__2_0_0__create_ticketComment(ticketComment)\n    # ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    # Zendesk_Service_Ticket__2_0_0__update_Ticket(ticket)\n    # Zendesk_Service_ticketAttachment__2_0_0__UPLOADATTACHMENT_ticketAttachment(ticket)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783442561,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 226,
+      "completion_tokens": 167,
+      "total_tokens": 393,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783442561190,
+        "prefill_wait_time_ms": 0.750398,
+        "prefill_time_ms": 23.705903,
+        "ttft_ms": 24.456301,
+        "total_time_ms": 2052.4372240000002,
+        "kv_hit_rate": 0.2,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Send a notification using Gmail\n    subject = \"Slack Notification\"\n    body = \"This is a notification from Slack.\"\n    Gmail_mail__2_0_0__create_mail(subject, body)\n    # Comment out the following lines as they are for Zendesk\n    # ticketComment = Zendesk_Service_ticketComment__2_0_0__retrievewithwhere_ticketComment()\n    # Zendesk_Service_ticketComment__2_0_0__create_ticketComment(ticketComment)\n    # ticket = Zendesk_Service_Ticket__2_0_0__create_Ticket()\n    # Zendesk_Service_Ticket__2_0_0__update_Ticket(ticket)\n    # Zendesk_Service_ticketAttachment__2_0_0__UPLOADATTACHMENT_ticketAttachment(ticket)"
+}

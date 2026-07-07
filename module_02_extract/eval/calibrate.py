@@ -48,6 +48,7 @@ from main import (  # noqa: E402
 from ast_extractor import run_v3_pipeline  # noqa: E402
 from z3_sym_engine import run_v2_pipeline  # noqa: E402
 from dynamic_tracer import run_v1_pipeline, MultiModalCertificateComposer  # noqa: E402
+from dynamic_tracer.randomized import extract_guard_string_literals  # noqa: E402
 import ast  # noqa: E402
 
 MANIFEST_PATH = EVAL_DIR / "manifest.json"
@@ -187,10 +188,23 @@ def _base_func_wir(base_uid: int, manifest_by_uid: dict[int, dict[str, Any]],
     return result
 
 
-def run_differential_verification(mutant_source: str, base_func_wir: dict[str, Any]) -> dict[str, Any]:
+def run_differential_verification(
+    mutant_source: str,
+    base_func_wir: dict[str, Any],
+    base_source: Optional[str] = None,
+) -> dict[str, Any]:
     """
     Verify *mutant_source* against the *base* program's WIR instead of a
     WIR re-derived from the mutant itself.
+
+    *base_source* (A2), if given, seeds V1's string-literal pool with the
+    BASE program's guard-compared literals in addition to the mutant's own
+    -- e.g. a constant-perturb mutant's ``"high"`` -> ``"high_X"`` pool
+    would otherwise only ever draw ``"high_X"``, so runs that don't happen
+    to also draw the ORIGINAL literal see no divergence at that guard.
+    Test inputs are not the oracle (only the expected trace is), so
+    drawing them from the base's guards is ordinary spec-based test-input
+    selection -- no anti-circularity issue.
 
     V3 still runs on the mutant standalone (extraction fidelity is a
     property of the mutant's own syntax, independent of any oracle) and
@@ -242,6 +256,13 @@ def run_differential_verification(mutant_source: str, base_func_wir: dict[str, A
     mutant_func_wir = functions[function_name]
     mutant_v1_params = _derive_v1_params(mutant_func_wir)
 
+    # A2: union the base program's own guard-compared string literals into
+    # V1's pool so a constant-perturb mutant's original literal (not just
+    # its mutated one) gets exercised too. None when base_source isn't
+    # supplied (e.g. some test call sites) -- falls back to the mutant's
+    # own pool only, as before A2.
+    extra_str_literals = extract_guard_string_literals(base_source) if base_source else None
+
     v1_cert = run_v1_pipeline(
         source=mutant_source,
         function_name=function_name,
@@ -257,6 +278,7 @@ def run_differential_verification(mutant_source: str, base_func_wir: dict[str, A
         # branch land is a property of the mutant's own syntax (observation
         # layer), not spec knowledge -- same anti-circularity rule as C2.
         branch_arms=mutant_v1_params["branch_arms"],
+        extra_str_literals=extra_str_literals,
     )
 
     v2_result = run_v2_pipeline(
@@ -271,7 +293,29 @@ def run_differential_verification(mutant_source: str, base_func_wir: dict[str, A
     v2_cert = v2_result["certificate"]
 
     composer = MultiModalCertificateComposer()
-    return composer.compose(v1_cert, v2_cert, v3_cert)
+    cert = composer.compose(v1_cert, v2_cert, v3_cert)
+
+    # A1: the standard OR-composition (combined = 1-(1-v1)(1-v2)) assumes both
+    # layers have an independent oracle. In differential mode that's true of
+    # V1 (its expected trace comes from the base program) but not of V2 --
+    # it symbolically explores the MUTANT's own code with no actual/expected
+    # comparator, so a high v2_confidence means "the mutant is internally
+    # consistent with itself," not "no bug found." Composing it via OR padded
+    # every score (buggy and correct alike) with a term that carries no
+    # detection signal -- e.g. a negate-guard mutant with v1=0.0 (perfect
+    # detection) still landed at combined=0.5 because self-referential v2=0.5
+    # floored the OR. V1 alone is the differential verdict; v2_confidence
+    # stays in the cert as telemetry (spec-path coverage stats), not verdict.
+    v1_confidence = v1_cert.get("confidence", 0.0)
+    cert["combined_confidence"] = v1_confidence
+    if not cert.get("v3_abort", False):
+        cert["passed"] = v1_confidence >= 0.95
+        cert["message"] = (
+            "WIR validated -- passed to Module 03."
+            if cert["passed"]
+            else "Flag for manual review -- combined confidence below 0.95."
+        )
+    return cert
 
 
 def run_pipeline_on_manifest(
@@ -300,8 +344,8 @@ def run_pipeline_on_manifest(
             base = _base_func_wir(base_uid, manifest_by_uid or {}, wir_cache)
             if base is None:
                 continue
-            _, base_func_wir = base
-            cert = run_differential_verification(source, base_func_wir)
+            base_source, base_func_wir = base
+            cert = run_differential_verification(source, base_func_wir, base_source=base_source)
 
         records.append({
             "uid": _uid_for(entry),

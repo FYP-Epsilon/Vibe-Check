@@ -1,0 +1,51 @@
+{
+  "uid": 40,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "42ae7792c7a5702ef65ccbaf5bd63f02b5e7249087b6df3981e7ef2eeb2e014c",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-237f131a-943d-4a23-b497-e21b9db2bdc8",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def Microsoft_Exchange_Events__2_0_0__deletewithwhere_Events():\n    # Check if there are any events to cancel\n    if not events_to_cancel:\n        print(\"No events to cancel.\")\n        return\n\n    # Loop through each event to cancel\n    for event in events_to_cancel:\n        # Call the helper function to delete the event\n        Microsoft_Exchange_Events__2_0_0__deletewithwhere_Events(event)\n\n    # Print a success message\n    print(\"Events successfully canceled.\")",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396799,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 167,
+      "completion_tokens": 113,
+      "total_tokens": 280,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440709,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440709,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396799126,
+        "prefill_wait_time_ms": 0.904268,
+        "prefill_time_ms": 18.405698,
+        "ttft_ms": 19.309966000000003,
+        "total_time_ms": 544.643419,
+        "kv_hit_rate": 0.09090909090909091,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def Microsoft_Exchange_Events__2_0_0__deletewithwhere_Events():\n    # Check if there are any events to cancel\n    if not events_to_cancel:\n        print(\"No events to cancel.\")\n        return\n\n    # Loop through each event to cancel\n    for event in events_to_cancel:\n        # Call the helper function to delete the event\n        Microsoft_Exchange_Events__2_0_0__deletewithwhere_Events(event)\n\n    # Print a success message\n    print(\"Events successfully canceled.\")"
+}

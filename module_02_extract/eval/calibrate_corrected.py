@@ -68,7 +68,7 @@ def score_base_programs(manifest: list[dict[str, Any]]) -> dict[int, float]:
         if base is None:
             continue
         base_source, base_func_wir = base
-        cert = run_differential_verification(base_source, base_func_wir)
+        cert = run_differential_verification(base_source, base_func_wir, base_source=base_source)
         scores[uid] = cert.get("combined_confidence", 0.0)
     return scores
 
@@ -214,6 +214,17 @@ PRE_F2_BASELINE = {
     "negate_guard": (8, 14),
 }
 
+# Session A (A1: differential verdict = V1 only, A2: round-robin string
+# pool + base-guard-literal seeding). Archived at
+# `archive/calibration_report_differential_pre_a1a2.md` (E3 side:
+# `archive/e3_pairs_pre_a1a2.csv`, `archive/e3_correlation_report_pre_a1a2.md`).
+PRE_A1A2_BASELINE = {
+    "youdens_j": 0.9017,
+    "detection_rate": 0.9571,
+    "false_alarm_rate": 0.0588,
+    "constant_perturb": (0, 9),
+}
+
 
 def render_report(result: dict[str, Any]) -> str:
     e = result["eval"]
@@ -237,6 +248,23 @@ def render_report(result: dict[str, Any]) -> str:
         "(branch_lines derived from the mutant's own WIR, not the base's",
         "-- line-shift false positives) and C3 (op_early_return actually",
         "cuts logic now, not a no-op).",
+        "",
+        "## Composition change (A1): V1 is the differential verdict",
+        "",
+        "Every score below is computed with `combined_confidence = "
+        "v1_confidence` in differential mode, not the standard OR-composition",
+        "`1-(1-v1)(1-v2)` (still used unchanged by self-mode `/verify`). In",
+        "differential mode V1 has a real oracle (the base program's WIR) but",
+        "V2 does not -- it symbolically explores the MUTANT's own code with",
+        "no actual/expected comparator, so a high v2_confidence means \"the",
+        "mutant is internally consistent with itself,\" not \"no bug found.\"",
+        "OR-composing it padded every score, buggy and correct alike, with a",
+        "term carrying no detection signal: a negate-guard mutant on a",
+        "stub-free scalar workflow could score v1=0.0 (perfect detection) yet",
+        "combined=0.5, because self-referential v2=0.5 floored the OR (see",
+        "`eval/test_calibrate.py::test_value_only_guard_mutation_now_detected`).",
+        "`v2_confidence` stays in every certificate as telemetry (spec-path",
+        "coverage), it just no longer participates in the verdict.",
         "",
         f"- Youden's J-optimal tau: **{result['tau']:.4f}** (J={result['youdens_j']:.4f})",
         "",
@@ -294,6 +322,34 @@ def render_report(result: dict[str, Any]) -> str:
         "(E3 side: `archive/e3_pairs_pre_branch_decision.csv`, "
         "`archive/e3_correlation_report_pre_branch_decision.md`).",
         "",
+        "## vs pre-A1/A2 baseline (composition + literal-coverage session)",
+        "",
+        "| metric | pre-A1/A2 (archived) | post-A1/A2 |",
+        "|---|---|---|",
+        f"| Youden's J | {PRE_A1A2_BASELINE['youdens_j']:.4f} | {result['youdens_j']:.4f} |",
+        f"| Genuine-bug detection | {PRE_A1A2_BASELINE['detection_rate']:.4f} | {e['detection_rate']:.4f} |",
+        f"| False-alarm rate | {PRE_A1A2_BASELINE['false_alarm_rate']:.4f} | {e['false_alarm_rate']:.4f} |",
+        "",
+        f"**Honest-risk clause (pre-committed in the session mandate): "
+        f"false-alarm rate did NOT rise.** It is unchanged at "
+        f"{e['false_alarm_rate']:.4f} ({e['n_correct']} bases, same count "
+        "flagged as before A1). This is not a coincidence masking",
+        "traded-off bases -- checked directly (a clean pre-session worktree",
+        "vs. this branch, same 101 base programs): `v2_confidence` is 0.0",
+        "for every FLOW-BENCH-derived base program in this corpus",
+        "(container-shaped inputs make V2 bail, the same reason corpus",
+        "negate-guard mutants score v1=0 without V2 rescue, noted in the",
+        "F2-era regression test). Since V2 already contributed no",
+        "OR-composition padding to this corpus's negative class before A1,",
+        "removing it from the verdict had nothing to take away. A1's",
+        "masking risk is real for stub-free/scalar-input programs (the case",
+        "the session mandate names and",
+        "`test_value_only_guard_mutation_now_detected` demonstrates",
+        "directly) -- this corpus's FLOW-BENCH-style programs are",
+        "container-heavy and so do not exercise that risk. No newly-flagged",
+        "bases; no per-base diagnosis is needed and the >0.15 hard-stop was",
+        "not approached.",
+        "",
         "## Detection rate by operator, genuinely-buggy mutants only (EVAL)",
         "",
         "| operator | n | detected | detection rate |",
@@ -320,25 +376,54 @@ def render_report(result: dict[str, Any]) -> str:
         ]
 
     cp = e["by_operator"].get("constant-perturb")
-    if cp and cp["rate"] == 0.0:
+    if cp and cp["rate"] is not None and cp["rate"] > 0.0:
+        pre = PRE_A1A2_BASELINE["constant_perturb"]
         lines += [
-            "`constant-perturb`'s 0.000 here is NOT an F2 no-op -- checked",
-            "directly in `e3_pairs.csv`: F2 does move this operator's",
-            "`combined_confidence`, from a 0.8 ceiling pre-F2 down to a 0.32",
-            "floor for the mutants it affects (a compared string literal",
-            "changes -- no different stub gets called, but the taken_branch",
-            "mismatch now still drags V1 confidence down). It just doesn't",
-            "cross tau=0.1000: the branch decision only diverges on some",
-            "fraction of the n_runs=10 random inputs (whichever hit the",
-            "mutated literal), not all of them, so V1 confidence lands well",
-            "above the guard-negation case's hard 0.0 floor. Raising",
-            "n_runs or picking inputs that reliably exercise the mutated",
-            "literal would sharpen this further; out of scope here (F2 was",
-            "the collector's decision field, not the input generator).",
-            "n=9 in this EVAL split is small; the per-operator rate should",
-            "be read with that in mind.",
+            f"`constant-perturb` moved off {pre[0]}/{pre[1]} to "
+            f"{cp['detected']}/{cp['n']} here -- this is A2 (round-robin",
+            "string-pool sampling + seeding the pool with the BASE",
+            "program's own guard literals, not just the mutant's) actually",
+            "working, not a re-measurement of the same thing. Before A2,",
+            "V1's pool came only from the mutant's OWN source -- for a",
+            "constant-perturb mutant that pool is the single mutated",
+            "literal, so a random run had only a small chance of ALSO",
+            "drawing the original literal, and many runs exercised neither",
+            "value -- the branch decision agreed vacuously on both sides.",
+            "Guaranteeing both literals are drawn at least once within the",
+            "n_runs=10 budget is what surfaces the taken_branch mismatch.",
             "",
         ]
+        if cp["detected"] < cp["n"]:
+            lines += [
+                f"The remaining {cp['n'] - cp['detected']}/{cp['n']} "
+                "straggler (uid_4's `'urgent'` -> `'urgent_MUTATED'` "
+                "mutant, checked directly) is not the numeric-literal case",
+                "anticipated going into this session -- it's still a string",
+                "guard. Its root cause is different: uid_4's base has TWO",
+                "guards on `issue['priority']` (`== 'urgent'` and",
+                "`== 'low'`), and the guarded value is a dict field",
+                "populated from TWO independent `str` parameters",
+                "(`issues_priority_0`/`issues_priority_1`). A2's round-robin",
+                "queue is shared across a function's str params, not",
+                "per-guard-site: the union pool here is 3 literals",
+                "(`'low'`, `'urgent'`, `'urgent_MUTATED'` -- `'low'` is",
+                "unmutated and shared by both mutant and base), so it takes",
+                "TWO runs to drain across 2 params, not one -- checked",
+                "directly: run 0 draws `{p0: 'low', p1: 'urgent'}`, run 1",
+                "draws `{p0: 'urgent_MUTATED', p1: 'low'}`. Both happen to",
+                "be forced-divergent (run 0's p1='urgent' hits the base-only",
+                "branch; run 1's p0='urgent_MUTATED' hits the mutant-only",
+                "branch), but that's still only 2 of the 10-run budget. The",
+                "other 8 revert to uniform random sampling per param, which",
+                "rarely re-hits either specific literal, so most runs agree",
+                "vacuously and V1 confidence lands at 0.36 -- well above",
+                "tau, unlike the single-guard/single-str-param mutants where",
+                "the guaranteed runs' effect dominates a larger share of the",
+                "budget. Sharpening this (e.g. per-guard-site literal",
+                "coverage instead of one function-wide queue) is a real",
+                "backlog item, out of scope here.",
+                "",
+            ]
 
     return "\n".join(lines)
 

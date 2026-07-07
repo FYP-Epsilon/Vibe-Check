@@ -1,0 +1,51 @@
+{
+  "uid": 43,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "43177cb4d27d3bcb0445a20ecb2923d84292285b3eaff2807f876d7c36d5775b",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-ea5c9256-17e8-406a-95fd-103d32811d4e",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow():\n    # Retrieve sales orders from Microsoft Dynamics 365\n    sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n\n    # Compile price lists from Microsoft Dynamics 365\n    price_levels = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel()\n\n    # Retrieve invoices from Microsoft Dynamics 365\n    invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n\n    # Compile the sales orders, price lists, and invoices into a single message\n    message = f\"Sales Orders: {sales_orders}, Price Lists: {price_levels}, Invoices: {invoices}\"\n\n    # Send the compiled message to the manager on Slack\n    Slack_message__3_0_0__create_message(message)",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396888,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 255,
+      "completion_tokens": 192,
+      "total_tokens": 447,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396888532,
+        "prefill_wait_time_ms": 0.854229,
+        "prefill_time_ms": 22.525719,
+        "ttft_ms": 23.379948000000002,
+        "total_time_ms": 1673.119789,
+        "kv_hit_rate": 0.0625,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow():\n    # Retrieve sales orders from Microsoft Dynamics 365\n    sales_orders = Microsoft_Dynamics_365_for_Sales_SalesOrder__7_0_0__retrievewithwhere_SalesOrder()\n\n    # Compile price lists from Microsoft Dynamics 365\n    price_levels = Microsoft_Dynamics_365_for_Sales_PriceLevel__7_0_0__retrievewithwhere_PriceLevel()\n\n    # Retrieve invoices from Microsoft Dynamics 365\n    invoices = Microsoft_Dynamics_365_for_Sales_Invoice__7_0_0__retrievewithwhere_Invoice()\n\n    # Compile the sales orders, price lists, and invoices into a single message\n    message = f\"Sales Orders: {sales_orders}, Price Lists: {price_levels}, Invoices: {invoices}\"\n\n    # Send the compiled message to the manager on Slack\n    Slack_message__3_0_0__create_message(message)"
+}

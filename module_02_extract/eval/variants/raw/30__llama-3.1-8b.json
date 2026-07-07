@@ -1,0 +1,51 @@
+{
+  "uid": 30,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "8488e8bb9599251967b364701569d1fffd23eed862568122eb56153d33eafa94",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-573b69f5-66c5-4e6c-9114-2cd8f4bf9e32",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(files_owned_by_0: str, files_owned_by_1: str):\n    box_files = Box_File__3_0_0__retrievewithwhere_File(files_owned_by_0=files_owned_by_0, files_owned_by_1=files_owned_by_1)\n    for file in box_files:\n        Box_File__3_0_0__deletewithwhere_File(file)\n    Jira_Issue__2_0_0__create_Issue()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783396288,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 247,
+      "completion_tokens": 102,
+      "total_tokens": 349,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440657,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440657,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783396288035,
+        "prefill_wait_time_ms": 0.870108,
+        "prefill_time_ms": 32.925016,
+        "ttft_ms": 33.795124,
+        "total_time_ms": 1054.962406,
+        "kv_hit_rate": 0.0625,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(files_owned_by_0: str, files_owned_by_1: str):\n    box_files = Box_File__3_0_0__retrievewithwhere_File(files_owned_by_0=files_owned_by_0, files_owned_by_1=files_owned_by_1)\n    for file in box_files:\n        Box_File__3_0_0__deletewithwhere_File(file)\n    Jira_Issue__2_0_0__create_Issue()"
+}

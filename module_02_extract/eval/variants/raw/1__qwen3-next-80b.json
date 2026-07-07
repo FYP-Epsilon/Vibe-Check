@@ -1,0 +1,45 @@
+{
+  "uid": 1,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "a78692bda9c9218ac35cce753991a99f6d75bf2c1df06770238fde052f18d11f",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-990e83587cd4a164",
+    "object": "chat.completion",
+    "created": 1783395431,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    Jira_Issue__2_0_0__create_Issue()\n    GitHub_Repository__3_0_0__create_Repository()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 164,
+      "total_tokens": 199,
+      "completion_tokens": 35,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    Jira_Issue__2_0_0__create_Issue()\n    GitHub_Repository__3_0_0__create_Repository()"
+}

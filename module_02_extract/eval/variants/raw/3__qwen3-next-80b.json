@@ -1,0 +1,45 @@
+{
+  "uid": 3,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "36d3ef3bd06b175d5b0833d81565ed9d8f45a8d8fd0b13232dd34a4a5c60c19d",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-b4cd3e8e6dca9f41",
+    "object": "chat.completion",
+    "created": 1783395530,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow(folder_name: str):\n    Salesforce_Contact__5_0_0__create_Contact()\n    if folder_name is not None:\n        Box_Folder__3_0_0__create_Folder(folder_name)\n    else:\n        Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 209,
+      "total_tokens": 279,
+      "completion_tokens": 70,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow(folder_name: str):\n    Salesforce_Contact__5_0_0__create_Contact()\n    if folder_name is not None:\n        Box_Folder__3_0_0__create_Folder(folder_name)\n    else:\n        Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()"
+}

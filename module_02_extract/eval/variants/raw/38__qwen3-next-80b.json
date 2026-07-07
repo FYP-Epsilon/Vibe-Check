@@ -1,0 +1,45 @@
+{
+  "uid": 38,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "cf9f0698a6c0aa688bde55bd3f566982d41d66f536251bb5e0540b2327dbf578",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-8592bc81321b7d60",
+    "object": "chat.completion",
+    "created": 1783396761,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    # Get the todo list by id\n    todo_list = Microsoft_To_Do_getUsersByUserIdTodoListsByTodoTaskListId_model__1_0_0__getUsersByUserIdTodoListsByTodoTaskListId_getUsersByUserIdTodoListsByTodoTaskListId_model()\n    \n    # Create a new task in the todo list\n    new_task = Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model()\n    \n    return new_task",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 229,
+      "total_tokens": 362,
+      "completion_tokens": 133,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    # Get the todo list by id\n    todo_list = Microsoft_To_Do_getUsersByUserIdTodoListsByTodoTaskListId_model__1_0_0__getUsersByUserIdTodoListsByTodoTaskListId_getUsersByUserIdTodoListsByTodoTaskListId_model()\n    \n    # Create a new task in the todo list\n    new_task = Microsoft_To_Do_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model__1_0_0__postUsersByUserIdTodoListsByTodoTaskListIdTasks_postUsersByUserIdTodoListsByTodoTaskListIdTasks_model()\n    \n    return new_task"
+}

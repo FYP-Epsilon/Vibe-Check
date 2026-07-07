@@ -1,0 +1,51 @@
+{
+  "uid": 3,
+  "model": "meta/llama-3.1-8b-instruct",
+  "model_slug": "llama-3.1-8b",
+  "prompt_sha256": "36d3ef3bd06b175d5b0833d81565ed9d8f45a8d8fd0b13232dd34a4a5c60c19d",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-1aa25521-2df8-4628-9c60-bc72a9139a28",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "def workflow(folder_name: str):\n    # Create a new contact in salesforce\n    Salesforce_Contact__5_0_0__create_Contact()\n    \n    # Create a box folder for this contact\n    Box_Folder__3_0_0__create_Folder(folder_name=folder_name)\n    \n    # If the folder name is none, send an email using outlook\n    if folder_name is None:\n        Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()",
+          "role": "assistant",
+          "reasoning_content": null
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1783395519,
+    "model": "meta/llama-3.1-8b-instruct",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 232,
+      "completion_tokens": 106,
+      "total_tokens": 338,
+      "prompt_tokens_details": {
+        "audio_tokens": null,
+        "cached_tokens": 48
+      }
+    },
+    "nvext": {
+      "worker_id": {
+        "prefill_worker_id": 7587895903503440747,
+        "prefill_dp_rank": 0,
+        "decode_worker_id": 7587895903503440747,
+        "decode_dp_rank": 0
+      },
+      "timing": {
+        "request_received_ms": 1783395519944,
+        "prefill_wait_time_ms": 0.91356,
+        "prefill_time_ms": 18.102068,
+        "ttft_ms": 19.015628,
+        "total_time_ms": 642.082077,
+        "kv_hit_rate": 0.0,
+        "router_queue_depth": 0
+      }
+    }
+  },
+  "extracted_code": "def workflow(folder_name: str):\n    # Create a new contact in salesforce\n    Salesforce_Contact__5_0_0__create_Contact()\n    \n    # Create a box folder for this contact\n    Box_Folder__3_0_0__create_Folder(folder_name=folder_name)\n    \n    # If the folder name is none, send an email using outlook\n    if folder_name is None:\n        Microsoft_Exchange_Messages__2_0_0__SENDOUTLOOK_Messages()"
+}

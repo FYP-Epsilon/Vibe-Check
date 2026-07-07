@@ -1,0 +1,22 @@
+def Jira_Issue__2_0_0__retrievewithwhere_Issue():
+    return [{'value': 0}, {'value': 1}]
+
+
+def Slack_message__3_0_0__create_message():
+    return {}
+
+
+def Jira_Project__2_0_0__retrievewithwhere_Project():
+    return {}
+
+
+def Jira_Issue__2_0_0__create_Issue():
+    return {}
+
+
+def workflow():
+    issues = Jira_Issue__2_0_0__retrievewithwhere_Issue()
+    for issue in issues:
+        new_issue = Jira_Issue__2_0_0__create_Issue(issue)
+    message = Slack_message__3_0_0__create_message('Copied all issues successfully.')
+    return None

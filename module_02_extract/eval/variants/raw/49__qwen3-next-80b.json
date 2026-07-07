@@ -1,0 +1,45 @@
+{
+  "uid": 49,
+  "model": "qwen/qwen3-next-80b-a3b-instruct",
+  "model_slug": "qwen3-next-80b",
+  "prompt_sha256": "588f2d11134a36235fd85a300e572975476a75ea54c3295bdf89d4dba45d659d",
+  "temperature": 0.7,
+  "raw_response": {
+    "id": "chatcmpl-acea018da366fb05",
+    "object": "chat.completion",
+    "created": 1783412816,
+    "model": "qwen/qwen3-next-80b-a3b-instruct",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "def workflow():\n    project_data = Jira_Project__2_0_0__retrievewithwhere_Project()\n    user_task(label=\"Copy project to Corpora\")\n    return project_data",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "tool_calls": [],
+          "reasoning": null,
+          "reasoning_content": null
+        },
+        "logprobs": null,
+        "finish_reason": "stop",
+        "stop_reason": null,
+        "token_ids": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": null,
+    "usage": {
+      "prompt_tokens": 150,
+      "total_tokens": 190,
+      "completion_tokens": 40,
+      "prompt_tokens_details": null
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "kv_transfer_params": null
+  },
+  "extracted_code": "def workflow():\n    project_data = Jira_Project__2_0_0__retrievewithwhere_Project()\n    user_task(label=\"Copy project to Corpora\")\n    return project_data"
+}
