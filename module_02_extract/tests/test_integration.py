@@ -50,6 +50,56 @@ class TestSelectEntryFunction:
         assert result["combined_confidence"] > 0.0
 
 
+class TestTypedLayerStatuses:
+    """B2: /verify no longer collapses every failure into one
+    indistinguishable all-zero response -- the "layers" key reports each
+    phase's own status and, on failure, which phase and why."""
+
+    def test_syntax_error_is_a_v3_failure_with_v2_v1_skipped(self):
+        result = _run_verification("def broken(:\n    pass")
+        assert result["layers"]["v3"]["status"] == "ERROR"
+        assert "syntax" in result["layers"]["v3"]["reason"].lower()
+        assert result["layers"]["v2"]["status"] == "SKIPPED"
+        assert result["layers"]["v1"]["status"] == "SKIPPED"
+        assert result["layers"]["v2"]["reason"] is not None
+        assert result["layers"]["v1"]["reason"] is not None
+        assert result["passed"] is False
+
+    def test_happy_path_all_layers_ok(self):
+        source = (
+            "def workflow(x: int) -> int:\n"
+            "    if x > 0:\n        return 1\n    return 0\n"
+        )
+        result = _run_verification(source)
+        assert result["layers"]["v3"]["status"] == "OK"
+        assert result["layers"]["v2"]["status"] == "OK"
+        assert result["layers"]["v1"]["status"] == "OK"
+
+    def test_v2_bail_case_carries_message_in_layers_v2_reason(self):
+        """A dynamic (non-literal) dict-key subscript defeats
+        _seed_containers' static key discovery, so the seeded generic
+        keys KeyError on the very first concrete execution -- V2's own
+        internal container-bail path (concolic.py's "V2 skipped:
+        uninterpreted container types"), not a Python exception. Status
+        stays OK (V2 didn't crash, it degraded gracefully); the bail
+        message must still be visible in layers.v2.reason."""
+        source = (
+            "def workflow(items: dict) -> int:\n"
+            "    key = 'x'\n"
+            "    return items[key]\n"
+        )
+        result = _run_verification(source)
+        assert result["layers"]["v2"]["status"] == "OK"
+        assert result["layers"]["v2"]["reason"] == "V2 skipped: uninterpreted container types"
+
+    def test_no_functions_in_source_is_a_v3_failure(self):
+        result = _run_verification("x = 1\n")
+        assert result["layers"]["v3"]["status"] == "ERROR"
+        assert "no functions" in result["layers"]["v3"]["reason"].lower()
+        assert result["layers"]["v2"]["status"] == "SKIPPED"
+        assert result["layers"]["v1"]["status"] == "SKIPPED"
+
+
 class TestTaskObservabilityAlignment:
     """E2 acceptance test -- the session's real definition of done.
 
