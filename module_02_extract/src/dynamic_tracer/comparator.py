@@ -58,8 +58,16 @@ class DifferentialComparator:
         # tuple against a taken-blind actual tuple would make every branch
         # mismatch regardless of correctness.
         use_taken = self.mode == "strict" and self._both_sides_have_taken(actual_filtered, self.expected_raw)
-        actual_seq = self._normalise(actual_filtered, use_taken, self.mode)
-        expected_seq = self._normalise(self.expected_raw, use_taken, self.mode)
+        # B1: return_value is only comparable when BOTH sides actually
+        # produced one. The expected side skips it on a graceful-degrade
+        # eval failure (see interpreter.py's _return_eval_failed); the
+        # actual side skips it only when the real call raised (already
+        # covered by its own exception event). Comparing a real value
+        # against "absent" would fabricate a mismatch that isn't a real
+        # behavioral divergence -- the false-alarm guard for this feature.
+        include_return = self._both_sides_have_return(actual_filtered, self.expected_raw)
+        actual_seq = self._normalise(actual_filtered, use_taken, self.mode, include_return)
+        expected_seq = self._normalise(self.expected_raw, use_taken, self.mode, include_return)
 
         # 3. LCS similarity.
         lcs_len = self._lcs(actual_seq, expected_seq)
@@ -86,6 +94,7 @@ class DifferentialComparator:
             "expected_length": len(expected_seq),
             "divergence_points": divergences,
             "passed": passed,
+            "return_value_skipped": not include_return,
         }
 
     # -- internal helpers ------------------------------------------------
@@ -132,7 +141,23 @@ class DifferentialComparator:
         return True
 
     @staticmethod
-    def _normalise(trace: list[dict[str, Any]], use_taken: bool = False, mode: str = "strict") -> list[tuple[Any, ...]]:
+    def _both_sides_have_return(
+        actual_trace: list[dict[str, Any]],
+        expected_trace: list[dict[str, Any]],
+    ) -> bool:
+        """True iff both sides emitted a return_value event (B1) -- the
+        expected side skips it on a graceful-degrade eval failure; the
+        actual side skips it only when the real call raised. See the
+        comment in compare() for why this must be symmetric."""
+        return (
+            any(e["event"] == "return_value" for e in actual_trace)
+            and any(e["event"] == "return_value" for e in expected_trace)
+        )
+
+    @staticmethod
+    def _normalise(
+        trace: list[dict[str, Any]], use_taken: bool = False, mode: str = "strict", include_return: bool = True,
+    ) -> list[tuple[Any, ...]]:
         """Convert trace records into comparable tuples."""
         seq: list[tuple[Any, ...]] = []
         for e in trace:
@@ -158,6 +183,15 @@ class DifferentialComparator:
                     seq.append(("branch_point",))
             elif ev == "exception":
                 seq.append(("exception", e.get("exception_type")))
+            elif ev == "return_value":
+                # B1: a return value is behavior, not branch structure --
+                # kept in BOTH comparison modes (unlike branch_point).
+                # include_return is False only when one side lacks a
+                # return_value event entirely (graceful degrade / a crash),
+                # in which case it's dropped from both sides symmetrically
+                # rather than compared against "absent".
+                if include_return:
+                    seq.append(("return_value", e.get("value")))
         return seq
 
     @staticmethod
