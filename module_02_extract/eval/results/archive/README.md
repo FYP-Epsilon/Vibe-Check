@@ -4,6 +4,34 @@ These are kept, not deleted, because they're part of the documented
 finding trail — each was superseded by a specific fix, and the numbers
 themselves are evidence for what was broken.
 
+## `e3_pairs_pre_b1_return_value.csv`, `e3_correlation_report_pre_b1_return_value.md`
+
+Session B (B1, return-value observable). Not superseded — kept as
+evidence that B1 was checked against the mutation corpus, not assumed
+neutral. B1 added `return_value` comparison to the differential
+comparator in BOTH modes (see `src/dynamic_tracer/comparator.py`), so
+E3 was re-run in full (all 427 mutant/base pairs recomputed, not
+resumed from the pre-B1 CSV) to check whether it moved. It didn't:
+`eval/results/e3_pairs.csv` and `e3_correlation_report.md` are
+byte-identical to these archived pre-B1 copies (Pearson r = 0.4085 /
+0.5580 restricted, Spearman rho = 0.5400 / 0.5988 restricted, 11/427
+equivalent). Diagnosed, not just observed: this corpus's mutation
+operators (negate-guard, drop-step, reorder-steps, wrong-variable,
+etc.) directly perturb control flow, so in strict mode a mutation
+almost always already diverges on task-sequence or branch-decision
+before return value would ever be the deciding channel -- for a
+genuine miss, return_value has nothing left to add; for an equivalent
+mutant, the return value agrees too, same as everything else. This is
+the complement of B1's actual target: the natural-bug corpus's 6
+previously-missed cases (`eval/results/cross_impl_mode_report.md`) are
+specifically return-value-ONLY divergences between independently
+written implementations that share identical branch structure and
+task sequence -- a class of divergence that essentially does not occur
+from directly mutating one program's own control-flow structure. See
+`eval/results/session_b_report.md`'s B1 section for the full
+instrument-gate numbers (natural-bug corpus, C5c both modes, full
+strict calibration) where B1's effect is real and large.
+
 ## `calibration_report_differential_pre_a1a2.md`, `e3_pairs_pre_a1a2.csv`, `e3_correlation_report_pre_a1a2.md`
 
 Session A (A1 + A2), before both fixes. Two backlog items from the
