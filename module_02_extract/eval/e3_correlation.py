@@ -405,6 +405,32 @@ def render_report(result: dict[str, Any]) -> str:
         "confirming the shift is entirely on the certificate side, same "
         "as the F2 transition above.",
         "",
+        "### r and rho unchanged after Session B (B1 return-value observable) -- checked, not assumed",
+        "",
+        "B1 added a `return_value` comparison to the differential "
+        "comparator's normalised sequence in BOTH modes (see "
+        "`src/dynamic_tracer/comparator.py`). Re-run in full (all 427 "
+        "pairs recomputed from scratch, not resumed from the pre-B1 CSV) "
+        "to check whether it moved this correlation rather than assuming "
+        "it didn't: it does not (byte-identical to the pre-B1 archived "
+        "copy, `archive/e3_pairs_pre_b1_return_value.csv` / "
+        "`archive/e3_correlation_report_pre_b1_return_value.md`). This "
+        "corpus's mutation operators (negate-guard, drop-step, "
+        "reorder-steps, wrong-variable, etc.) directly perturb control "
+        "flow, so in strict mode a genuine bug almost always already "
+        "diverges on task-sequence or branch-decision before "
+        "return_value would ever be the deciding channel, and an "
+        "equivalent mutant's return value agrees along with everything "
+        "else. B1's actual target is a different corpus: the natural-bug "
+        "cross-implementation set's 6 previously-missed cases "
+        "(`eval/results/cross_impl_mode_report.md`) are specifically "
+        "return-value-ONLY divergences between independently written "
+        "implementations sharing identical branch structure and task "
+        "sequence -- a class of divergence that essentially does not "
+        "arise from mutating one program's own control flow. See "
+        "`eval/results/session_b_report.md`'s B1 section for where B1's "
+        "effect is real and large.",
+        "",
         f"## Equivalent mutants (semantic_diff_rate == 0 at N={N_INPUTS}): {n_equivalent} / {n}",
         "",
         "| operator | equivalent | total |",
