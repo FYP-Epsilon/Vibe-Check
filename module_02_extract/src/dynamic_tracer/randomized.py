@@ -62,8 +62,13 @@ class RandomizedDifferentialTester:
         compiled_ns: Optional[dict[str, Any]] = None,
         branch_arms: Optional[dict[int, tuple[Optional[int], Optional[int]]]] = None,
         extra_str_literals: Optional[list[str]] = None,
+        comparison_mode: str = "strict",
     ) -> None:
         self.source = source
+        # D1: "strict" (default, same-lineage comparison -- e.g. mutant vs
+        # its own base) or "task_only" (cross-implementation comparison --
+        # independently-written programs, branch structure excluded).
+        self.comparison_mode = comparison_mode
         self.function_name = function_name
         self.wir = wir
         self.task_patterns = task_patterns
@@ -238,7 +243,7 @@ class RandomizedDifferentialTester:
             actual = self._run_actual(inputs)
             expected = self._run_expected(inputs)
 
-            comparator = DifferentialComparator(actual, expected)
+            comparator = DifferentialComparator(actual, expected, mode=self.comparison_mode)
             result = comparator.compare()
             results.append(result)
 

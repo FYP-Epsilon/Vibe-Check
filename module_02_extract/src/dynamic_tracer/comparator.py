@@ -25,9 +25,18 @@ class DifferentialComparator:
         self,
         actual_trace: list[dict[str, Any]],
         expected_trace: list[dict[str, Any]],
+        mode: str = "strict",
     ) -> None:
         self.actual_raw = actual_trace
         self.expected_raw = expected_trace
+        # "strict" (default): branch_point events compared like any other
+        # event -- correct when both sides share source lineage (a mutant
+        # vs its own base), so branch-structure divergence is signal.
+        # "task_only" (D1): branch_point events are dropped before the LCS
+        # entirely -- correct when the two sides are independently-written
+        # implementations, so branch structure is legitimate style, not a
+        # correctness signal. See docs/module02/11_multi_impl_corpus_contract.md.
+        self.mode = mode
 
     # -- public API ------------------------------------------------------
 
@@ -48,9 +57,9 @@ class DifferentialComparator:
         # This stays symmetric on purpose: comparing a taken-aware expected
         # tuple against a taken-blind actual tuple would make every branch
         # mismatch regardless of correctness.
-        use_taken = self._both_sides_have_taken(actual_filtered, self.expected_raw)
-        actual_seq = self._normalise(actual_filtered, use_taken)
-        expected_seq = self._normalise(self.expected_raw, use_taken)
+        use_taken = self.mode == "strict" and self._both_sides_have_taken(actual_filtered, self.expected_raw)
+        actual_seq = self._normalise(actual_filtered, use_taken, self.mode)
+        expected_seq = self._normalise(self.expected_raw, use_taken, self.mode)
 
         # 3. LCS similarity.
         lcs_len = self._lcs(actual_seq, expected_seq)
@@ -123,7 +132,7 @@ class DifferentialComparator:
         return True
 
     @staticmethod
-    def _normalise(trace: list[dict[str, Any]], use_taken: bool = False) -> list[tuple[Any, ...]]:
+    def _normalise(trace: list[dict[str, Any]], use_taken: bool = False, mode: str = "strict") -> list[tuple[Any, ...]]:
         """Convert trace records into comparable tuples."""
         seq: list[tuple[Any, ...]] = []
         for e in trace:
@@ -133,6 +142,14 @@ class DifferentialComparator:
             elif ev == "task_exit":
                 seq.append(("task_exit", e.get("task", e.get("function", ""))))
             elif ev == "branch_point":
+                if mode == "task_only":
+                    # D1: cross-implementation comparison -- branch structure
+                    # is legitimate style variation between independently
+                    # written but behaviorally equivalent programs, so it's
+                    # dropped entirely rather than kept as a decision-less
+                    # count (a count mismatch would still be the same style
+                    # noise the mode exists to exclude).
+                    continue
                 if use_taken:
                     seq.append(("branch_point", e.get("taken_branch")))
                 else:
