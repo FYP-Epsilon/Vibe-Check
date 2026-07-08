@@ -192,6 +192,7 @@ def run_differential_verification(
     mutant_source: str,
     base_func_wir: dict[str, Any],
     base_source: Optional[str] = None,
+    comparison_mode: str = "strict",
 ) -> dict[str, Any]:
     """
     Verify *mutant_source* against the *base* program's WIR instead of a
@@ -205,6 +206,14 @@ def run_differential_verification(
     Test inputs are not the oracle (only the expected trace is), so
     drawing them from the base's guards is ordinary spec-based test-input
     selection -- no anti-circularity issue.
+
+    *comparison_mode* (D1): "strict" (default) -- branch-decision
+    divergence is signal, correct when mutant_source and base_func_wir
+    share source lineage. "task_only" -- branch_point events are dropped
+    from the comparison entirely, correct when the two sides are
+    independently-written implementations (branch structure is style, not
+    a correctness signal there). See
+    docs/module02/11_multi_impl_corpus_contract.md.
 
     V3 still runs on the mutant standalone (extraction fidelity is a
     property of the mutant's own syntax, independent of any oracle) and
@@ -279,6 +288,7 @@ def run_differential_verification(
         # layer), not spec knowledge -- same anti-circularity rule as C2.
         branch_arms=mutant_v1_params["branch_arms"],
         extra_str_literals=extra_str_literals,
+        comparison_mode=comparison_mode,
     )
 
     v2_result = run_v2_pipeline(
@@ -322,8 +332,13 @@ def run_pipeline_on_manifest(
     manifest: list[dict[str, Any]],
     mode: str = "differential",
     manifest_by_uid: Optional[dict[int, dict[str, Any]]] = None,
+    comparison_mode: str = "strict",
 ) -> list[dict[str, Any]]:
-    """Run every runnable manifest entry through the chosen mode's pipeline."""
+    """Run every runnable manifest entry through the chosen mode's pipeline.
+
+    *comparison_mode* only applies when mode == "differential" (self-mode
+    has no cross-implementation use case); see run_differential_verification.
+    """
     records: list[dict[str, Any]] = []
     wir_cache: dict[int, tuple[str, dict[str, Any]]] = {}
     for entry in manifest:
@@ -345,7 +360,9 @@ def run_pipeline_on_manifest(
             if base is None:
                 continue
             base_source, base_func_wir = base
-            cert = run_differential_verification(source, base_func_wir, base_source=base_source)
+            cert = run_differential_verification(
+                source, base_func_wir, base_source=base_source, comparison_mode=comparison_mode,
+            )
 
         records.append({
             "uid": _uid_for(entry),
