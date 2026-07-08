@@ -188,7 +188,15 @@ class RandomizedDifferentialTester:
         func = self._compiled_ns[self.function_name]
         with collector:
             try:
-                func(**copy.deepcopy(inputs))
+                result = func(**copy.deepcopy(inputs))
+                # B1: real Python always has a well-defined return value on
+                # success (unlike the reference side, this never needs a
+                # graceful-degrade skip) -- appended after tracing captures
+                # everything else, so it lands as the trace's final event.
+                collector.trace_log.append({
+                    "event": "return_value",
+                    "value": self._make_hashable(result),
+                })
             except BaseException:
                 # Safety net: catch BaseException so SystemExit or KeyboardInterrupt
                 # inside traced code does not kill the FastAPI worker.
@@ -205,6 +213,15 @@ class RandomizedDifferentialTester:
             self.wir, exec_env=self._compiled_ns, task_names=self._stub_task_names
         )
         trace = interpreter.execute(inputs)
+        # B1: pull any return_value event out before wrapping and
+        # re-append it last, so it stays the trace's true final event even
+        # after the synthetic task_exit is added below -- matches the
+        # actual side's convention (collector.py's task_exit fires
+        # synchronously during the call, before _run_actual appends
+        # return_value afterward); positional agreement here matters
+        # because the comparator's LCS is order-sensitive.
+        return_events = [e for e in trace if e["event"] == "return_value"]
+        trace = [e for e in trace if e["event"] != "return_value"]
         # If the function name matches a task pattern, wrap the trace with
         # synthetic task-entry / task-exit events so it aligns with the
         # actual execution trace captured by sys.settrace.
@@ -214,6 +231,7 @@ class RandomizedDifferentialTester:
                 *trace,
                 {"event": "task_exit", "task": self.function_name},
             ]
+        trace.extend(return_events)
         return trace
 
     @staticmethod
@@ -253,6 +271,10 @@ class RandomizedDifferentialTester:
         # Input-coverage score: entropy of the generated input set.
         coverage_score = min(len(input_hashes) / self.n_runs, 1.0)
         confidence = (matching / self.n_runs) * coverage_score if self.n_runs else 1.0
+        # B1: surfaced, not hidden -- a run where return_value was excluded
+        # from the comparison (graceful degrade or a crash on either side)
+        # is not a silent gap; count it so it's visible in the certificate.
+        return_value_skips = sum(1 for r in results if r.get("return_value_skipped"))
 
         return {
             "version": "V1",
@@ -260,6 +282,7 @@ class RandomizedDifferentialTester:
             "matching_traces": matching,
             "total_runs": self.n_runs,
             "input_coverage_score": coverage_score,
+            "return_value_skips": return_value_skips,
             "message": (
                 "V1 dynamic tracing passed."
                 if confidence >= 0.95
