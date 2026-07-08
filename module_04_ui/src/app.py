@@ -5,15 +5,7 @@ import streamlit as st
 import sys
 import os
 
-# Add Module 01 to path for direct integration
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../module_01_spec/src")))
-
-try:
-    from semantic_extractor import SemanticExtractionEngine
-    from ltlf_synthesizer import FLTLSynthesizer
-    from mutation_refiner import MutationValidator
-except ImportError:
-    st.error("Could not import Module 01 components. Ensure paths are correct.")
+# Module 01 integration is handled via the spec-engine HTTP API.
 
 st.set_page_config(
     page_title="VibeCheck Portal",
@@ -92,10 +84,10 @@ def _check_extract_engine() -> str:
 
 
 def _check_spec_engine() -> str:
-    """Spec Engine runs via direct import – check if classes loaded."""
+    """Check if Spec Engine (Module 01) is online via API."""
     try:
-        _ = SemanticExtractionEngine
-        return "online"
+        r = requests.get("http://spec-engine:8000/docs", timeout=2)
+        return "online" if r.status_code == 200 else "idle"
     except Exception:
         return "idle"
 
@@ -208,6 +200,7 @@ if st.session_state.active_page == "dashboard":
     mode = st.radio(
         "Quick Launch",
         ["BPMN Spec Verification", "Python Workflow Verification"],
+        index=None,
         horizontal=True,
     )
     if mode == "BPMN Spec Verification":
@@ -278,17 +271,16 @@ elif st.session_state.active_page == "spec_engine":
             else:
                 with st.spinner("Executing Module 01 Pipeline..."):
                     try:
-                        # Phase 1: Semantic Extraction
-                        extractor = SemanticExtractionEngine(bpmn_xml)
-                        p1_result = extractor.run_pipeline()
-
-                        # Phase 2: LTLf Synthesis
-                        synthesizer = FLTLSynthesizer(p1_result)
-                        p2_result = synthesizer.run_pipeline()
-
-                        # Phase 3: Mutation Refinement
-                        validator = MutationValidator(p1_result["semantic_graph"], p2_result["ltlf_property_suite"])
-                        p3_result = validator.execute_validation_pipeline()
+                        response = requests.post(
+                            "http://spec-engine:8000/verify",
+                            json={"bpmn_xml": bpmn_xml},
+                            timeout=120,
+                        )
+                        response.raise_for_status()
+                        res_data = response.json()
+                        p1_result = res_data["phase_1"]
+                        p2_result = res_data["phase_2"]
+                        p3_result = res_data["phase_3"]
 
                         st.divider()
                         st.subheader("Spec Verification Results")

@@ -1,59 +1,67 @@
-import time
-import json
-from api import run_module_01_pipeline
+import os
+import uvicorn
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Dict, Any
 
-def main():
-    print("✅ Module 01 (Spec Engine): BPMN Parsing & LTLf Synthesis environment initialized.")
-    
-    # Example BPMN XML input with XOR gateway and implicit guard
-    bpmn_xml = """<?xml version="1.0" encoding="UTF-8"?>
-    <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="http://bpmn.io/schema/bpmn">
-      <bpmn:process id="Loan_Process" isExecutable="true">
-        <bpmn:startEvent id="Start_1" name="Begin" />
-        <bpmn:exclusiveGateway id="Gateway_1" name="Credit Check" />
-        <bpmn:task id="Activity_Approve" name="Approve Loan" />
-        <bpmn:task id="Activity_Reject" name="Reject Loan" />
-        <bpmn:endEvent id="End_1" name="Finish" />
+try:
+    from .semantic_extractor import SemanticExtractionEngine
+    from .ltlf_synthesizer import FLTLSynthesizer
+    from .mutation_refiner import MutationValidator, VerificationException
+except ImportError:
+    from semantic_extractor import SemanticExtractionEngine
+    from ltlf_synthesizer import FLTLSynthesizer
+    from mutation_refiner import MutationValidator, VerificationException
+
+app = FastAPI(title="VibeCheck Spec Engine", version="2.0.0")
+
+class BPMNPayload(BaseModel):
+    bpmn_xml: str
+
+@app.post("/verify")
+def verify_spec(payload: BPMNPayload):
+    bpmn_xml = payload.bpmn_xml
+    if not bpmn_xml.strip():
+        raise HTTPException(status_code=400, detail="BPMN XML content is required.")
         
-        <bpmn:sequenceFlow id="F1" sourceRef="Start_1" targetRef="Gateway_1" />
-        <bpmn:sequenceFlow id="F2" sourceRef="Gateway_1" targetRef="Activity_Approve">
-            <bpmn:conditionExpression>credit_score > 700</bpmn:conditionExpression>
-        </bpmn:sequenceFlow>
-        <bpmn:sequenceFlow id="F3" sourceRef="Gateway_1" targetRef="Activity_Reject" /> <!-- Implicit Else -->
-        
-        <bpmn:sequenceFlow id="F4" sourceRef="Activity_Approve" targetRef="End_1" />
-        <bpmn:sequenceFlow id="F5" sourceRef="Activity_Reject" targetRef="End_1" />
-      </bpmn:process>
-    </bpmn:definitions>
-    """
-    
-    print("\n[V3 -> V2 -> V1 Pipeline] Starting Full Module 01 Execution...")
     try:
-        result = run_module_01_pipeline(bpmn_xml)
+        # Phase 1: Semantic Extraction
+        extraction_engine = SemanticExtractionEngine(bpmn_xml)
+        phase_1_result = extraction_engine.run_pipeline()
         
-        if result["status"] == "PASS":
-            print("\n[Semantic Extraction Certificate]")
-            print(json.dumps(result["phase_1"]["phase_1_certificate"], indent=2))
-            
-            print("\n[LTLf Synthesis Certificate]")
-            print(json.dumps(result["phase_2"]["phase_2_certificate"], indent=2))
-            
-            print("\n[Inferred Implicit Guards]")
-            print(json.dumps(result["phase_2"]["inferred_implicit_guards"], indent=2))
-            
-            print("\n[Generated LTLf Properties (Sample)]")
-            for cat, props in result["phase_2"]["ltlf_property_suite"].items():
-                print(f"- {cat}: {len(props)} properties")
-                if props:
-                    print(f"  Example: {props[0]}")
-        else:
-            print(f"❌ Pipeline Failed at Phase {result.get('phase', 'Unknown')}: {result.get('error')}")
-        
-    except Exception as e:
-        print(f"❌ Execution Failed: {e}")
+        if phase_1_result["phase_1_certificate"]["status"] == "FAIL":
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "error": "Phase 1 Quality Gate failed.",
+                    "details": phase_1_result["phase_1_certificate"]
+                }
+            )
 
-    time.sleep(1)
-    print("\nModule 01: Standing by for real-time BPMN XML inputs...")
+        # Phase 2: LTLf Synthesis
+        synthesizer = FLTLSynthesizer(phase_1_result)
+        phase_2_result = synthesizer.run_pipeline()
+
+        # Phase 3: Mutation Refinement
+        validator = MutationValidator(phase_1_result["semantic_graph"], phase_2_result["ltlf_property_suite"])
+        phase_3_result = validator.execute_validation_pipeline()
+        
+        return {
+            "status": "PASS",
+            "phase_1": phase_1_result,
+            "phase_2": phase_2_result,
+            "phase_3": phase_3_result
+        }
+        
+    except VerificationException as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
+@app.get("/docs")
+@app.get("/")
+def read_root():
+    return {"status": "online", "message": "✅ Module 01 (Spec Engine) API is running."}
 
 if __name__ == "__main__":
-    main()
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False)
