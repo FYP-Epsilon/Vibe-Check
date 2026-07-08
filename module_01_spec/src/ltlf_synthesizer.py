@@ -134,11 +134,20 @@ class FLTLSynthesizer:
                 # AND Gateway: G(start(A) <-> start(B)) & G(done(A) <-> done(B))
                 outgoing = [e for e in self.edges if e["source_id"] == node_id]
                 if len(outgoing) >= 2:
-                    b1 = self._get_node_props(outgoing[0]["target_id"])[0]
-                    b2 = self._get_node_props(outgoing[1]["target_id"])[0]
-                    self.ltlf_suite["P1_Structural_Control_Flow"].append(
-                        f"G({b1} <-> {b2})"
-                    )
+                    branches = [self._get_node_props(e["target_id"]) for e in outgoing]
+                    for i in range(len(branches)):
+                        for j in range(i + 1, len(branches)):
+                            b_i_start = branches[i][0]
+                            b_i_done = branches[i][-1]
+                            b_j_start = branches[j][0]
+                            b_j_done = branches[j][-1]
+                            
+                            self.ltlf_suite["P1_Structural_Control_Flow"].append(
+                                f"G({b_i_start} <-> {b_j_start})"
+                            )
+                            self.ltlf_suite["P1_Structural_Control_Flow"].append(
+                                f"G({b_i_done} <-> {b_j_done})"
+                            )
 
     def _generate_sentinels(self):
         """Generates P0 Critical Sentinels and P2 Quality Limits."""

@@ -25,8 +25,10 @@ class BPMNMutationEngine:
             self._mutate_condition_inversion,
             self._mutate_loop_boundary
         ]
-        
-        while len(self.mutants) < count:
+        attempts = 0
+        max_attempts = 1000
+        while len(self.mutants) < count and attempts < max_attempts:
+            attempts += 1
             op = random.choice(operators)
             mutant = op(copy.deepcopy(self.original_graph))
             if mutant and mutant != self.original_graph:
@@ -208,9 +210,6 @@ class MutationValidator:
                 self.auditor = LTLfAuditor(temp_suite)
                 killed_now, _ = self.auditor.is_killed(mutant)
                 if killed_now:
-                    self.mutants_killed += 1
-                else:
-                    # Force kill for demonstration of recursive success if logic above is too simple
                     self.mutants_killed += 1
 
         # 3. Quality Gate Certification
