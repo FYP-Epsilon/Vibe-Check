@@ -22,6 +22,7 @@ def run_v1_pipeline(
     compiled_ns: Optional[dict[str, Any]] = None,
     branch_arms: Optional[dict[int, tuple[Optional[int], Optional[int]]]] = None,
     extra_str_literals: Optional[list[str]] = None,
+    comparison_mode: str = "strict",
 ) -> dict[str, Any]:
     """
     End-to-end Phase-3 pipeline.
@@ -42,5 +43,6 @@ def run_v1_pipeline(
         compiled_ns=compiled_ns,
         branch_arms=branch_arms,
         extra_str_literals=extra_str_literals,
+        comparison_mode=comparison_mode,
     )
     return tester.run()
