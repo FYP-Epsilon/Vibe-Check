@@ -317,6 +317,28 @@ def _run_verification(source: str) -> dict:
     query_budget = int(os.getenv("V2_QUERY_BUDGET", "20"))
     n_runs = int(os.getenv("V1_RUNS", "10"))
 
+    # B5: why n_runs is sized for input-space COVERAGE, not for detection
+    # confidence. Since F2 (branch decisions) and B1 (return values), a
+    # single V1 run's differential comparator now observes every
+    # behavioral surface this design covers: task/branch sequence,
+    # exception type, branch decision (strict mode), and return value.
+    # A behavioral divergence on ANY one of the n_runs runs drags that
+    # run's comparator result to "not passed", which lowers matching_traces
+    # and therefore v1_cert["confidence"] below tau regardless of how many
+    # OTHER runs happened to agree -- detection does not hinge on n_runs
+    # being large. What n_runs actually controls is how much of the input
+    # space gets sampled: a guard literal or code path that no run's
+    # inputs ever exercise can't diverge on either side, so raising n_runs
+    # raises the chance a rare guard-controlling input (e.g. a specific
+    # string literal) gets drawn, and raising it enough to drain the
+    # round-robin literal pool (see randomized.py's _pool_queue, A2)
+    # guarantees every known guard literal is exercised at least once
+    # within the budget. The known n-sensitive case is the constant-perturb
+    # mutation operator's straggler (uid_4, see session_a_report.md /
+    # [[session_2026_07_04_t1_t7_implementation]]): a mutated string
+    # literal that the round-robin pool doesn't happen to include is only
+    # reachable by chance, so its detection probability is a function of
+    # coverage (n_runs, pool composition), not of this scoring design.
     dynamic_query_budget = min(query_budget, max(10, 500 - ast_node_count // 10))
     dynamic_n_runs = min(n_runs, max(5, 100 - ast_node_count // 50))
 
