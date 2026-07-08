@@ -267,7 +267,9 @@ class TestWIRReferenceInterpreter:
         )
         interp = WIRReferenceInterpreter(wir)
         trace = interp.execute({})
-        assert len(trace) == 0  # no tasks or gateways
+        # B1: no tasks or gateways, but execute() always emits a trailing
+        # return_value (None here -- no return node in this graph).
+        assert trace == [{"event": "return_value", "value": None}]
 
     def test_gateway_branching(self):
         wir = self._make_wir(
@@ -371,6 +373,105 @@ class TestWIRReferenceInterpreter:
         trace_new = interp_new.execute({})
         assert any(e["event"] == "branch_point" and e["taken_branch"] is True for e in trace_new)
         assert interp_new.exec_errors == 0
+
+    def test_return_node_emits_evaluated_return_value(self):
+        """B1: a `return <expr>` node's expression is evaluated (not
+        exec()'d, which would SyntaxError outside a function body) into
+        the trailing return_value event."""
+        wir = self._make_wir(
+            [
+                {"id": "e", "type": "entry", "successors": ["r"]},
+                {"id": "r", "type": "return", "code": ["return {'a': 1, 'b': 2}"], "successors": []},
+            ],
+            "e",
+            "r",
+        )
+        interp = WIRReferenceInterpreter(wir)
+        trace = interp.execute({})
+        assert trace[-1] == {"event": "return_value", "value": (("a", 1), ("b", 2))}
+        assert interp.exec_errors == 0
+
+    def test_bare_return_emits_none(self):
+        wir = self._make_wir(
+            [
+                {"id": "e", "type": "entry", "successors": ["r"]},
+                {"id": "r", "type": "return", "code": ["return"], "successors": []},
+            ],
+            "e",
+            "r",
+        )
+        interp = WIRReferenceInterpreter(wir)
+        trace = interp.execute({})
+        assert trace[-1] == {"event": "return_value", "value": None}
+
+    def test_fall_through_without_return_node_emits_none(self):
+        """No return node reached at all -- matches Python's implicit
+        `return None` when a function falls off its end."""
+        wir = self._make_wir(
+            [
+                {"id": "e", "type": "entry", "successors": ["b"]},
+                {"id": "b", "type": "block", "code": ["y = 1"], "successors": ["x"]},
+                {"id": "x", "type": "exit", "successors": []},
+            ],
+            "e",
+            "x",
+        )
+        interp = WIRReferenceInterpreter(wir)
+        trace = interp.execute({})
+        assert trace == [{"event": "return_value", "value": None}]
+
+    def test_unevaluable_return_expression_skips_event_gracefully(self):
+        """B1's false-alarm guard: if the return expression can't be
+        evaluated (references an undefined name), no return_value event
+        is emitted at all -- never fabricate a value the interpreter
+        couldn't actually compute."""
+        wir = self._make_wir(
+            [
+                {"id": "e", "type": "entry", "successors": ["r"]},
+                {"id": "r", "type": "return", "code": ["return undefined_name + 1"], "successors": []},
+            ],
+            "e",
+            "r",
+        )
+        interp = WIRReferenceInterpreter(wir)
+        trace = interp.execute({})
+        assert not any(e["event"] == "return_value" for e in trace)
+        assert interp._return_eval_failed is True
+        assert interp.exec_errors > 0
+
+    def test_return_node_as_exit_node_is_still_processed(self):
+        """A function whose last statement is a bare top-level return has
+        that return node itself designated exit_node by the extractor
+        (verified against real CFGExtractor output) -- the old sentinel
+        stop-before-processing logic must not skip it."""
+        wir = self._make_wir(
+            [
+                {"id": "e", "type": "entry", "successors": ["r"]},
+                {"id": "r", "type": "return", "code": ["return 42"], "successors": []},
+            ],
+            "e",
+            "r",  # exit_node IS the return node
+        )
+        interp = WIRReferenceInterpreter(wir)
+        trace = interp.execute({})
+        assert trace[-1] == {"event": "return_value", "value": 42}
+
+    def test_non_return_exit_sentinel_still_not_processed(self):
+        """Regression: a genuine blank/bookkeeping exit sentinel (not a
+        return node) must still be stopped at, not executed -- only the
+        return-node case overrides the sentinel stop."""
+        wir = self._make_wir(
+            [
+                {"id": "e", "type": "entry", "successors": ["x"]},
+                {"id": "x", "type": "exit", "code": ["should_not_run()"], "successors": []},
+            ],
+            "e",
+            "x",
+        )
+        interp = WIRReferenceInterpreter(wir)
+        trace = interp.execute({})
+        assert interp.exec_errors == 0  # "should_not_run()" never executed
+        assert trace == [{"event": "return_value", "value": None}]
 
 
 # ----------------------------------------------------------------------
@@ -635,6 +736,81 @@ class TestComparisonModeTaskOnly:
         assert result["similarity_score"] < 1.0
 
 
+class TestReturnValueObservable:
+    """B1: return_value is compared in BOTH modes (behavior, not branch
+    structure) -- unlike branch_point, which is dropped in task_only."""
+
+    def test_matching_return_value_passes_in_strict_mode(self):
+        actual = [{"event": "return_value", "value": "neg"}]
+        expected = [{"event": "return_value", "value": "neg"}]
+        result = DifferentialComparator(actual, expected, mode="strict").compare()
+        assert result["similarity_score"] == 1.0
+        assert result["return_value_skipped"] is False
+
+    def test_return_value_only_divergence_detected_in_both_modes(self):
+        """The exact class Session D's 6-miss diagnosis found: identical
+        call sequence, differing only in the final return value."""
+        for mode in ("strict", "task_only"):
+            actual = [
+                {"event": "task_entry", "function": "foo"},
+                {"event": "task_exit", "function": "foo"},
+                {"event": "return_value", "value": (("tickets", ()), ("users", ()))},
+            ]
+            expected = [
+                {"event": "task_entry", "task": "foo"},
+                {"event": "task_exit", "task": "foo"},
+                {"event": "return_value", "value": None},
+            ]
+            result = DifferentialComparator(actual, expected, mode=mode).compare()
+            assert result["similarity_score"] < 1.0, f"mode={mode} should diverge on return value"
+            assert result["return_value_skipped"] is False
+
+    def test_return_value_kept_in_task_only_mode_unlike_branch_point(self):
+        """A branch-structure difference recovers under task_only, but a
+        genuine return-value difference on top of it still diverges --
+        task_only isn't blind to behavior, only to branch structure."""
+        actual = [
+            {"event": "branch_point", "function": "foo", "taken_branch": True},
+            {"event": "branch_point", "function": "foo", "taken_branch": False},  # extra guard (style)
+            {"event": "return_value", "value": "wrong"},
+        ]
+        expected = [
+            {"event": "branch_point", "task": "foo", "taken_branch": True},
+            {"event": "return_value", "value": "right"},
+        ]
+        result = DifferentialComparator(actual, expected, mode="task_only").compare()
+        assert result["similarity_score"] < 1.0
+
+    def test_return_value_absent_on_one_side_excluded_symmetrically(self):
+        """Graceful degrade (B1's false-alarm guard): if only ONE side has
+        a return_value event (e.g. the reference interpreter's eval
+        failed), it must be dropped from BOTH sides' comparison rather
+        than counted as a mismatch -- a fabricated divergence is exactly
+        the false-alarm risk this feature must not introduce."""
+        actual = [
+            {"event": "task_entry", "function": "foo"},
+            {"event": "task_exit", "function": "foo"},
+            {"event": "return_value", "value": "neg"},
+        ]
+        expected_no_return = [
+            {"event": "task_entry", "task": "foo"},
+            {"event": "task_exit", "task": "foo"},
+        ]
+        result = DifferentialComparator(actual, expected_no_return, mode="strict").compare()
+        assert result["similarity_score"] == 1.0
+        assert result["passed"] is True
+        assert result["return_value_skipped"] is True
+
+    def test_both_sides_have_return_helper(self):
+        assert DifferentialComparator._both_sides_have_return(
+            [{"event": "return_value", "value": 1}], [{"event": "return_value", "value": 2}],
+        ) is True
+        assert DifferentialComparator._both_sides_have_return(
+            [{"event": "return_value", "value": 1}], [],
+        ) is False
+        assert DifferentialComparator._both_sides_have_return([], []) is False
+
+
 # ----------------------------------------------------------------------
 # P3.4 -- RandomizedDifferentialTester
 # ----------------------------------------------------------------------
@@ -667,6 +843,82 @@ def classify(x, y):
         assert cert["version"] == "V1"
         assert 0 <= cert["confidence"] <= 1.0
         assert cert["total_runs"] == 10
+        assert cert["return_value_skips"] == 0
+
+    def test_run_actual_emits_return_value_event(self):
+        """B1: the real function's return value (previously discarded) is
+        captured and appended as the actual trace's final event."""
+        source = "def foo(x: int) -> int:\n    return x + 1\n"
+        from ast_extractor import CFGExtractor
+        func_wir = CFGExtractor().extract(source)["functions"]["foo"]
+        tester = RandomizedDifferentialTester(
+            source=source, function_name="foo", wir=func_wir,
+            task_patterns=["foo"], branch_lines=set(), control_variables=["x"],
+            n_runs=1, seed=1,
+        )
+        inputs = tester._generate_random_inputs()
+        actual = tester._run_actual(inputs)
+        assert actual[-1] == {"event": "return_value", "value": inputs["x"] + 1}
+
+    def test_return_value_only_divergence_detected_end_to_end(self):
+        """The exact Session D 6-miss class, reproduced end-to-end: base
+        falls through returning None, mutant has identical task/branch
+        structure but an explicit return -- V1 must now detect this."""
+        from ast_extractor import CFGExtractor
+        base_source = (
+            "def workflow(status: str) -> None:\n"
+            "    if status == 'high':\n"
+            "        pass\n"
+        )
+        mutant_source = (
+            "def workflow(status: str) -> dict:\n"
+            "    if status == 'high':\n"
+            "        pass\n"
+            "    return {'seen': True}\n"
+        )
+        base_func_wir = CFGExtractor().extract(base_source)["functions"]["workflow"]
+
+        tester = RandomizedDifferentialTester(
+            source=mutant_source, function_name="workflow", wir=base_func_wir,
+            task_patterns=["workflow"], branch_lines={2}, control_variables=["status"],
+            n_runs=10, seed=1,
+        )
+        cert = tester.run()
+        assert cert["confidence"] < 0.95
+        assert cert["return_value_skips"] == 0  # both sides always produce a value here
+
+    def test_graceful_degrade_no_false_alarm_when_reference_cannot_evaluate(self):
+        """B1's false-alarm guard, end-to-end: a base WIR whose return
+        expression references a name that will never be in the reference
+        interpreter's state (the graceful-degrade trigger) must not cause
+        every run to spuriously fail -- the return_value comparison is
+        skipped for those runs, surfaced via return_value_skips, not
+        turned into a fabricated mismatch."""
+        from ast_extractor import CFGExtractor
+        base_source = (
+            "def workflow(status: str):\n"
+            "    return this_name_is_never_defined\n"
+        )
+        mutant_source = (
+            "def workflow(status: str):\n"
+            "    return status\n"
+        )
+        base_func_wir = CFGExtractor().extract(base_source)["functions"]["workflow"]
+
+        tester = RandomizedDifferentialTester(
+            source=mutant_source, function_name="workflow", wir=base_func_wir,
+            task_patterns=["workflow"], branch_lines=set(), control_variables=["status"],
+            n_runs=10, seed=1,
+        )
+        cert = tester.run()
+        assert cert["return_value_skips"] == cert["total_runs"]
+        # No task/branch structure differs between the two sides here, and
+        # the unevaluable return is gracefully skipped rather than
+        # fabricated as a mismatch -- every run must still match (checking
+        # matching_traces directly, not overall confidence, which is also
+        # scaled by input_coverage_score -- an unrelated factor this
+        # str-only-param, no-guard-literal scenario doesn't max out).
+        assert cert["matching_traces"] == cert["total_runs"]
 
     def test_comparison_mode_threads_from_tester_to_comparator(self):
         """D1 integration: comparison_mode actually reaches the

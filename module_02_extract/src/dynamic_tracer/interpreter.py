@@ -56,6 +56,12 @@ class WIRReferenceInterpreter:
         # that fails on every statement can't silently look like a clean,
         # simply-short trace.
         self.exec_errors: int = 0
+        # B1: set when a return node's expression could not be evaluated
+        # (e.g. references a name outside this reference execution's
+        # state). execute() checks this before emitting return_value --
+        # never fabricate a value the reference interpreter couldn't
+        # actually compute; that's the false-alarm guard for this feature.
+        self._return_eval_failed: bool = False
 
     def execute(self, inputs: dict[str, Any]) -> list[dict[str, Any]]:
         """
@@ -68,11 +74,20 @@ class WIRReferenceInterpreter:
         steps = 0
         max_steps = 1000
 
-        while current is not None and current != exit_node and steps < max_steps:
-            steps += 1
+        while current is not None and steps < max_steps:
             node = self.nodes.get(current)
             if node is None:
                 break
+            # B1: exit_node is normally a bookkeeping sentinel with no code
+            # of its own, stopped at without being processed. But when a
+            # function's last statement is a bare `return`, the extractor
+            # makes that return node itself the exit_node -- stopping
+            # before processing it would mean its return value (and this
+            # is the graph's terminal, most common case) is never
+            # evaluated. Only a "return" node overrides the sentinel stop.
+            if current == exit_node and node.get("type", "block") != "return":
+                break
+            steps += 1
 
             nxt = self._step(node, state)
             current = nxt
@@ -86,6 +101,18 @@ class WIRReferenceInterpreter:
             self.trace_log.append(
                 {"event": "_exec_errors", "count": self.exec_errors}
             )
+
+        # B1: emit the observed return value as the trace's final event --
+        # None if a return node was never reached (matches Python's
+        # implicit `return None` on fall-through) or if one was reached
+        # with a bare `return`. Skipped entirely if the return expression
+        # couldn't be evaluated (graceful degrade -- see
+        # _return_eval_failed's docstring).
+        if not self._return_eval_failed:
+            self.trace_log.append({
+                "event": "return_value",
+                "value": self._make_hashable(state.get("__return__")),
+            })
 
         return self.trace_log
 
@@ -172,7 +199,7 @@ class WIRReferenceInterpreter:
 
         if node_type == "return":
             for stmt in node.get("code", []):
-                self._exec_stmt_observed(stmt, state)
+                self._exec_return_stmt(stmt, state)
             return None  # Stop execution at return
 
         if node_type in ("entry", "exit", "block", "break", "continue"):
@@ -241,6 +268,55 @@ class WIRReferenceInterpreter:
                 result = None
         self._stmt_call_cache[stmt] = result
         return result
+
+    @staticmethod
+    def _make_hashable(val: Any) -> Any:
+        """Recursively convert unhashable types to comparable equivalents
+        -- mirrors RandomizedDifferentialTester._make_hashable, duplicated
+        here (not imported) to avoid a randomized.py <-> interpreter.py
+        import cycle (randomized.py already imports this module)."""
+        if isinstance(val, list):
+            return tuple(WIRReferenceInterpreter._make_hashable(v) for v in val)
+        if isinstance(val, dict):
+            return tuple(sorted((k, WIRReferenceInterpreter._make_hashable(v)) for k, v in val.items()))
+        return val
+
+    def _exec_return_stmt(self, stmt: str, state: dict[str, Any]) -> None:
+        """Evaluate a `return <expr>` WIR statement's expression into
+        state["__return__"]. Never routed through _exec_stmt/exec() --
+        `exec("return x")` is a SyntaxError outside a function body, which
+        is why return nodes previously silently failed on every run (see
+        B1's session mandate). Observes any task call in the expression
+        the same way _exec_stmt_observed does. On evaluation failure, sets
+        _return_eval_failed so execute() emits no return_value event."""
+        try:
+            tree = ast.parse(stmt, mode="exec")
+        except SyntaxError:
+            self.exec_errors += 1
+            self._return_eval_failed = True
+            return
+        return_node = tree.body[0] if tree.body else None
+        if not isinstance(return_node, ast.Return):
+            self.exec_errors += 1
+            self._return_eval_failed = True
+            return
+
+        task_name = self._stmt_task_call_name(stmt)
+        if task_name is not None:
+            self.trace_log.append({"event": "task_entry", "function": task_name})
+
+        if return_node.value is None:
+            state["__return__"] = None
+        else:
+            expr = ast.unparse(return_node.value)
+            try:
+                state["__return__"] = _safe_eval(expr, state)
+            except Exception:
+                self.exec_errors += 1
+                self._return_eval_failed = True
+
+        if task_name is not None:
+            self.trace_log.append({"event": "task_exit", "function": task_name})
 
     def _exec_stmt_observed(self, stmt: str, state: dict[str, Any]) -> None:
         """Execute *stmt*; if it calls a known task/stub name, wrap it with
