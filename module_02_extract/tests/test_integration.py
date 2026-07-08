@@ -100,6 +100,102 @@ class TestTypedLayerStatuses:
         assert result["layers"]["v1"]["status"] == "SKIPPED"
 
 
+def _make_event_hang(event: "threading.Event") -> "Callable[[str], int]":
+    """Build a stand-in for a slow _run_verification call, used by
+    TestWallClockTimeout via monkeypatch. Waits on *event* -- a
+    GIL-RELEASING wait (threading.Event.wait blocks without holding the
+    GIL, like time.sleep or I/O), which is the case future.result(timeout=)
+    can actually interrupt promptly. This is deliberately NOT the
+    GIL-monopolizing case: a single uninterrupted C-level statement (e.g.
+    `10 ** (10**7)`, or the mandate's own example `pow(10, 10**8)`) was
+    verified directly (isolated debug script) to delay even the timeout
+    CHECK itself until the computation finishes and releases the GIL --
+    for that case future.result(timeout=) does not fire near the
+    requested timeout at all, so no test can honestly assert "typed
+    timeout response" against it (there isn't one; see
+    _run_verification_with_timeout's docstring for the documented
+    boundary). The test sets *event* right after its assertions so the
+    orphaned worker thread exits immediately instead of leaking past the
+    test (concurrent.futures registers an atexit join on worker threads,
+    so a thread that never terminates would hang the whole suite at
+    shutdown -- confirmed empirically with a `while True: pass` variant
+    during development). Monkeypatching main._run_verification directly
+    (instead of routing real slow source through the full pipeline) is
+    deliberate: the real V3->V2->V1 pipeline would run a slow statement
+    once per V1 run (n_runs, default 10) plus V2's own iterations,
+    compounding one already-slow call into an impractically long test --
+    this isolates _run_verification_with_timeout's own timeout mechanism
+    instead."""
+    def _hang(source: str) -> int:
+        event.wait()
+        return 0
+    return _hang
+
+
+class TestWallClockTimeout:
+    """B3: a hung /verify call must not block the worker forever --
+    bounded by VERIFY_TIMEOUT_S via a ThreadPoolExecutor +
+    future.result(timeout=...). Covers the case this mechanism can
+    actually bound (a GIL-releasing hang, e.g. an infinite loop or blocked
+    I/O); see _run_verification_with_timeout's docstring for the
+    GIL-monopolizing case it does NOT bound (a single uninterrupted
+    C-level statement -- the mandate's own `pow(10, 10**8)` example)."""
+
+    def test_hung_call_times_out_with_typed_response(self, monkeypatch):
+        import threading
+        import time as time_module
+        import main as main_module
+
+        release = threading.Event()
+        monkeypatch.setattr(main_module, "_run_verification", _make_event_hang(release))
+
+        try:
+            t0 = time_module.time()
+            result = main_module._run_verification_with_timeout("irrelevant", timeout_s=0.2)
+            elapsed = time_module.time() - t0
+
+            assert elapsed < 5.0  # promptly interrupted, not a late/eventual return
+            assert result["passed"] is False
+            assert "timeout" in result["message"].lower()
+            for layer in ("v3", "v2", "v1"):
+                assert result["layers"][layer]["status"] == "ERROR"
+                assert result["layers"][layer]["reason"] == "wall-clock timeout"
+        finally:
+            release.set()  # let the orphaned worker thread exit now, not at suite shutdown
+
+    def test_fast_verification_unaffected_by_timeout_wrapping(self):
+        from main import _run_verification_with_timeout
+
+        source = (
+            "def workflow(x: int) -> int:\n"
+            "    if x > 0:\n        return 1\n    return 0\n"
+        )
+        result = _run_verification_with_timeout(source, timeout_s=30.0)
+        assert result["layers"]["v3"]["status"] == "OK"
+
+    def test_verify_endpoint_reads_module_level_timeout_at_call_time(self, monkeypatch):
+        """VERIFY_TIMEOUT_S is a free variable in verify() -- Python looks
+        up a bare global name in the enclosing module's namespace at CALL
+        time, so monkeypatching the module attribute (not the env var)
+        must actually change verify()'s behavior. Also monkeypatches
+        _run_verification (see _make_event_hang) to keep this fast and
+        isolated from the full pipeline."""
+        import threading
+        import main as main_module
+        from main import verify, CodePayload
+
+        release = threading.Event()
+        monkeypatch.setattr(main_module, "VERIFY_TIMEOUT_S", 0.2)
+        monkeypatch.setattr(main_module, "_run_verification", _make_event_hang(release))
+        payload = CodePayload(source_code="irrelevant")
+
+        try:
+            result = verify(payload)
+            assert result["layers"]["v1"]["reason"] == "wall-clock timeout"
+        finally:
+            release.set()
+
+
 class TestTaskObservabilityAlignment:
     """E2 acceptance test -- the session's real definition of done.
 

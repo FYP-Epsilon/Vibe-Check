@@ -9,6 +9,7 @@ certificate as JSON.
 """
 
 import ast
+import concurrent.futures
 import inspect
 import os
 import time
@@ -18,6 +19,14 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI(title="VibeCheck Extract Engine", version="2.0.0")
+
+# B3: wall-clock timeout for the whole /verify call. Read once at import
+# time (module attribute, not re-read from the environment per request);
+# tests monkeypatch this attribute directly rather than the env var, since
+# Python looks up a bare global name in the enclosing module's namespace
+# at CALL time, so a monkeypatched value is picked up by verify() even
+# though it's a free variable there.
+VERIFY_TIMEOUT_S = float(os.getenv("VERIFY_TIMEOUT_S", "30"))
 
 try:
     from .ast_extractor import CFGExtractor, run_v3_pipeline
@@ -371,6 +380,81 @@ def _run_verification(source: str) -> dict:
     }
 
 
+def _timeout_result(timeout_s: float) -> dict:
+    reason = "wall-clock timeout"
+    return {
+        "passed": False,
+        "message": f"Verification aborted: wall-clock timeout after {timeout_s}s.",
+        "v3_coverage": 0.0,
+        "v2_confidence": 0.0,
+        "v1_confidence": 0.0,
+        "combined_confidence": 0.0,
+        "v3_details": {},
+        "v2_details": {},
+        "v1_details": {},
+        "wir": {},
+        "layers": {
+            "v3": {"status": "ERROR", "reason": reason},
+            "v2": {"status": "ERROR", "reason": reason},
+            "v1": {"status": "ERROR", "reason": reason},
+        },
+    }
+
+
+def _run_verification_with_timeout(source: str, timeout_s: float) -> dict:
+    """
+    B3: bound how long a single /verify call can run. Step counters
+    (WIR interpreter max_steps, V2's query_budget/iteration caps) only
+    catch loops that step through WIR nodes -- they do nothing for a
+    single Python-level statement that itself takes forever at the C
+    level (e.g. ``pow(10, 10**8)``) once inside the real function call in
+    V1's _run_actual / V2's _execute_concrete.
+
+    KNOWN LIMITATIONS (Windows has no SIGALRM or any signal-based
+    interruption primitive, and Python has no safe way to forcibly kill a
+    running thread), stated honestly rather than papered over -- neither
+    is production-grade cancellation, both are accepted for a research
+    prototype:
+
+    1. The worker thread cannot actually be terminated from here. On
+       timeout, this function returns (``wait=False``) rather than
+       blocking on the hung thread, but that thread keeps running in the
+       background, orphaned, until it either finishes or the process
+       exits.
+    2. This mechanism only bounds a GIL-RELEASING hang (a Python
+       bytecode loop, which yields the GIL at periodic safepoints, or a
+       blocking I/O call) -- verified directly: a `while True: pass` hang
+       is interrupted close to `timeout_s`. It does NOT bound a
+       GIL-MONOPOLIZING hang: a single uninterrupted C-level statement
+       with no safepoint (verified directly with a big-integer ``**`` of
+       this size, which holds the GIL for its whole ~5s runtime) blocks
+       `future.result()`'s own timeout check for as long as that
+       statement runs. Once the GIL is released, `future.result()`
+       returns the call's REAL result NORMALLY -- not a TimeoutError, not
+       a typed timeout response -- because the call did, eventually,
+       complete; `timeout_s` was never actually enforced against it. If
+       such a statement runs forever (rather than merely a long time),
+       this wrapper hangs forever too, silently reproducing the exact
+       failure mode it exists to prevent. This is precisely the
+       motivating example this docstring opened with (``pow(10,
+       10**8)``); a thread-based timeout cannot close this gap in
+       CPython, since only process-based isolation (e.g.
+       ``multiprocessing`` + ``Process.terminate()``) can preempt a
+       GIL-holding call from outside. That is out of scope for this
+       session and is named as the honest leftover, not silently
+       papered over.
+    """
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+    future = executor.submit(_run_verification, source)
+    try:
+        result = future.result(timeout=timeout_s)
+        executor.shutdown(wait=False)
+        return result
+    except concurrent.futures.TimeoutError:
+        executor.shutdown(wait=False)
+        return _timeout_result(timeout_s)
+
+
 @app.post("/verify")
 def verify(payload: CodePayload) -> dict:
     """
@@ -378,7 +462,7 @@ def verify(payload: CodePayload) -> dict:
     pipeline, and return the certificate JSON.
     """
     try:
-        result = _run_verification(payload.source_code)
+        result = _run_verification_with_timeout(payload.source_code, VERIFY_TIMEOUT_S)
     except (ValueError, SyntaxError, TypeError, KeyError, RuntimeError, Exception) as e:
         # Last resort: something outside _run_verification's own per-phase
         # try/except blocks raised (should not normally happen, since V3
