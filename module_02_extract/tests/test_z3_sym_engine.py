@@ -309,42 +309,6 @@ def quadrant(x, y):
         assert cert["iterations"] >= 1
         assert cert["total_paths"] > 0
 
-    def test_qce_cold_variables(self):
-        source = "def foo(x):\n    return x"
-        engine = BoundedConcolicEngine(source, "foo", max_k=3, query_budget=10)
-        state_a = {"y": z3.Int("y")}
-        state_b = {"y": z3.Int("y2")}
-        # x is not a future control var, so differing y is cold.
-        saves = engine.qce_predicts_savings("node_1", state_a, state_b)
-        assert saves is True
-
-    def test_qce_hot_variables(self):
-        source = """
-def foo(x):
-    if x > 0:
-        return 1
-    return 0
-"""
-        engine = BoundedConcolicEngine(source, "foo", max_k=3, query_budget=10)
-        state_a = {"x": z3.Int("x_a")}
-        state_b = {"x": z3.Int("x_b")}
-        # x is a future control var, so differing x is hot.
-        saves = engine.qce_predicts_savings(engine.wir["entry_node"], state_a, state_b)
-        assert saves is False
-
-    def test_merge_states(self):
-        source = "def foo(x):\n    return x"
-        engine = BoundedConcolicEngine(source, "foo", max_k=3, query_budget=10)
-        g = z3.Bool("g")
-        merged = engine.merge_states(
-            g,
-            {"x": z3.IntVal(1), "y": z3.IntVal(2)},
-            {"x": z3.IntVal(3), "y": z3.IntVal(2)},
-        )
-        assert merged["y"].eq(z3.IntVal(2))
-        # x should be an ITE.
-        assert "If" in str(merged["x"])
-
     def test_seed_containers_list_gets_real_branch_coverage(self):
         """An empty list input must be seeded with non-empty samples so the
         concolic loop actually enters the loop body and both branches of

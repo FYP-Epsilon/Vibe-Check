@@ -24,10 +24,18 @@ class BoundedConcolicEngine:
     """
     Bounded concolic execution engine.
 
-    Iteratively executes a target function with concrete inputs,
-    records the symbolic path condition, queries Z3 for alternative
-    inputs that explore unexplored branches, and applies k-bounding
-    and QCE state merging to control path explosion.
+    Iteratively executes a target function with concrete inputs, records
+    the symbolic path condition, and queries Z3 for alternative inputs
+    that explore unexplored branches (branch-negation concolic
+    exploration). Container inputs are seeded from statically-discoverable
+    keys/indices so V2 can reason about dict/list-shaped parameters. Path
+    explosion is controlled by k-bounding (max_k) and an iteration/query
+    budget, not by state merging -- an earlier design considered QCE
+    (Query Count Estimation) state merging, but it was never wired into
+    the exploration loop (only exercised directly by its own unit tests);
+    that dead code (merge_states/qce_predicts_savings/_reachable_from/
+    state_pool) was removed rather than kept as an unused capability the
+    engine doesn't actually have (B4).
     """
 
     def __init__(
@@ -76,7 +84,6 @@ class BoundedConcolicEngine:
         # Exploration bookkeeping.
         self.explored_path_conditions: list[z3.BoolRef] = []
         self.covered_edges: set[tuple[str, str]] = set()
-        self.state_pool: dict[str, list[tuple[dict[str, Any], dict[str, z3.ExprRef]]]] = {}
 
         # Persistent solver for incremental solving.  Blocking clauses
         # (Not(explored_pc)) are monotonic across iterations, so we assert them
@@ -457,81 +464,6 @@ class BoundedConcolicEngine:
             return False
         # Fallback -- return the raw Z3 value and hope the caller handles it.
         return z3_val
-
-    # -- QCE state merging (Layer 2) -------------------------------------
-
-    def qce_predicts_savings(
-        self,
-        node_id: str,
-        state_a: dict[str, z3.ExprRef],
-        state_b: dict[str, z3.ExprRef],
-    ) -> bool:
-        """
-        Query Count Estimation heuristic.
-
-        Returns *True* (merge is profitable) when the variables that
-        differ between *state_a* and *state_b* are **cold** -- i.e.
-        they do not appear in any branch condition reachable from
-        *node_id*.
-        """
-        differing = {k for k in state_a if k in state_b and state_a[k] is not state_b[k]}
-        differing |= {k for k in state_b if k not in state_a}
-        differing |= {k for k in state_a if k not in state_b}
-
-        if not differing:
-            return True  # identical states -- merging is free.
-
-        # Collect all control variables in successor gateways.
-        future_control_vars: set[str] = set()
-        reachable = self._reachable_from(node_id)
-        for nid in reachable:
-            n = self._node_map.get(nid, {})
-            if n.get("type") == "gateway":
-                future_control_vars.update(n.get("control_vars", []))
-
-        # If no differing variable is used in future branches, merge.
-        return differing.isdisjoint(future_control_vars)
-
-    def merge_states(
-        self,
-        guard: z3.BoolRef,
-        state_a: dict[str, z3.ExprRef],
-        state_b: dict[str, z3.ExprRef],
-    ) -> dict[str, z3.ExprRef]:
-        """
-        Merge two symbolic states into one using ITE chains.
-
-        For every differing variable ``v``:
-            ``v_merged = ITE(guard, state_a[v], state_b[v])``
-        """
-        merged: dict[str, z3.ExprRef] = {}
-        all_keys = set(state_a) | set(state_b)
-        for k in all_keys:
-            va = state_a.get(k)
-            vb = state_b.get(k)
-            if va is None:
-                merged[k] = vb
-            elif vb is None:
-                merged[k] = va
-            elif va.eq(vb):
-                merged[k] = va
-            else:
-                merged[k] = z3.If(guard, va, vb)
-        return merged
-
-    def _reachable_from(self, node_id: str) -> set[str]:
-        """BFS over the WIR graph starting at *node_id*."""
-        reachable: set[str] = set()
-        frontier = [node_id]
-        while frontier:
-            nid = frontier.pop()
-            if nid in reachable:
-                continue
-            reachable.add(nid)
-            n = self._node_map.get(nid, {})
-            for succ in n.get("successors", []):
-                frontier.append(succ)
-        return reachable
 
     # -- P2.4 certificate ------------------------------------------------
 
