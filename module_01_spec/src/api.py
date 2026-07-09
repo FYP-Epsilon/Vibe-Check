@@ -40,6 +40,3 @@ def run_module_01_pipeline(bpmn_xml: str) -> Dict[str, Any]:
             "status": "FAIL",
             "error": f"Unexpected error: {str(e)}"
         }
-
-if __name__ == "__main__":
-    # Test with a simple BPMN XML
