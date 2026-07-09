@@ -1,13 +1,15 @@
 # Module 02: Verified IR Extraction — Comprehensive Technical Documentation
 
-**Document Classification**: Module Technical Specification / Research Evaluation Document  
-**Module**: 02 — Verified IR Extraction (Role B)  
-**Framework**: VibeCheck — Verified Translation Validation Framework  
-**Project**: Group 18 (Epsilon), Level 4 Research Project  
-**Institution**: Faculty of Information Technology, University of Moratuwa  
-**Supervisor**: Dr. Thilina Thanthriwatta  
-**Date**: 2026-05-19  
-**Version**: 1.0  
+**Document Classification**: Module Technical Specification / Research Evaluation Document
+**Module**: 02 — Verified IR Extraction (Role B)
+**Framework**: VibeCheck — Verified Translation Validation Framework
+**Project**: Group 18 (Epsilon), Level 4 Research Project
+**Institution**: Faculty of Information Technology, University of Moratuwa
+**Supervisor**: Dr. Thilina Thanthriwatta
+**Date**: 2026-07-09 (rewritten from the current implementation; supersedes the 2026-05-19 version below)
+**Version**: 2.0
+
+> This document was rewritten in a docs-refresh session to reconcile it with the implemented reality after seven engineering sessions of changes (verdict-formula fix, QCE deletion, tracer migration to `sys.monitoring`, a full evaluation harness, a multi-implementation corpus). The literature review (§2) and problem-framing (§3) sections below predate the implementation and remain valid background — everything from §4 onward describes what is actually built and measured today, not the original plan. See §11 ("Design History") for the auditable correction trail.
 
 ---
 
@@ -23,6 +25,7 @@
 8. [About the Dataset](#8-about-the-dataset)
 9. [Dataset Handling and Processing](#9-dataset-handling-and-processing)
 10. [Validation Strategy](#10-validation-strategy)
+11. [Design History](#11-design-history)
 
 ---
 
@@ -30,33 +33,36 @@
 
 ### 1.1 High-Level Summary
 
-**Module 02: Verified IR Extraction** constitutes the **code-to-semantics track** (Role B) of the VibeCheck dual-track verification architecture. Its fundamental purpose is to bridge the semantic chasm between **untrusted, LLM-generated Python workflow code** and **formally verifiable control-flow representations**. Module 02 ingests raw Python source code as its primary input and produces a **validated Workflow Intermediate Representation (WIR)** — a JSON-structured labelled transition system accompanied by a quantified, multi-modal correctness certificate.
+**Module 02: Verified IR Extraction** constitutes the **code-to-semantics track** (Role B) of the VibeCheck dual-track verification architecture. Its fundamental purpose is to bridge the semantic chasm between **untrusted, LLM-generated Python workflow code** and **formally verifiable control-flow representations**. Module 02 ingests raw Python source code as its primary input and produces a **validated Workflow Intermediate Representation (WIR)** — a JSON-structured control-flow graph accompanied by a quantified, multi-modal correctness certificate.
 
-Without Module 02, the downstream Module 03 (Equivalence Analysis via bisimulation checking) would lack any trustworthy code-derived model (M_code) against which to compare the specification-derived automaton (M_spec) produced by Module 01. Module 02 is therefore the **technical centerpiece of Research Question 2 (RQ2)**: *"How can we gain confidence that extracted IR faithfully represents the original code's behavior when both the code and the extraction process are potentially unreliable?"*
+Without Module 02, the downstream Module 03 (Equivalence Analysis via bisimulation checking) would lack any trustworthy code-derived model against which to compare the specification-derived automaton produced by Module 01. Module 02 is therefore the **technical centerpiece of Research Question 2 (RQ2)**: *"How can we gain confidence that extracted IR faithfully represents the original code's behavior when both the code and the extraction process are potentially unreliable?"*
 
 ### 1.2 Primary Inputs
 
 | Input | Type | Description | Source |
 |-------|------|-------------|--------|
-| `workflow_code` | `str` | LLM-generated Python workflow implementation (constrained IR subset: assignments, `if/elif/else`, `for`/`while` loops, function calls) | Module 01 Generation Adapter or upstream LLM sampling |
-| `specification` | `str` (optional) | BPMN 2.0 XML or natural language specification | Module 01 (for diagnostic enrichment only) |
-| `query_budget` | `int` | Maximum Z3 solver queries per verification run (default: 200) | Configuration (`ValidationConfig`) |
-| `test_runs` | `int` | Number of randomized differential test executions (default: 50) | Configuration (`ValidationConfig`) |
+| `source_code` | `str` | LLM-generated Python workflow implementation (assignments, `if`/`elif`/`else`, `for`/`while` loops, function calls, `try`/`except`, `match`) | Module 01 / upstream LLM sampling |
+| `specification` | — | **Planned, not implemented.** No field for BPMN/LTLf context is currently accepted by `POST /verify`. | — |
+| `V2_QUERY_BUDGET` | env var, `int` | Max Z3 solver queries per verification run. Default **20** (not 200 as originally planned), dynamically reduced further for larger programs. | Read once per request in `main.py` |
+| `V1_RUNS` | env var, `int` | Number of randomized differential test executions. Default **10** (not 50 as originally planned), dynamically reduced further for larger programs. | Read once per request in `main.py` |
+| `VERIFY_TIMEOUT_S` | env var, `float` | Wall-clock budget for the whole `/verify` call. Default **30**. See §4.4's honest limitation note on what this can and cannot bound. | Read once at import time in `main.py` |
+
+The actual request body is a single JSON field, not the originally-envisioned `workflow_code`/`specification` pair — see §9.2 and Appendix A for the verified current schema.
 
 ### 1.3 Primary Outputs
 
 | Output | Type | Description |
 |--------|------|-------------|
-| **WIR** (`wir`) | `dict` | JSON-structured Workflow Intermediate Representation: entry/exit nodes, typed node set (block, gateway, loop, task), control/data variable classification, dominator annotations |
-| **V3 Certificate** | `dict` | Structural validation score (node coverage, edge coverage, guard CNF flattening success rate, dominator verification) |
-| **V2 Certificate** | `dict` | Symbolic validation score (paths explored, feasible paths verified, solver success rate, solver wall-clock time) |
-| **V1 Certificate** | `dict` | Dynamic validation score (matching traces, total runs, input entropy/coverage score) |
-| **Combined Certificate** | `dict` | Aggregated confidence: `combined = 1 - (1 - v1) * (1 - v2) * (1 - v3)`, binary `passed` flag at threshold `>= 0.95` |
-| **AI Refinement** (`ai_refinement`) | `dict` (optional) | Human-readable counterexample explanation, certificate narrative, guard simplification suggestions (Phase 2) |
+| **WIR** (`wir`) | `dict` | JSON-structured Workflow Intermediate Representation: entry/exit nodes, typed node set (`entry`/`exit`/`block`/`gateway`/`loop`/`task`/`break`/`continue`/`return`/`except`/`finally`/`match`), control/data variable classification, dominator + dominance-frontier annotations, guard CNF extraction. See §9.2 for the full schema. |
+| **V3 Certificate** | `dict` | Structural validation score (node coverage, edge coverage, guard extraction success rate, `abort` gate) |
+| **V2 Certificate** | `dict` | Symbolic validation score (feasible paths / total paths, solver success rate, timeout rate) |
+| **V1 Certificate** | `dict` | Dynamic validation score (matching traces / total runs, input coverage score, return-value skip count) |
+| **Combined Certificate** | top-level keys | `v3_coverage`, `v2_confidence`, `v1_confidence`, `combined_confidence = 1 - (1-v1)(1-v2)`, `passed` (boolean), `message`, and a per-layer `layers` status object (`"OK"`/`"ERROR"`/`"SKIPPED"` + `reason` for each of v3/v2/v1) |
+| **AI Refinement** | — | **Not implemented.** No counterexample explanation, certificate narrative, or guard simplification exists. Recorded here as design history only (see §5.3, §7). |
 
 ### 1.4 Role within the VibeCheck Pipeline
 
-Module 02 occupies **Stage S3 (Verified IR Extraction)** and **Stage S4 (Code-Derived Model Construction)** in the five-stage dual-track pipeline:
+Module 02 occupies **Stage S3 (Verified IR Extraction)** and **Stage S4 (Code-Derived Model Construction)** in the dual-track pipeline. The conceptual flow below is unchanged from the original design:
 
 ```mermaid
 flowchart TB
@@ -86,11 +92,13 @@ flowchart TB
     style S4 fill:#4A90D9,stroke:#333,stroke-width:2px,color:#fff
 ```
 
-Module 02 is **consumed by Module 03** through a stable REST API contract (`POST /verify` and `POST /verify-batch`). The validated WIR output from Module 02 is deterministically lifted into a labelled transition system representation within SPOT's C++ mathematical memory space, enabling the automata-theoretic intersection and stuttering bisimulation computation that constitute Module 03's core contribution.
+**What is actually implemented today**: Module 02 is consumed by Module 03 through `POST /verify` only — `POST /verify-batch` (for multi-implementation batches) remains planned, not implemented (see §7). The S4 lifting step (WIR → automaton) is Module 03's own responsibility, described on its page, not Module 02's; Module 02's contract with Module 03 ends at the validated WIR + certificate. See `docs/module02/12_wir_and_certificate_contract.md` for the authoritative interface contract.
 
 ---
 
 ## 2. Current Approaches (Literature/Previous Tryouts)
+
+*(Unchanged from the original document — this is background/literature review, independent of implementation details, and remains valid.)*
 
 ### 2.1 Traditional BPMN-to-Formal-Model Translation
 
@@ -124,6 +132,8 @@ Recent advances in Python verification have introduced specialized tools for cod
 
 ## 3. Current Gap in the Field
 
+*(Unchanged from the original document — problem framing, independent of implementation details, remains valid.)*
+
 ### 3.1 The Verification Crisis in Generative Software Engineering
 
 The rapid adoption of LLMs for software generation has precipitated what researchers have termed the **"Verification Crisis in Generative Software Engineering"** [2]. LLM-generated software frequently exhibits **syntactic perfection while harboring subtle semantic flaws, safety violations, and logic errors** that evade conventional testing paradigms. In high-assurance domains such as financial services, healthcare administration, and automated control systems, functional validation alone is insufficient. The stochastic nature of LLM generation introduces the risk of **"hallucinations" in logic** — where a generated workflow might satisfy primary functional objectives while violating critical negative constraints (e.g., "never approve a loan without a credit check," "inventory must never be negative") [Interim Report, §1.2].
@@ -155,7 +165,7 @@ No existing framework combines these three dimensions with **independent failure
 
 ### 4.1 Architectural Philosophy: Defense in Depth with Independent Failure Modes
 
-Module 02 implements a **three-layer validation architecture** inspired by defense-in-depth security principles and multi-modal sensor fusion. Each layer provides a distinct type of correctness evidence with **statistically independent failure modes** — a bug in the V3 AST extractor does not correlate with a bug in the V2 Z3 engine or the V1 trace collector. This independence is the mathematical foundation for the certificate composition formula.
+Module 02 implements a **three-layer validation architecture** inspired by defense-in-depth security principles and multi-modal sensor fusion. Each layer provides a distinct type of correctness evidence with **statistically independent failure modes** — a bug in the V3 AST extractor does not correlate with a bug in the V2 Z3 engine or the V1 trace collector.
 
 ```mermaid
 flowchart TB
@@ -174,27 +184,27 @@ flowchart TB
     subgraph V2_Layer["<b>V2: Symbolic Validation (Bounded Logical)</b>"]
         V2_1["Z3VariableRegistry<br/><i>Python → Z3 sort inference</i>"]
         V2_2["BoundedConcolicEngine<br/><i>k-bounded loop unrolling (k=3)</i>"]
-        V2_3["Path Exploration<br/><i>Solver query → new input → repeat</i>"]
+        V2_3["Path Exploration<br/><i>branch-negation solver query → new input → repeat</i>"]
         V2_4["Incremental Confidence<br/><i>feasible_paths / total_paths</i>"]
         V2_CERT["<b>V2 Certificate</b><br/>feasible_paths × solver_success × (1 - timeout_rate)"]
     end
 
     subgraph V1_Layer["<b>V1: Dynamic Validation (Statistical)</b>"]
-        V1_1["WIRTraceCollector<br/><i>sys.settrace selective capture</i>"]
+        V1_1["WIRTraceCollector<br/><i>sys.monitoring (PEP 669), settrace fallback</i>"]
         V1_2["WIRReferenceInterpreter<br/><i>Deterministic WIR execution</i>"]
         V1_3["DifferentialComparator<br/><i>LCS trace alignment</i>"]
-        V1_4["Randomized Testing<br/><i>n=50 inputs, entropy-scored</i>"]
+        V1_4["Randomized Testing<br/><i>n=10 (default) inputs, type-driven generation</i>"]
         V1_CERT["<b>V1 Certificate</b><br/>matching_traces / total_runs × input_coverage"]
     end
 
     subgraph Composition["<b>Certificate Composition</b>"]
-        COMP["combined = 1 - ∏(1 - vᵢ)<br/><i>Assumes independent failure modes</i>"]
-        GATE["<b>Certification Gate</b><br/>combined ≥ 0.95 → PASS"]
+        COMP["combined_confidence = 1 - (1-v1)(1-v2)<br/><i>V3 is a gate, not a voting term</i>"]
+        GATE["<b>Certification Gate</b><br/>combined ≥ 0.95 AND NOT v3.abort → PASS"]
     end
 
     subgraph Output["<b>Output Layer</b>"]
         WIR_OUT["<b>Validated WIR</b><br/>(JSON-structured CFG)"]
-        CERT_OUT["<b>Multi-Modal Certificate</b><br/>(v1, v2, v3, combined, passed)"]
+        CERT_OUT["<b>Multi-Modal Certificate</b><br/>(v1, v2, v3, combined, passed, layers)"]
     end
 
     PY --> V3_1
@@ -204,7 +214,7 @@ flowchart TB
     PY --> V1_1
     V1_1 --> V1_2 --> V1_3 --> V1_4 --> V1_CERT
 
-    V3_CERT --> COMP
+    V3_CERT --> GATE
     V2_CERT --> COMP
     V1_CERT --> COMP
     COMP --> GATE
@@ -219,60 +229,58 @@ flowchart TB
 
 ### 4.2 V3: Structural Validation (The Foundation)
 
-V3 provides the syntactic foundation upon which V2 reasons and V1 statistically compensates. It operates entirely through **static analysis** of the Python Abstract Syntax Tree (AST), guaranteeing zero hallucination in the control-flow extraction step.
+V3 provides the syntactic foundation upon which V2 reasons and V1 statistically compensates. It operates entirely through **static analysis** of the Python Abstract Syntax Tree (AST), guaranteeing zero hallucination in the control-flow extraction step. It is implemented as the `ast_extractor/` package (modularized from a single `ast_extractor.py` file during development):
 
-**Component Pipeline**:
-
-| Component | Technology | Function |
-|-----------|-----------|----------|
-| `CFGExtractor` | `ast.NodeVisitor`, `ast.parse` | Traverses Python AST; emits WIR nodes (entry, exit, block, gateway, loop, task, except) and directed edges; handles `If`, `While`, `For`, `Try`, `TryStar`, `Match`, `NamedExpr` |
-| `DominatorAnalyzer` | `networkx.immediate_dominators` | Computes immediate dominator tree and dominance frontiers; enables structural ordering verification (e.g., "Gateway X must precede Task Y") |
-| `GuardExtractor` | Recursive AST traversal | Flattens compound boolean expressions (`and`, `or`, `not`) into Conjunctive Normal Form (CNF); produces atomic predicates with variable inventories for Z3 consumption |
-| `WIRDataLayer` | Reaching-definitions analysis | Classifies variables as **control variables** (appear in branch conditions) vs. **data variables** (computation only); critical for V2's symbolic abstraction |
-| `V3Certificate` | Metric composition | Emits node coverage, edge coverage, guard extraction success rate; hard aborts if node coverage `< 0.95` |
+| Component | File | Function |
+|-----------|------|----------|
+| `CFGExtractor` | `cfg_extractor.py` | Traverses Python AST; emits WIR nodes (`entry`, `exit`, `block`, `gateway`, `loop`, `task`, `break`, `continue`, `return`, `except`, `finally`, `match`) and directed edges; a post-construction pass (`contract_bookkeeping_nodes`) contracts blank merge/exit bookkeeping nodes so WIRs contain no structurally-redundant nodes |
+| `DominatorAnalyzer` | `dominators.py` | `networkx.immediate_dominators` with fallback for disconnected graphs; dominance frontier computation |
+| `GuardExtractor` | `guards.py` | Flattens compound boolean expressions (`and`, `or`, `not`) into Conjunctive Normal Form (CNF); produces atomic predicates with variable inventories for Z3 consumption |
+| Control/data classification | `data_layer.py` | Classifies variables as **control variables** (appear in branch conditions) vs. **data variables** (computation only); critical for V2's symbolic abstraction |
+| `V3Certificate` | `certificate.py` | Emits node coverage, edge coverage, guard extraction success rate; hard aborts (`abort=True`) if node coverage `< 0.95` |
 
 **Key Design Decision**: The CFGExtractor explicitly handles Python 3.10+ constructs (`match` statements via PEP 634, exception groups via PEP 654, walrus operator via PEP 572) because LLMs frequently generate these patterns. The walrus operator is particularly insidious as it introduces assignment expressions inside branch conditions — the CFG builder treats `NamedExpr` as both a data-flow assignment and a control-flow predicate simultaneously.
 
 ### 4.3 V2: Symbolic Validation (Logical Confidence)
 
-V2 provides **bounded logical confidence** that paths through the WIR are semantically feasible in the original code. It employs **concolic (concrete + symbolic) execution** using the Microsoft Z3 SMT solver.
+V2 provides **bounded logical confidence** that paths through the WIR are semantically feasible in the original code. It employs **concolic (concrete + symbolic) execution** using the Microsoft Z3 SMT solver, implemented as the `z3_sym_engine/` package:
 
-**Component Pipeline**:
+| Component | File | Function |
+|-----------|------|----------|
+| `Z3VariableRegistry` | `registry.py` | Bridges Python's dynamic typing to Z3's static sort system: `int → IntSort()`, `float → RealSort()`, `bool → BoolSort()`, `str → IntSort()` (tokenized); handles type transitions via versioned names |
+| `BoundedConcolicEngine` | `concolic.py` | Maintains parallel concrete and symbolic states; at each branch, records path conditions; negates the last-taken branch and queries Z3 for a satisfying input to drive unexplored execution. Also seeds empty container (`list`/`dict`) inputs with small non-empty samples (discovering subscripted string keys from the source AST where possible) so container-dependent branches actually get explored |
+| `k`-Bounded Loop Unrolling | inside `concolic.py`'s tracer | Unrolls loops up to `k=3` iterations by default |
+| `V2Certificate` | `_emit_certificate` in `concolic.py` | `confidence = (feasible_paths / total_paths) * (1 - timeout_rate) * solver_success_rate`; a persistent, incrementally-blocked Z3 solver is reused across iterations rather than rebuilt each time |
 
-| Component | Technology | Function |
-|-----------|-----------|----------|
-| `Z3VariableRegistry` | `z3.Solver`, runtime type inspection | Bridges Python's dynamic typing to Z3's static sort system: `int → IntSort()`, `float → RealSort()`, `bool → BoolSort()`, `str → IntSort()` (tokenized); handles type transitions via versioned names (`x_0`, `x_1`) |
-| `BoundedConcolicEngine` | `z3.Solver`, k-induction | Maintains parallel concrete and symbolic states; at each branch, records path conditions; queries Z3 for alternative satisfiable paths to drive unexplored execution |
-| `k-Bounded Loop Unrolling` | Static k-induction (k=3) | Unrolls loops exactly k times; applies Havoc assignment (non-deterministic values consistent with loop invariants) for remaining iterations; transforms unbounded loops into bounded acyclic CFGs |
-| `State Merging` | QCE heuristic (Query Count Estimation) | Merges symbolic states at loop headers when predicted solver cost of merged exploration is less than separate exploration; states mergeable when differing variables are "cold" (not used in subsequent branches) |
-| `V2Certificate` | Incremental accumulation | `confidence = (feasible_paths / total_paths) * (1 - timeout_rate) * solver_success_rate`; stalls below 0.80 trigger V1 as compensating modality |
+**QCE state merging was removed.** An earlier design (Query Count Estimation — merging symbolic states at loop headers when the variables that differ are "cold," i.e. not used in future branch conditions) was implemented as `merge_states`/`qce_predicts_savings`/`_reachable_from` but was **never wired into the concolic exploration loop above** — it was exercised only by its own unit tests. Rather than leave unused code implying a capability the engine doesn't have, it was deleted (`eval/results/session_b_report.md`'s B4 section documents the `gitnexus_impact`-confirmed zero-production-caller evidence for this).
 
-**The Dynamic Variable Injection Problem**: The core challenge identified in the interim report is "passing dynamically generated, unpredictable Python variables into Z3." The `Z3VariableRegistry` solves this through a **two-phase inference system**: Phase A performs static type inference during AST traversal (mapping `ast.Constant` nodes to sorts); Phase B confirms types at runtime during concolic execution, creating versioned constants when type transitions occur.
+**The Dynamic Variable Injection Problem**: the core challenge identified in the interim report is "passing dynamically generated, unpredictable Python variables into Z3." The `Z3VariableRegistry` solves this through a **two-phase inference system**: Phase A performs static type inference during AST traversal (mapping `ast.Constant` nodes to sorts); Phase B confirms types at runtime during concolic execution, creating versioned constants when type transitions occur.
 
 ### 4.4 V1: Dynamic Validation (Statistical Confidence)
 
-V1 provides **statistical confidence** that the code and WIR behave identically on concrete inputs. It employs Python's `sys.settrace` for low-overhead execution instrumentation combined with differential testing against a WIR reference interpreter.
+V1 provides **statistical confidence** that the code and WIR behave identically on concrete inputs. It employs a low-overhead trace collector combined with differential testing against a WIR reference interpreter, implemented as the `dynamic_tracer/` package:
 
-**Component Pipeline**:
+| Component | File | Function |
+|-----------|------|----------|
+| `WIRTraceCollector` | `collector.py` | Prefers **PEP 669 `sys.monitoring`** (Python 3.12+, orders of magnitude cheaper than `sys.settrace` — no per-line frame materialisation), falling back to `sys.settrace` on older interpreters or if no monitoring tool id is free. Captures task boundaries, branch decisions (including `taken_branch`, via native `BRANCH` events with a next-line-inference fallback), and exceptions |
+| `WIRReferenceInterpreter` | `interpreter.py` | Executes WIR JSON against concrete inputs; produces an "expected" trace of task entry/exit events, branch decisions, exceptions, and (since the most recent engineering session) the function's actual return value |
+| `DifferentialComparator` | `comparator.py` | LCS (Longest Common Subsequence)-based trace alignment; supports two comparison modes — `strict` (branch decisions are signal, correct for a mutant vs. its own base) and `task_only` (branch decisions dropped, correct for comparing independently-written implementations where branch structure is legitimate style, not a correctness signal) |
+| `RandomizedDifferentialTester` | `randomized.py` | Type-driven input generation: `bool` params drawn from both `True`/`False` every run; `str` params drawn from a round-robin-guaranteed pool of the code's own guard-compared string literals; `int`/`float` params drawn uniformly from a fixed range (no targeted boundary sampling — a named, open gap); `confidence = (matching_traces / total_runs) * input_coverage_score` |
+| `MultiModalCertificateComposer` | `composer.py` | Combines v1/v2 into `combined_confidence`, gates on v3's `abort` |
 
-| Component | Technology | Function |
-|-----------|-----------|----------|
-| `WIRTraceCollector` | `sys.settrace` | Selective two-tier trace callback: captures only task boundaries (function entry/exit matching BPMN tasks) and control-flow decisions (branch points); returns `None` aggressively for non-target frames; serializes observable variables as type + 32-bit hash (never deepcopy) |
-| `WIRReferenceInterpreter` | Deterministic Python execution | Executes WIR JSON against concrete inputs; produces "expected" trace of task entry/exit events and branch decisions; handles sequential blocks, conditional branching, bounded loops |
-| `DifferentialComparator` | LCS (Longest Common Subsequence) | Normalizes actual and expected traces to task-observable event sequences; computes alignment score; divergence points identified with mismatch classification |
-| `RandomizedDifferentialTester` | Entropy-scored input generation | Generates n=50 random concrete inputs; `confidence = (matching_traces / total_runs) * input_coverage_score` where coverage score uses Shannon entropy of branch outcomes |
+**Return-value observability** was added in the most recent engineering session: both trace sides now emit a `return_value` event (with a graceful-degrade guard — if the reference interpreter can't evaluate a return expression, no event is emitted on that side, and the comparison excludes return-value comparison for that run symmetrically rather than fabricating a value). This closed a previously-invisible class of bug: two implementations with identical branch structure and task-call sequence but a different final return value.
 
-**Critical Performance Decisions**: The trace function returns `None` for all library/stdlib frames (primary overhead control). Observable extraction uses shallow copy only — never `deepcopy` of potentially large data structures. Branch line numbers are pre-computed during V3 AST analysis to avoid runtime string parsing.
+**Wall-clock timeout, and its honest limitation**: the whole `/verify` call runs under a `ThreadPoolExecutor` + `future.result(timeout=VERIFY_TIMEOUT_S)`. This reliably bounds a **GIL-releasing** hang (an infinite Python bytecode loop, or blocked I/O). It does **not** bound a **GIL-monopolizing** hang — a single uninterrupted C-level statement with no bytecode safepoint blocks the timeout check itself until that statement finishes (verified directly with a big-integer exponentiation holding the GIL for its whole runtime); if such a statement never finished, this wrapper would hang forever too. Closing this gap would require process-based isolation (`multiprocessing` + `Process.terminate()`), not implemented — named as an open item rather than silently assumed solved.
 
 ### 4.5 Certificate Composition
 
-The three certificates are composed using the **parallel-system reliability formula**:
+The two behavioral-correctness certificates are composed using the **parallel-system reliability formula**:
 
 ```
-combined = 1 - (1 - v1) * (1 - v2) * (1 - v3)
+combined_confidence = 1 - (1 - v1_confidence) * (1 - v2_confidence)
 ```
 
-A WIR is **certified valid** when `combined >= 0.95`. This threshold was selected based on empirical targets from concolic testing literature and is subject to calibration during Phase 5 experiments. The composition assumes independence of failure modes — if V3 has a bug in dominator analysis, V1 and V2 still provide confidence because they operate on entirely different principles (statistical testing and logical solving, respectively).
+V3 does **not** appear in this product (an earlier three-term version did — see §11's design history). V3 measures extraction fidelity, not behavioral correctness, and saturates to a near-1.0 score for almost any structurally extractable program, which made the three-term product's combined score vacuous. V3 now **gates**: if `v3_cert["abort"]` is true, verification fails immediately regardless of v1/v2. A WIR is **certified valid** when `combined_confidence >= 0.95` and V3 did not abort. This self-mode threshold is distinct from differential mode's separately-calibrated `tau = 0.10` operating point — see §10.6.
 
 ---
 
@@ -286,129 +294,114 @@ The primary scientific contribution of Module 02 is the **systematic combination
 - **Proof-based confidence** (absolute but requires trusted source — e.g., CompCert [15])
 - **Static analysis confidence** (syntactic, no behavioral guarantee — e.g., standard linting)
 
-Module 02 occupies a unique position: it provides **quantified confidence for untrusted source code** by combining statistical and bounded-logical evidence from independent modalities.
+Module 02 occupies a unique position: it provides **quantified confidence for untrusted source code** by combining statistical and bounded-logical evidence from independent modalities. This is implemented and measured — see §10.6 for current calibration numbers.
 
 ### 5.2 The Workflow Intermediate Representation (WIR)
 
-The WIR is a novel JSON-structured labelled transition system designed specifically for **workflow code verification**. Unlike generic IRs (LLVM IR, Python bytecode), the WIR explicitly captures:
+The WIR is a JSON-structured labelled transition system designed specifically for **workflow code verification**. Unlike generic IRs (LLVM IR, Python bytecode), the WIR explicitly captures:
 
-- **Process semantics**: Task boundaries (entry/exit events), data object references, resource claims
+- **Process semantics**: Task boundaries (entry/exit events), guard conditions, exception types
 - **Control/data variable distinction**: Variables classified by their role in the business process
 - **Guard CNF annotations**: Branch conditions flattened into Z3-evaluable atomic predicates
-- **Dominator metadata**: Structural ordering proofs for BPMN constraint verification
+- **Dominator metadata**: Structural ordering information
 
-### 5.3 Self-Strengthening Formalization via AI Refinement (Phase 2)
+The full, current schema is in §9.2 and `docs/module02/12_wir_and_certificate_contract.md`.
 
-The AI refinement layer represents a **methodological innovation**: it uses LLMs exclusively as **post-hoc diagnostic aids**, never as verification authorities. This preserves the architectural integrity of the formal-methods-based validation while significantly improving developer experience. The refinement layer operates only on the outputs of V1/V2/V3 — never on the inputs — preventing circular dependency (the verification system does not depend on the same class of stochastic tools that generate the untrusted code being verified).
+### 5.3 AI-Assisted Refinement — planned, not realized
 
-Three strictly post-hoc roles:
+An earlier design proposed an AI-refinement layer: LLMs used exclusively as **post-hoc diagnostic aids** (counterexample explanation, certificate narrative, guard simplification), never as verification authorities, to preserve the architectural integrity of the formal-methods-based validation. **This was never implemented** — no code exists under this design. It is recorded here as design history, not as a realized contribution; see §7 and §11.
 
-| Role | Input | Output |
-|------|-------|--------|
-| Counterexample Explanation | V1 trace divergence point | Human-readable root-cause analysis (1-2 sentences) |
-| Certificate Narrative | V1/V2/V3 numeric scores | Technical verification report paragraph |
-| Guard Simplification | Z3 counterexample + complex guard | Simplified equivalent guard expression (verified by V2 before adoption) |
+### 5.4 Multi-Implementation Comparison — realized differently than planned
 
-### 5.4 Self-Consistency Sampling Adapter (Phase 3)
-
-The multi-implementation generation layer applies **self-consistency sampling** (Wang et al. [38]) to workflow code generation. Rather than generating a single implementation, N variants are sampled at higher temperature, each independently validated by Module 02, and the results passed to Module 03 for equivalence clustering. This is the first application of self-consistency to **process-level equivalence** measured by bisimulation rather than token overlap.
+An earlier design proposed **self-consistency sampling** (Wang et al. [38]): generating N implementations of the same workflow at high temperature from the *same* model and validating each independently. What was actually built is different and, in one respect, stronger: a **multi-implementation corpus generated from three independent LLM model families** (not temperature-sampled variants of one model) — `meta/llama-3.1-8b-instruct`, `mistralai/mixtral-8x7b-instruct-v0.1`, `qwen/qwen3-next-80b-a3b-instruct` — compared against each other and against reference WIRs, plus a `comparison_mode` (`strict`/`task_only`) that explicitly distinguishes "branch-structure divergence is signal" (same-lineage, e.g. a mutant vs. its base) from "branch-structure divergence is legitimate style" (independent implementations of the same task). This was built as an **evaluation harness** (`eval/`), not as a production `src/` adapter layer or a `/verify-batch` endpoint — see §7 and §8.2 for what exists and its measured numbers.
 
 ### 5.5 Novelty Summary Table
 
 | Dimension | Existing Approaches | Module 02 Contribution |
 |-----------|-------------------|----------------------|
 | **Source trust** | Trusted source assumed (CompCert) | Handles inherently untrusted LLM output |
-| **Confidence type** | Binary pass/fail or unimodal statistical | Multi-modal quantified confidence with composition formula |
-| **Failure modes** | Single point of failure | Three independent failure surfaces |
-| **IR design** | Generic (LLVM, bytecode) | Process-aware WIR with BPMN semantics |
-| **Multi-impl handling** | Not addressed | Self-consistency sampling + adaptive budget allocation |
-| **LLM integration** | LLM as generator or prover | LLM as diagnostic aid only (post-hoc, non-blocking) |
+| **Confidence type** | Binary pass/fail or unimodal statistical | Multi-modal quantified confidence with composition formula (implemented, measured — §10.6) |
+| **Failure modes** | Single point of failure | Three independent failure surfaces (V3 gates, V1/V2 vote) |
+| **IR design** | Generic (LLVM, bytecode) | Process-aware WIR with task/guard/dominator semantics |
+| **Multi-impl handling** | Not addressed | Cross-model natural-bug corpus + comparison-mode distinction (evaluation harness, not yet a production endpoint) |
+| **LLM integration** | LLM as generator or prover | Not used at verification time at all in the current implementation — the planned "diagnostic aid only" role (§5.3) was never built |
 
 ---
 
 ## 6. What We Have Done So Far
 
-### 6.1 Core Engine Implementation (Completed)
+### 6.1 Core Engine Implementation
 
-The following components are implemented and operational in the `module_02_extract/` repository:
-
-| Component | File | Status | Description |
-|-----------|------|--------|-------------|
-| `CFGExtractor` | `src/ast_extractor.py` | **Complete** | Full AST → CFG traversal with handlers for `If`, `While`, `For`, `Try`, `TryStar`, `Match`, `NamedExpr`, `Break`, `Continue`, `Return`; emits WIR nodes and edges |
-| `DominatorAnalyzer` | `src/ast_extractor.py` | **Complete** | `networkx.immediate_dominators` with fallback for disconnected graphs; dominance frontier computation |
-| WIR Data Model | `src/ast_extractor.py` | **Complete** | `WIRNode`, `WIREdge`, `Literal` dataclasses with JSON serialization; `WIRSchema` validation via `jsonschema` |
-| V3 Certificate | `src/ast_extractor.py` | **Complete** | Node coverage, edge coverage, guard extraction success rate; abort gate at 0.95 |
-| `Z3VariableRegistry` | `src/z3_sym_engine.py` | **Implemented** | Automatic sort inference with versioned constants for type transitions |
-| `BoundedConcolicEngine` | `src/z3_sym_engine.py` | **Implemented** | k-bounded concolic execution (k=3); solver query budget enforcement |
-| `WIRTraceCollector` | `src/dynamic_tracer.py` | **Implemented** | `sys.settrace`-based selective capture; two-tier filtering; 32-bit hash serialization |
-| `WIRReferenceInterpreter` | `src/dynamic_tracer.py` | **Implemented** | Deterministic WIR execution producing expected traces |
-| `DifferentialComparator` | `src/dynamic_tracer.py` | **Implemented** | LCS-based trace alignment with divergence point identification |
-| FastAPI Server | `src/main.py` | **Complete** | `POST /verify` endpoint orchestrating V3 → V2 → V1 pipeline; JSON request/response schemas via Pydantic |
+| Component | Package | Status |
+|-----------|---------|--------|
+| `CFGExtractor`, `DominatorAnalyzer`, `GuardExtractor`, WIR data model, `V3Certificate` | `src/ast_extractor/` | **Complete** |
+| `Z3VariableRegistry`, `BoundedConcolicEngine`, container-input seeding | `src/z3_sym_engine/` | **Complete** (QCE state merging deleted — see §4.3) |
+| `WIRTraceCollector` (monitoring-first), `WIRReferenceInterpreter` (incl. return-value observability), `DifferentialComparator` (strict/task_only modes), `RandomizedDifferentialTester`, `MultiModalCertificateComposer` | `src/dynamic_tracer/` | **Complete** |
+| FastAPI server: `POST /verify`, typed per-layer `layers` status, wall-clock timeout | `src/main.py` | **Complete** |
 
 ### 6.2 Test Suite
 
-| Test File | Coverage | Status |
-|-----------|----------|--------|
-| `test_ast_extractor.py` | Basic blocks, Python 3.10+ constructs, dominator tree, guard CNF, end-to-end | Complete |
-| `test_z3_engine.py` | Solver model production, path diversity, container fallback | Complete |
-| `test_dynamic_tracer.py` | Mismatch detection, entropy scoring | Complete |
-| `test_integration.py` | Full pipeline, combined certificate calculation, abort threshold | Complete |
+246 tests passing (`tests/` — 162 — plus `eval/`'s own test files — 84), spanning `test_ast_extractor.py`, `test_z3_sym_engine.py`, `test_dynamic_tracer.py`, `test_dynamic_tracer_parity.py` (verifies the `sys.monitoring`/`sys.settrace` backends agree), and `test_integration.py`.
 
-### 6.3 Docker Containerization
+### 6.3 Evaluation Harness (`eval/`)
+
+Not part of the original plan's shape (see §7, §11) but substantial and real:
+
+- **Corpus**: `flowbench_adapter.py` turns all 101 IBM FLOW-BENCH sequences into executable workflows.
+- **Mutation testing**: `mutate.py` implements 10 mutation operators; 427 applicable mutants across 9 operator classes in this corpus (`off-by-one-loop` has zero applicable sites here — see §8.2).
+- **Calibration**: `calibrate.py`/`calibrate_corrected.py` perform stratified CALIB/EVAL threshold selection via Youden's J, with Clopper-Pearson confidence intervals (hand-rolled, no `scipy` dependency).
+- **Multi-implementation corpus**: `nim_client.py`, `gen_variants.py`, `admit_variants.py` generate and behaviorally-admit a natural-bug corpus from 3 independent LLM APIs.
+- **Structural and behavioral accuracy experiments**: `e2_structural.py` (WIR structural accuracy against a hand-labeled gold set) and `e3_correlation.py` (certificate score vs. independently-measured code-vs-code semantic divergence).
+- **Cross-implementation comparison-mode experiments**: `c5_experiments.py`, `d3_control.py`.
+
+See §10.6 for the current measured results.
+
+### 6.4 Docker Containerization
 
 - `Dockerfile`: Python 3.11-slim base with `z3-solver`, `networkx`, `fastapi`, `uvicorn`, `pydantic`, `jsonschema`
 - Container exposes port 8000 via Uvicorn
-- `module_04_ui/` provides Streamlit frontend (`src/app.py`) for interactive verification with telemetry visualization
+- `module_04_ui/` provides a Streamlit frontend (`src/app.py`) with a dedicated Extract Engine (Module 02) page — paste code, get the certificate rendered with per-layer telemetry tabs
 
-### 6.4 Interim Results (from Report)
+### 6.5 Interim Results (from the original Interim Report, unchanged)
 
-The interim report (Chapter 7) documents:
-- Successful AST parsing and JSON-based WIR extraction for standard and anomalous Python scripts (Figure 7.3)
-- Deterministic lifting of JSON intermediate representations into formal Labelled Transition Systems preserving action labels and guard conditions (Figure 7.5)
-- Terminal output demonstrating semantic mapping of BPMN sequence flows and conditional logic into the WIR JSON schema (Figure 7.1)
+The interim report (Chapter 7) documents early-stage results that predate the sessions described above: successful AST parsing and JSON-based WIR extraction for standard and anomalous Python scripts (Figure 7.3); deterministic lifting of JSON intermediate representations into formal Labelled Transition Systems preserving action labels and guard conditions (Figure 7.5); terminal output demonstrating semantic mapping of BPMN sequence flows and conditional logic into the WIR JSON schema (Figure 7.1). See §10.6 for the current, much more extensive quantitative results that supersede these early figures.
 
 ---
 
 ## 7. What is Left to Do
 
-### 7.1 Implementation Roadmap (6 Phases)
+### 7.1 Implementation Roadmap — current status
 
-| Phase | Document | Scope | Timeline | Status |
-|-------|----------|-------|----------|--------|
-| **Phase 1** | `05_core_hardening.md` | Fix Z3 solver double-reset bug (P0), increase V1 test runs to 50-100 with dynamic adjustment, validate all confidence gating thresholds (0.50, 0.75, 0.80), extract thresholds to `ValidationConfig` dataclass, add branch diversity metric | Weeks 1-2 | **Pending** |
-| **Phase 2** | `06_ai_refinement.md` | Integrate OpenAI GPT-4o-mini client (`gpt-4o-mini-2024-07-18`, temperature=0.3, max_tokens=300); implement `CounterexampleExplainer`, `CertificateNarrative`, `GuardSimplifier`; all tasks strictly post-hoc and non-blocking | Weeks 2-3 | **Pending** |
-| **Phase 3** | `07_multi_impl.md` | Implement `GenerationAdapter` abstract interface; build `SelfConsistencyAdapter` (progressive temperature: 0.3 baseline, 0.8 exploration) and `Module01Adapter`; implement `MultiImplementationValidator` with adaptive budget allocation; expose `POST /verify-batch` endpoint | Weeks 3-4 | **Pending** |
-| **Phase 4** | `08_eval_data.md` | Generate 4-layer evaluation dataset: Layer 1 (50 golden workflows via GPT-4o-mini), Layer 2 (100 augmented variants via systematic transformations), Layer 3 (500 seeded bug mutants via ROR/COR/BOR/STR/JTD operators), Layer 4 (10 adversarial hand-crafted cases) | Weeks 4-5 | **Pending** |
-| **Phase 5** | `09_experiments.md` | Run three controlled experiments: E1 (seeded bug detection, target ≥95%), E2 (structural accuracy, target ≥98%), E3 (confidence calibration, Pearson r ≥ 0.85); calibrate thresholds based on results | Weeks 5-6 | **Pending** |
-| **Phase 6** | `10_integration.md` | Finalize Module 03 API contract (`POST /verify`, `POST /verify-batch`, `GET /health`); complete thesis documentation chapter; supervisor sign-off | Week 6-7 | **Pending** |
+| Phase | Document | Original Scope | Actual Status |
+|-------|----------|-----------------|----------------|
+| **Phase 1** | `05_core_hardening.md` | Fix solver bugs, increase test coverage, validate thresholds | **Done** — via a series of engineering sessions rather than this doc's original plan (see its historical-document banner). 246 tests passing. |
+| **Phase 2** | `06_ai_refinement.md` | OpenAI GPT-4o-mini for counterexample explanation, certificate narrative, guard simplification | **Not implemented.** No code exists. |
+| **Phase 3** | `07_multi_impl.md` | Self-consistency sampling adapter, `/verify-batch` endpoint | **Done, differently** — a real multi-implementation corpus exists (§5.4, §8.2), built as an evaluation harness, not this endpoint/adapter shape. |
+| **Phase 4** | `08_eval_data.md` | 4-layer evaluation data (golden, augmented, mutation, adversarial) | **Done, differently** — mutation corpus (§8.2) + multi-implementation natural-bug corpus, not this 4-layer structure. |
+| **Phase 5** | `09_experiments.md` | Seeded bug detection, metric calibration, threshold tuning | **Done** — see §10.6 for current numbers. |
+| **Phase 6** | `10_integration.md` | Module 03 API contract, thesis documentation | **Partially done** — the contract now exists at `docs/module02/12_wir_and_certificate_contract.md`. |
 
-### 7.2 Known Limitations (Documented)
+### 7.2 Known Limitations (Current, Verified)
 
-| Limitation | Impact | Resolution Plan |
-|-----------|--------|-----------------|
-| QCE state merging not invoked in concolic loop | Path explosion for deep loops (>k=5) | Revisit if Phase 5 evaluation reveals issue |
-| Container types (`list`, `dict`) force V1 fallback | ~30% of FLOW-BENCH workflows skip V2 | Minimal fix in Phase 1 (uninterpreted scalars for loop bounds); full array theory deferred |
-| Reference interpreter uses restricted `eval()` | Workflow code calling stdlib helpers may fail | Whitelist expansion on demand |
+| Limitation | Impact | Status |
+|-----------|--------|--------|
+| No numeric guard-literal pooling for V1 | A numeric-boundary-only bug (e.g. `<` vs `<=` on an integer guard) isn't guaranteed to be sampled by V1's uniform `-100..100` int generation | Open, named backlog item |
+| Wall-clock timeout can't bound a GIL-monopolizing single statement | A genuinely infinite C-level statement would hang `/verify` despite the timeout wrapper | Open — needs process-based isolation (§4.4) |
+| Round-robin string-literal pool is function-wide, not per-guard-site | A guard fed by two independent `str` params can take more than one run's budget to force-cover both sides (the `constant-perturb` operator's one remaining undetected case, see §10.6) | Open, named backlog item |
+| Reference interpreter uses restricted `_safe_eval` | Workflow code calling unusual stdlib helpers may not evaluate on the WIR-interpreter side | Open, whitelist expansion on demand |
+| No `/verify-batch` endpoint, no `src/` adapter layer, no Module 01 integration | Multi-implementation comparison only exists in the evaluation harness, not as a production API | Open — §7.1 Phase 3 |
 
-### 7.3 Target Metric Achievement
+### 7.3 Actual Measured Metrics (supersedes the original aspirational target table)
 
-| Metric | Symbol | Definition | Target | Phase |
-|--------|--------|-----------|--------|-------|
-| Trace coverage | τ_cov | Fraction of WIR transitions exercised by differential testing | ≥ 0.95 | E1 |
-| Branch coverage | β_cov | Fraction of Python branches with verified WIR correspondence | ≥ 0.80 | E2 |
-| Mismatch rate | μ | Fraction of test inputs with trace mismatch | ≤ 0.01 | E1 |
-| Refinement success | ρ | Fraction of critical transitions with proven simulation relation | ≥ 0.70 | E2 |
-| Mutation detection | δ | Fraction of semantic-altering mutations detected | ≥ 0.95 | E1 |
-| False positive rate | φ | Fraction of equivalent mutations wrongly rejected | ≤ 0.05 | E1 |
-| Validation time | t_val | Wall-clock time per 100 LOC | < 300s | All |
-| Combined-pass rate | π_pass | Fraction of valid workflows with combined ≥ 0.95 | ≥ 0.85 | E3 |
-| Structural accuracy | α_struct | Fraction with correct node/edge/decision counts | ≥ 0.98 | E2 |
+See §10.6 for the full current numbers with sources. Headline: genuine-bug detection on synthetic mutants **0.9952**; false-alarm rate on untouched base programs **0.0588**; natural-bug (real LLM implementations) detection **1.0000** (same-lineage/strict) and **0.9329** (independent-implementation/task_only); WIR structural node and edge F1 **1.0000**.
 
 ---
 
 ## 8. About the Dataset
 
 ### 8.1 Primary Dataset: IBM FLOW-BENCH
+
+*(Unchanged from the original document — this description remains accurate.)*
 
 The **FLOW-BENCH** dataset [11] serves as the principal ground-truth for verification research. It consists of **101 incremental test cases** stored in `conditional_ootb.yaml`, providing paired triads of:
 
@@ -430,94 +423,93 @@ The **FLOW-BENCH** dataset [11] serves as the principal ground-truth for verific
 | `linear_update_delete` | 5 | Remove step from linear sequence | Delete action |
 | `user_task` | 16 | Include human approval step | `user_task("validate")` |
 
-**Key Methodological Insight**: FLOW-BENCH uses an **incremental build pattern** — complex test cases are generated by applying systematic transformations to simpler base workflows. This methodology is replicated in our Layer 2 augmentation pipeline.
+FLOW-BENCH's public release does **not** include executable-correctness labels — VibeCheck's own mutation corpus (§8.2) supplies the missing ground truth, using FLOW-BENCH only as the base-program source.
 
-### 8.2 Synthetic Evaluation Dataset (4-Layer)
+### 8.2 The Real Evaluation Corpora (replaces the originally-planned 4-layer dataset)
 
-Module 02 constructs a proprietary **4-layer evaluation dataset** to provide comprehensive ground truth for all validation metrics:
+The originally-planned "Golden / Augmented / Mutation / Adversarial" 4-layer structure (50 + 100 + 500 + 10 = 660 items, GPT-4o-mini-generated) was **not built**. What exists instead is two real corpora:
 
-| Layer | Name | Size | Purpose | Generation Method |
-|-------|------|------|---------|-------------------|
-| **Layer 1** | Golden Workflows | 50 | Fresh workflows not in FLOW-BENCH | GPT-4o-mini with controlled complexity levels (linear, conditional, loop, conditional_loop, nested_loop, deep_conditional) |
-| **Layer 2** | FLOW-BENCH Derivatives | 100 | Structural transformation testing | Systematic augmentation operators (add_guard, add_loop, invert_condition, fuse_sequential, add_elif_chain) |
-| **Layer 3** | Seeded Bug Mutants | 500 | Verification effectiveness validation | AST-based mutation operators (ROR, COR, BOR, STR, JTD, RER) applied to correct base workflows |
-| **Layer 4** | Adversarial Structures | 10 | Component stress-testing | Hand-crafted edge cases targeting specific components (diamond CFG, deep elif chains, walrus operators, nested try-except) |
+**A. Mutation corpus** (`eval/mutate.py`, `eval/manifest.json`): 10 mutation operators applied to all 101 FLOW-BENCH-derived base programs; **427 applicable mutants** across **9 operator classes** with at least one applicable site in this corpus (`off-by-one-loop` never finds an applicable site — no `range()`/slice usage anywhere in this corpus):
 
-### 8.3 Mutation Operators (Layer 3)
+| Operator | What it does |
+|----------|---------------|
+| `negate-guard` | Flips a branch condition |
+| `constant-perturb` | Mutates a guard-compared string literal |
+| `boundary-shift` | Shifts a numeric comparison boundary |
+| `drop-step` | Removes a statement |
+| `reorder-steps` | Reorders independent statements |
+| `swap-branches` | Swaps if/else bodies |
+| `wrong-variable` | Substitutes a wrong variable reference |
+| `corrupt-container-op` | Corrupts a list/dict operation |
+| `early-return` | Inserts an early return before real logic |
+| `off-by-one-loop` | Off-by-one loop-bound shift (no applicable sites in this corpus) |
 
-| Operator | Code Transformation | Semantic Effect | Detection Target |
-|----------|-------------------|-----------------|------------------|
-| **ROR** (Relational Operator Replacement) | `==` → `!=` | Alters branch condition | V1 (trace divergence), V2 (guard CNF) |
-| **COR** (Conditional Operator Replacement) | `and` → `or` | Alters compound guard | V2 (guard CNF change) |
-| **BOR** (Branch body swap) | Swap if/else bodies | Preserves semantics (equivalent mutant) | Should NOT be detected |
-| **STR** (Statement Removal) | Delete assignment | Missing API call | V1 (trace length), V3 (node count) |
-| **JTD** (Jump Target Destruction) | `break` → `continue` | Wrong loop exit | V1 (trace path), V3 (CFG edge) |
-| **RER** (Return Expression Replacement) | Change return value | Wrong output | V1 (return value diff) |
+**B. Multi-implementation natural-bug corpus** (`eval/nim_client.py`, `eval/gen_variants.py`, `eval/admit_variants.py`): independent Python implementations of the same 101 FLOW-BENCH tasks generated by 3 distinct LLM model families (`meta/llama-3.1-8b-instruct`, `mistralai/mixtral-8x7b-instruct-v0.1`, `qwen/qwen3-next-80b-a3b-instruct` — the last completed only 49/101 generations due to a sustained provider-side outage, reported as-is rather than curated around). Each variant is behaviorally admitted or rejected against its base program over N=100 sampled inputs: **20 admitted** (behaviorally indistinguishable from the base at this sample size — used to measure whether the certificate over-punishes legitimate implementation-style differences) and **164 rejected-behavioral** (kept as the natural, real-LLM-bug corpus, not discarded).
+
+### 8.3 Mutation Operators — semantic effect and detection target (current)
+
+| Operator | Detection Target | Detected by |
+|----------|------------------|-------------|
+| `negate-guard` | Branch decision flip | V1 (`taken_branch` divergence, strict mode) |
+| `constant-perturb` | Altered guard-compared literal | V1 (branch decision divergence once the pool covers both literals) |
+| `drop-step`, `reorder-steps`, `corrupt-container-op`, `wrong-variable`, `swap-branches` | Altered task-call sequence or return value | V1 (task-event or return-value divergence, either comparison mode) |
+| `early-return` | Truncated logic | V1 (task-event divergence) — see §10.6's note on its equivalent-mutant rate |
+| `boundary-shift` | Shifted numeric decision boundary | V1/V2, with the known numeric-literal-pooling gap noted in §7.2 |
+| `off-by-one-loop` | Loop-bound shift | No applicable sites in this corpus |
 
 ---
 
 ## 9. Dataset Handling and Processing
 
-### 9.1 End-to-End Data Flow
+### 9.1 End-to-End Data Flow (current)
 
 ```mermaid
 flowchart LR
     subgraph Sources["<b>Input Sources</b>"]
-        FB["<b>FLOW-BENCH</b><br/>(101 workflows)<br/>YAML + BPMN + Python"]
-        L1["<b>Layer 1:</b> Golden<br/>(50 workflows)<br/>GPT-4o-mini generated"]
-        L2["<b>Layer 2:</b> Augmented<br/>(100 variants)<br/>Transformed from L1"]
-        L3["<b>Layer 3:</b> Mutants<br/>(500 mutations)<br/>AST NodeTransformer"]
-        L4["<b>Layer 4:</b> Adversarial<br/>(10 edge cases)<br/>Hand-crafted"]
-    end
-
-    subgraph Preprocessing["<b>Preprocessing Pipeline</b>"]
-        PARSE["<b>AST Parsing</b><br/>ast.parse(source)<br/>→ Python AST"]
-        VALIDATE["<b>Syntactic Validation</b><br/>Function def check<br/>Return statement check<br/>API call presence check"]
-        SCHEMA["<b>WIR Schema Validation</b><br/>jsonschema.validate()<br/>→ Structured WIR"]
+        FB["<b>FLOW-BENCH</b><br/>(101 base workflows)<br/>YAML → Python via flowbench_adapter.py"]
+        MUT["<b>Mutation corpus</b><br/>(427 mutants, 9 operator classes)<br/>eval/mutate.py"]
+        NIM["<b>Multi-impl corpus</b><br/>(20 admitted / 164 rejected-behavioral)<br/>3 LLM APIs via eval/nim_client.py"]
     end
 
     subgraph Module02_Engine["<b>Module 02 Engine</b>"]
-        V3_P["<b>V3 Extract</b><br/>CFGExtractor + DominatorAnalyzer<br/>+ GuardExtractor"]
+        V3_P["<b>V3 Extract</b><br/>CFGExtractor + DominatorAnalyzer + GuardExtractor"]
         V2_P["<b>V2 Symbolic</b><br/>Z3VariableRegistry + BoundedConcolicEngine"]
-        V1_P["<b>V1 Dynamic</b><br/>WIRTraceCollector + ReferenceInterpreter<br/>+ DifferentialComparator"]
-        COMP_P["<b>Certificate Composer</b><br/>combined = 1 - ∏(1-vᵢ)"]
+        V1_P["<b>V1 Dynamic</b><br/>WIRTraceCollector + ReferenceInterpreter + DifferentialComparator"]
+        COMP_P["<b>Certificate Composer</b><br/>combined_confidence = 1-(1-v1)(1-v2), V3 gates"]
     end
 
     subgraph Output["<b>Output Artifacts</b>"]
-        WIR["<b>Validated WIR</b><br/>JSON: nodes, edges, guards,<br/>control_vars, dominators"]
-        CERT["<b>Multi-Modal Certificate</b><br/>v1, v2, v3, combined, passed"]
-        DIAG["<b>Diagnostics</b><br/>Divergence points,<br/>counterexamples, narrative"]
+        WIR["<b>Validated WIR</b><br/>JSON: nodes, edges, guards, control_vars, dominators"]
+        CERT["<b>Multi-Modal Certificate</b><br/>v1, v2, v3, combined, passed, layers"]
+        REPORTS["<b>eval/results/*.md</b><br/>calibration, structural accuracy,<br/>correlation, multi-impl reports"]
     end
 
-    FB --> PARSE
-    L1 --> PARSE
-    L2 --> PARSE
-    L3 --> PARSE
-    L4 --> PARSE
-    
-    PARSE --> VALIDATE --> SCHEMA
-    SCHEMA --> V3_P --> V2_P --> V1_P --> COMP_P
+    FB --> V3_P
+    MUT --> V3_P
+    NIM --> V3_P
+
+    V3_P --> V2_P --> V1_P --> COMP_P
     COMP_P --> WIR
     COMP_P --> CERT
-    COMP_P --> DIAG
+    COMP_P --> REPORTS
 
     style Module02_Engine fill:#E8F4FD,stroke:#4A90D9,stroke-width:2px
     style Sources fill:#FFF4E6,stroke:#E69F00,stroke-width:1px
     style Output fill:#E8F8E8,stroke:#009E73,stroke-width:1px
 ```
 
-### 9.2 WIR JSON Schema
+### 9.2 WIR JSON Schema (current, verified against `shared_schemas/wir_schema.json`)
 
-The validated Workflow Intermediate Representation follows a strict JSON schema:
+The full JSON Schema (draft-07) lives at `shared_schemas/wir_schema.json` — the authoritative, machine-checkable definition. Summary:
 
 ```json
 {
-  "entry_node": "node_0",
-  "exit_node": "node_N",
+  "entry_node": "node_id",
+  "exit_node": "node_id",
   "nodes": [
     {
       "id": "node_id",
-      "type": "entry|exit|block|gateway|loop|task|except",
+      "type": "entry|exit|block|gateway|loop|task|break|continue|return|except|finally|match",
       "ast_type": "If|While|For|Try|...",
       "line": 42,
       "code": ["statement_text"],
@@ -530,53 +522,46 @@ The validated Workflow Intermediate Representation follows a strict JSON schema:
     }
   ],
   "edges": [
-    {
-      "source": "node_id",
-      "target": "node_id",
-      "guard": "condition_or_null",
-      "exception_type": "ExceptionName_or_null"
-    }
+    { "source": "node_id", "target": "node_id", "guard": "condition_or_null", "exception_type": "ExceptionName_or_null" }
   ],
   "unsupported_constructs": [],
-  "functions": {
-    "function_name": { ...nested WIR... }
-  }
+  "dominators": { "node_id": "immediate_dominator_node_id" },
+  "dominance_frontier": { "node_id": ["node_id", "..."] },
+  "guard_extraction": { "total": 1, "success": 1, "conditions": [ { "node_id": "...", "guard": "...", "cnf": [[ { "negated": false, "text": "...", "vars": ["..."] } ]] } ] },
+  "control_variables": ["..."],
+  "data_variables": ["..."],
+  "certificate": { "version": "V3", "node_coverage": 1.0, "edge_coverage": 1.0, "guard_success_rate": 1.0, "abort": false, "confidence": 1.0, "message": "..." },
+  "functions": { "function_name": { "...": "nested WIR, same shape as above" } }
 }
 ```
 
-### 9.3 Batch Processing Pipeline
+**Real, verified example** — the top-level module graph and one nested function WIR, generated locally against a small sample function (`def approve_or_reject(score: int) -> str: ...`):
 
-For multi-implementation analysis (Phase 3), the data flow extends as follows:
-
-```mermaid
-flowchart TB
-    SPEC["<b>BPMN / NL Specification</b>"] --> ADAPTER["<b>GenerationAdapter</b><br/>SelfConsistencyAdapter<br/>or Module01Adapter"]
-    ADAPTER --> |"N variants<br/>(temperature 0.3-0.8)"| PARALLEL["<b>Parallel Validation</b><br/>asyncio.Semaphore(max_parallel=3)"]
-    
-    PARALLEL --> V_A["Variant 0<br/>WIR + Certificate"]
-    PARALLEL --> V_B["Variant 1<br/>WIR + Certificate"]
-    PARALLEL --> V_N["Variant N-1<br/>WIR + Certificate"]
-    
-    V_A --> AGG["<b>BatchValidationResult</b>"]
-    V_B --> AGG
-    V_N --> AGG
-    
-    AGG --> OUT["<b>Output:</b> N (WIR, cert) pairs<br/>+ cluster summary<br/>+ consensus variant selection"]
-    
-    style ADAPTER fill:#D5E8D4,stroke:#82B366,stroke-width:2px
-    style PARALLEL fill:#FFE6CC,stroke:#D79B00,stroke-width:2px
+```json
+{
+  "entry_node": "node_1",
+  "exit_node": "node_5",
+  "nodes": [
+    { "id": "node_1", "type": "gateway", "ast_type": "If", "line": 2, "code": [], "successors": ["node_2", "node_3"], "predecessors": [], "guard": "score >= 700", "exception_type": null, "control_vars": ["score"], "data_vars": ["score"] },
+    { "id": "node_2", "type": "block", "ast_type": "Assign", "line": 3, "code": ["status = 'approved'"], "successors": ["node_5"], "predecessors": ["node_1"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["status"] },
+    { "id": "node_3", "type": "block", "ast_type": "Assign", "line": 5, "code": ["status = 'rejected'"], "successors": ["node_5"], "predecessors": ["node_1"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["status"] },
+    { "id": "node_5", "type": "return", "ast_type": "Return", "line": 6, "code": ["return status"], "successors": [], "predecessors": ["node_2", "node_3"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["status"] }
+  ],
+  "edges": [
+    { "source": "node_1", "target": "node_2", "guard": "score >= 700", "exception_type": null },
+    { "source": "node_1", "target": "node_3", "guard": "not (score >= 700)", "exception_type": null },
+    { "source": "node_2", "target": "node_5", "guard": null, "exception_type": null },
+    { "source": "node_3", "target": "node_5", "guard": null, "exception_type": null }
+  ],
+  "unsupported_constructs": []
+}
 ```
 
-### 9.4 Adaptive Budget Allocation
+Note there are **no blank structural bookkeeping nodes** in this output (post-F1 contraction pass) — every node corresponds to real source code. See `docs/module02/12_wir_and_certificate_contract.md` for the full contract, including the certificate fields, aimed specifically at Module 03's consumption needs.
 
-For batch processing, per-variant resource budgets scale inversely with N to maintain constant total wall-clock time (~5 minutes):
+### 9.3 Batch Processing — planned, not implemented
 
-| N | Z3 Queries/Variant | Test Runs/Variant | Per-Variant Timeout | Total Wall Clock |
-|---|-------------------|-------------------|--------------------|--------------------|
-| 1 | 200 | 50 | 300s | 300s |
-| 3 | 100 | 35 | 100s | ~180s (parallel) |
-| 5 | 80 | 25 | 60s | ~180s (parallel) |
-| 10 | 50 | 15 | 30s | ~180s (parallel) |
+The originally-planned batch pipeline (`GenerationAdapter` → parallel per-variant validation → `BatchValidationResult` with adaptive budget allocation scaling inversely with N) does not exist in `src/`. The closest real equivalent is the evaluation harness's multi-implementation corpus generation (§8.2, §5.4), which is a one-off evaluation script, not a production, budget-adaptive batch endpoint. Kept here as a still-open design sketch — see §7.1, Phase 3.
 
 ---
 
@@ -584,138 +569,98 @@ For batch processing, per-variant resource budgets scale inversely with N to mai
 
 ### 10.1 Multi-Layer Validation Architecture
 
-Module 02's validation strategy is **self-referential** — the module validates its own outputs through three independent mechanisms, each grounded in distinct mathematical foundations:
-
 | Mode | Mathematical Foundation | Confidence Type | Failure Mode | Independence |
 |------|------------------------|-----------------|-------------|--------------|
-| **V3** | Graph theory (dominators), formal languages (CNF) | Syntactic | AST traversal bug | Independent of V1, V2 |
+| **V3** | Graph theory (dominators), formal languages (CNF) | Syntactic — gates, does not vote | AST traversal bug | Independent of V1, V2 |
 | **V2** | SMT solving (Z3), symbolic execution | Logical (bounded) | Solver timeout, path explosion | Independent of V1, V3 |
-| **V1** | Statistical hypothesis testing, sequence alignment | Statistical | Insufficient test inputs | Independent of V2, V3 |
+| **V1** | Statistical hypothesis testing, sequence alignment | Statistical | Insufficient/untargeted test inputs (§7.2) | Independent of V2, V3 |
 
 ### 10.2 V3: Structural Correctness Validation
 
-**Method**: The CFGExtractor's output is validated against the Python AST through:
-
-- **Node coverage**: Fraction of AST statement nodes mapped to WIR nodes (target: ≥ 0.95)
-- **Edge coverage**: Fraction of control-flow edges preserved (target: ≥ 0.95)
-- **Guard extraction success rate**: Fraction of branch conditions successfully decomposed to CNF (target: ≥ 0.95)
-- **Dominator verification**: Structural ordering constraints checked via `nx.immediate_dominators`
-
-**Quality Gate**: If node coverage < 0.95, verification aborts and flags for manual review.
+**Method**: node coverage, edge coverage, and guard-extraction success rate (target ≥ 0.95 each), plus dominator verification via `nx.immediate_dominators`. If node coverage `< 0.95`, verification aborts and flags for manual review. **Measured (E2 experiment, current)**: node and edge precision/recall/F1 are all **1.0000** across the full 101-program FLOW-BENCH-derived corpus, human-validated against a hand-labeled gold set (`eval/results/e2_structural_report.md`).
 
 ### 10.3 V2: Path Feasibility Validation
 
-**Method**: Concolic execution with Z3 provides **bounded logical confidence**:
-
-- **Concrete execution**: Native Python execution with actual values
-- **Symbolic tracking**: Parallel Z3 expression tracking for control-relevant variables
-- **Path condition collection**: At each branch, the taken condition is recorded as a Z3 assertion
-- **Alternative path exploration**: After concrete execution, Z3 queries for satisfiable alternative path conditions, generating new inputs for unexplored paths
-
-**Confidence Formula**:
-```
-confidence = (feasible_paths_verified / total_paths_explored) 
-             × (1 - timeout_rate) 
-             × solver_success_rate
-```
-
-**Path Explosion Mitigation**:
-- **Layer 1**: Static k-bounding (k=3 loop unrollings) with Havoc assignments
-- **Layer 2**: QCE (Query Count Estimation) dynamic state merging at loop headers
-- **Layer 3**: Coverage-guided path pruning with BFS prioritization of unexplored edges
-
-**Fallback**: If V2 confidence stalls below 0.80 after 500 solver queries, V1 (dynamic tracing) is triggered as a compensating modality.
+**Method**: concolic execution with Z3 — concrete execution, symbolic path-condition tracking, branch-negation solver queries for alternative paths. `confidence = (feasible_paths / total_paths) * (1 - timeout_rate) * solver_success_rate`. Path-explosion mitigation is `k`-bounding only (QCE state merging was removed — §4.3); coverage-guided pruning is limited to the branch-negation exploration order itself, not a separate BFS layer. If V2 confidence stalls below 0.80, V1 is triggered as a compensating modality; container-typed inputs with no discoverable structure also trigger a V1 fallback.
 
 ### 10.4 V1: Behavioral Preservation Validation
 
-**Method**: Randomized differential testing provides **statistical confidence**:
-
-1. **Trace collection** (`sys.settrace`): Captures task entry/exit events and branch decisions from the original Python code
-2. **Reference execution**: The WIR Reference Interpreter executes the same inputs, producing an "expected" trace
-3. **LCS alignment**: Traces are compared under the **task-observable abstraction** — two traces are equivalent if they produce the same sequence of task entry/exit events, regardless of intermediate data values or silent steps
-4. **Confidence accumulation**: `confidence = (matching_traces / total_runs) × input_coverage_score`
-
-**Input Diversity**: The input generator uses entropy-based scoring (Shannon entropy of branch outcome distribution) to ensure test inputs explore diverse control-flow paths.
+**Method**: randomized differential testing — trace collection (monitoring-first, §4.4), reference execution via the WIR interpreter, LCS alignment under the task-observable abstraction (extended, since the most recent session, to also observe the return value), `confidence = (matching_traces / total_runs) * input_coverage_score`. Input diversity for `bool`/`str` parameters is guaranteed by construction (§4.4); `int`/`float` diversity is uniform-random, not targeted (§7.2).
 
 ### 10.5 Certificate Composition: Mathematical Foundation
 
-The combined certificate uses the **parallel-system reliability formula** from fault-tolerant systems engineering:
-
 ```
-combined = 1 - (1 - v1) × (1 - v2) × (1 - v3)
+combined_confidence = 1 - (1 - v1_confidence) * (1 - v2_confidence)
 ```
 
-Under the assumption of independent failure modes, this formula computes the probability that **at least one validation mode** correctly identifies a faulty WIR. The threshold `combined ≥ 0.95` was selected based on:
+V3 gates rather than votes (§4.5). A WIR is certified valid at `combined_confidence >= 0.95` (self-mode) with V3 not aborting. Differential mode uses a separately-calibrated `tau = 0.10` operating point on `combined_confidence` instead — see §10.6.
 
-- Concolic testing literature benchmarks (Godefroid et al. [20], Cadar et al. [21])
-- Empirical calibration during Phase 5 experiments
-- The requirement that at least two modes provide significant evidence for certification
+### 10.6 Experimental Validation — current, measured results (supersedes the original aspirational E1/E2/E3 targets)
 
-### 10.6 Experimental Validation (Phase 5)
+**Mutation-corpus calibration** (`eval/results/calibration_report_differential.md`, stratified CALIB/EVAL split, seed=1234, tau selected via Youden's J on CALIB using only genuinely-buggy mutants as positives):
 
-Three controlled experiments provide empirical evidence of Module 02's correctness:
+- Youden's J-optimal `tau = 0.1000` (J = 0.9600)
+- **Genuine-bug detection**: 0.9952 (n=210, 95% CI [0.974, 1.000])
+- **Equivalent-mutant specificity**: 0.1111 (n=9, wide CI — investigated, not a new bug; see the report)
+- **False-alarm rate on untouched bases**: 0.0588 (n=51, 95% CI [0.012, 0.162])
 
-**Experiment E1: Seeded Bug Detection** (Layer 3 dataset)
-- Protocol: 500 mutants × 5 base workflows, classify as DETECTED (combined < 0.95) or UNDETECTED
-- Target: Detection rate δ ≥ 0.95, False positive rate φ ≤ 0.05
-- Validates: V1+V2+V3 catch semantic alterations
+Per-operator detection rate (EVAL split): `corrupt-container-op`, `drop-step`, `early-return`, `negate-guard`, `reorder-steps`, `swap-branches`, `wrong-variable` all **1.000**; `constant-perturb` **0.889** (8/9 — the one remaining case has a guard fed by two independent `str` parameters sharing a single round-robin pool, a per-guard-site coverage gap, §7.2).
 
-**Experiment E2: Structural Accuracy** (Layer 1 + Layer 4 datasets)
-- Protocol: Compare V3-extracted metrics (nodes, edges, decisions) against AST-computed ground truth
-- Target: Match rate α_struct ≥ 0.98
-- Validates: V3 extraction correctness
+**Structural accuracy** (`eval/results/e2_structural_report.md`): node and edge precision/recall/F1 all **1.0000** across all 101 corpus programs.
 
-**Experiment E3: Confidence Calibration** (Layer 1 + Layer 2 datasets)
-- Protocol: Measure Pearson correlation between combined score and ground-truth correctness labels
-- Target: Pearson r ≥ 0.85, threshold accuracy ≥ 90%
-- Validates: Combined score correlates with actual correctness
+**Certificate-score-vs-ground-truth correlation** (`eval/results/e3_correlation_report.md`, n=427 mutants, `semantic_diff_rate` measured independently by executing base and mutant code directly — no WIR involved on that side): Pearson r = **0.4085** (0.5580 restricted to non-equivalent mutants), Spearman rho = **0.5400** (0.5988 restricted).
 
-### 10.7 Ablation Study
+**Multi-implementation natural-bug corpus** (`eval/results/multi_impl_report.md`, `eval/results/session_b_report.md`): on the 164 rejected-behavioral (real LLM logic-bug) variants, detection is **1.0000** in `strict` (same-lineage) comparison mode and **0.9329** in `task_only` (independent-implementation) mode — both figures include the most recent session's return-value observable, which closed all 6 previously-undetected cases (all were identical-branch-structure, differing-only-in-return-value divergences). On the 20 admitted (behaviorally-equivalent-by-construction, independently-styled) variants, the certificate's implementation-freedom false-alarm rate is **0.25** in `strict` mode and **0.10** in `task_only` mode — the explicit, measured trade the two comparison modes exist to make visible (see `docs/module02/11_multi_impl_corpus_contract.md`).
 
-The experimental framework includes an ablation study comparing:
+### 10.7 Interpretation, Not a Formal Ablation
 
-| Configuration | Expected Behavior |
-|-------------|-------------------|
-| V1-only | High recall, lower precision (testing cannot prove absence of bugs) |
-| V2-only | Strong logical confidence for bounded regions, misses unbounded behavior |
-| V3-only | Fast syntactic check, no behavioral guarantee |
-| V1+V2+V3 (combined) | Optimal trade-off: independent modalities compensate for individual weaknesses |
+The original document proposed a formal ablation study (V1-only / V2-only / V3-only / combined). This has not been run as a controlled experiment. What *is* known from the calibration results above: V2's `confidence` is measured at 0.0 for essentially every FLOW-BENCH-derived base program in this corpus (container-shaped inputs make V2 bail to a V1 fallback), so in practice the current corpus's `combined_confidence` is driven almost entirely by V1 — a real, checked fact (not an assumption) documented in the Session A composition-change notes in `calibration_report_differential.md`, not a formal ablation result.
 
 ---
 
-## Appendix A: API Contract Summary
+## 11. Design History
+
+This document has gone through substantial revision as the implementation diverged from the original plan across (at the time of this rewrite) seven engineering sessions. Rather than silently overwrite that history, the correction trail is preserved and auditable:
+
+- **`docs/module02/05_core_hardening.md` through `10_integration.md`** — the original numbered phase-plan documents. Each carries a historical-document banner pointing to what actually superseded it (see `docs/module02/00_overview.md`'s roadmap table, §4 above, for the current status of each phase).
+- **`eval/results/archive/`** — every superseded evaluation report is archived, not deleted, with a `README.md` explaining what changed and why for each one (verdict-composition fix, branch-decision observability, literal-coverage fix, return-value observable, and more).
+- **`eval/results/session_b_report.md`** — the most recent engineering session's own before/after tables (return-value observable, typed per-layer `/verify` statuses, wall-clock timeout, the QCE deletion, and this document's own trigger).
+- **`docs/module02/12_wir_and_certificate_contract.md`** — the current, authoritative interface contract for Module 03, generated from source rather than from the original plan.
+
+---
+
+## Appendix A: API Contract Summary (current, verified)
 
 ### A.1 Single Implementation: `POST /verify`
 
-**Request**: `{"workflow_code": "str", "specification": "str (optional)"}`  
-**Response**: `{"wir": dict, "certificate": dict, "ai_refinement": dict, "metadata": dict}`  
-**Status Codes**: `200 OK` (passed or failed), `400 VALIDATION_ERROR` (syntax errors), `500 INTERNAL_ERROR` (solver failure)
+**Request**: `{"source_code": "str"}` (not `{"workflow_code": ..., "specification": ...}` as originally planned — see §1.2).
+**Response**: a flat object — `v3_coverage`, `v3_abort`, `v2_confidence`, `v1_confidence`, `combined_confidence`, `passed`, `message`, `v3_details`, `v2_details`, `v1_details`, `wir`, `layers` (not the nested `{wir, certificate, ai_refinement, metadata}` shape originally planned).
+**Status handling**: the endpoint does not use HTTP status codes to signal verification failure — a syntactically invalid or unverifiable program still returns `200 OK` with `passed: false` and per-layer `ERROR`/`SKIPPED` statuses in `layers`, so a client can always parse a structured result rather than handling an HTTP error path.
 
-### A.2 Batch Implementation: `POST /verify-batch`
+### A.2 Batch Implementation: `POST /verify-batch` — not implemented
 
-**Request**: `{"specification": "str", "n_variants": int, "adapter": "self_consistency|module_01"}`  
-**Response**: `{"implementations": [...], "summary": dict, "metadata": dict}`
+Planned, not present. See §7.1, §9.3.
 
-### A.3 Health Check: `GET /health`
+### A.3 Health Check: `GET /health` — not implemented
 
-**Response**: `{"status": "healthy", "version": "str", "components": dict, "timestamp": "ISO-8601"}`
+Not present. Module 04's UI checks liveness by `GET`ting `/docs` (FastAPI's auto-generated interactive docs page) instead, as an incidental health signal, not a dedicated endpoint.
 
 ---
 
-## Appendix B: Technology Stack
+## Appendix B: Technology Stack (current, verified against `requirements.txt`)
 
-| Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
-| Core language | Python | 3.11+ | Primary implementation |
-| AST parsing | `ast` (stdlib) | — | Control-flow extraction |
-| Graph analysis | NetworkX | latest | CFG construction, dominator computation |
-| SMT solving | Z3 (Microsoft) | latest | Symbolic refinement checking |
-| API framework | FastAPI | latest | REST endpoint orchestration |
-| Validation | Pydantic, jsonschema | latest | Request/response schema validation |
-| Tracing | `sys.settrace` (stdlib) | — | Dynamic execution capture |
-| Frontend | Streamlit | latest | Interactive verification portal (Module 04) |
-| AI refinement | OpenAI GPT-4o-mini | 2024-07-18 | Diagnostic explanations (Phase 2) |
-| Model checking | SPOT (C++) | latest | Automata-theoretic verification (Module 03) |
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| Core language | Python | 3.11+ (see `Dockerfile`) |
+| AST parsing | `ast` (stdlib) | Control-flow extraction |
+| Graph analysis | NetworkX | CFG construction, dominator computation |
+| SMT solving | Z3 (`z3-solver`) | Symbolic refinement checking |
+| API framework | FastAPI + `uvicorn` | REST endpoint orchestration |
+| Validation | Pydantic, `jsonschema` | Request/response schema validation |
+| Tracing | `sys.monitoring` (PEP 669, stdlib), `sys.settrace` fallback (stdlib) | Dynamic execution capture |
+| Frontend | Streamlit | Interactive verification portal (Module 04) |
+| AI refinement | — | **Not used** — the originally-planned OpenAI GPT-4o-mini integration (§5.3) was never implemented |
+| Model checking | SPOT (C++) | Automata-theoretic verification (Module 03's own stack, referenced here only as the downstream consumer) |
 
 ---
 
@@ -765,4 +710,4 @@ The experimental framework includes an ablation study comparing:
 
 ---
 
-*Document generated for Module 02 evaluation. All terminology (M_spec, M_code, WIR, approx_proc, etc.) is drawn directly from the VibeCheck Interim Report and supporting technical documentation.*
+*Document rewritten 2026-07-09 for Module 02's implemented, measured reality. All terminology (M_spec, M_code, WIR, etc.) is drawn from the VibeCheck Interim Report and supporting technical documentation; all current numbers are drawn from `module_02_extract/eval/results/` and the current source, not from the original plan.*
