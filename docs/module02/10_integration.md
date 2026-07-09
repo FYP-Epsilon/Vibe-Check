@@ -1,5 +1,7 @@
 # Phase 6: Integration & Documentation
 
+> **Historical document** (written during Module 02's original 6-phase planning, predating the implementation sessions): describes the design/plan as of that point, including a `POST /verify` request/response shape (`workflow_code`/`specification` fields) that was never adopted — the actual endpoint uses `source_code`/`CodePayload`. Superseded by `docs/module02/12_wir_and_certificate_contract.md`, the current, source-generated Module 03 API contract. Kept as the project's finding trail.
+
 > **Phase**: 6 of 6  
 > **Scope**: Module 03 API contract, thesis documentation, final integration checklist  
 > **Prerequisite**: All Phases 1–5 complete  
