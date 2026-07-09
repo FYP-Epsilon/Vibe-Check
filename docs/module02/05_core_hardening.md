@@ -1,5 +1,7 @@
 # Phase 1: Core Module 02 Hardening
 
+> **Historical document** (written during Module 02's original 6-phase planning, predating the implementation sessions): describes the design/plan as of that point. Superseded by the actual hardening work across multiple engineering sessions — see `docs/module02/00_overview.md` §4's roadmap table for current status, `.claude/memory/z3_double_reset_misdiagnosis.md` for why the "P0 double-reset" bug below turned out not to exist (the real fix was an O(n²)→O(n) solver refactor), and `docs/module_summery/Module_02_Verified_IR_Extraction.md` §4.3 for why QCE state merging (§2.2 below) was deleted rather than integrated. Kept as the project's finding trail.
+
 > **Phase**: 1 of 6  
 > **Scope**: Bug fixes, test coverage improvements, and validation threshold calibration  
 > **Prerequisite**: Existing `ast_extractor.py`, `z3_sym_engine.py`, `dynamic_tracer.py`, `main.py`  
