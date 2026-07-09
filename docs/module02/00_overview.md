@@ -1,8 +1,8 @@
 # Module 02: VibeCheck IR Validator — Architecture Overview
 
-> **Status**: Core validator (V1/V2/V3) implemented in `src/`. Phases 1–6 (hardening, AI refinement, multi-impl, evaluation, integration) not yet implemented — see §4.  
-> **Owner**: Module 02 Lead Developer  
-> **Last Updated**: 2026-06-22
+> **Status**: Core validator (V1/V2/V3) implemented in `src/`, plus core hardening, multi-implementation corpus generation, and a full evaluation harness (`eval/`) — see §4 for per-phase detail. AI-assisted refinement (originally-planned Phase 2) is not implemented. This document is a living reference, kept in sync with the current source — see `docs/module02/12_wir_and_certificate_contract.md` for the authoritative WIR/certificate schema consumed by Module 03.
+> **Owner**: Module 02 Lead Developer
+> **Last Updated**: 2026-07-09 (docs refresh reconciling this document with seven engineering sessions' worth of implementation changes)
 
 ---
 
@@ -21,50 +21,68 @@ Module 02 operates through **three complementary validation modes**, each provid
 | Mode | Name | Technique | What It Proves | Independence |
 |------|------|-----------|----------------|--------------|
 | V3 | Structural Validation | AST → CFG extraction, dominator analysis, guard CNF flattening, control/data variable classification | *"The WIR structurally matches the code"* | Independent of V1, V2 |
-| V2 | Symbolic Validation | Z3 concolic execution with k-bounded loop unrolling, QCE state merging, path exploration | *"The paths through the WIR are logically feasible in the code"* | Independent of V1, V3 |
-| V1 | Dynamic Validation | `sys.settrace` differential testing, WIR reference interpreter, LCS trace comparison, randomized testing | *"The code and WIR behave identically on concrete inputs"* | Independent of V2, V3 |
+| V2 | Symbolic Validation | Z3 concolic execution with k-bounded loop unrolling, branch-negation path exploration, container-input seeding | *"The paths through the WIR are logically feasible in the code"* | Independent of V1, V3 |
+| V1 | Dynamic Validation | PEP 669 `sys.monitoring`-first differential testing (falls back to `sys.settrace` on Python < 3.12 or when no monitoring tool id is free), WIR reference interpreter, LCS trace comparison, randomized testing | *"The code and WIR behave identically on concrete inputs"* | Independent of V2, V3 |
+
+(An earlier V2 design also included QCE — Query Count Estimation — symbolic state merging. It was never wired into the concolic exploration loop above, only exercised by its own unit tests, and was deleted as dead code rather than kept as an unused capability; see `eval/results/session_b_report.md`'s B4 section.)
 
 ### Certificate Composition Formula
 
 ```
-combined = 1 - (1 - v1) * (1 - v2) * (1 - v3)
+combined_confidence = 1 - (1 - v1_confidence) * (1 - v2_confidence)
 ```
 
-A WIR is **certified valid** if `combined >= 0.95`. Each mode contributes independently — the combined score only reaches the threshold if at least two modes provide significant evidence.
+V3 does **not** appear in this product. An earlier version of this formula included a `(1 - v3)` term, but V3 measures *extraction fidelity* (does the WIR structurally match the code?), not *behavioral correctness* — and V3 saturates to a near-1.0 score for almost any structurally extractable program, which made the three-term product's combined score vacuous (a WIR could reach the certification threshold on V3's contribution alone, regardless of what V1/V2 found). V3 now acts as a **gate** instead: if extraction fidelity is below threshold (`v3_cert["abort"] = True`), verification fails immediately regardless of V1/V2, since a low-fidelity WIR means every downstream check ran against an unfaithful model of the code in the first place. A WIR is **certified valid** if `combined_confidence >= 0.95` and V3 did not abort.
 
 ---
 
 ## 3. Component Map
 
-Legend: ✅ implemented in `module_02_extract/src/` · ⏳ planned, not yet implemented.
+Legend: ✅ implemented · ⏳ planned, not present. The three validation layers were modularized from single-file monoliths into packages partway through implementation — each is now a directory, not a `.py` file.
 
 ```
 module_02_extract/
 ├── src/
-│   ├── ast_extractor.py      # ✅ V3: CFGExtractor, DominatorAnalyzer, GuardExtractor, WIRDataLayer, V3Certificate, run_v3_pipeline
-│   ├── z3_sym_engine.py      # ✅ V2: Z3VariableRegistry, SymbolicEvaluator, WIRSymbolicTracer, BoundedConcolicEngine (QCE state merging)
-│   ├── dynamic_tracer.py     # ✅ V1: WIRTraceCollector, WIRReferenceInterpreter, DifferentialComparator, RandomizedDifferentialTester, run_v1_pipeline
-│   └── main.py               # ✅ FastAPI /verify endpoint + orchestration; CodePayload(BaseModel) defined inline
-├── tests/                    # ✅ test_ast_extractor, test_z3_sym_engine, test_dynamic_tracer(_parity), test_integration
-├── inputs/                   # ✅ sample workflows (e.g. loan_approval.py)
+│   ├── ast_extractor/         # ✅ V3: cfg_extractor.py (CFGExtractor), dominators.py,
+│   │                          #    guards.py, data_layer.py, certificate.py, models.py,
+│   │                          #    schema.py, pipeline.py (run_v3_pipeline)
+│   ├── z3_sym_engine/          # ✅ V2: registry.py (Z3VariableRegistry), evaluator.py,
+│   │                          #    tracer.py (WIRSymbolicTracer), concolic.py
+│   │                          #    (BoundedConcolicEngine), pipeline.py (run_v2_pipeline)
+│   ├── dynamic_tracer/         # ✅ V1: collector.py (WIRTraceCollector), interpreter.py
+│   │                          #    (WIRReferenceInterpreter), comparator.py
+│   │                          #    (DifferentialComparator), randomized.py
+│   │                          #    (RandomizedDifferentialTester), composer.py
+│   │                          #    (MultiModalCertificateComposer), pipeline.py (run_v1_pipeline)
+│   └── main.py                 # ✅ FastAPI /verify endpoint + orchestration; CodePayload(BaseModel)
+│                              #    still defined inline (see "Planned" below); typed per-layer
+│                              #    `layers` status key; wall-clock timeout wrapper
+├── tests/                     # ✅ test_ast_extractor.py, test_z3_sym_engine.py,
+│                              #    test_dynamic_tracer.py, test_dynamic_tracer_parity.py,
+│                              #    test_integration.py (246 tests total, incl. eval/)
+├── inputs/                    # ✅ sample workflows (e.g. loan_approval.py)
+├── eval/                      # ✅ full evaluation harness — NOT the 4-layer plan originally
+│   │                          #    sketched below; see docs/module02/09_experiments.md's
+│   │                          #    historical-document banner for what changed and why.
+│   │                          #    manifest.json + flowbench_adapter.py (corpus), mutate.py
+│   │                          #    (10 mutation operators), calibrate*.py (threshold
+│   │                          #    selection), nim_client.py + gen_variants.py +
+│   │                          #    admit_variants.py (multi-implementation corpus),
+│   │                          #    e2_structural.py / e3_correlation.py (structural /
+│   │                          #    behavioral accuracy experiments), c5_experiments.py /
+│   │                          #    d3_control.py (cross-implementation comparison-mode
+│   │                          #    experiments), results/ (all current reports)
 │
-│   # --- Planned, not yet present in src/ ---
-├── models.py                 # ⏳ Pydantic schemas (currently CodePayload lives inline in main.py)
-├── adapters/                 # ⏳ Phase 3: Multi-implementation generation
-│   ├── base.py              #    GenerationAdapter abstract interface
-│   ├── llm_adapter.py       #    SelfConsistencyAdapter: temperature-sampled LLM generation
-│   └── m01_adapter.py       #    Module01Adapter: delegates to external Module 01 (blocked on Module 01)
-├── ai_refinement/           # ⏳ Phase 2: LLM-based diagnostic refinement
-│   ├── client.py            #    OpenAI GPT-4o-mini client wrapper
-│   ├── counterexample.py    #    V1 failure explanation generator
-│   ├── narrative.py         #    Certificate → human-readable report
-│   └── guard_simplify.py    #    Guard expression simplification
-└── eval/                    # ⏳ Phases 4–5: Evaluation framework
-    ├── generate_golden.py   #    Layer 1: Golden workflow generator
-    ├── augment_flowbench.py #    Layer 2: FLOW-BENCH derivative augmenter
-    ├── mutation_engine.py   #    Layer 3: Mutation testing engine
-    ├── adversarial.py       #    Layer 4: Hand-crafted edge cases
-    └── run_experiments.py   #    Evaluation orchestrator + metric calculator
+│   # --- Still planned, not present in src/ ---
+├── models.py                  # ⏳ Pydantic schemas (CodePayload still lives inline in main.py)
+├── adapters/                  # ⏳ originally-planned pluggable multi-implementation-generation
+│                              #    layer (base.py / llm_adapter.py / m01_adapter.py). Multi-
+│                              #    implementation generation was ultimately built directly in
+│                              #    eval/ (nim_client.py, flowbench_adapter.py) as an evaluation
+│                              #    harness, not as this production adapter layer or a
+│                              #    /verify-batch endpoint — no Module 01 integration exists yet.
+└── ai_refinement/             # ⏳ LLM-based diagnostic refinement (originally-planned Phase 2)
+                               #    — not implemented; no code under this name exists.
 ```
 
 ---
@@ -73,12 +91,12 @@ module_02_extract/
 
 | Phase | Document | Scope | Status |
 |-------|----------|-------|--------|
-| **Phase 1** | `05_core_hardening.md` | Fix solver bugs, increase test coverage, validate thresholds | Pending |
-| **Phase 2** | `06_ai_refinement.md` | Integrate OpenAI GPT-4o-mini for counterexample explanation, certificate narrative, guard simplification | Pending |
-| **Phase 3** | `07_multi_impl.md` | Self-consistency sampling adapter, multi-implementation orchestrator, `/verify-batch` endpoint | Pending |
-| **Phase 4** | `08_eval_data.md` | 4-layer evaluation data generation (golden, augmented, mutation, adversarial) | Pending |
-| **Phase 5** | `09_experiments.md` | Seeded bug detection, metric calibration, threshold tuning | Pending |
-| **Phase 6** | `10_integration.md` | Module 03 API contract, thesis documentation, supervisor checkpoint | Pending |
+| **Phase 1** | `05_core_hardening.md` | Fix solver bugs, increase test coverage, validate thresholds | **Done** — hardening happened, but as a series of engineering sessions rather than this doc's original plan; see its historical-document banner. 246 tests passing today. |
+| **Phase 2** | `06_ai_refinement.md` | Integrate OpenAI GPT-4o-mini for counterexample explanation, certificate narrative, guard simplification | **Not implemented.** No code under `ai_refinement/` or equivalent exists. This is the one phase whose original "Pending" status is still accurate. |
+| **Phase 3** | `07_multi_impl.md` | Self-consistency sampling adapter, multi-implementation orchestrator, `/verify-batch` endpoint | **Done, differently.** Multi-implementation generation and comparison exist (`eval/nim_client.py`, `eval/flowbench_adapter.py`, `comparison_mode` in the comparator), but as an evaluation harness against 3 real LLM APIs, not this doc's planned adapter layer or `/verify-batch` endpoint. See its historical-document banner. |
+| **Phase 4** | `08_eval_data.md` | 4-layer evaluation data generation (golden, augmented, mutation, adversarial) | **Done, differently.** A mutation-based evaluation corpus exists (`eval/mutate.py`, 10 operators, 427 applicable mutants) plus the multi-implementation natural-bug corpus from Phase 3 above — not this doc's originally-planned 4-layer structure. See its historical-document banner. |
+| **Phase 5** | `09_experiments.md` | Seeded bug detection, metric calibration, threshold tuning | **Done.** See `eval/results/calibration_report_differential.md` and `eval/results/session_b_report.md` for current, verified numbers — not this doc's original plan. See its historical-document banner. |
+| **Phase 6** | `10_integration.md` | Module 03 API contract, thesis documentation, supervisor checkpoint | **Partially done.** The Module 03 API contract now exists at `docs/module02/12_wir_and_certificate_contract.md` (current, generated from source). See `10_integration.md`'s historical-document banner for the rest of this phase's original scope. |
 
 ---
 
@@ -86,7 +104,7 @@ module_02_extract/
 
 ### Input: `POST /verify` — `CodePayload`
 
-The implemented endpoint takes a single field (`main.py: CodePayload`). The `specification` field below is planned, not yet accepted.
+The implemented endpoint takes a single field (`main.py: CodePayload`). A `specification` field (to carry Module 01's output directly into a single combined-verification call) is planned but not currently part of the accepted schema.
 
 ```json
 {
@@ -96,24 +114,32 @@ The implemented endpoint takes a single field (`main.py: CodePayload`). The `spe
 
 ### Output: actual `/verify` response (flat wire format)
 
-The current `_run_verification` returns a flat object (not the nested `wir`+`certificate` shape that was originally envisioned). On error it returns the same keys with `passed: false` and a `message`.
+The current `_run_verification` returns a flat object (not the nested `wir`+`certificate` shape that was originally envisioned). Every phase (V3, compile, V2, V1) runs in its own try/except and contributes a per-layer `status` (`"OK"` / `"ERROR"` / `"SKIPPED"`) plus a `reason` to the `layers` key — a fatal earlier-phase failure marks later phases `SKIPPED` with the upstream reason rather than leaving them silently absent. On error the top-level keys are the same shape with `passed: false`, a `message`, and every `layers` entry `"ERROR"`. The whole call is wrapped in a wall-clock timeout (`VERIFY_TIMEOUT_S` env var, default 30s) — see `docs/module02/12_wir_and_certificate_contract.md` for its documented boundary (it reliably bounds a hung Python loop; it cannot, in CPython, preempt a single long-running C-level statement holding the interpreter lock).
+
+Below is a **real response**, generated locally against this repo's own `module_02_extract/inputs/loan_approval.py` sample (`v3_details`/`v2_details`/`v1_details`/`wir` omitted here for brevity — they're large nested objects, present in the real response):
 
 ```json
 {
-  "v3_coverage": 0.98,
-  "v2_confidence": 0.85,
-  "v1_confidence": 0.92,
-  "combined_confidence": 0.9997,
+  "v3_coverage": 1.0,
+  "v3_abort": false,
+  "v2_confidence": 1.0,
+  "v1_confidence": 1.0,
+  "combined_confidence": 1.0,
   "passed": true,
-  "message": "",
-  "v3_details": { "...": "V3Certificate.generate()" },
-  "v2_details": { "...": "V2 certificate" },
-  "v1_details": { "...": "V1 certificate" },
-  "wir": { "entry": "node_0", "nodes": [], "edges": [] }
+  "message": "WIR validated -- passed to Module 03.",
+  "layers": {
+    "v3": { "status": "OK", "reason": "V3 structural extraction passed quality gate." },
+    "v2": { "status": "OK", "reason": "V2 symbolic refinement complete." },
+    "v1": { "status": "OK", "reason": "V1 dynamic tracing passed." }
+  }
 }
 ```
 
-### New: Batch Output (Phase 3)
+The combined-confidence formula for a less-than-perfect run, worked through for illustration (not a live run): `v1_confidence=0.92`, `v2_confidence=0.85` gives `combined_confidence = 1 - (1 - 0.92)(1 - 0.85) = 0.988` — the three-term formula's old example value of `0.9997` is not reachable under the current two-term formula for these inputs.
+
+### Planned, not implemented: batch output (originally-planned Phase 3)
+
+No `/verify-batch` endpoint exists. This shape was the original plan for the adapter-layer multi-implementation orchestrator described in §4's Phase 3 row; that work happened instead in `eval/` as an evaluation harness (see `eval/results/multi_impl_report.md`), not as this production endpoint. Kept here as a still-open design sketch, not current behavior.
 
 ```json
 {
@@ -136,12 +162,12 @@ The current `_run_verification` returns a flat object (not the nested `wir`+`cer
 
 | Decision | Rationale |
 |----------|-----------|
-| **Three independent modes** | Independent failure surfaces prevent correlated failures. If V3 has a bug in dominator analysis, V1 and V2 still provide confidence. |
-| **Combined = 1 - product of failures** | Standard parallel-system reliability formula. Each mode independently contributes evidence. |
-| **0.95 certification threshold** | Empirical target from concolic testing literature. Calibrated during Phase 5 experiments. |
-| **OpenAI GPT-4o-mini for refinement** | $5 budget covers entire project. Used only for diagnostics (not verification logic). Prevents circular reasoning in research. |
-| **Self-consistency in adapter layer** | Multi-implementation generation lives in pluggable adapter, not core validator. Keeps validation engine model-agnostic. |
-| **4-layer evaluation data** | Matches FLOW-BENCH methodology (golden + augmented + mutation + adversarial). Provides ground truth for all metrics. |
+| **Three independent modes, but only two vote** | Independent failure surfaces prevent correlated failures. V3 (structural fidelity) acts as a gate rather than a voting term — see §2's formula section for why the original three-term product was replaced. |
+| **Combined = 1 - (1-v1)(1-v2)** | Standard parallel-system reliability formula for the two behavioral-correctness layers. Each independently contributes evidence; V3 gates instead of voting. |
+| **0.95 certification threshold (self-mode)** | Empirical target, calibrated during the eval sessions described in §4's Phase 5 row. Differential mode (verifying a program against a *different* program's WIR — mutants, or independent implementations) uses a separately-calibrated operating point on `combined_confidence`, currently `tau = 0.10` (below which a run is flagged), selected via Youden's J on a held-out split — see `eval/results/calibration_report_differential.md`. |
+| **OpenAI GPT-4o-mini for refinement** *(not realized)* | This was the plan for the never-implemented AI-refinement phase (§4, Phase 2). Recorded here as design history, not current behavior — no code exists under this decision. |
+| **Self-consistency in adapter layer** *(not realized as planned)* | Multi-implementation generation was originally planned as a pluggable adapter layer in `src/`. It was ultimately built inside `eval/` instead (`nim_client.py`, `flowbench_adapter.py`), as an evaluation harness against real LLM APIs rather than a production adapter — see §4's Phase 3 row. |
+| **4-layer evaluation data** *(not realized as planned)* | The originally-planned golden/augmented/mutation/adversarial 4-layer structure was not built. What exists instead is a mutation-based corpus (`eval/mutate.py`, 10 operators) plus a real multi-implementation natural-bug corpus (3 LLM model families) — see §4's Phase 4 row. |
 
 ---
 

@@ -1,5 +1,7 @@
 # Phase 5: Experiments & Metric Calibration
 
+> **Historical document** (written during Module 02's original 6-phase planning, predating the implementation sessions): describes the design/plan as of that point — three experiments (E1/E2/E3) against the fictional 4-layer dataset from `08_eval_data.md`, with aspirational targets (e.g. Pearson r ≥ 0.85). Superseded by the actual, real experiments and measured results: `eval/results/calibration_report_differential.md` (genuine-bug detection 0.9952, false-alarm rate 0.0588), `eval/results/e2_structural_report.md` (structural F1 1.0000), `eval/results/e3_correlation_report.md` (Pearson r 0.4085), and `eval/results/session_b_report.md` / `eval/results/multi_impl_report.md` for the natural-bug and cross-implementation results. See `docs/module_summery/Module_02_Verified_IR_Extraction.md` §10.6 for the current, consolidated numbers with sources. Kept as the project's finding trail.
+
 > **Phase**: 5 of 6  
 > **Scope**: Run seeded bug detection, calibrate thresholds, measure all target metrics  
 > **Prerequisite**: Phases 1–4 complete (core hardened, AI refinement integrated, evaluation data generated)  
