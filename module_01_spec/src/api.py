@@ -43,20 +43,3 @@ def run_module_01_pipeline(bpmn_xml: str) -> Dict[str, Any]:
 
 if __name__ == "__main__":
     # Test with a simple BPMN XML
-    test_xml = """<?xml version="1.0" encoding="UTF-8"?>
-    <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="http://bpmn.io/schema/bpmn">
-      <bpmn:process id="Process_1" isExecutable="false">
-        <bpmn:startEvent id="Start_1" name="Start" />
-        <bpmn:exclusiveGateway id="Gateway_1" name="Check" />
-        <bpmn:task id="Task_A" name="A" />
-        <bpmn:task id="Task_B" name="B" />
-        <bpmn:sequenceFlow id="F1" sourceRef="Start_1" targetRef="Gateway_1" />
-        <bpmn:sequenceFlow id="F2" sourceRef="Gateway_1" targetRef="Task_A">
-            <bpmn:conditionExpression>x > 10</bpmn:conditionExpression>
-        </bpmn:sequenceFlow>
-        <bpmn:sequenceFlow id="F3" sourceRef="Gateway_1" targetRef="Task_B" />
-      </bpmn:process>
-    </bpmn:definitions>
-    """
-    result = run_module_01_pipeline(test_xml)
-    print(json.dumps(result, indent=2))
