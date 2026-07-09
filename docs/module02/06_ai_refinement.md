@@ -1,5 +1,7 @@
 # Phase 2: AI Refinement Integration
 
+> **Historical document** (written during Module 02's original 6-phase planning, predating the implementation sessions): describes the design/plan as of that point. Unlike most of the other numbered phase docs, this one has **not** been superseded by different work — it remains genuinely not implemented, and its `Status: Pending` below is still accurate. See `docs/module02/00_overview.md` §4's roadmap table for current status. Kept as the project's finding trail and as a still-open design sketch.
+
 > **Phase**: 2 of 6  
 > **Scope**: Integrate OpenAI GPT-4o-mini for diagnostic refinement — NOT for verification logic  
 > **Prerequisite**: Phase 1 complete (core engine hardened, all tests passing)  
