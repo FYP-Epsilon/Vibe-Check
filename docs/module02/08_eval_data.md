@@ -1,5 +1,7 @@
 # Phase 4: Evaluation Data Generation
 
+> **Historical document** (written during Module 02's original 6-phase planning, predating the implementation sessions): describes the design/plan as of that point — a 4-layer synthetic dataset (Golden/Augmented/Mutation/Adversarial, ~660 GPT-4o-mini-generated items). Superseded by what was actually built: a 10-operator mutation corpus (427 applicable mutants across 9 operator classes, `eval/mutate.py`) plus a real multi-implementation natural-bug corpus (3 LLM model families, 20 admitted / 164 rejected-behavioral, `eval/nim_client.py`) — see `docs/module_summery/Module_02_Verified_IR_Extraction.md` §8.2 and `eval/manifest.json` for current numbers. Kept as the project's finding trail.
+
 > **Phase**: 4 of 6  
 > **Scope**: Generate 4-layer evaluation dataset (golden, augmented, mutation, adversarial)  
 > **Prerequisite**: Phases 1–3 complete  

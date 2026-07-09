@@ -1,5 +1,7 @@
 # Phase 3: Multi-Implementation Generation
 
+> **Historical document** (written during Module 02's original 6-phase planning, predating the implementation sessions): describes the design/plan as of that point — a `src/adapters/` layer and a `POST /verify-batch` endpoint. Superseded by what was actually built: a real multi-implementation corpus generated from 3 independent LLM model families, implemented as an evaluation harness (`eval/nim_client.py`, `eval/gen_variants.py`, `eval/admit_variants.py`), not this production adapter/endpoint shape. See `eval/results/multi_impl_report.md`, `eval/results/session_b_report.md`, and `docs/module02/11_multi_impl_corpus_contract.md` (current) for what exists today. Kept as the project's finding trail.
+
 > **Phase**: 3 of 6  
 > **Scope**: Self-consistency sampling adapter, multi-implementation orchestrator, batch verification endpoint  
 > **Prerequisite**: Phase 1 (hardened core) and Phase 2 (AI refinement) complete  
