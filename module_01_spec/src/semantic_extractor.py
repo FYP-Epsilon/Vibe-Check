@@ -177,8 +177,8 @@ class SemanticExtractionEngine:
                         "source_id": source,
                         "target_id": target
                     }
-                    if condition:
-                        edge["condition"] = condition
+                    if condition and condition.strip():
+                        edge["condition"] = condition.strip()
                     
                     self.edges.append(edge)
                     self.mapped_edges_count += 1
