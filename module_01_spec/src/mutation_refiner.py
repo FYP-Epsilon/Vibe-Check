@@ -178,8 +178,8 @@ class LTLfAuditor:
                                 break
                     if len(all_paths) >= 100:
                         break
-        except:
-            pass
+        except Exception as e:
+            print(f"Trace generation error: {e}")
         
         # Convert node paths to proposition traces
         node_map = {s["node_id"]: s.get("atomic_propositions", []) for s in graph["states"]}
