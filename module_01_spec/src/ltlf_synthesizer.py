@@ -56,7 +56,8 @@ class FLTLSynthesizer:
                 ]
                 self.xor_gateways.append({
                     "gateway_id": gateway_id,
-                    "outgoing_flows": outgoing_flows
+                    "outgoing_flows": outgoing_flows,
+                    "default_flow": state.get("default_flow")
                 })
 
     def _layer_v2_synthesize_logic(self):
@@ -76,14 +77,28 @@ class FLTLSynthesizer:
         """Computes the mathematical negation for 'Else' paths in XOR gateways."""
         for gateway in self.xor_gateways:
             flows = gateway["outgoing_flows"]
+            if len(flows) < 2:
+                continue # Join gateway, skip
+                
             explicit_guards = [f.get("condition") for f in flows if f.get("condition")]
             unconditioned_flows = [f for f in flows if not f.get("condition")]
 
             if unconditioned_flows and explicit_guards:
                 # Compute mathematical negation: NOT(C1) AND NOT(C2) ...
                 negated_conjunction = " && ".join([f"!({g})" for g in explicit_guards])
+                default_flow_id = gateway.get("default_flow")
                 
-                for flow in unconditioned_flows:
+                if default_flow_id:
+                    default_flow = next((f for f in unconditioned_flows if f.get("flow_id") == default_flow_id), None)
+                    if default_flow:
+                        default_flow["condition"] = negated_conjunction
+                        self.inferred_guards.append({
+                            "gateway_id": gateway["gateway_id"],
+                            "target_node_id": default_flow["target_id"],
+                            "inferred_condition": negated_conjunction
+                        })
+                elif len(unconditioned_flows) == 1:
+                    flow = unconditioned_flows[0]
                     flow["condition"] = negated_conjunction
                     self.inferred_guards.append({
                         "gateway_id": gateway["gateway_id"],
@@ -99,18 +114,16 @@ class FLTLSynthesizer:
 
     def _instantiate_ltlf_templates(self):
         """Translates graph edges and nodes into LTLf properties."""
-        # Sequence Flows: G(start(B) -> F(done(A)))
+        # Sequence Flows: !start(B) W done(A)
         for edge in self.edges:
             source_props = self._get_node_props(edge["source_id"])
             target_props = self._get_node_props(edge["target_id"])
             
-            # Using templates from prompt
-            # Sequence Flow (A -> B): G(start(B) -> F(done(A)))
             src_done = source_props[-1]
             tgt_start = target_props[0]
             
             self.ltlf_suite["P1_Structural_Control_Flow"].append(
-                f"G({tgt_start} -> F({src_done}))"
+                f"!{tgt_start} W {src_done}"
             )
 
         # Gateway Specific Logic
@@ -151,7 +164,7 @@ class FLTLSynthesizer:
 
     def _generate_sentinels(self):
         """Generates P0 Critical Sentinels and P2 Quality Limits."""
-        # Sentinel Guard: G(!forbidden_state U prerequisite_met)
+        # Sentinel Guard: !forbidden_state W prerequisite_met
         # For every task/event, cannot be 'done' until it 'starts' (or reached)
         for state in self.states:
             props = state.get("atomic_propositions", [])
@@ -159,7 +172,7 @@ class FLTLSynthesizer:
                 start_prop = props[0]
                 done_prop = props[-1]
                 self.ltlf_suite["P0_Critical_Sentinels"].append(
-                    f"G(!{done_prop} U {start_prop})"
+                    f"!{done_prop} W {start_prop}"
                 )
         
         # Bounded Loop: G(count(iteration) <= N -> F(exit_condition))
@@ -171,24 +184,26 @@ class FLTLSynthesizer:
         """
         Layer V1: Enforces Quality Gate and generates Certificate.
         """
-        total_xor = len(self.xor_gateways)
+        # Only splits (gateways with >= 2 outgoing flows) need guard resolution
+        splits = [g for g in self.xor_gateways if len(g["outgoing_flows"]) >= 2]
+        total_xor = len(splits)
         resolved_xor = 0
         
-        for gateway in self.xor_gateways:
+        for gateway in splits:
             flows = gateway["outgoing_flows"]
-            if all(f.get("condition") for f in flows):
+            unconditioned = [f for f in flows if not f.get("condition")]
+            if not unconditioned:
                 resolved_xor += 1
+            else:
+                gateway_id = gateway["gateway_id"]
+                raise VerificationException(
+                    f"XOR Gateway '{gateway_id}' has {len(unconditioned)} unconditioned branch(es) "
+                    "without a default flow. Decision logic is ambiguous."
+                )
         
         self.guard_resolution_coverage = resolved_xor / total_xor if total_xor > 0 else 1.0
         
         status = "PASS" if self.guard_resolution_coverage >= 1.0 else "FAIL"
-        
-        if status == "FAIL":
-            raise VerificationException(
-                f"Guard Resolution Coverage {self.guard_resolution_coverage} < 1.0. "
-                "Logical dead-zone detected."
-            )
-
         total_props = sum(len(v) for v in self.ltlf_suite.values())
         
         return {
