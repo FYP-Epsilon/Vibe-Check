@@ -29,25 +29,12 @@ class EntropyDeltaLocator:
         # They are usually in the form: start(NodeID), done(NodeID), or just NodeID
         mentioned_props = []
         
-        # Regex to catch start(X), done(X), or raw words. 
-        # Since formulas might be normalized (start_X) or unnormalized (start(X)), we handle both.
-        token_pattern = re.compile(r'start_([a-zA-Z0-9_]+)|done_([a-zA-Z0-9_]+)|start\(([a-zA-Z0-9_]+)\)|done\(([a-zA-Z0-9_]+)\)')
-        
         for prop in failing_properties:
-            matches = token_pattern.findall(prop)
-            for match in matches:
-                # match is a tuple like ('Task1', '', '', '')
-                # Filter out empties and get the actual ID
-                actual_id = next(m for m in match if m)
-                mentioned_props.append(actual_id)
-                
-            # If the property didn't use start/done (e.g. quality limits)
-            if not matches:
-                # Simple fallback: look for words that might match node IDs
-                words = re.findall(r'\b[a-zA-Z0-9_]+\b', prop)
-                for w in words:
-                    if w not in ['G', 'F', 'X', 'W', 'U', 'start', 'done']:
-                        mentioned_props.append(w)
+            # Extract all alphanumeric words (with underscores)
+            words = re.findall(r'\b[a-zA-Z0-9_]+\b', prop)
+            for w in words:
+                if w not in ['G', 'F', 'X', 'W', 'U', 'start', 'done']:
+                    mentioned_props.append(w)
 
         # 2. Map propositions back to graph node_ids
         # Build a reverse mapping from atomic_propositions -> node_id
@@ -70,10 +57,9 @@ class EntropyDeltaLocator:
             else:
                 node_scores[p] += 1.0
 
-        # 3.5 Upstream Attribution
+        # 3.5 Common Upstream Attribution
         # If the formula only mentions branches (TaskA, TaskB), the actual fault 
-        # might be the gateway splitting them. We propagate some score upstream.
-        # Find predecessors for all nodes
+        # might be the gateway splitting them. 
         preds = {}
         for edge in semantic_graph.get("edges", []):
             src = edge.get("source_id")
@@ -83,10 +69,17 @@ class EntropyDeltaLocator:
             preds[tgt].append(src)
 
         upstream_scores = Counter()
-        for node_id, score in node_scores.items():
+        # For each predecessor, count how many of its targets were mentioned
+        pred_to_mentioned_targets = Counter()
+        for node_id in node_scores.keys():
             for p_id in preds.get(node_id, []):
-                # Propagate high score to the predecessor (control structure)
-                upstream_scores[p_id] += score * 1.5
+                pred_to_mentioned_targets[p_id] += 1
+                
+        for p_id, count in pred_to_mentioned_targets.items():
+            if count >= 2:
+                upstream_scores[p_id] += 2.0 * count
+            else:
+                upstream_scores[p_id] += 0.2
                 
         for node_id, score in upstream_scores.items():
             node_scores[node_id] += score
