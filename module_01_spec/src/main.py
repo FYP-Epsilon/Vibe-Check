@@ -17,6 +17,7 @@ app = FastAPI(title="VibeCheck Spec Engine", version="2.0.0")
 
 class BPMNPayload(BaseModel):
     bpmn_xml: str
+    seed: int = 42
 
 @app.post("/verify")
 def verify_spec(payload: BPMNPayload):
@@ -33,8 +34,9 @@ def verify_spec(payload: BPMNPayload):
             raise HTTPException(
                 status_code=422,
                 detail={
-                    "error": "Phase 1 Quality Gate failed.",
-                    "details": phase_1_result["phase_1_certificate"]
+                    "phase": 1,
+                    "error_code": "PHASE_1_GATE_FAIL",
+                    "certificate": phase_1_result["phase_1_certificate"]
                 }
             )
 
@@ -44,7 +46,17 @@ def verify_spec(payload: BPMNPayload):
 
         # Phase 3: Mutation Refinement
         validator = MutationValidator(phase_1_result["semantic_graph"], phase_2_result["ltlf_property_suite"])
-        phase_3_result = validator.execute_validation_pipeline()
+        phase_3_result = validator.execute_validation_pipeline(seed=payload.seed)
+        
+        if phase_3_result["phase_3_certificate"]["status"] == "FAIL":
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "phase": 3,
+                    "error_code": "PHASE_3_GATE_FAIL",
+                    "certificate": phase_3_result["phase_3_certificate"]
+                }
+            )
         
         return {
             "status": "PASS",
@@ -54,11 +66,26 @@ def verify_spec(payload: BPMNPayload):
         }
         
     except VerificationException as e:
-        raise HTTPException(status_code=422, detail=str(e))
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "phase": 2,
+                "error_code": "PHASE_2_VERIFICATION_FAIL",
+                "message": str(e)
+            }
+        )
+    except HTTPException:
+        # Re-raise FastAPIs HTTPExceptions
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error_code": "UNEXPECTED_ERROR",
+                "message": f"Unexpected error: {str(e)}"
+            }
+        )
 
-@app.get("/docs")
 @app.get("/")
 def read_root():
     return {"status": "online", "message": "✅ Module 01 (Spec Engine) API is running."}
