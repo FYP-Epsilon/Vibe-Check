@@ -1,0 +1,129 @@
+{
+  "entry_node": "node_1",
+  "exit_node": "node_2",
+  "nodes": [
+    {
+      "id": "node_1", "type": "entry", "ast_type": "Module", "line": 0,
+      "code": [], "successors": ["node_3"], "predecessors": [],
+      "guard": null, "exception_type": null, "control_vars": [], "data_vars": []
+    },
+    {
+      "id": "node_2", "type": "exit", "ast_type": "Module", "line": 0,
+      "code": [], "successors": [], "predecessors": ["node_3"],
+      "guard": null, "exception_type": null, "control_vars": [], "data_vars": []
+    },
+    {
+      "id": "node_3", "type": "task", "ast_type": "FunctionDef", "line": 1,
+      "code": ["def process_batch_orders(...)"],
+      "successors": ["node_2"], "predecessors": ["node_1"],
+      "guard": null, "exception_type": null, "control_vars": [],
+      "data_vars": ["inventory_level", "order_quantities", "is_premium_vendor"]
+    }
+  ],
+  "edges": [
+    {"source": "node_1", "target": "node_3", "guard": null, "exception_type": null},
+    {"source": "node_3", "target": "node_2", "guard": null, "exception_type": null}
+  ],
+  "unsupported_constructs": [],
+  "functions": {
+    "process_batch_orders": {
+      "entry_node": "node_1",
+      "exit_node": "node_29",
+      "nodes": [
+        {"id": "node_1", "type": "block", "ast_type": "Assign", "line": 2, "code": ["status = 'PROCESSING'"], "successors": ["node_2"], "predecessors": [], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["status", "inventory_level", "order_quantities", "is_premium_vendor"]},
+        {"id": "node_2", "type": "block", "ast_type": "Assign", "line": 3, "code": ["fulfilled_orders = 0"], "successors": ["node_3"], "predecessors": ["node_1"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["fulfilled_orders"]},
+        {"id": "node_3", "type": "block", "ast_type": "Assign", "line": 4, "code": ["revenue = 0.0"], "successors": ["node_4"], "predecessors": ["node_2"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["revenue"]},
+        {"id": "node_4", "type": "gateway", "ast_type": "If", "line": 6, "code": [], "successors": ["node_5", "node_6"], "predecessors": ["node_3"], "guard": "inventory_level < 0", "exception_type": null, "control_vars": ["inventory_level"], "data_vars": []},
+        {"id": "node_5", "type": "return", "ast_type": "Return", "line": 7, "code": ["return {'status': 'INVALID_STATE', 'revenue': 0.0}"], "successors": ["node_7"], "predecessors": ["node_4"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_6", "type": "block", "ast_type": "If", "line": 6, "code": [], "successors": ["node_7"], "predecessors": ["node_4"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_7", "type": "block", "ast_type": "If", "line": 6, "code": [], "successors": ["node_8"], "predecessors": ["node_5", "node_6"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_8", "type": "loop", "ast_type": "For", "line": 9, "code": [], "successors": ["node_10", "node_9"], "predecessors": ["node_11", "node_23", "node_7"], "guard": "iter order_quantities", "exception_type": null, "control_vars": ["order_quantities"], "data_vars": ["qty"]},
+        {"id": "node_9", "type": "block", "ast_type": "For", "line": 9, "code": [], "successors": ["node_24"], "predecessors": ["node_22", "node_8"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_10", "type": "gateway", "ast_type": "If", "line": 10, "code": [], "successors": ["node_11", "node_12"], "predecessors": ["node_8"], "guard": "qty <= 0", "exception_type": null, "control_vars": ["qty"], "data_vars": []},
+        {"id": "node_11", "type": "continue", "ast_type": "Continue", "line": 11, "code": ["continue"], "successors": ["node_8", "node_13"], "predecessors": ["node_10"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_12", "type": "block", "ast_type": "If", "line": 10, "code": [], "successors": ["node_13"], "predecessors": ["node_10"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_13", "type": "block", "ast_type": "If", "line": 10, "code": [], "successors": ["node_14"], "predecessors": ["node_11", "node_12"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_14", "type": "gateway", "ast_type": "If", "line": 13, "code": [], "successors": ["node_15", "node_22"], "predecessors": ["node_13"], "guard": "inventory_level >= qty", "exception_type": null, "control_vars": ["inventory_level", "qty"], "data_vars": []},
+        {"id": "node_15", "type": "block", "ast_type": "AugAssign", "line": 14, "code": ["inventory_level -= qty"], "successors": ["node_16"], "predecessors": ["node_14"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["inventory_level", "qty"]},
+        {"id": "node_16", "type": "block", "ast_type": "AugAssign", "line": 15, "code": ["fulfilled_orders += 1"], "successors": ["node_17"], "predecessors": ["node_15"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["fulfilled_orders"]},
+        {"id": "node_17", "type": "gateway", "ast_type": "If", "line": 17, "code": [], "successors": ["node_18", "node_19"], "predecessors": ["node_16"], "guard": "is_premium_vendor", "exception_type": null, "control_vars": ["is_premium_vendor"], "data_vars": []},
+        {"id": "node_18", "type": "block", "ast_type": "Assign", "line": 18, "code": ["price = 80.0 * qty"], "successors": ["node_20"], "predecessors": ["node_17"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["qty", "price"]},
+        {"id": "node_19", "type": "block", "ast_type": "Assign", "line": 20, "code": ["price = 100.0 * qty"], "successors": ["node_20"], "predecessors": ["node_17"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["qty", "price"]},
+        {"id": "node_20", "type": "block", "ast_type": "If", "line": 17, "code": [], "successors": ["node_21"], "predecessors": ["node_18", "node_19"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_21", "type": "block", "ast_type": "AugAssign", "line": 22, "code": ["revenue += price"], "successors": ["node_23"], "predecessors": ["node_20"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["revenue", "price"]},
+        {"id": "node_22", "type": "break", "ast_type": "Break", "line": 24, "code": ["break"], "successors": ["node_9", "node_23"], "predecessors": ["node_14"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_23", "type": "block", "ast_type": "If", "line": 13, "code": [], "successors": ["node_8"], "predecessors": ["node_21", "node_22"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_24", "type": "gateway", "ast_type": "If", "line": 26, "code": [], "successors": ["node_25", "node_26"], "predecessors": ["node_9"], "guard": "inventory_level == 0", "exception_type": null, "control_vars": ["inventory_level"], "data_vars": []},
+        {"id": "node_25", "type": "block", "ast_type": "Assign", "line": 27, "code": ["status = 'RESTOCK_REQUIRED'"], "successors": ["node_27"], "predecessors": ["node_24"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["status"]},
+        {"id": "node_26", "type": "block", "ast_type": "Assign", "line": 29, "code": ["status = 'SUCCESS'"], "successors": ["node_27"], "predecessors": ["node_24"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["status"]},
+        {"id": "node_27", "type": "block", "ast_type": "If", "line": 26, "code": [], "successors": ["node_28"], "predecessors": ["node_25", "node_26"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": []},
+        {"id": "node_28", "type": "block", "ast_type": "Assign", "line": 31, "code": ["audit_trail = f'Fulfilled {fulfilled_orders} orders. Remaining stock: {inventory_level}'"], "successors": ["node_29"], "predecessors": ["node_27"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["fulfilled_orders", "inventory_level", "audit_trail"]},
+        {"id": "node_29", "type": "return", "ast_type": "Return", "line": 33, "code": ["return {'status': status, 'revenue': revenue}"], "successors": [], "predecessors": ["node_28"], "guard": null, "exception_type": null, "control_vars": [], "data_vars": ["revenue", "status"]}
+      ],
+      "edges": [
+        {"source": "node_1", "target": "node_2", "guard": null, "exception_type": null},
+        {"source": "node_2", "target": "node_3", "guard": null, "exception_type": null},
+        {"source": "node_4", "target": "node_5", "guard": "inventory_level < 0", "exception_type": null},
+        {"source": "node_4", "target": "node_6", "guard": "not (inventory_level < 0)", "exception_type": null},
+        {"source": "node_5", "target": "node_7", "guard": null, "exception_type": null},
+        {"source": "node_6", "target": "node_7", "guard": null, "exception_type": null},
+        {"source": "node_3", "target": "node_4", "guard": null, "exception_type": null},
+        {"source": "node_11", "target": "node_8", "guard": null, "exception_type": null},
+        {"source": "node_10", "target": "node_11", "guard": "qty <= 0", "exception_type": null},
+        {"source": "node_10", "target": "node_12", "guard": "not (qty <= 0)", "exception_type": null},
+        {"source": "node_11", "target": "node_13", "guard": null, "exception_type": null},
+        {"source": "node_12", "target": "node_13", "guard": null, "exception_type": null},
+        {"source": "node_15", "target": "node_16", "guard": null, "exception_type": null},
+        {"source": "node_17", "target": "node_18", "guard": "is_premium_vendor", "exception_type": null},
+        {"source": "node_17", "target": "node_19", "guard": "not (is_premium_vendor)", "exception_type": null},
+        {"source": "node_18", "target": "node_20", "guard": null, "exception_type": null},
+        {"source": "node_19", "target": "node_20", "guard": null, "exception_type": null},
+        {"source": "node_16", "target": "node_17", "guard": null, "exception_type": null},
+        {"source": "node_20", "target": "node_21", "guard": null, "exception_type": null},
+        {"source": "node_22", "target": "node_9", "guard": null, "exception_type": null},
+        {"source": "node_14", "target": "node_15", "guard": "inventory_level >= qty", "exception_type": null},
+        {"source": "node_14", "target": "node_22", "guard": "not (inventory_level >= qty)", "exception_type": null},
+        {"source": "node_21", "target": "node_23", "guard": null, "exception_type": null},
+        {"source": "node_22", "target": "node_23", "guard": null, "exception_type": null},
+        {"source": "node_13", "target": "node_14", "guard": null, "exception_type": null},
+        {"source": "node_8", "target": "node_10", "guard": "next(order_quantities)", "exception_type": null},
+        {"source": "node_8", "target": "node_9", "guard": "exhausted(order_quantities)", "exception_type": null},
+        {"source": "node_23", "target": "node_8", "guard": null, "exception_type": null},
+        {"source": "node_7", "target": "node_8", "guard": null, "exception_type": null},
+        {"source": "node_24", "target": "node_25", "guard": "inventory_level == 0", "exception_type": null},
+        {"source": "node_24", "target": "node_26", "guard": "not (inventory_level == 0)", "exception_type": null},
+        {"source": "node_25", "target": "node_27", "guard": null, "exception_type": null},
+        {"source": "node_26", "target": "node_27", "guard": null, "exception_type": null},
+        {"source": "node_9", "target": "node_24", "guard": null, "exception_type": null},
+        {"source": "node_27", "target": "node_28", "guard": null, "exception_type": null},
+        {"source": "node_28", "target": "node_29", "guard": null, "exception_type": null}
+      ],
+      "unsupported_constructs": []
+    }
+  },
+  "dominators": {"node_3": "node_1", "node_2": "node_3"},
+  "dominance_frontier": {"node_1": [], "node_2": [], "node_3": []},
+  "guard_extraction": {
+    "total": 6,
+    "success": 5,
+    "conditions": [
+      {"node_id": "node_4", "guard": "inventory_level < 0", "cnf": [[{"negated": false, "text": "inventory_level < 0", "vars": ["inventory_level"]}]]},
+      {"node_id": "node_8", "guard": "iter order_quantities", "cnf": null, "error": "Failed to parse guard into CNF"},
+      {"node_id": "node_10", "guard": "qty <= 0", "cnf": [[{"negated": false, "text": "qty <= 0", "vars": ["qty"]}]]},
+      {"node_id": "node_14", "guard": "inventory_level >= qty", "cnf": [[{"negated": false, "text": "inventory_level >= qty", "vars": ["inventory_level", "qty"]}]]},
+      {"node_id": "node_17", "guard": "is_premium_vendor", "cnf": [[{"negated": false, "text": "is_premium_vendor", "vars": ["is_premium_vendor"]}]]},
+      {"node_id": "node_24", "guard": "inventory_level == 0", "cnf": [[{"negated": false, "text": "inventory_level == 0", "vars": ["inventory_level"]}]]}
+    ]
+  },
+  "control_variables": ["inventory_level", "is_premium_vendor", "order_quantities", "qty"],
+  "data_variables": ["audit_trail", "fulfilled_orders", "price", "revenue", "status"],
+  "certificate": {
+    "version": "V3",
+    "node_coverage": 1.0,
+    "edge_coverage": 1.0,
+    "guard_success_rate": 0.8333333333333334,
+    "unsupported_constructs": [],
+    "abort": false,
+    "message": "V3 structural extraction passed quality gate."
+  }
+}

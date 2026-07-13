@@ -1,0 +1,8 @@
+# Module 03: Equivalence Checking Engine
+# ========================================
+# Pure Python pipeline — zero external runtime dependencies.
+# All 4 phases (lifter, stuttering, clustering, model_checker)
+# use only the Python standard library.
+
+# Testing
+pytest>=7.0
