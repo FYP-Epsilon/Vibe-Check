@@ -144,7 +144,6 @@ public:
 
     // ── Hashing / Matching / Accessors ───────────────────────────────────
 
-    std::string compute_deterministic_hash(const spot::twa_graph_ptr& graph);
     void set_bpmn_tasks(const std::vector<std::string>& tasks);
     std::string semantic_match(const std::string& action_name);
     spot::bdd_dict_ptr get_dict() const;
@@ -217,10 +216,6 @@ private:
 // ---------------------------------------------------------------------------
 // Free function — convenience Pybind11 entry point
 // ---------------------------------------------------------------------------
-
-spot::twa_graph_ptr build_spot_automaton(
-    const std::string& wir_json_str,
-    const std::vector<std::string>& bpmn_tasks = {});
 
 } // namespace vibecheck
 

@@ -199,23 +199,36 @@ class TestSemanticMatching:
         lifter.set_bpmn_tasks(["Approve Loan", "Reject Loan"])
         assert lifter.semantic_match("completely_unknown_action") == "unlabeled_task"
 
-    def test_semantic_match_with_guard(self):
-        """Edge guards should be matched against BPMN tasks."""
+
+def test_semantic_match_with_guard_nlp(self):
+        """Tier 3 NLP matching should resolve 'verify_identity_task' to 'Verify Identity'."""
+        # This explicitly skips the test if the NLP environment isn't set up, preventing false failures in CI
+        pytest.importorskip("nlp_utils", reason="nlp_utils (Sentence-BERT) not available")
+        
         lifter = vibecheck_lifter.AdvancedLifter()
         lifter.set_bpmn_tasks(["Approve Loan", "Reject Loan", "Verify Identity"])
-        graph = lifter.build_spot_automaton(json.dumps(SEMANTIC_MATCH_WIR))
+        lifter.build_spot_automaton(json.dumps(SEMANTIC_MATCH_WIR))
         diag = lifter.get_last_diagnostics()
-        # "approve_loan" → Tier 1 lexical match to "Approve Loan"
-        # "verify_identity_task" → normalized "verifyidentitytask" has Levenshtein
-        #   distance 4 from "verifyidentity", exceeding threshold 2.
-        #   Falls to Tier 3 NLP; if sentence_transformers unavailable, registers
-        #   as a raw AP instead. Either way, both edges are observable.
-        assert diag.observable_edges >= 2
-        # At minimum, "Approve Loan" is semantically matched
-        assert len(diag.matched_aps) >= 1
-        assert "Approve Loan" in diag.matched_aps
 
-    def test_task_code_action_matching(self):
+        # Both tasks should be successfully matched to canonical BPMN names
+        assert "Approve Loan" in diag.matched_aps       # Matches via Tier 1 (Lexical)
+        assert "Verify Identity" in diag.matched_aps    # Matches via Tier 3 (NLP)
+        assert diag.observable_edges >= 2
+
+def test_semantic_match_with_guard_fallback(self):
+        """Unmatched guards should fall back to raw opaque APs (e.g., 'g_verify_identity_task')."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        # Intentionally omit "Verify Identity" so it fails Tier 1, Tier 2, and Tier 3
+        lifter.set_bpmn_tasks(["Approve Loan", "Reject Loan"])
+        lifter.build_spot_automaton(json.dumps(SEMANTIC_MATCH_WIR))
+        diag = lifter.get_last_diagnostics()
+
+        assert "Approve Loan" in diag.matched_aps
+        assert "Verify Identity" not in diag.matched_aps # Failed to match
+        # BUT the edge is STILL observable because it fell back to a raw opaque guard AP
+        assert diag.observable_edges >= 2
+
+def test_task_code_action_matching(self):
         """Task nodes with code arrays should produce matched APs."""
         lifter = vibecheck_lifter.AdvancedLifter()
         lifter.set_bpmn_tasks(["Approve Loan", "Verify Identity"])
@@ -268,24 +281,6 @@ class TestEquivalenceAndHashing:
         graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
         assert lifter.check_stuttering_bisimulation(graph, graph) is True
 
-    def test_deterministic_hash_stability(self):
-        """The same automaton should always produce the same hash."""
-        lifter = vibecheck_lifter.AdvancedLifter()
-        graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
-        h1 = lifter.compute_deterministic_hash(graph)
-        h2 = lifter.compute_deterministic_hash(graph)
-        assert h1 == h2
-        assert len(h1) == 16  # 16 hex chars
-
-    def test_different_wirs_different_hashes(self):
-        """Structurally different automata should (very likely) hash differently."""
-        lifter = vibecheck_lifter.AdvancedLifter()
-        g1 = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
-        g2 = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
-        h1 = lifter.compute_deterministic_hash(g1)
-        h2 = lifter.compute_deterministic_hash(g2)
-        assert h1 != h2
-
 
 # ---------------------------------------------------------------------------
 # Test: Variable map and AP registration
@@ -332,24 +327,6 @@ class TestErrorHandling:
 # Test: Free function convenience wrapper
 # ---------------------------------------------------------------------------
 
-class TestFreeFunctionWrapper:
-    """Tests for the module-level build_spot_automaton() function."""
-
-    def test_free_function_basic(self):
-        """The free function should work without BPMN tasks."""
-        graph = vibecheck_lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
-        assert graph.num_states() == 3
-
-    def test_free_function_with_bpmn_tasks(self):
-        """The free function should accept BPMN tasks for matching."""
-        graph = vibecheck_lifter.build_spot_automaton(
-            json.dumps(SEMANTIC_MATCH_WIR),
-            bpmn_tasks=["Approve Loan", "Verify Identity"],
-        )
-        assert graph.num_states() == 3
-        assert graph.num_edges() == 2
-
-
 # ---------------------------------------------------------------------------
 # Standalone runner (for manual testing outside pytest)
 # ---------------------------------------------------------------------------
@@ -381,16 +358,5 @@ if __name__ == "__main__":
     print("\n--- Test: Self-equivalence ---")
     eq = lifter.check_stuttering_bisimulation(g, g)
     print(f"  Result: {'PASSED' if eq else 'FAILED'}")
-
-    print("\n--- Test: Hashing ---")
-    h = lifter.compute_deterministic_hash(g)
-    print(f"  Hash: {h}")
-
-    print("\n--- Test: Free function ---")
-    g3 = vibecheck_lifter.build_spot_automaton(
-        json.dumps(SEMANTIC_MATCH_WIR),
-        bpmn_tasks=["Approve Loan", "Verify Identity"],
-    )
-    print(f"  States: {g3.num_states()}, Edges: {g3.num_edges()}")
 
     print("\n✅ All manual tests completed.")

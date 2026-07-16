@@ -176,7 +176,7 @@ std::string AdvancedLifter::semantic_match(const std::string& action_name) {
 std::vector<std::string> AdvancedLifter::extract_actions_from_code(const std::vector<std::string>& code_lines) {
     std::vector<std::string> actions;
 
-    static const std::regex call_re(R"((?:^|[^a-zA-Z0-9_.])([a-zA-Z_][a-zA-Z0-9_]*)\s*\()");
+    static const std::regex call_re(R"((?:^|[^a-zA-Z0-9_])([a-zA-Z_][a-zA-Z0-9_]*)\s*\()");
 
     static const std::unordered_set<std::string> structural_builtins = {
         "print", "len", "range", "int", "str", "float", "bool", "list",
@@ -1003,26 +1003,6 @@ spot::twa_graph_ptr AdvancedLifter::tarjan_tau_collapse(const spot::twa_graph_pt
 // Deterministic Hashing
 // ═══════════════════════════════════════════════════════════════════════════
 
-std::string AdvancedLifter::compute_deterministic_hash(const spot::twa_graph_ptr& graph) {
-    auto canon = spot::canonicalize(graph);
-    std::stringstream ss;
-    for (unsigned s = 0; s < canon->num_states(); ++s) {
-        std::vector<std::string> edges;
-        for (auto& edge : canon->out(s)) {
-            edges.push_back(std::to_string(edge.cond.id()) + "->" + std::to_string(edge.dst));
-        }
-        std::sort(edges.begin(), edges.end());
-        ss << "S" << s << ":";
-        for (const auto& e : edges) ss << e << ";";
-    }
-    
-    std::string s = ss.str();
-    size_t h = std::hash<std::string>{}(s);
-    char buf[64];
-    snprintf(buf, sizeof(buf), "%016zx", h);
-    return std::string(buf);
-}
-
 } // namespace vibecheck
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1104,18 +1084,11 @@ PYBIND11_MODULE(vibecheck_lifter, m) {
         .def("tarjan_tau_collapse", &vibecheck::AdvancedLifter::tarjan_tau_collapse,
              py::arg("graph"),
              "Collapse tau-SCCs into macro-states (uses spot::scc_info).")
-        // Hashing / Matching
-        .def("compute_deterministic_hash", &vibecheck::AdvancedLifter::compute_deterministic_hash,
-             py::arg("graph"))
+        // Matching
         .def("set_bpmn_tasks", &vibecheck::AdvancedLifter::set_bpmn_tasks,
              py::arg("tasks"))
         .def("semantic_match", &vibecheck::AdvancedLifter::semantic_match,
              py::arg("action_name"))
         .def("get_variable_map", &vibecheck::AdvancedLifter::get_variable_map);
 
-    // -- Free function entry point ----------------------------------------
-    m.def("build_spot_automaton", &vibecheck::build_spot_automaton,
-          py::arg("wir_json_str"),
-          py::arg("bpmn_tasks") = std::vector<std::string>{},
-          "Convenience function: builds a SPOT automaton from WIR JSON in one call.");
 }
