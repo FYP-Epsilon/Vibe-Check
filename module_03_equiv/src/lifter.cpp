@@ -27,6 +27,7 @@
 #include <spot/twaalgos/isdet.hh>
 #include <spot/twaalgos/simulation.hh>
 #include <spot/twaalgos/postproc.hh>
+#include <spot/twaalgos/are_isomorphic.hh>
 #include <spot/misc/hash.hh>
 
 namespace py = pybind11;
@@ -1003,6 +1004,53 @@ spot::twa_graph_ptr AdvancedLifter::tarjan_tau_collapse(const spot::twa_graph_pt
 // Deterministic Hashing
 // ═══════════════════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════════════════
+// Phase C — Clustering Engine: cluster_implementations()
+// ═══════════════════════════════════════════════════════════════════════════
+
+std::unordered_map<unsigned, ClusterEntry> cluster_implementations(
+    const std::vector<spot::twa_graph_ptr>& automata) {
+
+    std::unordered_map<unsigned, ClusterEntry> clusters;
+    unsigned next_cluster_id = 0;
+
+    for (unsigned i = 0; i < automata.size(); ++i) {
+        const auto& graph = automata[i];
+        bool found_cluster = false;
+
+        // Compare against every existing cluster's representative
+        for (auto& [cid, entry] : clusters) {
+            if (spot::isomorphism_checker::are_isomorphic(graph, entry.representative)) {
+                entry.indices.push_back(i);
+
+                // Update representative if this graph is "simpler":
+                //   prefer fewer states, break ties by fewer edges
+                unsigned cur_states = entry.representative->num_states();
+                unsigned cur_edges  = entry.representative->num_edges();
+                unsigned new_states = graph->num_states();
+                unsigned new_edges  = graph->num_edges();
+
+                if (new_states < cur_states ||
+                    (new_states == cur_states && new_edges < cur_edges)) {
+                    entry.representative = graph;
+                }
+
+                found_cluster = true;
+                break;
+            }
+        }
+
+        if (!found_cluster) {
+            ClusterEntry new_entry;
+            new_entry.indices.push_back(i);
+            new_entry.representative = graph;
+            clusters[next_cluster_id++] = std::move(new_entry);
+        }
+    }
+
+    return clusters;
+}
+
 } // namespace vibecheck
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1010,7 +1058,7 @@ spot::twa_graph_ptr AdvancedLifter::tarjan_tau_collapse(const spot::twa_graph_pt
 // ═══════════════════════════════════════════════════════════════════════════
 
 PYBIND11_MODULE(vibecheck_lifter, m) {
-    m.doc() = "VibeCheck C++ Engine — Phase A (Lifter) + Phase B (Stuttering Bisimulation)";
+    m.doc() = "VibeCheck C++ Engine — Phase A (Lifter) + Phase B (Stuttering Bisimulation) + Phase C (Clustering)";
 
     // -- LifterDiagnostics (Phase A) --------------------------------------
     py::class_<vibecheck::LifterDiagnostics>(m, "LifterDiagnostics")
@@ -1090,5 +1138,31 @@ PYBIND11_MODULE(vibecheck_lifter, m) {
         .def("semantic_match", &vibecheck::AdvancedLifter::semantic_match,
              py::arg("action_name"))
         .def("get_variable_map", &vibecheck::AdvancedLifter::get_variable_map);
+
+    // -- ClusterEntry (Phase C) -------------------------------------------
+    py::class_<vibecheck::ClusterEntry>(m, "ClusterEntry")
+        .def(py::init<>())
+        .def_readonly("indices",        &vibecheck::ClusterEntry::indices)
+        .def_readonly("representative", &vibecheck::ClusterEntry::representative)
+        .def("__repr__", [](const vibecheck::ClusterEntry& c) {
+            std::string idx_str = "[";
+            for (size_t i = 0; i < c.indices.size(); ++i) {
+                if (i > 0) idx_str += ", ";
+                idx_str += std::to_string(c.indices[i]);
+            }
+            idx_str += "]";
+            unsigned rep_states = c.representative ? c.representative->num_states() : 0;
+            unsigned rep_edges  = c.representative ? c.representative->num_edges()  : 0;
+            return "<ClusterEntry indices=" + idx_str
+                 + " rep_states=" + std::to_string(rep_states)
+                 + " rep_edges="  + std::to_string(rep_edges) + ">";
+        });
+
+    // -- Phase C free function --------------------------------------------
+    m.def("cluster_implementations", &vibecheck::cluster_implementations,
+          py::arg("automata"),
+          "Group quotient automata by graph isomorphism (Phase C).\n"
+          "All graphs MUST share the same bdd_dict (use a single AdvancedLifter).\n"
+          "Returns dict[cluster_id] → ClusterEntry.");
 
 }

@@ -217,6 +217,42 @@ private:
 // Free function — convenience Pybind11 entry point
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Phase C — Clustering Result
+// ---------------------------------------------------------------------------
+
+/**
+ * @brief A single equivalence cluster produced by cluster_implementations().
+ *
+ * Each cluster contains:
+ *  - The original input-vector indices of all isomorphic graphs.
+ *  - A representative graph chosen by (lowest state count, then lowest edge count).
+ */
+struct ClusterEntry {
+    std::vector<unsigned> indices;         ///< Original vector indices belonging to this cluster.
+    spot::twa_graph_ptr   representative;  ///< Simplest graph in this cluster.
+};
+
+/**
+ * @brief Group quotient automata by graph isomorphism (Phase C).
+ *
+ * PRECONDITION: All graphs in @p automata MUST share the same bdd_dict.
+ * This is enforced by constructing them from a single AdvancedLifter instance.
+ *
+ * Algorithm:
+ *   1. For each new graph, compare against the representative of every
+ *      existing cluster using spot::are_isomorphic().
+ *   2. If isomorphic, add to that cluster.
+ *   3. Otherwise, start a new cluster.
+ *   4. Within each cluster, the representative is the graph with the
+ *      lowest state count; ties broken by lowest edge count.
+ *
+ * @param automata Vector of minimized quotient twa_graph_ptr (all sharing one bdd_dict).
+ * @return Map from cluster_id (0-based) to ClusterEntry.
+ */
+std::unordered_map<unsigned, ClusterEntry> cluster_implementations(
+    const std::vector<spot::twa_graph_ptr>& automata);
+
 } // namespace vibecheck
 
 #endif // VIBECHECK_LIFTER_HPP

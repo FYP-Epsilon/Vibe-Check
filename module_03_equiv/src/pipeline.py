@@ -27,6 +27,14 @@ from .stuttering_engine import StutteringEngine, StutteringResult
 from .clustering import BehavioralClusterer, ClusterResult
 from .model_checker import ModelChecker, PropertyMonitor, VerificationVerdict
 
+# Optional C++ engine — gracefully degrade to pure-Python if not compiled
+try:
+    import vibecheck_lifter as _cpp
+    HAS_CPP_ENGINE = True
+except ImportError:
+    _cpp = None  # type: ignore[assignment]
+    HAS_CPP_ENGINE = False
+
 # ---------------------------------------------------------------------------
 # Logging setup
 # ---------------------------------------------------------------------------
@@ -36,6 +44,103 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 logger = logging.getLogger("module_03_equiv.pipeline")
+
+
+# ---------------------------------------------------------------------------
+# Phase C: C++ Batch Orchestrator
+# ---------------------------------------------------------------------------
+
+def process_wir_batch(
+    wir_json_strings: list[str],
+    *,
+    bpmn_tasks: list[str] | None = None,
+) -> dict:
+    """
+    Process a batch of WIR JSON strings through the C++ engine.
+
+    CRITICAL INVARIANT: Exactly ONE AdvancedLifter is instantiated so that
+    all automata share the same ``bdd_dict``.  This is required for SPOT's
+    ``are_isomorphic()`` (and therefore ``cluster_implementations()``) to
+    work correctly.
+
+    Steps:
+        1. Instantiate a single ``AdvancedLifter``.
+        2. For each WIR variant, call ``build_spot_automaton()`` then
+           ``minimize_stuttering()`` — producing the quotient automaton.
+        3. Collect all quotients into a list.
+        4. Pass the list to ``cluster_implementations()`` (C++).
+
+    Args:
+        wir_json_strings: List of WIR JSON strings (one per LLM implementation).
+        bpmn_tasks: Optional list of BPMN task names for semantic matching.
+
+    Returns:
+        A dict with keys:
+            ``quotients``  — list of minimized TwaGraph objects.
+            ``diagnostics`` — list of LifterDiagnostics (one per input).
+            ``clusters``   — dict[cluster_id] → {indices, representative}.
+
+    Raises:
+        RuntimeError: If the C++ engine is not available.
+    """
+    if not HAS_CPP_ENGINE:
+        raise RuntimeError(
+            "vibecheck_lifter C++ module not available. "
+            "Build it with CMake first (see module_03_equiv/CMakeLists.txt)."
+        )
+
+    # ── Step 1: Single lifter instance (shared bdd_dict) ──────────────
+    lifter = _cpp.AdvancedLifter()
+
+    if bpmn_tasks:
+        lifter.set_bpmn_tasks(bpmn_tasks)
+
+    # ── Steps 2–3: Build + minimize each variant ─────────────────────
+    quotients: list = []
+    diagnostics: list = []
+
+    for idx, wir_json_str in enumerate(wir_json_strings):
+        logger.info("Processing variant %d/%d", idx + 1, len(wir_json_strings))
+
+        # Phase A: WIR → SPOT automaton
+        graph = lifter.build_spot_automaton(wir_json_str)
+        diag = lifter.get_last_diagnostics()
+        diagnostics.append(diag)
+
+        # Phase B: Stuttering bisimulation → quotient
+        quotient = lifter.minimize_stuttering(graph)
+        quotients.append(quotient)
+
+        logger.info(
+            "  Variant %d: %d states → %d quotient states, %d edges",
+            idx,
+            graph.num_states(),
+            quotient.num_states(),
+            quotient.num_edges(),
+        )
+
+    # ── Step 4: Cluster via C++ isomorphism engine ───────────────────
+    raw_clusters = _cpp.cluster_implementations(quotients)
+
+    # Convert to a plain dict for easy serialisation
+    clusters: dict[int, dict] = {}
+    for cid, entry in raw_clusters.items():
+        clusters[int(cid)] = {
+            "indices": list(entry.indices),
+            "representative": entry.representative,
+        }
+
+    logger.info(
+        "Clustering complete: %d variants → %d cluster(s)",
+        len(wir_json_strings),
+        len(clusters),
+    )
+
+    return {
+        "quotients": quotients,
+        "diagnostics": diagnostics,
+        "clusters": clusters,
+    }
 
 
 # ---------------------------------------------------------------------------
