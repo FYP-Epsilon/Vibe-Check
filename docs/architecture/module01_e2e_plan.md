@@ -38,7 +38,7 @@ Phase descriptions in the prompt are otherwise accurate, with these precision fi
 | 8 | NC-3 PWBE | **DESIGN-ONLY-NO-CODE** | grep → 0 | Wiki L62 only. Note the per-tier verdict would belong at the M03 comparison, not in M01 alone. |
 | 9 | NC-4 ΔH | **DESIGN-ONLY-NO-CODE** | grep `entropy` → 0 | Wiki L63 only. |
 | 10 | Parallel-gateway super-node abstraction | **DESIGN-ONLY-NO-CODE** | `semantic_extractor.py` has no trace of it; wiki L18 even claims it's "in Phase 1" | Also: corpus contains **zero** `parallelGateway` elements — the state-explosion problem it solves does not occur in the target dataset. |
-| 11 | Phase 4 dual validation (SPOT lifting, language inclusion, GED diagnostics) | **DESIGN-ONLY-NO-CODE** | `requirements.txt:1-3`; no `spot` import anywhere; `main.py:27-54` runs phases 1–3 and returns | Wiki L24-26. Module 03 (`module_03_equiv/src/lifter.cpp` + prebuilt `.so`) has its own SPOT integration — the only SPOT in the repo. |
+| 11 | Phase 4 dual validation (SPOT lifting, language inclusion, GED diagnostics) | **TO BE IMPLEMENTED (Phase B)** | `requirements.txt:1-3`; no `spot` import anywhere; `main.py:27-54` runs phases 1–3 and returns | Wiki L24-26. Module 03 (`module_03_equiv/src/lifter.cpp` + prebuilt `.so`) has its own SPOT integration — the only SPOT in the repo. |
 | 12 | TCB analysis (normalizer invertibility, N-version vs `ltlf2dfa`, canonical vectors) | **DESIGN-ONLY-NO-CODE** | grep `ltlf2dfa\|normaliz\|canonical` → 0 | Wiki L35-40 only. |
 
 The live wiki page itself carries a "⚠️ Pending module-owner review" banner (wiki L3) and a hedged status note (L42-44) — the *page* is more honest than the novelty section reads in isolation, but the NC-series and Phase-4 text is written in the present tense as if operational.
@@ -75,6 +75,7 @@ The live wiki page itself carries a "⚠️ Pending module-owner review" banner 
 | 10 | Super-node abstraction prevents state explosion while staying faithful (wiki L18, L66) | **H10**: For diagrams with AND-blocks, verification with super-nodes agrees with unabstracted verification (same verdicts) at ≥ some bound, with measurable state-count savings. | **Y in principle** | **High for this corpus**: zero `parallelGateway` in FLOW-BENCH — no instance where the abstraction fires; savings claim would be untestable on the target data. Also collides with H9 (localization inside a collapsed node is impossible by construction). | Requires a synthetic AND-heavy mini-corpus (10 diagrams); falsified if any verdict flips under abstraction or state savings <2×. Recommend descoping instead (Synthesis §3). |
 | 11 | Phase 4 proves L(G_BPMN) = L(A_SPOT), sound + complete (wiki L24-26) | **H11**: For every corpus diagram, the language-inclusion check passes both directions; for every seeded translation bug (deliberately corrupted formula), it fails. | **Y** | Medium: "exhaustively proves" needs bounded traces (LTLf/finite); the check is only as good as the trace enumeration bound — state the bound. | Implement Phase 4; run both directions over corpus + 20 seeded translation faults; falsified if any seeded fault passes or any clean diagram fails. |
 | 12 | TCB defenses drive shared-compilation-error probability "to zero" (wiki L38-40) | **H12a**: normalizer round-trip `denormalize(normalize(φ)) == φ` holds over the entire generated suite. **H12b**: SPOT-vs-ltlf2dfa disagreement detects seeded normalizer bugs. | **Y** (a is a plain assertion suite; b is a fault-injection experiment) | **High for the rhetoric**: N-version checking cannot catch a *specification-level* error (same wrong φ fed to both compilers) — "to zero" is unfalsifiable marketing; scope it to "compiler-implementation faults." | H12a: property-based test (Hypothesis) over the suite grammar. H12b: 20 seeded normalizer mutations; falsified if <90% flagged by the equivalence check. |
+| 13 | Reverse Process Mining Alignment for Specification Validation (EAS metric) | **H13**: For every corpus diagram, alignment fitness and precision (computed via Adriansyah-style alignment of LTLf-accepted traces against the BPMN Petri-net) are both ≥ 0.9; and for every seeded translation fault, at least one score drops below 0.7. | **Y** | Low-Medium: PM4Py handles the alignment rigor; risk is mostly in BPMN→Petri-net translation fidelity and bounded trace limits. | Run `alignment_validator.py` over 100 corpus diagrams and 20 seeded translation faults; falsified if fitness+precision < 0.9 on clean diagrams or fails to drop on known-bad specs. |
 
 **Scholarly-positioning (not scientific) claims**: "first application of mutation-based sensitivity validation to BPMN property extraction" (wiki L52), "first systematic integration of negative-invariant synthesis…" (L55), "first equivalence relation to output a vector verdict" (L62), "first application of Shannon entropy to…" (L63). None are falsifiable by experiment; they are literature-positioning claims and survive only via a related-work search (note: PWBE's "first vector verdict" is at high risk — multi-valued/graded semantics for LTL and severity-tiered conformance checking both exist in the literature). Label them as positioning, cite the closest prior art, and never present them as results.
 
@@ -220,6 +221,7 @@ Power to *defend a pre-registered "≥90% detection" claim* when the true rate i
 - **NC-1 SFI monotonicity**: 20 EVAL diagrams × 5-step nested perturbation chains (each step adds one more `mutate_bpmn` edit to the previous mutant, so information loss strictly grows). Metric: violation rate = fraction of chain steps where SFI increases by > ε=0.01. Pre-register: claim holds iff violation rate ≤ 5% (exact binomial CI reported). Also demand the written theorem+proof; if the proof needs assumptions (e.g., GED normalizer monotone in edit count), state them or demote the claim to "empirically monotone."
 - **NC-4 ΔH localization**: the 280 EVAL mutants already carry `target_element_id`. Score top-1 (and top-3) accuracy of the per-element entropy-delta attribution vs the uniform baseline 1/n̄ (n̄ ≈ mean element count). Pre-register: top-1 ≥ 50%. Define \|L\| on bounded-unrolled traces (bound = M03's unrolling convention) or restrict to loop-free diagrams and say so.
 - **NC-3 PWBE non-vacuousness**: over EVAL mutants, report (i) fraction tripping ≥1 P0 sentinel (if >90%, the veto collapses the vector — report and discuss), (ii) among P0-clean cases, AUC of the (E_P1, E_P2) scores for mutant-vs-equivalent-mutant discrimination; pre-register AUC ≥ 0.7 as "carries information."
+- **Reverse Process Mining Alignment (EAS)**: Over the EVAL corpus, validate the alignment metrics (fitness, precision, generalization). Pre-register: alignment fitness ≥ 0.9 and precision ≥ 0.85 on the clean extracted specs. On the seeded translation fault mutants, verify the metric drops correctly.
 - **What to build first**: `fetch_corpus.py` → `gold_from_sequence.py` + structural-accuracy runner (works against *current* code, quantifies the Phase-0 fixes) → `mutate_bpmn.py` → calibration. NC metrics only after Phase 4 exists.
 
 ---
@@ -247,7 +249,7 @@ Agent 1 §1.2 stands as the scorecard. Compressed: **items 1–5** (original nov
 
 ### 2. Novelty & Hypothesis Register
 
-Agent 2's 12-row table stands. Load-bearing flags: H1 vacuousness already realized (fix before any claim); H6 "proven monotonicity" currently an unbacked adjective; H8 P0-veto vacuousness must be measured, not assumed; H10 untestable on the target corpus (descope); H12's "to zero" unfalsifiable (rescope to compiler faults); four "first-X" claims are positioning, not science.
+Agent 2's 13-row table stands. Load-bearing flags: H1 vacuousness already realized (fix before any claim); H6 "proven monotonicity" currently an unbacked adjective; H8 P0-veto vacuousness must be measured, not assumed; H10 untestable on the target corpus (descope); H12's "to zero" unfalsifiable (rescope to compiler faults); H13 requires faithful BPMN-to-Petri-net translation; four "first-X" claims are positioning, not science.
 
 ### 3. Phase-Ordered Implementation Plan
 
@@ -268,6 +270,33 @@ Files: `semantic_extractor.py`, `ltlf_synthesizer.py`, `mutation_refiner.py`, `m
 - **A.4** `eval/mutate_bpmn.py` — 10 operators + equivalent-mutant set, `eval/split.json` (uid-hash 30/70), `eval/OPERATING_POINT.md`. Acceptance: ≥280 EVAL mutants; three-figure report (detection / equivalent-specificity / base false-alarm). Effort M.
 
 **Phase B — Phase 4 automata lifting (`src/automata_lifter.py`).**
+**Status:** TO BE FULLY IMPLEMENTED BY THE END OF MODULE 01.
+Translating declarative LTLf rules back into a structured, imperative BPMN diagram is notoriously difficult and usually results in a messy "spaghetti" diagram. Instead of comparing two BPMN diagrams, the validation engine translates both the BPMN and the LTLf rules into mathematical graphs and compares those directly.
+
+Here is exactly how the round-trip comparison works under the hood:
+
+### Phase 1: Semantic Extraction (BPMN to Graph)
+
+* **What happens:** The system ingests your raw BPMN 2.0 XML file and strips away all the visual layout data (the DI tags).
+* **The output:** It converts the business process into a strict mathematical structure (a streamlined NetworkX directed graph), where tasks and events become nodes labeled with semantic states like `start(Approve_Loan)` and `done(Approve_Loan)`. This is your **Source Graph** ($G_{BPMN}$).
+
+### Phase 2: Temporal Logic Synthesis (Graph to LTLf)
+
+* **What happens:** The engine traverses the Source Graph and automatically writes a suite of Linear-time Temporal Logic on Finite Traces (LTLf) rules.
+* **The output:** It infers things like mutually exclusive paths (XOR branches), required chronological order (e.g., you cannot end the process until you start the process), and implicit "else" conditions. The output is a highly structured LTLf Property Suite representing the rules of your business logic.
+
+### Phase 3: Self-Strengthening Mutation Refinement
+
+* **What happens:** The engine plays devil's advocate. It takes your original Source Graph and deliberately introduces errors into it (e.g., dropping tasks, swapping branches, deleting gateways) to create "mutants."
+* **The output:** It checks if the LTLf rules from Phase 2 are strong enough to catch and "kill" every single mutant. If a mutant sneaks through without violating a rule, the engine synthesizes a new "killer" rule to patch the loophole. This guarantees the property suite is sensitive to edge-case errors.
+
+### Phase 4: The Round-Trip Proof (The New Addition!)
+
+* **What happens:** Finally, to prove that the LTLf rules perfectly encapsulate the BPMN diagram without any information loss, it executes the Dual Comparison Engine.
+* **The output:**
+1. It uses the SPOT library to compile your extracted LTLf rules into a mathematical state machine (**Target Automaton** - $G_{SPOT}$).
+2. **Trace Proof (Behavior):** It mathematically proves that every valid path in $G_{BPMN}$ is accepted by $G_{SPOT}$, and vice-versa (proving their trace languages are identical).
+3. **Structural Diagnostics (Shape):** It calculates the Graph Edit Distance (GED) between the two structures to ensure their shapes align, outputting a highly specific diagnostic report if any logic was warped during translation.
 Deps: `spot` (conda-forge or Docker layer — no Windows pip; update `Dockerfile`; align with M03's existing SPOT toolchain), plus `src/formula_normalizer.py` **first** (M01 LTLf strings → SPOT grammar: `&&`→`&`, `start(X)`→`start_X` mangling, plus `denormalize`). Order within B: normalizer + round-trip test → LTLf→automaton per property → monitor export → language-inclusion check vs the semantic graph (bounded unrolling = M03's convention). Agent-3 §3.6 cases it must handle before "done": parser-reject fallback (typed error, not 500), documented loop bound, per-property compile-time budget. Acceptance: 100/100 corpus suites compile; 20 seeded translation faults all caught (H11); round-trip holds across all generated suites (H12a). Effort **L**.
 
 **Phase C — NC series (each gated on Phase B; "implemented" = code + validated hypothesis):**
@@ -275,6 +304,7 @@ Deps: `spot` (conda-forge or Docker layer — no Windows pip; update `Dockerfile
 - **C.2** NC-4 `src/entropy_delta.py` (bounded-\|L\| definition). Acceptance: H9 top-1 ≥ pre-registered 50%. Effort M–L.
 - **C.3** NC-3 PWBE — belongs at the M01→M03 boundary: per-tier verdict vector in the comparison layer (coordinate with M03's owner; M01's deliverable is the per-tier grouping already present). Acceptance: H8 measured (veto prevalence + conditional AUC), reported *whatever the result*. Effort M.
 - **C.4** NC-2 `src/spec_refiner.py` (ISOLATE/WEAKEN/SYNTHESIZE with an over-weakening guard: external-detection regression ≤5 points, H7b). Effort L. **Lowest priority — cut first if the term runs out.**
+- **C.5** Reverse Process Mining Alignment (`src/alignment_validator.py`): Implement PM4Py dependency (Petri-net conversion + alignment), computing EAS metric (harmonic mean of fitness and precision). Acceptance: H13 verified (fitness+precision ≥0.9 on clean, drops on seeded faults). Effort M-L.
 
 **Phase D — TCB defenses (independent of C; gate-able):**
 - **D.1** Normalizer invertibility property-test (`tests/test_normalizer_roundtrip.py`, Hypothesis-based). Effort S (once B exists).
@@ -326,6 +356,13 @@ Agent 4 in full; reconciled build order: **(1)** `fetch_corpus.py` (availability
 5. **T5** — `eval/adapter.py` + `eval/gold_from_sequence.py` + structural micro-F1 report (Phase A.2/A.3), then re-run T2's sweep → `eval/reports/baseline_post_fix.md` (the thesis before/after table).
 6. **T6** — `eval/mutate_bpmn.py` + split + `OPERATING_POINT.md` + three-figure calibration report (Phase A.4).
 7. **T7** — Phase B start: `src/formula_normalizer.py` + round-trip test + Dockerfile SPOT layer (coordinate with M03's SPOT toolchain).
+8. **T8** — `src/alignment_validator.py`: BPMN→Petri-net (PM4Py), LTLf→trace set (bounded DFA enumeration), Adriansyah alignment, EAS metric. Acceptance: fitness+precision ≥0.9 on ≥90/100 corpus diagrams; known-bad backwards template yields EAS≈0.0. (Phase C.5).
+
+### 8. References
+
+- Adriansyah, A. (2014). Aligning observed and modeled behavior. PhD thesis, Eindhoven University of Technology.
+- PM4Py — Process Mining for Python (https://pm4py.fit.fraunhofer.de/)
+- van der Aalst, W.M.P. et al. — Conformance checking using alignments
 
 ---
 
