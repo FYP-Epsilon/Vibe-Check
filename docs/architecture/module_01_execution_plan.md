@@ -8,7 +8,37 @@
 
 ## 1. The E2E Master Execution Plan (Step-by-Step)
 
-The remainder of Module 01's workload is organized into four chronological phases, each delivering a progressively refined artifact toward the final Specification-Derived Automaton (A_spec). The progression is deliberate: Phase 1 (XML Ingestion & Semantic Graph Construction) establishes the foundational data structure; Phase 2 (Implicit Guard Resolution & FLTL Synthesis) generates the formal property suite; Phase 3 (Mutation-Based Validation & Recursive Refinement) hardens the specification against LLM hallucination profiles; and Phase 4 (Automata-Theoretic Lifting via SPOT) compiles the validated logic into a model-checkable automaton. This ordering ensures that each phase's correctness certificate strengthens the overall confidence calculation before any comparison against LLM-generated Python implementations.
+Translating declarative LTLf rules back into a structured, imperative BPMN diagram is notoriously difficult and usually results in a messy "spaghetti" diagram. Instead of comparing two BPMN diagrams, the validation engine translates both the BPMN and the LTLf rules into mathematical graphs and compares those directly.
+
+Here is exactly how the round-trip comparison works under the hood:
+
+#### Phase 1: Semantic Extraction (BPMN to Graph)
+
+* **What happens:** The system ingests your raw BPMN 2.0 XML file and strips away all the visual layout data (the DI tags).
+* **The output:** It converts the business process into a strict mathematical structure (a streamlined NetworkX directed graph), where tasks and events become nodes labeled with semantic states like `start(Approve_Loan)` and `done(Approve_Loan)`. This is your **Source Graph** ($G_{BPMN}$).
+
+#### Phase 2: Temporal Logic Synthesis (Graph to LTLf)
+
+* **What happens:** The engine traverses the Source Graph and automatically writes a suite of Linear-time Temporal Logic on Finite Traces (LTLf) rules.
+* **The output:** It infers things like mutually exclusive paths (XOR branches), required chronological order (e.g., you cannot end the process until you start the process), and implicit "else" conditions. The output is a highly structured LTLf Property Suite representing the rules of your business logic.
+
+#### Phase 3: Self-Strengthening Mutation Refinement
+
+* **What happens:** The engine plays devil's advocate. It takes your original Source Graph and deliberately introduces errors into it (e.g., dropping tasks, swapping branches, deleting gateways) to create "mutants."
+* **The output:** It checks if the LTLf rules from Phase 2 are strong enough to catch and "kill" every single mutant. If a mutant sneaks through without violating a rule, the engine synthesizes a new "killer" rule to patch the loophole. This guarantees the property suite is sensitive to edge-case errors.
+
+#### Phase 4: The Round-Trip Proof (The New Addition!)
+
+* **What happens:** Finally, to prove that the LTLf rules perfectly encapsulate the BPMN diagram without any information loss, it executes the Dual Comparison Engine.
+* **The output:**
+1. It uses the SPOT library to compile your extracted LTLf rules into a mathematical state machine (**Target Automaton** - $G_{SPOT}$).
+2. **Trace Proof (Behavior):** It mathematically proves that every valid path in $G_{BPMN}$ is accepted by $G_{SPOT}$, and vice-versa (proving their trace languages are identical).
+3. **Structural Diagnostics (Shape):** It calculates the Graph Edit Distance (GED) between the two structures to ensure their shapes align, outputting a highly specific diagnostic report if any logic was warped during translation.
+
+#### Phase 5: Reverse Process Mining Alignment
+
+* **What happens:** Validates that the extracted specification semantically matches the original model by using process mining alignment algorithms in reverse. Instead of aligning event logs to a process model, it aligns the extracted LTLf specification trace set back to the original BPMN model.
+* **The output:** It calculates the Extraction Alignment Score (EAS) based on fitness (under-specification) and precision (over-permissive rules), bridging process mining and formal verification to catch bugs directly related to semantic fidelity.
 
 ### Phase 1: XML Ingestion & Semantic Graph Construction — Weeks 1–2
 
@@ -46,6 +76,7 @@ The Phase 1 architecture proceeds through five concrete milestones. **Milestone 
 | **Bounded Loop** | Termination | `□(count(iteration) ≤ N → ◇exit_condition)` | Iteration Bounds, Loop Conditions |
 | **Boundary Exception** | Error Handling | `□(error_event → ◇catch_handler) ∧ □(¬catch_handler W error_event)` | Error/Timer Event IDs |
 | **Sentinel Guard** | Safety Perimeter | `□(¬forbidden_state U prerequisite_met)` | Forbidden State Triggers |
+| **Alignment Validation** | Semantic Fidelity | `EAS = 2 * (Fitness * Precision) / (Fitness + Precision)` | Trace Event Logs, Petri Net Transitions |
 
 In the XOR Gateway template, the logical exclusive-or (`⊕`) enforces strict mutual exclusion, mathematically guaranteeing that the LLM cannot instantiate a state where both divergent branches execute simultaneously. The loop construct utilizes counting fluents to enforce bounded termination, preventing the AI from generating non-terminating `while True` sequences lacking proper exit conditions.
 
@@ -88,6 +119,18 @@ The unified coefficient aggregates these metrics. If `C_struct < 0.95`, trigger 
 **Milestone P4.2** integrates **BuDDy BDD Compression**. SPOT leverages the BuDDy Binary Decision Diagram (BDD) dictionary to provide algebraic compression of state transitions. BDDs represent Boolean functions as highly optimized directed acyclic graphs, revolutionizing memory efficiency. Apply BDD compression systematically to mitigate the state explosion problem inherent in highly parallel business workflows with multiple AND gateways.
 
 **Milestone P4.3** exports the **Specification-Derived Automaton** `A_spec`. The finalized automaton represents the absolute mathematical ground truth derived from the BPMN specification. Export it into a shared memory space (JSON or binary format compatible with Module 03's bisimulation engine), fully prepared to undergo process equivalence analysis and divergence-sensitive stuttering bisimulation against the automata generated from LLM Python implementations.
+
+### Phase 5: Reverse Process Mining Alignment for Semantic Validation — Weeks 5–6
+
+**Objective:** Compute the Extraction Alignment Score (EAS) to directly measure the semantic fidelity between the extracted LTLf rules and the original BPMN model, quantifying fitness, precision, and generalization.
+
+**Milestone P5.1** implements the **BPMN to Petri Net Conversion**. Utilizing PM4Py, automatically convert the sanitized BPMN Source Graph into a formal Petri Net (`bpmn_to_petri_net()`). This serves as the rigorous behavioral baseline.
+
+**Milestone P5.2** generates the **LTLf Trace Set**. From the extracted LTLf specification, use the `ltlf_to_trace_set()` function to systematically generate a comprehensive set of event logs (traces) that represent all permissible executions according to the rules.
+
+**Milestone P5.3** computes the **Alignment Metrics**. Using Adriansyah's alignment algorithms (`compute_alignment()`), attempt to replay the LTLf-generated traces against the baseline Petri Net. Calculate the three core metrics: Fitness (identifies under-specification; traces that should be valid but aren't), Precision (identifies over-permissive rules; traces allowed by LTLf that are impossible in BPMN), and Generalization (checks for overfitting).
+
+**Milestone P5.4** executes **Diagnostics and EAS Calculation**. Compute the Extraction Alignment Score (EAS), which is the harmonic mean of fitness and precision (`validate_extraction()`). If EAS falls below the required threshold, trigger `diagnose_misalignment()` to pinpoint the exact sequence of events causing the divergence, catching semantic translation bugs that bypass pure structural comparisons.
 
 ---
 
@@ -224,6 +267,19 @@ The results of the mutation testing directly inform the coverage metrics. If the
 
 This self-healing mechanism halts the progression of the verification pipeline. It algorithmically isolates the surviving mutants, traces them back to the specific BPMN topological anomaly, and forces the property synthesis module to auto-generate new, highly specific FLTL constraints designed explicitly to kill those exact mutants. The extraction process is recursively looped and verified against the mutation engine until the 0.95 threshold is achieved. This ensures that the resultant formal properties are entirely robust before they are ever compared against the LLM's Python code, achieving a self-auditing specification layer.
 
+### 5.3 Reverse Process Mining Alignment as Semantic Fidelity Validation
+
+While mutation testing ensures structural coverage (i.e., every logical branch and constraint is monitored), it does not directly verify if the *meaning* of the LTLf property suite matches the *meaning* of the BPMN model. To bridge this gap, the pipeline implements Reverse Process Mining Alignment. 
+
+Standard process mining alignment (introduced by Adriansyah et al., 2014) is typically used to compare real-world event logs against a theoretical process model to find compliance violations. The framework uses this technique IN REVERSE: it takes the extracted LTLf specification, synthesizes synthetic event logs (traces) of allowable behavior, and aligns them back to the original BPMN model (converted to a Petri net using `PM4Py`). 
+
+This provides three powerful quantitative metrics:
+1. **Fitness:** Measures under-specification. Are there valid BPMN paths that the LTLf rules incorrectly forbid? 
+2. **Precision:** Measures over-permissive rules. Do the LTLf rules allow sequences of events that the BPMN model strictly prohibits?
+3. **Generalization:** Measures overfitting. Does the property suite merely memorize the training examples, or does it generalize to unseen concurrent interleavings?
+
+The engine computes the **Extraction Alignment Score (EAS)** — the harmonic mean of Fitness and Precision. This catches a completely different class of bugs than mutation testing, directly quantifying the semantic fidelity of the extraction. If the LTLf rules mean something functionally different than the original diagram, the alignment algorithm precisely isolates the misaligned token trace, serving as the ultimate ground-truth validation.
+
 ---
 
 ## 6. Deep Dive: Automata-Theoretic Translation via SPOT
@@ -297,6 +353,11 @@ To fully operationalize the optimized blueprint detailed above within a Generati
    * Simulate a theoretical mutation pass utilizing principles derived from MutaBPMN/Wodel operators. Identify the three most critical structural vulnerabilities in the provided BPMN model (e.g., a parallel gateway being misinterpreted as an exclusive gateway, or an infinite loop trap).
    * Generate three highly specific "Mutant-Killer" LTLf constraints specifically designed to trigger a violation if these vulnerabilities manifest in the generated code.
 
+4.5. **Reverse Alignment Semantic Fidelity Check:**
+   * Run the reverse process mining alignment using PM4Py.
+   * Generate traces from the synthesized LTLf properties and align them against the baseline BPMN-derived Petri Net.
+   * Compute the Extraction Alignment Score (EAS) based on Fitness and Precision. If EAS is below threshold, generate a diagnostic report of the specific misaligned traces.
+
 5. **Output Formatting:**
    * Do not output intermediate conversational text.
    * Output the finalized extraction strictly as a JSON block formatted for immediate ingestion by the SPOT Python bindings. The JSON must contain:
@@ -355,3 +416,7 @@ Acknowledge these constraints. Ingest the provided BPMN XML, execute the 5-step 
 | 39 | On-the-fly Synthesis Framework for LTL over Finite Traces | SMU |
 | 40 | ltlf2dfa — SPOT | LRE, EPITA |
 | 41 | Computer Aided Verification (CAV) | OAPEN Library, Springer 2024 |
+| 42 | Aligning observed and modeled behavior | Adriansyah, A. (2014) |
+| 43 | Process Mining for Python | PM4Py |
+| 44 | Conformance checking using alignments | van der Aalst, W.M.P. |
+| 45 | Token-based replay conformance | Rozinat & van der Aalst (2008) |
