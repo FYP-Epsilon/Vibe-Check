@@ -23,7 +23,6 @@ class FLTLSynthesizer:
             "P1_Structural_Control_Flow": [],
             "P2_Quality_Limits": []
         }
-        
         self.xor_gateways: List[Dict[str, Any]] = []
         self.guard_coverage: float = 0.0
 
@@ -107,10 +106,13 @@ class FLTLSynthesizer:
                     })
 
     def _get_node_props(self, node_id: str) -> List[str]:
+        props = [node_id]
         for state in self.states:
             if state["node_id"] == node_id:
-                return state.get("atomic_propositions", [node_id])
-        return [node_id]
+                props = state.get("atomic_propositions", [node_id])
+                break
+        
+        return props
 
     def _instantiate_ltlf_templates(self):
         """Translates graph edges and nodes into LTLf properties."""
