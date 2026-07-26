@@ -285,7 +285,7 @@ class MutationValidator:
         actual_count = len(self.engine.mutants)
         killed_ratio = self.mutants_killed / actual_count if actual_count > 0 else 1.0
         
-        status = "PASS" if c_struct >= 0.95 and killed_ratio >= 1.0 else "FAIL"
+        status = "PASS" if c_struct >= 1.0 and killed_ratio >= 1.0 else "FAIL"
         
         return {
             "phase_3_certificate": {
@@ -334,7 +334,7 @@ def main():
     # Strict Threshold Enforcement
     cert = result["phase_3_certificate"]
     if cert["status"] == "FAIL":
-        raise VerificationException(f"VerificationException: Quality Gate Failed ($C_{{struct}} < 0.95$ or Survival Rate > 0)")
+        raise VerificationException(f"VerificationException: Quality Gate Failed ($C_{{struct}} < 1.0$ or Survival Rate > 0)")
 
 if __name__ == "__main__":
     main()

@@ -126,6 +126,24 @@ class FLTLSynthesizer:
                 f"!{tgt_start} W {src_done}"
             )
 
+        # Global Invariants: Strict Start-to-Task and Start-to-End bounds
+        start_nodes = [s["node_id"] for s in self.states if s["node_type"] == "startEvent"]
+        end_nodes = [s["node_id"] for s in self.states if s["node_type"] == "endEvent"]
+        
+        for s_node in start_nodes:
+            s_prop = self._get_node_props(s_node)[0]
+            
+            # 1. No end event can happen before a start event
+            for e_node in end_nodes:
+                e_prop = self._get_node_props(e_node)[0]
+                self.ltlf_suite["P1_Structural_Control_Flow"].append(f"!{e_prop} W {s_prop}")
+                
+            # 2. No task can start before a start event
+            for state in self.states:
+                if state["node_type"] == "task":
+                    t_start = self._get_node_props(state["node_id"])[0]
+                    self.ltlf_suite["P1_Structural_Control_Flow"].append(f"!{t_start} W {s_prop}")
+
         # Gateway Specific Logic
         for state in self.states:
             node_id = state["node_id"]

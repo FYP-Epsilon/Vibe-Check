@@ -29,7 +29,8 @@ def generate_tiered_properties(xml_str):
         return {"P0": set(), "P1": set(), "P2": set()}
 
 def main():
-    mutants_file = Path("module_01_spec/eval/mutants.json")
+    eval_dir = Path(__file__).parent
+    mutants_file = eval_dir / "mutants.json"
     if not mutants_file.exists():
         print("Mutants file not found.")
         return
@@ -59,8 +60,8 @@ def main():
             continue
             
         uid = mut["uid"]
-        orig_file = Path(f"module_01_spec/eval/corpus/flowbench/uid_{uid}_output.bpmn")
-        mut_file = Path(f"module_01_spec/eval/corpus/mutants/{mut['file']}")
+        orig_file = eval_dir / f"corpus/flowbench/uid_{uid}_output.bpmn"
+        mut_file = eval_dir / f"corpus/mutants/{mut['file']}"
         
         if not orig_file.exists() or not mut_file.exists():
             continue
@@ -101,7 +102,7 @@ def main():
     if p0_clean_fraction > 0:
         if roc_auc_score:
             auc = roc_auc_score(y_true, y_scores)
-            print(f"Conditional AUC (P1/P2 score | P0-clean): {auc:.4f} (Acceptance: > 0.50)")
+            print(f"Conditional AUC (P1/P2 score | P0-clean): {auc:.4f} (Acceptance: > 0.70)")
         else:
             print("scikit-learn not installed, cannot compute exact AUC easily.")
     else:

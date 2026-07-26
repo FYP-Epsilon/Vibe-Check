@@ -78,7 +78,9 @@ def build_chain_and_test(file_path: Path) -> int:
     return violations
 
 def main():
-    with open("module_01_spec/eval/split.json", "r") as f:
+    eval_dir = Path(__file__).parent
+    split_file = eval_dir / "split.json"
+    with open(split_file, "r") as f:
         split = json.load(f)
     
     eval_uids = split.get("EVAL", [])
@@ -90,7 +92,7 @@ def main():
     total_violations = 0
     
     for uid in eval_uids[:20]: # 20 nested-perturbation chains
-        bpmn_path = Path(f"module_01_spec/eval/corpus/flowbench/uid_{uid}_output.bpmn")
+        bpmn_path = eval_dir / f"corpus/flowbench/uid_{uid}_output.bpmn"
         if not bpmn_path.exists():
             continue
             
