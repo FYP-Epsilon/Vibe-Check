@@ -192,7 +192,7 @@ class SemanticExtractionEngine:
         if self.executable_nodes_count > 0:
             node_coverage = self.mapped_nodes_count / self.executable_nodes_count
         
-        status = "PASS" if node_coverage >= 0.95 else "FAIL"
+        status = "PASS" if node_coverage >= 1.0 else "FAIL"
         
         return {
             "status": status,

@@ -1,40 +1,64 @@
 import re
 
+
 class FormulaNormalizer:
     """
     Normalizes hand-rolled LTLf strings into SPOT-compatible grammar,
     and provides a round-trip denormalization method.
+
+    Normalization rules:
+        && -> &
+        || -> |
+        start(X) -> start_X
+        done(X)  -> done_X
     """
-    
+
     @staticmethod
     def normalize(formula: str) -> str:
         """
         Converts M01 LTLf string to SPOT grammar.
-        - && -> &
+        - && -> &  (but not a bare & that was already single)
         - || -> |
         - start(X) -> start_X
         - done(X) -> done_X
         """
-        f = formula.replace("&&", "&").replace("||", "|")
-        
-        # Mangle start(X) and done(X)
-        # Assuming X contains only alphanumeric and underscores
-        f = re.sub(r'start\(([^)]+)\)', r'start_\1', f)
-        f = re.sub(r'done\(([^)]+)\)', r'done_\1', f)
-        
-        # Handle <-> to <-> (SPOT supports <->, no change needed usually, but just in case)
-        # Handle -> to -> (SPOT supports ->)
+        # Replace && with a single &
+        f = formula.replace("&&", "&")
+        # Replace || with a single |
+        f = f.replace("||", "|")
+
+        # Mangle start(X) and done(X) — X can contain alphanumeric, underscores,
+        # dots, hyphens, slashes, and spaces (cleaned to underscores)
+        def _mangle_atom(match: re.Match) -> str:
+            prefix = match.group(1)  # 'start' or 'done'
+            name = match.group(2)
+            # Clean special chars to underscores for SPOT identifiers
+            clean = re.sub(r'[^a-zA-Z0-9_]', '_', name)
+            return f"{prefix}_{clean}"
+
+        f = re.sub(r'(start|done)\(([^)]+)\)', _mangle_atom, f)
+
         return f
 
     @staticmethod
     def denormalize(formula: str) -> str:
         """
         Reverts SPOT grammar back to M01 LTLf string.
+        - Single & (not already &&) -> &&
+        - Single | (not already ||) -> ||
+        - start_X -> start(X)
+        - done_X  -> done(X)
         """
-        f = formula.replace("&", "&&").replace("|", "||")
-        
-        # We need to be careful not to replace &&& if that happens, but simple replace is fine for this subset
-        f = re.sub(r'start_([a-zA-Z0-9_]+)', r'start(\1)', f)
-        f = re.sub(r'done_([a-zA-Z0-9_]+)', r'done(\1)', f)
-        
+        # First, restore start_X and done_X back to start(X) and done(X).
+        # Match start_ or done_ followed by one or more word characters,
+        # but only if not already in the form start(X) or done(X).
+        f = re.sub(r'\b(start|done)_([a-zA-Z0-9_]+)', r'\1(\2)', formula)
+
+        # Restore & -> && and | -> ||
+        # Use negative lookbehind/lookahead to avoid doubling already-doubled operators.
+        # Replace single & that is not part of && with &&
+        f = re.sub(r'(?<!\&)\&(?!\&)', '&&', f)
+        # Replace single | that is not part of || with ||
+        f = re.sub(r'(?<!\|)\|(?!\|)', '||', f)
+
         return f
