@@ -220,6 +220,13 @@ class MutationValidator:
         self.mutants_killed = 0
         self.refinement_loops = 0
         self.synthesized_killers = []
+        
+        try:
+            from .adversarial_generator import AdversarialGenerator
+        except ImportError:
+            from adversarial_generator import AdversarialGenerator
+        self.adversarial_gen = AdversarialGenerator()
+        self.adversarial_killers = []
 
     def execute_validation_pipeline(self, seed: int = 42):
         # 1. Generate Mutants
@@ -246,6 +253,11 @@ class MutationValidator:
                 killed_now, _ = self.auditor.is_killed(mutant)
                 if killed_now:
                     self.mutants_killed += 1
+
+        # 2.5 Adversarial Red-Teaming (Predictive Defense)
+        deceptive_traces = self.adversarial_gen.generate_deceptive_traces(self.graph)
+        new_killers = self.adversarial_gen.synthesize_killer_properties(deceptive_traces)
+        self.adversarial_killers.extend(new_killers)
 
         # 3. Quality Gate Certification
         certificate = self._certify()
@@ -299,6 +311,7 @@ class MutationValidator:
                 "P0_Critical_Sentinels": self.suite.get("P0_Critical_Sentinels", []),
                 "P1_Structural_Control_Flow": self.suite.get("P1_Structural_Control_Flow", []),
                 "P2_Quality_Limits": self.suite.get("P2_Quality_Limits", []),
+                "P3_Adversarial_Defenses": self.adversarial_killers,
                 "synthesized_mutant_killers": self.synthesized_killers
             }
         }
