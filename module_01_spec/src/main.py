@@ -85,7 +85,31 @@ def verify_spec(payload: BPMNPayload):
                 }
             }
 
-        # Determine overall status — Phase 4 failure is non-blocking
+        # Phase 5: Reverse Process Mining Alignment
+        phase_5_result = None
+        try:
+            try:
+                from .process_mining_alignment import ProcessMiningAlignment
+                from .mutation_refiner import LTLfAuditor
+            except ImportError:
+                from process_mining_alignment import ProcessMiningAlignment
+                from mutation_refiner import LTLfAuditor
+                
+            auditor = LTLfAuditor(phase_3_result["refined_ltlf_property_suite"])
+            ltlf_traces = auditor._generate_traces(phase_1_result["semantic_graph"], depth=10)
+            
+            aligner = ProcessMiningAlignment(bpmn_xml, ltlf_traces, semantic_graph=phase_1_result["semantic_graph"])
+            phase_5_result = aligner.run_pipeline()
+        except Exception as e:
+            phase_5_result = {
+                "phase_5_certificate": {
+                    "status": "FAIL_WITH_ERRORS",
+                    "error_code": "PHASE_5_ALIGNMENT_FAIL",
+                    "message": str(e)
+                }
+            }
+
+        # Determine overall status
         overall_status = "PASS"
         if phase_4_result:
             p4_status = phase_4_result.get("phase_4_certificate", {}).get("status", "")
@@ -93,6 +117,14 @@ def verify_spec(payload: BPMNPayload):
                 overall_status = "PASS_PHASE4_FAIL"
             elif p4_status == "PASS_NO_SPOT":
                 overall_status = "PASS_NO_SPOT"
+                
+        if phase_5_result:
+            p5_status = phase_5_result.get("phase_5_certificate", {}).get("status", "")
+            if p5_status == "FAIL":
+                overall_status = "PASS_PHASE5_FAIL"
+            elif p5_status == "PASS_NO_PM4PY":
+                if overall_status == "PASS":
+                    overall_status = "PASS_NO_PM4PY"
 
         return {
             "status": overall_status,
@@ -100,6 +132,7 @@ def verify_spec(payload: BPMNPayload):
             "phase_2": phase_2_result,
             "phase_3": phase_3_result,
             "phase_4": phase_4_result,
+            "phase_5": phase_5_result,
         }
         
     except VerificationException as e:
