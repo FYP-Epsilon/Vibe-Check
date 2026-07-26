@@ -41,11 +41,76 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
                 "details": phase_3_result["phase_3_certificate"]
             }
 
+        # Phase 4: Automata Lifting (non-blocking)
+        phase_4_result = None
+        try:
+            from .automata_lifter import AutomataLifter, AutomataLifterException
+            lifter = AutomataLifter(
+                property_suite=phase_3_result,
+                semantic_graph=phase_1_result["semantic_graph"],
+            )
+            phase_4_result = lifter.run_pipeline()
+        except ImportError:
+            from automata_lifter import AutomataLifter, AutomataLifterException
+            lifter = AutomataLifter(
+                property_suite=phase_3_result,
+                semantic_graph=phase_1_result["semantic_graph"],
+            )
+            phase_4_result = lifter.run_pipeline()
+        except Exception as e:
+            phase_4_result = {
+                "phase_4_certificate": {
+                    "status": "FAIL_WITH_ERRORS",
+                    "message": str(e),
+                }
+            }
+
+        # Phase 5: Reverse Process Mining Alignment
+        phase_5_result = None
+        try:
+            try:
+                from .process_mining_alignment import ProcessMiningAlignment
+                from .mutation_refiner import LTLfAuditor
+            except ImportError:
+                from process_mining_alignment import ProcessMiningAlignment
+                from mutation_refiner import LTLfAuditor
+                
+            auditor = LTLfAuditor(phase_3_result["refined_ltlf_property_suite"])
+            ltlf_traces = auditor._generate_traces(phase_1_result["semantic_graph"], depth=10)
+            
+            aligner = ProcessMiningAlignment(bpmn_xml, ltlf_traces, semantic_graph=phase_1_result["semantic_graph"])
+            phase_5_result = aligner.run_pipeline()
+        except Exception as e:
+            phase_5_result = {
+                "phase_5_certificate": {
+                    "status": "FAIL_WITH_ERRORS",
+                    "message": str(e)
+                }
+            }
+
+        overall_status = "PASS"
+        if phase_4_result:
+            p4_status = phase_4_result.get("phase_4_certificate", {}).get("status", "")
+            if p4_status == "FAIL":
+                overall_status = "PASS_PHASE4_FAIL"
+            elif p4_status == "PASS_NO_SPOT":
+                overall_status = "PASS_NO_SPOT"
+                
+        if phase_5_result:
+            p5_status = phase_5_result.get("phase_5_certificate", {}).get("status", "")
+            if p5_status == "FAIL":
+                overall_status = "PASS_PHASE5_FAIL"
+            elif p5_status == "PASS_NO_PM4PY":
+                if overall_status == "PASS":
+                    overall_status = "PASS_NO_PM4PY"
+
         return {
-            "status": "PASS",
+            "status": overall_status,
             "phase_1": phase_1_result,
             "phase_2": phase_2_result,
-            "phase_3": phase_3_result
+            "phase_3": phase_3_result,
+            "phase_4": phase_4_result,
+            "phase_5": phase_5_result
         }
         
     except VerificationException as e:
