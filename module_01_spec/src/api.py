@@ -125,6 +125,47 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
             "error": f"Unexpected error: {str(e)}"
         }
 
+def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "module_03_input.json"):
+    """
+    Extracts the specific artifacts required by Module 03 and saves them to a JSON file.
+    """
+    if pipeline_result.get("status") in ["FAIL", "FAIL_WITH_ERRORS"]:
+        raise ValueError("Cannot export to Module 03: Pipeline failed.")
+
+    m3_payload = {
+        "semantic_graph": pipeline_result["phase_1"]["semantic_graph"],
+        "ltlf_property_suite": pipeline_result["phase_3"]["refined_ltlf_property_suite"],
+        "loop_bound_documented": pipeline_result["phase_4"]["phase_4_certificate"].get("loop_bound_documented", 0)
+    }
+
+    with open(filepath, "w") as f:
+        json.dump(m3_payload, f, indent=2)
+    return filepath
+
+def export_for_module_02(pipeline_result: Dict[str, Any], filepath: str = "module_02_input.json"):
+    """
+    Extracts the Semantic Map required by Module 02 for AST tracking and dynamic tracing.
+    """
+    if pipeline_result.get("status") in ["FAIL", "FAIL_WITH_ERRORS"]:
+        raise ValueError("Cannot export to Module 02: Pipeline failed.")
+
+    m2_payload = {
+        "semantic_graph": pipeline_result["phase_1"]["semantic_graph"],
+        "task_patterns": []
+    }
+    
+    # Auto-generate task patterns for Module 02's Observable Trace Capture
+    for node in m2_payload["semantic_graph"]["states"]:
+        if node["node_type"] == "task":
+            # Extract raw task names as patterns (e.g., "Check_Inventory")
+            for prop in node["atomic_propositions"]:
+                if prop.startswith("start("):
+                    m2_payload["task_patterns"].append(prop[6:-1])
+                    
+    with open(filepath, "w") as f:
+        json.dump(m2_payload, f, indent=2)
+    return filepath
+
 if __name__ == "__main__":
     # Test with a simple BPMN XML in here
     simple_bpmn_xml = """<?xml version="1.0" encoding="UTF-8"?>
@@ -145,4 +186,8 @@ if __name__ == "__main__":
     """
     
     result = run_module_01_pipeline(simple_bpmn_xml)
-    print(json.dumps(result, indent=2))
+    print("Pipeline Result Status:", result["status"])
+    export_path = export_for_module_03(result)
+    print(f"Exported perfectly structured payload for Module 03 to {export_path}")
+    export_path_2 = export_for_module_02(result)
+    print(f"Exported Semantic Map payload for Module 02 to {export_path_2}")
