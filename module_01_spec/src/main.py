@@ -8,10 +8,12 @@ try:
     from .semantic_extractor import SemanticExtractionEngine
     from .ltlf_synthesizer import FLTLSynthesizer
     from .mutation_refiner import MutationValidator, VerificationException
+    from .automata_lifter import AutomataLifter, AutomataLifterException
 except ImportError:
     from semantic_extractor import SemanticExtractionEngine
     from ltlf_synthesizer import FLTLSynthesizer
     from mutation_refiner import MutationValidator, VerificationException
+    from automata_lifter import AutomataLifter, AutomataLifterException
 
 app = FastAPI(title="VibeCheck Spec Engine", version="2.0.0")
 
@@ -58,11 +60,46 @@ def verify_spec(payload: BPMNPayload):
                 }
             )
         
+        # Phase 4: Automata Lifting (non-blocking — SPOT may not be installed)
+        phase_4_result = None
+        try:
+            lifter = AutomataLifter(
+                property_suite=phase_3_result,
+                semantic_graph=phase_1_result["semantic_graph"],
+            )
+            phase_4_result = lifter.run_pipeline()
+        except AutomataLifterException as e:
+            phase_4_result = {
+                "phase_4_certificate": {
+                    "status": "FAIL",
+                    "error_code": "PHASE_4_LIFTER_FAIL",
+                    "message": str(e),
+                }
+            }
+        except Exception as e:
+            phase_4_result = {
+                "phase_4_certificate": {
+                    "status": "FAIL_WITH_ERRORS",
+                    "error_code": "PHASE_4_UNEXPECTED_ERROR",
+                    "message": str(e),
+                }
+            }
+
+        # Determine overall status — Phase 4 failure is non-blocking
+        overall_status = "PASS"
+        if phase_4_result:
+            p4_status = phase_4_result.get("phase_4_certificate", {}).get("status", "")
+            if p4_status == "FAIL":
+                overall_status = "PASS_PHASE4_FAIL"
+            elif p4_status == "PASS_NO_SPOT":
+                overall_status = "PASS_NO_SPOT"
+
         return {
-            "status": "PASS",
+            "status": overall_status,
             "phase_1": phase_1_result,
             "phase_2": phase_2_result,
-            "phase_3": phase_3_result
+            "phase_3": phase_3_result,
+            "phase_4": phase_4_result,
         }
         
     except VerificationException as e:
