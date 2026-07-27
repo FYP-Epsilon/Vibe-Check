@@ -268,13 +268,46 @@ class MutationValidator:
         original_edges = set((e["source_id"], e["target_id"]) for e in self.graph["edges"])
         mutant_edges = set((e["source_id"], e["target_id"]) for e in mutant["edges"])
         
+        # 1. Sequence Flow Deletion
         diff_del = original_edges - mutant_edges
-        
         if diff_del:
             u, v = list(diff_del)[0]
             u_props = self._get_node_props(u)
             v_props = self._get_node_props(v)
             return f"!{v_props[0]} W {u_props[-1]}"
+            
+        original_states = {s["node_id"]: s for s in self.graph["states"]}
+        for mut_s in mutant["states"]:
+            orig_s = original_states.get(mut_s["node_id"])
+            if not orig_s: continue
+            
+            # 2. Gateway Substitution (AND <-> XOR)
+            if orig_s.get("node_type") != mut_s.get("node_type") and "Gateway" in str(orig_s.get("node_type")):
+                props = orig_s.get("atomic_propositions", [orig_s["node_id"]])
+                return f"G({props[0]} -> (F(end) | F(error)))"
+                
+            # 3. Task Retyping
+            if orig_s.get("node_type") != mut_s.get("node_type") and "Task" in str(orig_s.get("node_type", "")).title():
+                props = orig_s.get("atomic_propositions", [orig_s["node_id"]])
+                return f"G({props[0]} -> F({props[-1]}))"
+                
+            # 4. Loop Boundary Modification
+            if orig_s.get("atomic_propositions") != mut_s.get("atomic_propositions"):
+                orig_props = orig_s.get("atomic_propositions", [])
+                for prop in orig_props:
+                    if "iteration" in prop.lower() or "count" in prop.lower():
+                        return f"G({prop} -> F(end))"
+                if orig_props:
+                    return f"F({orig_props[0]})"
+                    
+        # 5. Condition Inversion
+        for orig_e in self.graph["edges"]:
+            for mut_e in mutant["edges"]:
+                if orig_e["source_id"] == mut_e["source_id"] and orig_e["target_id"] == mut_e["target_id"]:
+                    if orig_e.get("condition") != mut_e.get("condition"):
+                        u_props = self._get_node_props(orig_e["source_id"])
+                        v_props = self._get_node_props(orig_e["target_id"])
+                        return f"G({u_props[-1]} -> F({v_props[0]}))"
         
         return "no killer found"
 

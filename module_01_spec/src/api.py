@@ -44,14 +44,14 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
         # Phase 4: Automata Lifting (non-blocking)
         phase_4_result = None
         try:
-            from .automata_lifter import AutomataLifter, AutomataLifterException
+            from .automata_lifter import AutomataLifter
             lifter = AutomataLifter(
                 property_suite=phase_3_result,
                 semantic_graph=phase_1_result["semantic_graph"],
             )
             phase_4_result = lifter.run_pipeline()
         except ImportError:
-            from automata_lifter import AutomataLifter, AutomataLifterException
+            from automata_lifter import AutomataLifter
             lifter = AutomataLifter(
                 property_suite=phase_3_result,
                 semantic_graph=phase_1_result["semantic_graph"],
@@ -91,18 +91,16 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
         overall_status = "PASS"
         if phase_4_result:
             p4_status = phase_4_result.get("phase_4_certificate", {}).get("status", "")
-            if p4_status == "FAIL":
-                overall_status = "PASS_PHASE4_FAIL"
+            if "FAIL" in p4_status:
+                overall_status = f"PASS_PHASE4_{p4_status}"
             elif p4_status == "PASS_NO_SPOT":
                 overall_status = "PASS_NO_SPOT"
                 
         if phase_5_result:
             p5_status = phase_5_result.get("phase_5_certificate", {}).get("status", "")
-            if p5_status == "FAIL":
-                overall_status = "PASS_PHASE5_FAIL"
-            elif p5_status == "PASS_NO_PM4PY":
-                if overall_status == "PASS":
-                    overall_status = "PASS_NO_PM4PY"
+            if "FAIL" in p5_status:
+                overall_status = f"PASS_PHASE5_{p5_status}"
+
 
         return {
             "status": overall_status,
