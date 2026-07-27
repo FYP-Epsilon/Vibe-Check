@@ -164,20 +164,26 @@ class LTLfAuditor:
         all_paths = []
         try:
             for start in start_states:
-                if start in nx_graph:
-                    for node in end_nodes:
-                        if node in nx_graph:
-                            generator = nx.all_simple_paths(nx_graph, source=start, target=node, cutoff=path_cutoff)
-                            pair_paths = 0
-                            for path in generator:
-                                all_paths.append(path)
-                                pair_paths += 1
-                                if pair_paths >= 50 or len(all_paths) >= 100:
-                                    break
-                            if len(all_paths) >= 100:
-                                break
-                    if len(all_paths) >= 100:
-                        break
+                if start not in nx_graph: continue
+                
+                # Bounded DFS to allow loops (unlike simple_paths)
+                stack = [(start, [start])]
+                while stack:
+                    curr, path = stack.pop()
+                    
+                    if curr in end_nodes:
+                        all_paths.append(path)
+                        if len(all_paths) >= 100:
+                            break
+                            
+                    if len(path) >= path_cutoff:
+                        continue
+                        
+                    for neighbor in nx_graph.successors(curr):
+                        stack.append((neighbor, path + [neighbor]))
+                        
+                if len(all_paths) >= 100:
+                    break
         except Exception as e:
             print(f"Trace generation error: {e}")
         

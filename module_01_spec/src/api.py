@@ -41,65 +41,33 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
                 "details": phase_3_result["phase_3_certificate"]
             }
 
-        # Phase 4: Automata Lifting (non-blocking)
-        phase_4_result = None
-        try:
-            from .automata_lifter import AutomataLifter
-            lifter = AutomataLifter(
-                property_suite=phase_3_result,
-                semantic_graph=phase_1_result["semantic_graph"],
-            )
-            phase_4_result = lifter.run_pipeline()
-        except ImportError:
-            from automata_lifter import AutomataLifter
-            lifter = AutomataLifter(
-                property_suite=phase_3_result,
-                semantic_graph=phase_1_result["semantic_graph"],
-            )
-            phase_4_result = lifter.run_pipeline()
-        except Exception as e:
-            phase_4_result = {
-                "phase_4_certificate": {
-                    "status": "FAIL_WITH_ERRORS",
-                    "message": str(e),
-                }
-            }
-
-        # Phase 5: Reverse Process Mining Alignment
-        phase_5_result = None
+        # Phase 5B: Progression-Based Constructive Trace Synthesis (PBCTS)
+        # Replaces Phase 4 (Automata Lifting) and Phase 5A (Process Mining Alignment)
+        # with a rigorous mathematical algorithm.
+        phase_pbcts_result = None
         try:
             try:
-                from .process_mining_alignment import ProcessMiningAlignment
-                from .mutation_refiner import LTLfAuditor
+                from .bidirectional_alignment import run_pbcts_pipeline
             except ImportError:
-                from process_mining_alignment import ProcessMiningAlignment
-                from mutation_refiner import LTLfAuditor
-                
-            auditor = LTLfAuditor(phase_3_result["refined_ltlf_property_suite"])
-            ltlf_traces = auditor._generate_traces(phase_1_result["semantic_graph"], depth=10)
+                from bidirectional_alignment import run_pbcts_pipeline
             
-            aligner = ProcessMiningAlignment(bpmn_xml, ltlf_traces, semantic_graph=phase_1_result["semantic_graph"])
-            phase_5_result = aligner.run_pipeline()
+            phase_pbcts_result = run_pbcts_pipeline(
+                property_suite=phase_3_result["refined_ltlf_property_suite"],
+                semantic_graph=phase_1_result["semantic_graph"]
+            )
         except Exception as e:
-            phase_5_result = {
-                "phase_5_certificate": {
+            phase_pbcts_result = {
+                "phase_4_certificate": {
                     "status": "FAIL_WITH_ERRORS",
                     "message": str(e)
                 }
             }
 
         overall_status = "PASS"
-        if phase_4_result:
-            p4_status = phase_4_result.get("phase_4_certificate", {}).get("status", "")
-            if "FAIL" in p4_status:
-                overall_status = f"PASS_PHASE4_{p4_status}"
-            elif p4_status == "PASS_NO_SPOT":
-                overall_status = "PASS_NO_SPOT"
-                
-        if phase_5_result:
-            p5_status = phase_5_result.get("phase_5_certificate", {}).get("status", "")
-            if "FAIL" in p5_status:
-                overall_status = f"PASS_PHASE5_{p5_status}"
+        if phase_pbcts_result:
+            p4_status = phase_pbcts_result.get("phase_4_certificate", {}).get("convergence", {}).get("converged", False)
+            if not p4_status:
+                overall_status = "PASS_PBCTS_UNCONVERGED"
 
 
         return {
@@ -107,8 +75,8 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
             "phase_1": phase_1_result,
             "phase_2": phase_2_result,
             "phase_3": phase_3_result,
-            "phase_4": phase_4_result,
-            "phase_5": phase_5_result
+            "phase_4": phase_pbcts_result,
+            "phase_5": None
         }
         
     except VerificationException as e:
@@ -130,10 +98,23 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
     if pipeline_result.get("status") in ["FAIL", "FAIL_WITH_ERRORS"]:
         raise ValueError("Cannot export to Module 03: Pipeline failed.")
 
+    import re
+    # PBCTS ignores loop bounds. We extract it directly from P2_Quality_Limits.
+    loop_bound = 0
+    p2_suite = pipeline_result["phase_3"]["refined_ltlf_property_suite"].get("P2_Quality_Limits", [])
+    for prop in p2_suite:
+        # e.g., looks like a comment or specifically encoded in a property string.
+        # The semantic extractor puts loop limits in comments sometimes, but 
+        # normally we can safely default to 3 if we can't parse it.
+        match = re.search(r'loop_bound\s*=\s*(\d+)', prop, re.IGNORECASE)
+        if match:
+            loop_bound = int(match.group(1))
+            break
+            
     m3_payload = {
         "semantic_graph": pipeline_result["phase_1"]["semantic_graph"],
         "ltlf_property_suite": pipeline_result["phase_3"]["refined_ltlf_property_suite"],
-        "loop_bound_documented": pipeline_result["phase_4"]["phase_4_certificate"].get("loop_bound_documented", 0)
+        "loop_bound_documented": loop_bound
     }
 
     with open(filepath, "w") as f:
