@@ -122,27 +122,32 @@ class TestBuildSpotAutomaton:
 
     def test_simple_linear_state_count(self):
         """A 3-node linear WIR should produce exactly 3 states."""
-        graph = vibecheck_lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
         assert graph.num_states() == 3
 
     def test_simple_linear_edge_count(self):
         """A 3-node linear WIR with 2 edges should produce exactly 2 edges."""
-        graph = vibecheck_lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
         assert graph.num_edges() == 2
 
     def test_init_state_is_zero(self):
         """The entry node S0 should be mapped to init state 0 (first created)."""
-        graph = vibecheck_lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
         assert graph.get_init_state_number() == 0
 
     def test_branching_state_count(self):
         """The branching WIR has 5 nodes → 5 states."""
-        graph = vibecheck_lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
         assert graph.num_states() == 5
 
     def test_branching_edge_count(self):
         """The branching WIR has 5 edges → 5 edges."""
-        graph = vibecheck_lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
         assert graph.num_edges() == 5
 
 
@@ -200,7 +205,7 @@ class TestSemanticMatching:
         assert lifter.semantic_match("completely_unknown_action") == "unlabeled_task"
 
 
-def test_semantic_match_with_guard_nlp(self):
+    def test_semantic_match_with_guard_nlp(self):
         """Tier 3 NLP matching should resolve 'verify_identity_task' to 'Verify Identity'."""
         # This explicitly skips the test if the NLP environment isn't set up, preventing false failures in CI
         pytest.importorskip("nlp_utils", reason="nlp_utils (Sentence-BERT) not available")
@@ -215,7 +220,7 @@ def test_semantic_match_with_guard_nlp(self):
         assert "Verify Identity" in diag.matched_aps    # Matches via Tier 3 (NLP)
         assert diag.observable_edges >= 2
 
-def test_semantic_match_with_guard_fallback(self):
+    def test_semantic_match_with_guard_fallback(self):
         """Unmatched guards should fall back to raw opaque APs (e.g., 'g_verify_identity_task')."""
         lifter = vibecheck_lifter.AdvancedLifter()
         # Intentionally omit "Verify Identity" so it fails Tier 1, Tier 2, and Tier 3
@@ -228,7 +233,7 @@ def test_semantic_match_with_guard_fallback(self):
         # BUT the edge is STILL observable because it fell back to a raw opaque guard AP
         assert diag.observable_edges >= 2
 
-def test_task_code_action_matching(self):
+    def test_task_code_action_matching(self):
         """Task nodes with code arrays should produce matched APs."""
         lifter = vibecheck_lifter.AdvancedLifter()
         lifter.set_bpmn_tasks(["Approve Loan", "Verify Identity"])
@@ -333,7 +338,7 @@ class TestErrorHandling:
 
 if __name__ == "__main__":
     if not HAS_MODULE:
-        print("❌ Could not import vibecheck_lifter. Ensure it is compiled and in the 'src/' directory.")
+        print(" Could not import vibecheck_lifter. Ensure it is compiled and in the 'src/' directory.")
         sys.exit(0)
 
     print("Running manual integration tests...\n")
@@ -359,4 +364,4 @@ if __name__ == "__main__":
     eq = lifter.check_stuttering_bisimulation(g, g)
     print(f"  Result: {'PASSED' if eq else 'FAILED'}")
 
-    print("\n✅ All manual tests completed.")
+    print("\n All manual tests completed.")
