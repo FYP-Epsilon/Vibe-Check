@@ -23,7 +23,6 @@ class FLTLSynthesizer:
             "P1_Structural_Control_Flow": [],
             "P2_Quality_Limits": []
         }
-        
         self.xor_gateways: List[Dict[str, Any]] = []
         self.guard_coverage: float = 0.0
 
@@ -56,7 +55,8 @@ class FLTLSynthesizer:
                 ]
                 self.xor_gateways.append({
                     "gateway_id": gateway_id,
-                    "outgoing_flows": outgoing_flows
+                    "outgoing_flows": outgoing_flows,
+                    "default_flow": state.get("default_flow")
                 })
 
     def _layer_v2_synthesize_logic(self):
@@ -76,14 +76,28 @@ class FLTLSynthesizer:
         """Computes the mathematical negation for 'Else' paths in XOR gateways."""
         for gateway in self.xor_gateways:
             flows = gateway["outgoing_flows"]
+            if len(flows) < 2:
+                continue # Join gateway, skip
+                
             explicit_guards = [f.get("condition") for f in flows if f.get("condition")]
             unconditioned_flows = [f for f in flows if not f.get("condition")]
 
             if unconditioned_flows and explicit_guards:
                 # Compute mathematical negation: NOT(C1) AND NOT(C2) ...
                 negated_conjunction = " && ".join([f"!({g})" for g in explicit_guards])
+                default_flow_id = gateway.get("default_flow")
                 
-                for flow in unconditioned_flows:
+                if default_flow_id:
+                    default_flow = next((f for f in unconditioned_flows if f.get("flow_id") == default_flow_id), None)
+                    if default_flow:
+                        default_flow["condition"] = negated_conjunction
+                        self.inferred_guards.append({
+                            "gateway_id": gateway["gateway_id"],
+                            "target_node_id": default_flow["target_id"],
+                            "inferred_condition": negated_conjunction
+                        })
+                elif len(unconditioned_flows) == 1:
+                    flow = unconditioned_flows[0]
                     flow["condition"] = negated_conjunction
                     self.inferred_guards.append({
                         "gateway_id": gateway["gateway_id"],
@@ -92,26 +106,45 @@ class FLTLSynthesizer:
                     })
 
     def _get_node_props(self, node_id: str) -> List[str]:
+        props = [node_id]
         for state in self.states:
             if state["node_id"] == node_id:
-                return state.get("atomic_propositions", [node_id])
-        return [node_id]
+                props = state.get("atomic_propositions", [node_id])
+                break
+        
+        return props
 
     def _instantiate_ltlf_templates(self):
         """Translates graph edges and nodes into LTLf properties."""
-        # Sequence Flows: G(start(B) -> F(done(A)))
+        # Sequence Flows: !start(B) W done(A)
         for edge in self.edges:
             source_props = self._get_node_props(edge["source_id"])
             target_props = self._get_node_props(edge["target_id"])
             
-            # Using templates from prompt
-            # Sequence Flow (A -> B): G(start(B) -> F(done(A)))
             src_done = source_props[-1]
             tgt_start = target_props[0]
             
             self.ltlf_suite["P1_Structural_Control_Flow"].append(
-                f"G({tgt_start} -> F({src_done}))"
+                f"!{tgt_start} W {src_done}"
             )
+
+        # Global Invariants: Strict Start-to-Task and Start-to-End bounds
+        start_nodes = [s["node_id"] for s in self.states if s["node_type"] == "startEvent"]
+        end_nodes = [s["node_id"] for s in self.states if s["node_type"] == "endEvent"]
+        
+        for s_node in start_nodes:
+            s_prop = self._get_node_props(s_node)[0]
+            
+            # 1. No end event can happen before a start event
+            for e_node in end_nodes:
+                e_prop = self._get_node_props(e_node)[0]
+                self.ltlf_suite["P1_Structural_Control_Flow"].append(f"!{e_prop} W {s_prop}")
+                
+            # 2. No task can start before a start event
+            for state in self.states:
+                if state["node_type"] == "task":
+                    t_start = self._get_node_props(state["node_id"])[0]
+                    self.ltlf_suite["P1_Structural_Control_Flow"].append(f"!{t_start} W {s_prop}")
 
         # Gateway Specific Logic
         for state in self.states:
@@ -151,7 +184,7 @@ class FLTLSynthesizer:
 
     def _generate_sentinels(self):
         """Generates P0 Critical Sentinels and P2 Quality Limits."""
-        # Sentinel Guard: G(!forbidden_state U prerequisite_met)
+        # Sentinel Guard: !forbidden_state W prerequisite_met
         # For every task/event, cannot be 'done' until it 'starts' (or reached)
         for state in self.states:
             props = state.get("atomic_propositions", [])
@@ -159,7 +192,7 @@ class FLTLSynthesizer:
                 start_prop = props[0]
                 done_prop = props[-1]
                 self.ltlf_suite["P0_Critical_Sentinels"].append(
-                    f"G(!{done_prop} U {start_prop})"
+                    f"!{done_prop} W {start_prop}"
                 )
         
         # Bounded Loop: G(count(iteration) <= N -> F(exit_condition))
@@ -171,24 +204,26 @@ class FLTLSynthesizer:
         """
         Layer V1: Enforces Quality Gate and generates Certificate.
         """
-        total_xor = len(self.xor_gateways)
+        # Only splits (gateways with >= 2 outgoing flows) need guard resolution
+        splits = [g for g in self.xor_gateways if len(g["outgoing_flows"]) >= 2]
+        total_xor = len(splits)
         resolved_xor = 0
         
-        for gateway in self.xor_gateways:
+        for gateway in splits:
             flows = gateway["outgoing_flows"]
-            if all(f.get("condition") for f in flows):
+            unconditioned = [f for f in flows if not f.get("condition")]
+            if not unconditioned:
                 resolved_xor += 1
+            else:
+                gateway_id = gateway["gateway_id"]
+                raise VerificationException(
+                    f"XOR Gateway '{gateway_id}' has {len(unconditioned)} unconditioned branch(es) "
+                    "without a default flow. Decision logic is ambiguous."
+                )
         
         self.guard_resolution_coverage = resolved_xor / total_xor if total_xor > 0 else 1.0
         
         status = "PASS" if self.guard_resolution_coverage >= 1.0 else "FAIL"
-        
-        if status == "FAIL":
-            raise VerificationException(
-                f"Guard Resolution Coverage {self.guard_resolution_coverage} < 1.0. "
-                "Logical dead-zone detected."
-            )
-
         total_props = sum(len(v) for v in self.ltlf_suite.values())
         
         return {
@@ -209,11 +244,11 @@ def main():
         "semantic_graph": {
             "initial_state": "Start_1",
             "states": [
-                {"node_id": "Start_1", "node_type": "startEvent", "atomic_propositions": ["start_event"]},
-                {"node_id": "Gateway_1", "node_type": "exclusiveGateway", "atomic_propositions": ["xor_gate"]},
+                {"node_id": "Start_1", "node_type": "startEvent", "atomic_propositions": ["node(start_event)"]},
+                {"node_id": "Gateway_1", "node_type": "exclusiveGateway", "atomic_propositions": ["node(xor_gate)"]},
                 {"node_id": "Task_Approve", "node_type": "task", "atomic_propositions": ["start(Approve)", "done(Approve)"]},
                 {"node_id": "Task_Reject", "node_type": "task", "atomic_propositions": ["start(Reject)", "done(Reject)"]},
-                {"node_id": "End_1", "node_type": "endEvent", "atomic_propositions": ["end_event"]}
+                {"node_id": "End_1", "node_type": "endEvent", "atomic_propositions": ["node(end_event)"]}
             ],
             "edges": [
                 {"source_id": "Start_1", "target_id": "Gateway_1"},
