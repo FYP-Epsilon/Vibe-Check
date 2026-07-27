@@ -244,11 +244,11 @@ def main():
         "semantic_graph": {
             "initial_state": "Start_1",
             "states": [
-                {"node_id": "Start_1", "node_type": "startEvent", "atomic_propositions": ["start_event"]},
-                {"node_id": "Gateway_1", "node_type": "exclusiveGateway", "atomic_propositions": ["xor_gate"]},
+                {"node_id": "Start_1", "node_type": "startEvent", "atomic_propositions": ["node(start_event)"]},
+                {"node_id": "Gateway_1", "node_type": "exclusiveGateway", "atomic_propositions": ["node(xor_gate)"]},
                 {"node_id": "Task_Approve", "node_type": "task", "atomic_propositions": ["start(Approve)", "done(Approve)"]},
                 {"node_id": "Task_Reject", "node_type": "task", "atomic_propositions": ["start(Reject)", "done(Reject)"]},
-                {"node_id": "End_1", "node_type": "endEvent", "atomic_propositions": ["end_event"]}
+                {"node_id": "End_1", "node_type": "endEvent", "atomic_propositions": ["node(end_event)"]}
             ],
             "edges": [
                 {"source_id": "Start_1", "target_id": "Gateway_1"},

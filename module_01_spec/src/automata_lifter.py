@@ -22,9 +22,6 @@ except ImportError:
     spot = None
 
 
-class AutomataLifterException(Exception):
-    """Exception for Automata Lifter phase failures."""
-    pass
 
 
 class AutomataLifter:
