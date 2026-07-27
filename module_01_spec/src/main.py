@@ -8,15 +8,18 @@ try:
     from .semantic_extractor import SemanticExtractionEngine
     from .ltlf_synthesizer import FLTLSynthesizer
     from .mutation_refiner import MutationValidator, VerificationException
+    from .automata_lifter import AutomataLifter
 except ImportError:
     from semantic_extractor import SemanticExtractionEngine
     from ltlf_synthesizer import FLTLSynthesizer
     from mutation_refiner import MutationValidator, VerificationException
+    from automata_lifter import AutomataLifter
 
 app = FastAPI(title="VibeCheck Spec Engine", version="2.0.0")
 
 class BPMNPayload(BaseModel):
     bpmn_xml: str
+    seed: int = 42
 
 @app.post("/verify")
 def verify_spec(payload: BPMNPayload):
@@ -33,8 +36,9 @@ def verify_spec(payload: BPMNPayload):
             raise HTTPException(
                 status_code=422,
                 detail={
-                    "error": "Phase 1 Quality Gate failed.",
-                    "details": phase_1_result["phase_1_certificate"]
+                    "phase": 1,
+                    "error_code": "PHASE_1_GATE_FAIL",
+                    "certificate": phase_1_result["phase_1_certificate"]
                 }
             )
 
@@ -44,21 +48,104 @@ def verify_spec(payload: BPMNPayload):
 
         # Phase 3: Mutation Refinement
         validator = MutationValidator(phase_1_result["semantic_graph"], phase_2_result["ltlf_property_suite"])
-        phase_3_result = validator.execute_validation_pipeline()
+        phase_3_result = validator.execute_validation_pipeline(seed=payload.seed)
         
+        if phase_3_result["phase_3_certificate"]["status"] == "FAIL":
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "phase": 3,
+                    "error_code": "PHASE_3_GATE_FAIL",
+                    "certificate": phase_3_result["phase_3_certificate"]
+                }
+            )
+        
+        # Phase 4: Automata Lifting (non-blocking — SPOT may not be installed)
+        phase_4_result = None
+        try:
+            lifter = AutomataLifter(
+                property_suite=phase_3_result,
+                semantic_graph=phase_1_result["semantic_graph"],
+            )
+            phase_4_result = lifter.run_pipeline()
+        except Exception as e:
+            phase_4_result = {
+                "phase_4_certificate": {
+                    "status": "FAIL_WITH_ERRORS",
+                    "error_code": "PHASE_4_UNEXPECTED_ERROR",
+                    "message": str(e),
+                }
+            }
+
+        # Phase 5: Reverse Process Mining Alignment
+        phase_5_result = None
+        try:
+            try:
+                from .process_mining_alignment import ProcessMiningAlignment
+                from .mutation_refiner import LTLfAuditor
+            except ImportError:
+                from process_mining_alignment import ProcessMiningAlignment
+                from mutation_refiner import LTLfAuditor
+                
+            auditor = LTLfAuditor(phase_3_result["refined_ltlf_property_suite"])
+            ltlf_traces = auditor._generate_traces(phase_1_result["semantic_graph"], depth=10)
+            
+            aligner = ProcessMiningAlignment(bpmn_xml, ltlf_traces, semantic_graph=phase_1_result["semantic_graph"])
+            phase_5_result = aligner.run_pipeline()
+        except Exception as e:
+            phase_5_result = {
+                "phase_5_certificate": {
+                    "status": "FAIL_WITH_ERRORS",
+                    "error_code": "PHASE_5_ALIGNMENT_FAIL",
+                    "message": str(e)
+                }
+            }
+
+        # Determine overall status
+        overall_status = "PASS"
+        if phase_4_result:
+            p4_status = phase_4_result.get("phase_4_certificate", {}).get("status", "")
+            if "FAIL" in p4_status:
+                overall_status = f"PASS_PHASE4_{p4_status}"
+            elif p4_status == "PASS_NO_SPOT":
+                overall_status = "PASS_NO_SPOT"
+                
+        if phase_5_result:
+            p5_status = phase_5_result.get("phase_5_certificate", {}).get("status", "")
+            if "FAIL" in p5_status:
+                overall_status = f"PASS_PHASE5_{p5_status}"
+
+
         return {
-            "status": "PASS",
+            "status": overall_status,
             "phase_1": phase_1_result,
             "phase_2": phase_2_result,
-            "phase_3": phase_3_result
+            "phase_3": phase_3_result,
+            "phase_4": phase_4_result,
+            "phase_5": phase_5_result,
         }
         
     except VerificationException as e:
-        raise HTTPException(status_code=422, detail=str(e))
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "phase": 2,
+                "error_code": "PHASE_2_VERIFICATION_FAIL",
+                "message": str(e)
+            }
+        )
+    except HTTPException:
+        # Re-raise FastAPIs HTTPExceptions
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error_code": "UNEXPECTED_ERROR",
+                "message": f"Unexpected error: {str(e)}"
+            }
+        )
 
-@app.get("/docs")
 @app.get("/")
 def read_root():
     return {"status": "online", "message": "✅ Module 01 (Spec Engine) API is running."}
