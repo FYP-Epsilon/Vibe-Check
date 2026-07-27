@@ -1,8 +1,13 @@
 import json
 import random
 import copy
-from typing import List, Dict, Any, Tuple, Set
+from typing import List, Dict, Any, Tuple, Set, Optional
 import networkx as nx
+
+try:
+    from .ltlf_eval import evaluate_ltlf
+except ImportError:
+    from ltlf_eval import evaluate_ltlf
 
 class VerificationException(Exception):
     """Custom exception for verification failures."""
@@ -17,7 +22,8 @@ class BPMNMutationEngine:
         self.original_graph = semantic_graph
         self.mutants: List[Dict[str, Any]] = []
 
-    def generate_mutants(self, count: int = 20) -> List[Dict[str, Any]]:
+    def generate_mutants(self, count: int = 20, seed: int = 42) -> List[Dict[str, Any]]:
+        random.seed(seed)
         operators = [
             self._mutate_gateway_substitution,
             self._mutate_sequence_flow_deletion,
@@ -25,6 +31,12 @@ class BPMNMutationEngine:
             self._mutate_condition_inversion,
             self._mutate_loop_boundary
         ]
+        
+        # Generate canonical original traces to compare
+        auditor = LTLfAuditor({})
+        original_traces = auditor._generate_traces(self.original_graph, depth=10)
+        canonical_original = {tuple(frozenset(s) for s in t) for t in original_traces}
+
         attempts = 0
         max_attempts = 1000
         while len(self.mutants) < count and attempts < max_attempts:
@@ -32,6 +44,13 @@ class BPMNMutationEngine:
             op = random.choice(operators)
             mutant = op(copy.deepcopy(self.original_graph))
             if mutant and mutant != self.original_graph:
+                mutant_traces = auditor._generate_traces(mutant, depth=10)
+                canonical_mutant = {tuple(frozenset(s) for s in t) for t in mutant_traces}
+                
+                # Exclude behaviorally equivalent mutants
+                if canonical_mutant == canonical_original:
+                    continue
+                    
                 self.mutants.append(mutant)
         
         return self.mutants
@@ -106,75 +125,88 @@ class LTLfAuditor:
         # Generate symbolic traces from mutant
         traces = self._generate_traces(mutant, depth=10)
         
+        # If no traces are generated, it means the mutant cannot reach any end event (disconnected)
+        # and is therefore killed.
+        if not traces:
+            return True, "No complete execution traces generated (graph disconnected)"
+        
         for trace in traces:
             for prop in self.properties:
                 if not self._evaluate(prop, trace):
                     return True, f"Property {prop} failed on trace {trace}"
         return False, ""
 
-    def _generate_traces(self, graph: Dict[str, Any], depth: int) -> List[List[Set[str]]]:
+    def _generate_traces(self, graph: Dict[str, Any], depth: int, cutoff: Optional[int] = None) -> List[List[Set[str]]]:
         """Generates possible execution traces (sequences of sets of active propositions)."""
         nx_graph = nx.DiGraph()
         for edge in graph["edges"]:
             nx_graph.add_edge(edge["source_id"], edge["target_id"])
         
-        initial = graph.get("initial_state")
-        if not initial or initial not in nx_graph:
-            return []
+        # Find all start states (per-start trace roots)
+        start_states = graph.get("start_states", [])
+        if not start_states:
+            initial = graph.get("initial_state")
+            start_states = [initial] if initial else []
 
-        # Simple BFS/DFS to find paths
+        # Find all actual endEvent nodes
+        end_nodes = [s["node_id"] for s in graph["states"] if s["node_type"] == "endEvent"]
+        if not end_nodes:
+            # Fallback to out-degree 0 nodes if no endEvent is defined
+            end_nodes = [node for node in nx_graph.nodes() if nx_graph.out_degree(node) == 0]
+
+        # Determine path cutoff (node-count guard)
+        num_nodes = len(nx_graph.nodes())
+        if cutoff is not None:
+            path_cutoff = min(cutoff, num_nodes)
+        else:
+            path_cutoff = min(20, num_nodes) if num_nodes > 0 else 0
+
         all_paths = []
         try:
-            # Get paths up to depth
-            for node in nx_graph.nodes():
-                if nx_graph.out_degree(node) == 0: # End nodes
-                    paths = list(nx.all_simple_paths(nx_graph, source=initial, target=node))
-                    all_paths.extend(paths)
-        except:
-            pass
+            for start in start_states:
+                if start in nx_graph:
+                    for node in end_nodes:
+                        if node in nx_graph:
+                            generator = nx.all_simple_paths(nx_graph, source=start, target=node, cutoff=path_cutoff)
+                            pair_paths = 0
+                            for path in generator:
+                                all_paths.append(path)
+                                pair_paths += 1
+                                if pair_paths >= 50 or len(all_paths) >= 100:
+                                    break
+                            if len(all_paths) >= 100:
+                                break
+                    if len(all_paths) >= 100:
+                        break
+        except Exception as e:
+            print(f"Trace generation error: {e}")
         
         # Convert node paths to proposition traces
-        node_map = {s["node_id"]: s["atomic_propositions"] for s in graph["states"]}
+        node_map = {s["node_id"]: s.get("atomic_propositions", []) for s in graph["states"]}
         traces = []
         for path in all_paths[:20]: 
-            trace = [set(node_map.get(node_id, [])) for node_id in path]
+            trace = []
+            for node_id in path:
+                props = node_map.get(node_id, [])
+                if len(props) > 1:
+                    # Emit start(X) and done(X) as separate consecutive steps
+                    for p in props:
+                        trace.append({p})
+                elif len(props) == 1:
+                    trace.append({props[0]})
+                else:
+                    trace.append(set())
             traces.append(trace)
         return traces
 
     def _evaluate(self, formula: str, trace: List[Set[str]]) -> bool:
         """
-        Simplified LTLf evaluator.
-        Supports G(A -> B), G(!A U B), F(A), and custom killers.
+        Evaluates the LTLf formula over the trace using the robust LTLf evaluator.
         """
-        if "refined_constraint" in formula:
-            # Special case for synthesized killers
+        try:
+            return evaluate_ltlf(formula, trace)
+        except Exception:
             return False
-
-        if formula.startswith("G("):
-            inner = formula[2:-1]
-            if " -> " in inner:
-                lhs, rhs = inner.split(" -> ", 1)
-                for i in range(len(trace)):
-                    if self._check_atom(lhs, trace[i]):
-                        if rhs.startswith("F("):
-                            f_inner = rhs[2:-1]
-                            if not any(self._check_atom(f_inner, trace[j]) for j in range(i, len(trace))):
-                                return False
-                        elif not self._check_atom(rhs, trace[i]):
-                            return False
-                return True
-        
-        if formula.startswith("F("):
-            atom = formula[2:-1]
-            return any(self._check_atom(atom, step) for step in trace)
-        
-        return True
-
-    def _check_atom(self, atom: str, step_props: Set[str]) -> bool:
-        atom = atom.strip()
-        if atom.startswith("!"):
-            return atom[1:] not in step_props
-        return atom in step_props
 
 class MutationValidator:
     """
@@ -188,10 +220,17 @@ class MutationValidator:
         self.mutants_killed = 0
         self.refinement_loops = 0
         self.synthesized_killers = []
+        
+        try:
+            from .adversarial_generator import AdversarialGenerator
+        except ImportError:
+            from adversarial_generator import AdversarialGenerator
+        self.adversarial_gen = AdversarialGenerator()
+        self.adversarial_killers = []
 
-    def execute_validation_pipeline(self):
+    def execute_validation_pipeline(self, seed: int = 42):
         # 1. Generate Mutants
-        mutants = self.engine.generate_mutants(20)
+        mutants = self.engine.generate_mutants(20, seed=seed)
         
         # 2. Audit & Refine
         for i, mutant in enumerate(mutants):
@@ -202,8 +241,11 @@ class MutationValidator:
                 # Survival detected! Recursive Refinement.
                 self.refinement_loops += 1
                 killer = self._synthesize_killer(mutant)
-                self.synthesized_killers.append(killer)
-                self.suite["P1_Structural_Control_Flow"].append(killer)
+                if killer != "no killer found":
+                    self.synthesized_killers.append(killer)
+                    self.suite["P1_Structural_Control_Flow"].append(killer)
+                else:
+                    self.synthesized_killers.append("no killer found")
                 
                 # Re-audit current mutant with new killer
                 temp_suite = copy.deepcopy(self.suite)
@@ -211,6 +253,11 @@ class MutationValidator:
                 killed_now, _ = self.auditor.is_killed(mutant)
                 if killed_now:
                     self.mutants_killed += 1
+
+        # 2.5 Adversarial Red-Teaming (Predictive Defense)
+        deceptive_traces = self.adversarial_gen.generate_deceptive_traces(self.graph)
+        new_killers = self.adversarial_gen.synthesize_killer_properties(deceptive_traces)
+        self.adversarial_killers.extend(new_killers)
 
         # 3. Quality Gate Certification
         certificate = self._certify()
@@ -221,16 +268,48 @@ class MutationValidator:
         original_edges = set((e["source_id"], e["target_id"]) for e in self.graph["edges"])
         mutant_edges = set((e["source_id"], e["target_id"]) for e in mutant["edges"])
         
+        # 1. Sequence Flow Deletion
         diff_del = original_edges - mutant_edges
-        diff_add = mutant_edges - original_edges
-        
         if diff_del:
             u, v = list(diff_del)[0]
             u_props = self._get_node_props(u)
             v_props = self._get_node_props(v)
-            return f"G({v_props[0]} -> F({u_props[-1]}))"
+            return f"!{v_props[0]} W {u_props[-1]}"
+            
+        original_states = {s["node_id"]: s for s in self.graph["states"]}
+        for mut_s in mutant["states"]:
+            orig_s = original_states.get(mut_s["node_id"])
+            if not orig_s: continue
+            
+            # 2. Gateway Substitution (AND <-> XOR)
+            if orig_s.get("node_type") != mut_s.get("node_type") and "Gateway" in str(orig_s.get("node_type")):
+                props = orig_s.get("atomic_propositions", [orig_s["node_id"]])
+                return f"G({props[0]} -> (F(end) | F(error)))"
+                
+            # 3. Task Retyping
+            if orig_s.get("node_type") != mut_s.get("node_type") and "Task" in str(orig_s.get("node_type", "")).title():
+                props = orig_s.get("atomic_propositions", [orig_s["node_id"]])
+                return f"G({props[0]} -> F({props[-1]}))"
+                
+            # 4. Loop Boundary Modification
+            if orig_s.get("atomic_propositions") != mut_s.get("atomic_propositions"):
+                orig_props = orig_s.get("atomic_propositions", [])
+                for prop in orig_props:
+                    if "iteration" in prop.lower() or "count" in prop.lower():
+                        return f"G({prop} -> F(end))"
+                if orig_props:
+                    return f"F({orig_props[0]})"
+                    
+        # 5. Condition Inversion
+        for orig_e in self.graph["edges"]:
+            for mut_e in mutant["edges"]:
+                if orig_e["source_id"] == mut_e["source_id"] and orig_e["target_id"] == mut_e["target_id"]:
+                    if orig_e.get("condition") != mut_e.get("condition"):
+                        u_props = self._get_node_props(orig_e["source_id"])
+                        v_props = self._get_node_props(orig_e["target_id"])
+                        return f"G({u_props[-1]} -> F({v_props[0]}))"
         
-        return f"G(refined_constraint_{self.refinement_loops})"
+        return "no killer found"
 
     def _get_node_props(self, node_id: str) -> List[str]:
         for s in self.graph["states"]:
@@ -247,15 +326,17 @@ class MutationValidator:
         path_cov = 1.0
         
         c_struct = (node_cov + edge_cov + path_cov) / 3.0
-        killed_ratio = self.mutants_killed / 20.0
         
-        status = "PASS" if c_struct >= 0.95 and killed_ratio >= 1.0 else "FAIL"
+        actual_count = len(self.engine.mutants)
+        killed_ratio = self.mutants_killed / actual_count if actual_count > 0 else 1.0
+        
+        status = "PASS" if c_struct >= 1.0 and killed_ratio >= 1.0 else "FAIL"
         
         return {
             "phase_3_certificate": {
                 "status": status,
                 "C_struct_coefficient": round(c_struct, 4),
-                "mutants_generated": 20,
+                "mutants_generated": actual_count,
                 "mutants_killed_ratio": killed_ratio,
                 "refinement_loops_executed": self.refinement_loops
             },
@@ -263,6 +344,7 @@ class MutationValidator:
                 "P0_Critical_Sentinels": self.suite.get("P0_Critical_Sentinels", []),
                 "P1_Structural_Control_Flow": self.suite.get("P1_Structural_Control_Flow", []),
                 "P2_Quality_Limits": self.suite.get("P2_Quality_Limits", []),
+                "P3_Adversarial_Defenses": self.adversarial_killers,
                 "synthesized_mutant_killers": self.synthesized_killers
             }
         }
@@ -298,7 +380,7 @@ def main():
     # Strict Threshold Enforcement
     cert = result["phase_3_certificate"]
     if cert["status"] == "FAIL":
-        raise VerificationException(f"VerificationException: Quality Gate Failed ($C_{{struct}} < 0.95$ or Survival Rate > 0)")
+        raise VerificationException(f"VerificationException: Quality Gate Failed ($C_{{struct}} < 1.0$ or Survival Rate > 0)")
 
 if __name__ == "__main__":
     main()
