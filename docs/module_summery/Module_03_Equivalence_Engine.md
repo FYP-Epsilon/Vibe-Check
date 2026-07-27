@@ -4,11 +4,15 @@
 
 ---
 
-**Module Lead:** Hettiarachchi HTV (Index: 214077J)  
-**Project Group:** Group 18 — Epsilon  
-**Supervisor:** Dr. Thilina Thanthriwatta  
-**Institution:** Faculty of Information Technology, University of Moratuwa  
-**Date:** 2026  
+**Module Lead:** Hettiarachchi HTV (Index: 214077J)
+
+**Project Group:** Group 18 — Epsilon
+
+**Supervisor:** Dr. Thilina Thanthriwatta
+
+**Institution:** Faculty of Information Technology, University of Moratuwa
+
+**Date:** 2026
 
 ---
 
@@ -34,7 +38,7 @@
 ### Primary Inputs
 
 | Input | Source | Description |
-|-------|--------|-------------|
+| --- | --- | --- |
 | **M_spec** | Module 01 (Role A) | The specification-derived automaton (Labeled Transition System) constructed from parsed BPMN 2.0 XML, paired with the coverage-quantified property suite **P** containing Fluent Linear Temporal Logic (FLTL) formulas |
 | **M_code** | Module 02 (Role B) | The code-derived automaton (**LTS_code**), lifted from the validated Workflow Intermediate Representation (WIR) through deterministic JSON-to-automaton translation |
 | **IR_val + Certificate** | Module 02 (Role B) | The validated Workflow Intermediate Representation (JSON-structured WIR with WIR-Core, WIR-Data, WIR-Proc, and WIR-Type layers), accompanied by an Extraction Quality Indicator (EQI) correctness certificate |
@@ -43,7 +47,7 @@
 ### Primary Outputs
 
 | Output | Description |
-|--------|-------------|
+| --- | --- |
 | **Equivalence Clusters** | Mathematically grouped sets of implementations proven **~proc**-equivalent via divergence-sensitive stuttering bisimulation |
 | **Singleton Anomalies** | Isolated implementations that fail to cluster, indicating LLM process drift, omitted constraints, or structural hallucinations |
 | **Representative Automaton (LTS_rep)** | A single, complexity-minimized automaton extracted from each valid cluster for downstream model checking |
@@ -85,7 +89,7 @@ flowchart TB
     end
 
     subgraph PHASE_C["Phase C: Clustering & Representatives"]
-        C1["Pairwise Computation &<br/>Deterministic Hash Signatures"]
+        C1["Graph Isomorphism Evaluation<br/>(spot::are_isomorphic)"]
         C2["Singleton Analysis &<br/>Anomaly Detection"]
         C3["Representative Automaton<br/>Extraction (LTS_rep)"]
     end
@@ -115,6 +119,7 @@ flowchart TB
     C2 --> SINGLES
     D3 --> VERDICT
     D3 --> DIAG
+
 ```
 
 ---
@@ -128,14 +133,16 @@ The formal verification of software artifacts has evolved along several distinct
 The earliest and most established approach to BPMN verification involves translating visual process models into **Petri nets**, a well-studied formalism with extensive analysis tooling. **Dijkman et al.** [6] proposed the foundational mapping, establishing that BPMN constructs (tasks, gateways, events) can be systematically represented as Petri net elements (places, transitions, arcs), enabling deadlock-freedom and liveness checking through existing tools.
 
 **Key characteristics of this approach:**
-- Leverages the mature Petri net analysis ecosystem with decades of model checking research.
-- Translation is deterministic and well-defined, ensuring faithful semantic representation.
-- Verification results can be traced back to the original BPMN diagram for diagnostic feedback.
+
+* Leverages the mature Petri net analysis ecosystem with decades of model checking research.
+* Translation is deterministic and well-defined, ensuring faithful semantic representation.
+* Verification results can be traced back to the original BPMN diagram for diagnostic feedback.
 
 **Critical limitations:**
-- Operates exclusively as a **static specification check** — it verifies the BPMN model in isolation, not the executable code purporting to implement that model.
-- Lacks any mechanism to ingest, audit, or compare non-deterministic execution traces from Python implementations.
-- Petri-net formalisms are optimized for **reachability analysis**, not the **temporal ordering** of business logic constraints. This creates a fundamental blind spot for detecting data-driven hallucinations in LLM-generated code [Interim Report, §2.1.2].
+
+* Operates exclusively as a **static specification check** — it verifies the BPMN model in isolation, not the executable code purporting to implement that model.
+* Lacks any mechanism to ingest, audit, or compare non-deterministic execution traces from Python implementations.
+* Petri-net formalisms are optimized for **reachability analysis**, not the **temporal ordering** of business logic constraints. This creates a fundamental blind spot for detecting data-driven hallucinations in LLM-generated code [Interim Report, §2.1.2].
 
 Subsequent work by **Kherbouche and Ahmad** [7] advanced this domain by applying **Linear Temporal Logic (LTL)** property patterns with the SPIN model checker, and **De Giacomo and Vardi** [9] introduced **Linear Temporal Logic on Finite Traces (LTLf)** specifically for finite-execution business processes. However, all these approaches share a common limitation: **they verify the model, not the implementation** [Interim Report, §2.1.3].
 
@@ -146,9 +153,10 @@ The concept of **translation validation** originates from the verified compilati
 **Pnueli et al.** [17] formalized translation validation through the concept of a **simulation relation**, providing mathematical guarantees that every observable behavior of a target program is explicitly permitted by its source. **Cordeiro and Fischer** [16] extended this to software model checking, demonstrating that program transformations could be validated post-hoc.
 
 **Critical limitations:**
-- These approaches assume a **trusted source program** and a **deterministic translation process**.
-- In the VibeCheck context, the source (LLM-generated Python) is **inherently untrusted**, and the extraction process involves significant semantic abstraction.
-- CompCert demands **full proof** — an unrealistic standard when the code generator is a stochastic neural network with billions of parameters [Interim Report, §2.3.1].
+
+* These approaches assume a **trusted source program** and a **deterministic translation process**.
+* In the VibeCheck context, the source (LLM-generated Python) is **inherently untrusted**, and the extraction process involves significant semantic abstraction.
+* CompCert demands **full proof** — an unrealistic standard when the code generator is a stochastic neural network with billions of parameters [Interim Report, §2.3.1].
 
 ### 2.3 Equivalence Checking via Bisimulation
 
@@ -163,6 +171,7 @@ Stuttering bisimulation allows the abstraction of **silent (τ) transitions** �
 Contemporary verification pipelines leverage **Transition-based Automata** optimized through **Binary Decision Diagrams (BDDs)**. **Bryant** [30] introduced BDDs as a canonical representation of boolean functions, fundamentally revolutionizing the memory efficiency of model checking. **Duret-Lutz et al.** [31], the architects of the **SPOT library**, provided state-of-the-art C++ implementations for LTL translation, emptiness checking, and automata transformations.
 
 The classical automata-theoretic approach to LTL model checking involves:
+
 1. Translating the negated property **¬φ** into a **Büchi automaton A_¬φ**.
 2. Computing the **synchronous product** of the system automaton and the property automaton.
 3. Checking the resulting product for **emptiness** (an empty language proves no counter-examples exist).
@@ -179,13 +188,10 @@ Recent literature has shifted toward **semantic clustering** based on program ex
 
 Recent academic work has begun addressing the intersection of LLM code generation and formal verification:
 
-- **Astrogator** [Towards Formal Verification of LLM-Generated Code, 2025] proposes **formal query languages** that bridge natural language intent with verifiable specifications, using symbolic interpreters and state calculus to compare program behavior against formal queries. This addresses the "no formal specification" problem but does not provide BPMN-to-code equivalence checking.
-
-- **SpecVerify / ESBMC-AI** [Supporting Software Formal Verification with LLMs, 2025] investigates LLM-assisted property generation for C code verification using bounded model checking, comparing automation levels of LLM-driven vs. manual verification workflows. This work focuses on memory safety and assertion verification, not process-level behavioral equivalence.
-
-- **Property-based LLM translation validation** [Eniser et al., 2024] specifies k-safety properties for code-to-code translation, using assertion-based verification. While property-driven, this approach does not employ automata-theoretic equivalence checking or bisimulation [MDPI Technologies, 2024].
-
-- **ARDiff** [Badihi et al., 2024] improves scalability of symbolic-execution-based equivalence checking through novel heuristics for pruning common code paths, but is limited to syntactically similar program versions and struggles with nested loops and large codebases.
+* **Astrogator** [Towards Formal Verification of LLM-Generated Code, 2025] proposes **formal query languages** that bridge natural language intent with verifiable specifications, using symbolic interpreters and state calculus to compare program behavior against formal queries. This addresses the "no formal specification" problem but does not provide BPMN-to-code equivalence checking.
+* **SpecVerify / ESBMC-AI** [Supporting Software Formal Verification with LLMs, 2025] investigates LLM-assisted property generation for C code verification using bounded model checking, comparing automation levels of LLM-driven vs. manual verification workflows. This work focuses on memory safety and assertion verification, not process-level behavioral equivalence.
+* **Property-based LLM translation validation** [Eniser et al., 2024] specifies k-safety properties for code-to-code translation, using assertion-based verification. While property-driven, this approach does not employ automata-theoretic equivalence checking or bisimulation [MDPI Technologies, 2024].
+* **ARDiff** [Badihi et al., 2024] improves scalability of symbolic-execution-based equivalence checking through novel heuristics for pruning common code paths, but is limited to syntactically similar program versions and struggles with nested loops and large codebases.
 
 ---
 
@@ -197,16 +203,16 @@ Despite decades of advances in formal verification, a critical **multi-dimension
 
 The stochastic nature of LLM generation introduces what researchers have termed the **"Verification Crisis"** [2]. LLMs operate as probabilistic token predictors, not logical reasoning engines. This creates a fundamental asymmetry:
 
-- **Syntactic correctness does not imply semantic fidelity.** Code that compiles and passes unit tests may still violate critical business process constraints.
-- **Logic hallucinations are invisible to testing.** An LLM might generate a loan approval workflow that passes all functional tests while silently omitting the mandatory credit check — a safety violation that only formal verification can detect.
-- **Non-deterministic outputs defy traditional verification.** A single prompt can produce dozens of structurally divergent but functionally equivalent implementations, rendering one-to-one equivalence checking computationally infeasible [Interim Report, §1.2].
+* **Syntactic correctness does not imply semantic fidelity.** Code that compiles and passes unit tests may still violate critical business process constraints.
+* **Logic hallucinations are invisible to testing.** An LLM might generate a loan approval workflow that passes all functional tests while silently omitting the mandatory credit check — a safety violation that only formal verification can detect.
+* **Non-deterministic outputs defy traditional verification.** A single prompt can produce dozens of structurally divergent but functionally equivalent implementations, rendering one-to-one equivalence checking computationally infeasible [Interim Report, §1.2].
 
 ### 3.2 The Specification-to-Implementation Chasm
 
 Existing approaches suffer from a **directional disconnect**:
 
 | Approach Domain | What It Verifies | What It Misses |
-|-----------------|-----------------|----------------|
+| --- | --- | --- |
 | BPMN-to-Petri-net [6] | The process model itself | The code implementing the model |
 | LTL pattern checking [7] | Properties against the model | Properties against the implementation |
 | LLM benchmarks (HumanEval, MBPP) [3] | Stateless functional correctness | Stateful workflow logic, temporal ordering |
@@ -248,6 +254,7 @@ flowchart LR
     LTS["LTS_code<br/>(M_code)"]
 
     WIR --> A1 --> A2 --> A3 --> A4 --> LTS
+
 ```
 
 **Milestone P1.1 — WIR-Type Layer Parser and BDD Dictionary Initialization:**
@@ -297,6 +304,7 @@ for (const auto& edge : wir_json["edges"]) {
     bdd transition_condition = guard_bdd & label_bdd;
     m_code->new_edge(src, dst, transition_condition, m_code->acc().mark(0));
 }
+
 ```
 
 ### 4.2 Phase B: Divergence-Sensitive Stuttering Bisimulation
@@ -312,6 +320,7 @@ flowchart LR
     QLTS["Quotient LTS<br/>(Minimized)"]
 
     LTS --> B1 --> B2 --> B3 --> QLTS
+
 ```
 
 **Milestone P2.1 — 3-Tier Equivalence Hierarchy:**
@@ -319,7 +328,7 @@ flowchart LR
 The engine evaluates implementations across three hierarchical tiers:
 
 | Level | Notation | Definition | Preserves |
-|-------|----------|------------|-----------|
+| --- | --- | --- | --- |
 | **Functional** | **~fun** | Same input-output behavior | Final data results, terminal states |
 | **Trace** | **~trace** | Same task entry/exit sequences | Strict action ordering |
 | **Process** | **~proc** | Same traces up to stuttering | Business observables, control flow |
@@ -345,15 +354,16 @@ The Groote-Vaandrager algorithm achieves **O(m log n)** complexity through itera
 ```mermaid
 flowchart LR
     QLTS["Quotient LTS Set"]
-    C1["Milestone P3.1<br/>Pairwise Computation &<br/>SHA-256 Hash Signatures"]
+    C1["Milestone P3.1<br/>Graph Isomorphism Evaluation<br/>(spot::are_isomorphic)"]
     C2["Milestone P3.2<br/>Singleton Analysis &<br/>Anomaly Detection"]
     C3["Milestone P3.3<br/>Representative Automaton<br/>Extraction"]
     REP["LTS_rep per cluster"]
 
     QLTS --> C1 --> C2 --> C3 --> REP
+
 ```
 
-**Milestone P3.1** computes deterministic hash signatures (canonical state ordering → edge serialization → SHA-256) for O(n) identity clustering. **Milestone P3.2** isolates non-clustering "singletons" as anomaly indicators. **Milestone P3.3** extracts a single **LTS_rep** per cluster — selecting the lowest cyclomatic complexity implementation — reducing verification overhead from O(num_scripts) to O(num_clusters) [Execution Plan, §Phase C].
+**Milestone P3.1** evaluates mathematical graph isomorphism (`spot::are_isomorphic`) over the quotient automata, ensuring strict behavioral equivalence without relying on fragile string serialization. **Milestone P3.2** isolates non-clustering "singletons" as anomaly indicators. **Milestone P3.3** extracts a single **LTS_rep** per cluster — selecting the lowest cyclomatic complexity implementation — reducing verification overhead from O(num_scripts) to O(num_clusters) [Execution Plan, §Phase C].
 
 ### 4.4 Phase D: Final Automata-Theoretic Model Checking
 
@@ -368,6 +378,7 @@ flowchart LR
 
     MSPEC --> D1 --> D2
     REP --> D2 --> D3 --> VERDICT
+
 ```
 
 The SPOT C++ library executes the automata-theoretic intersection:
@@ -381,7 +392,7 @@ The SPOT C++ library executes the automata-theoretic intersection:
 Module 03 adapts verification strictness based on the **Extraction Quality Indicator (EQI)** score from Module 02:
 
 | Tier | EQI Range | Policy | Outcome |
-|------|-----------|--------|---------|
+| --- | --- | --- | --- |
 | **GREEN** | ≥ 0.90 | Standard model checking | Fully Verified |
 | **YELLOW** | 0.70 – 0.90 | Conservative abstraction (uncertain guards → `bdd_true()`) | Conditionally Verified |
 | **RED** | < 0.70 | Refuse automaton lifting | Flagged for Manual Review |
@@ -400,9 +411,9 @@ Novelty: This is the **first framework** to construct independent formal automat
 
 Novelty: We extend classical stuttering bisimulation with **divergence-sensitivity** specifically engineered to detect LLM-induced livelocks. Classical stuttering bisimulation would erroneously merge a `while True: pass` hallucination with a benign wait-state. Our divergence-sensitive variant mathematically classifies this as a fatal violation by tracking **bottom states** and enforcing that divergent states can never be equivalent to non-divergent states [Execution Plan, §3.2]. This addresses a previously unidentified theoretical vulnerability in applying process equivalence to stochastic code generators.
 
-### 5.3 Implementation Space Clustering with Cryptographic Hash Optimization
+### 5.3 Implementation Space Clustering with Structural Isomorphism
 
-Novelty: Rather than individually model-checking every LLM-generated script, we introduce **deterministic hash-based equivalence clustering** that groups process-equivalent implementations in linear time. This reduces verification overhead from **O(num_scripts)** to **O(num_clusters)** — a critical optimization given that LLMs routinely produce dozens of candidate implementations per specification. Singletons (non-clustering implementations) serve as primary indicators of generative anomalies, enabling automatic anomaly detection without manual inspection [Interim Report, §4.4.3].
+Novelty: Rather than individually model-checking every LLM-generated script, we introduce **deterministic equivalence clustering** that groups process-equivalent implementations based on structural isomorphism. This reduces verification overhead from **O(num_scripts)** to **O(num_clusters)** — a critical optimization given that LLMs routinely produce dozens of candidate implementations per specification. Singletons (non-clustering implementations) serve as primary indicators of generative anomalies, enabling automatic anomaly detection without manual inspection [Interim Report, §4.4.3].
 
 ### 5.4 Parallel Gateway Abstraction for Combinatorial State Explosion
 
@@ -415,7 +426,7 @@ Novelty: For deeply nested loops where exhaustive bisimulation remains intractab
 ### 5.6 Summary of Novelty Matrix
 
 | Dimension | Prior Work | Our Contribution |
-|-----------|-----------|------------------|
+| --- | --- | --- |
 | **Verification target** | BPMN model only [6,7] | Code implementation against model |
 | **Source trust assumption** | Trusted source [15] | Untrusted LLM output |
 | **Confidence type** | Absolute proof or statistical testing | Quantified formal confidence |
@@ -458,42 +469,48 @@ role_c_equivalence/
     └── tests/
         ├── test_bisimulation.cpp
         └── test_spot_interface.cpp
+
 ```
 
 ### 6.2 Operational Components
 
 **M_codeAutomaton Lifter (`m_code_lifter.py`):**
-- Successfully implemented the **MCodeAutomaton** class representing LTS_code with states, transitions, initial state designation, and symbolic guard preservation.
-- Implements `lift_ir_to_mcode()` for deterministic JSON WIR → automaton translation.
-- Maps WIR node labels to semantic action labels, with `UNKNOWN` labels normalized to **`tau`** (silent transitions).
-- Produces deterministically repeatable M_code structures validated by SHA-256 hashing [Repo Snapshot].
+
+* Successfully implemented the **MCodeAutomaton** class representing LTS_code with states, transitions, initial state designation, and symbolic guard preservation.
+* Implements `lift_ir_to_mcode()` for deterministic JSON WIR → automaton translation.
+* Maps WIR node labels to semantic action labels, with `UNKNOWN` labels normalized to **`tau`** (silent transitions).
+* Produces deterministically repeatable M_code structures validated via strict mathematical isomorphism [Repo Snapshot].
 
 **Stuttering Bisimulation Engine (`verify_determinism.py`):**
-- Full Python implementation of the **Groote-Vaandrager partition refinement algorithm** with:
-  - Silent graph construction and reflexive-transitive closure computation
-  - **Tarjan's SCC algorithm** for stutter cycle detection
-  - Backward divergence propagation through reverse silent paths
-  - Observable signature extraction for block initialization
-  - Iterative partition refinement with visible transition analysis
-- Namespaced state handling ("A|", "B|" prefixes) for cross-automaton comparison.
-- **`check_stuttering_bisimulation()`** function returning equivalence decision + matched state pairs.
-- **Determinism verification** executing 10 iteration rounds per UID to confirm hash stability.
+
+* Full Python implementation of the **Groote-Vaandrager partition refinement algorithm** with:
+* Silent graph construction and reflexive-transitive closure computation
+* **Tarjan's SCC algorithm** for stutter cycle detection
+* Backward divergence propagation through reverse silent paths
+* Observable signature extraction for block initialization
+* Iterative partition refinement with visible transition analysis
+
+
+* Namespaced state handling ("A|", "B|" prefixes) for cross-automaton comparison.
+* **`check_stuttering_bisimulation()`** function returning equivalence decision + matched state pairs.
 
 **Test Harness (`test_equivalence.py`):**
-- Ground-truth determinism tests comparing automata pairs (uid_9 vs. uid_10).
-- Outputs equivalence decisions with complete super-state mapping.
+
+* Ground-truth determinism tests comparing automata pairs (uid_9 vs. uid_10).
+* Outputs equivalence decisions with complete super-state mapping.
 
 **Master Orchestrator (`main_role_c.py`):**
-- Batch-lifts all JSON WIR files from `data/processed/irs/`.
-- Reports state counts per implementation for pipeline monitoring.
+
+* Batch-lifts all JSON WIR files from `data/processed/irs/`.
+* Reports state counts per implementation for pipeline monitoring.
 
 ### 6.3 Interim Test Results
 
 As documented in the Interim Report (§7.1.3), the prototype successfully:
-- **Deterministically lifted** 15 JSON WIR files into formal M_code structures.
-- Preserved action labels and guard conditions through the lifting pipeline.
-- Validated 100% hash stability across 10 iteration rounds for all UIDs.
-- Successfully detected equivalence and non-equivalence between test pairs.
+
+* **Deterministically lifted** 15 JSON WIR files into formal M_code structures.
+* Preserved action labels and guard conditions through the lifting pipeline.
+* Successfully detected equivalence and non-equivalence between test pairs.
 
 ---
 
@@ -502,7 +519,7 @@ As documented in the Interim Report (§7.1.3), the prototype successfully:
 ### 7.1 Phase A Completion: C++ SPOT Lifter (Weeks 1–2)
 
 | Milestone | Task | Deliverable |
-|-----------|------|-------------|
+| --- | --- | --- |
 | **P1.1** | Implement WIR-Type parser with BDD dictionary initialization | `m_code_lifter.cpp` with `parse_and_register_guard()` |
 | **P1.2** | Integrate 3-tier semantic matching (exact → Levenshtein → Sentence-BERT) | `semantic_match()` function with embedding model |
 | **P1.3** | Implement bounded loop unrolling with `loop_max` propagation | Loop cloning + exception state redirection |
@@ -511,7 +528,7 @@ As documented in the Interim Report (§7.1.3), the prototype successfully:
 ### 7.2 Phase B Completion: Divergence-Sensitive Stuttering Bisimulation (Weeks 2–3)
 
 | Milestone | Task | Deliverable |
-|-----------|------|-------------|
+| --- | --- | --- |
 | **P2.1** | Implement 3-tier equivalence hierarchy (~fun, ~trace, ~proc) | Tiered classification engine |
 | **P2.2** | Build divergence-sensitivity enforcement layer | Divergence propagation + bottom state isolation |
 | **P2.3** | Implement Groote-Vaandrager partition refinement in C++ | `equivalence_engine.cpp` with O(m log n) refinement |
@@ -519,26 +536,26 @@ As documented in the Interim Report (§7.1.3), the prototype successfully:
 ### 7.3 Phase C Completion: Clustering and Representatives (Weeks 3–4)
 
 | Milestone | Task | Deliverable |
-|-----------|------|-------------|
-| **P3.1** | Implement deterministic hash signatures (canonical ordering → SHA-256) | `verify_determinism.py` hash-based clustering |
+| --- | --- | --- |
+| **P3.1** | Implement native SPOT graph isomorphism checking (`spot::are_isomorphic`) over quotient automata | `verify_determinism.py` isomorphism-based clustering |
 | **P3.2** | Build singleton analysis and anomaly detection pipeline | Anomaly isolation + diagnostic reporting |
 | **P3.3** | Implement representative automaton extraction | `LTS_rep` selection (lowest cyclomatic complexity) |
 
 ### 7.4 Phase D Completion: Final Model Checking (Weeks 4–5)
 
 | Milestone | Task | Deliverable |
-|-----------|------|-------------|
+| --- | --- | --- |
 | **P4.1** | Property translation layer (FLTL → LTLf → Büchi via `spot::translator`) | `ModelChecker` class with translation pipeline |
 | **P4.2** | Synchronous product intersection + Couvreur's emptiness check | `spot::product` + `spot::couvreur99` integration |
 | **P4.3** | Diagnostic propagation + EQI certificate integration | Counter-example extraction + 3-tier EQI policy |
 
 ### 7.5 Integration and End-to-End Testing (Weeks 5–6)
 
-- Pybind11 binding layer for Python ↔ C++ interop
-- End-to-end pipeline execution on FLOW-BENCH development set
-- Performance benchmarking and state-space scalability analysis
-- Bounded equivalence checking fallback integration
-- Predicate abstraction for data variable compression
+* Pybind11 binding layer for Python ↔ C++ interop
+* End-to-end pipeline execution on FLOW-BENCH development set
+* Performance benchmarking and state-space scalability analysis
+* Bounded equivalence checking fallback integration
+* Predicate abstraction for data variable compression
 
 ### 7.6 Critical Edge Cases to Address
 
@@ -555,22 +572,26 @@ As documented in the Interim Report (§7.1.3), the prototype successfully:
 The **FLOW-BENCH** dataset [11] serves as the primary evaluation corpus for Module 03. It is a publicly available collection specifically designed for evaluating LLM-generated enterprise workflow code.
 
 **Key attributes:**
-- **100+ workflow triplets**, each consisting of:
-  - Natural language process description
-  - BPMN 2.0 XML representation
-  - Python reference implementation
-- **Domain coverage:** vending machine workflows, loan approval pipelines, inventory management systems, scheduling processes, customer service workflows
-- **BPMN construct coverage:** start/end events, tasks, XOR (exclusive) gateways, AND (parallel) gateways, bounded loops, intermediate events, boundary events
-- **Explicit alignment** with the controlled BPMN subset targeted by Module 01's property extraction
+
+* **100+ workflow triplets**, each consisting of:
+* Natural language process description
+* BPMN 2.0 XML representation
+* Python reference implementation
+
+
+* **Domain coverage:** vending machine workflows, loan approval pipelines, inventory management systems, scheduling processes, customer service workflows
+* **BPMN construct coverage:** start/end events, tasks, XOR (exclusive) gateways, AND (parallel) gateways, bounded loops, intermediate events, boundary events
+* **Explicit alignment** with the controlled BPMN subset targeted by Module 01's property extraction
 
 **Partitioning:**
-- **80% development set** (stratified by process complexity) — used for pipeline calibration, equivalence threshold tuning, and clustering algorithm validation.
-- **20% held-out evaluation set** — reserved for final framework assessment and novelty validation.
+
+* **80% development set** (stratified by process complexity) — used for pipeline calibration, equivalence threshold tuning, and clustering algorithm validation.
+* **20% held-out evaluation set** — reserved for final framework assessment and novelty validation.
 
 ### 8.2 Supplementary Datasets
 
 | Dataset | Purpose | Source |
-|---------|---------|--------|
+| --- | --- | --- |
 | **Workflow Patterns Repository** | Property template validation and FLTL pattern verification | van der Aalst et al. |
 | **LTL Benchmark Suite** | SPOT model checking infrastructure testing | Spot.lrde.epita.fr |
 | **Custom Synthetic Mutants** | Controlled defect injection for pipeline self-validation | Internally generated |
@@ -578,9 +599,10 @@ The **FLOW-BENCH** dataset [11] serves as the primary evaluation corpus for Modu
 ### 8.3 Synthetic Data Generation for Module 03 Self-Validation
 
 A **synthetic data generation protocol** injects controlled defects to validate the equivalence engine itself:
-- **Benign variations:** loop unrolling variants, variable renaming, redundant assignment insertion (should cluster together).
-- **Structural anomalies:** omitted business constraints, process drift, unauthorized shortcut paths (should isolate as singletons).
-- **Divergent implementations:** non-terminating loops, infinite stuttering sequences (should fail divergence-sensitivity checks).
+
+* **Benign variations:** loop unrolling variants, variable renaming, redundant assignment insertion (should cluster together).
+* **Structural anomalies:** omitted business constraints, process drift, unauthorized shortcut paths (should isolate as singletons).
+* **Divergent implementations:** non-terminating loops, infinite stuttering sequences (should fail divergence-sensitivity checks).
 
 These synthetic variants enable rigorous measurement of **Equivalence Classification Accuracy** against manually annotated ground truth [Interim Report, §4.4.1.1].
 
@@ -632,19 +654,22 @@ flowchart LR
     C3 --> O1
     C4 --> O2
     C6 --> O3
+
 ```
 
 ### 9.2 Processing Pipeline Detail
 
 **Step 1 — WIR JSON Ingestion:**
 The pipeline ingests validated WIR files from `data/processed/irs/` (e.g., `uid_1.json` through `uid_15.json` in the current development set). Each WIR contains:
-- **`nodes` array** — state identifiers with semantic labels.
-- **`edges` array** — transitions with source, destination, guard conditions, and action references.
-- **`wir_type` layer** — type inferences for BDD variable construction.
-- **`wir_proc` layer** — process semantics including task boundaries and parallel block identifiers.
+
+* **`nodes` array** — state identifiers with semantic labels.
+* **`edges` array** — transitions with source, destination, guard conditions, and action references.
+* **`wir_type` layer** — type inferences for BDD variable construction.
+* **`wir_proc` layer** — process semantics including task boundaries and parallel block identifiers.
 
 **Step 2 — Advanced Lifter Execution:**
 The `MCodeLifter` class (Python prototype) or `m_code_lifter.cpp` (production C++) executes:
+
 1. Parse WIR nodes → instantiate mathematical states (S_0, S_1, ..., S_n).
 2. Designate initial state from WIR start event.
 3. Map node IDs to semantic action labels via the 3-tier matching engine.
@@ -656,6 +681,7 @@ The `MCodeLifter` class (Python prototype) or `m_code_lifter.cpp` (production C+
 
 **Step 3 — Divergence-Sensitive Stuttering Bisimulation:**
 The `StutteringEngine` class executes:
+
 1. Extract observable signatures (incoming/outgoing labels + divergence status).
 2. Compute silent subgraph (τ-transitions + signature-equivalent transitions).
 3. Compute reflexive-transitive closure of silent reachability.
@@ -665,51 +691,24 @@ The `StutteringEngine` class executes:
 7. Output: minimized quotient automaton + equivalence class mapping.
 
 **Step 4 — Clustering and Representative Selection:**
-1. Compute SHA-256 hash of canonical graph serialization for each quotient.
-2. Group identical hashes → initial identity clusters (linear time).
-3. Execute pairwise bisimulation for unique hashes → refine clusters.
-4. Isolate singletons (non-clustering implementations) as anomalies.
-5. Select `LTS_rep` per cluster (lowest cyclomatic complexity).
+
+1. Evaluate graph isomorphism (`spot::are_isomorphic`) on the minimized quotient automata.
+2. Group isomorphic graphs into behavioral equivalence clusters.
+3. Isolate singletons (non-clustering implementations) as anomalies.
+4. Select `LTS_rep` per cluster (lowest cyclomatic complexity).
 
 **Step 5 — Synchronous Product and Emptiness Check:**
+
 1. Translate property suite `P` (FLTL → LTLf → Büchi automaton A_¬φ).
 2. Compute `spot::product(LTS_rep, A_¬φ)` with BDD-conjoined guards.
 3. Execute `spot::couvreur99(product)` emptiness check.
 4. If empty → PASS (conformance proven). If non-empty → extract counter-example.
 
 **Step 6 — Diagnostic Propagation:**
+
 1. Translate counter-example BDD path → human-readable action sequence.
 2. Propagate verdict to all cluster members.
 3. Map violating transitions back to original Python code lines.
-
-### 9.3 Data Schemas
-
-**Canonical LTS Serialization Schema (for deterministic hashing):**
-```json
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "CanonicalLTS",
-  "type": "object",
-  "properties": {
-    "initial_state": { "type": "string" },
-    "states": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
-    "transitions": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "from": { "type": "string" },
-          "to": { "type": "string" },
-          "guard": { "type": "string" },
-          "label": { "type": "string" }
-        },
-        "required": ["from", "to", "guard", "label"]
-      }
-    }
-  },
-  "required": ["initial_state", "states", "transitions"]
-}
-```
 
 ---
 
@@ -720,21 +719,25 @@ Module 3 employs a **multi-layered validation methodology** combining mathematic
 ### 10.1 Mathematical Validation
 
 **Algorithm Correctness:**
-- The partition refinement algorithm implements the **Groote-Vaandrager** procedure, which has been proven to achieve **O(m log n)** time complexity for stuttering equivalence computation [28].
-- Divergence-sensitivity is enforced through **bottom state isolation**, mathematically ensuring that divergent states (capable of infinite τ-sequences) are never merged with non-divergent states in the quotient automaton [24].
-- The synchronous product construction (`LTS_rep ⊗ A_¬φ`) is a direct application of the classical automata-theoretic model checking paradigm, where emptiness implies property satisfaction by construction [31].
+
+* The partition refinement algorithm implements the **Groote-Vaandrager** procedure, which has been proven to achieve **O(m log n)** time complexity for stuttering equivalence computation [28].
+* Divergence-sensitivity is enforced through **bottom state isolation**, mathematically ensuring that divergent states (capable of infinite τ-sequences) are never merged with non-divergent states in the quotient automaton [24].
+* The synchronous product construction (`LTS_rep ⊗ A_¬φ`) is a direct application of the classical automata-theoretic model checking paradigm, where emptiness implies property satisfaction by construction [31].
 
 **BDD Variable Consistency:**
-- A single `bdd_dict_ptr` is shared across all automata (all code variants + specification model), ensuring that atomic propositions are allocated consistently. This guarantees that conjunction operations during synchronous product construction operate on compatible Boolean variable spaces [Execution Plan, §2.1].
+
+* A single `bdd_dict_ptr` is shared across all automata (all code variants + specification model), ensuring that atomic propositions are allocated consistently. This guarantees that conjunction operations during synchronous product construction operate on compatible Boolean variable spaces [Execution Plan, §2.1].
 
 **Conservative Over-Approximation:**
-- For Union/Unresolved types, transitions are flagged as "may be satisfiable" rather than strictly satisfiable. This conservative approach ensures the equivalence engine **never produces false positives** — if a model passes verification despite over-approximation, it is definitively safe [Execution Plan, §2.1].
+
+* For Union/Unresolved types, transitions are flagged as "may be satisfiable" rather than strictly satisfiable. This conservative approach ensures the equivalence engine **never produces false positives** — if a model passes verification despite over-approximation, it is definitively safe [Execution Plan, §2.1].
 
 ### 10.2 Equivalence Classification Accuracy
 
 The primary empirical metric for Module 3 is **Equivalence Classification Accuracy**: the percentage of correctly classified baseline scripts into the three hierarchical tiers (~fun, ~trace, ~proc) against manually annotated ground truth.
 
 **Measurement Protocol:**
+
 1. Ingest pre-labeled FLOW-BENCH implementations (human experts annotated as clustered or isolated).
 2. Process each script through the Module 03 pipeline.
 3. Compare automated tier assignments against manual labels.
@@ -744,40 +747,42 @@ The primary empirical metric for Module 3 is **Equivalence Classification Accura
 
 ### 10.3 Determinism Verification
 
-The `verify_determinism.py` module executes **10 iteration rounds** per UID:
-1. Lift the same WIR JSON 10 times.
-2. Compute SHA-256 hash of the resulting M_code each time.
-3. Verify all 10 hashes are identical.
-4. Report: `PASSED` (deterministic) or `FAILED` (inconsistent).
+The `verify_determinism.py` module executes determinism validation over generated variants:
 
-**Current result:** **100% pass rate** across all 15 UIDs in the development set [Repo Snapshot].
+1. Lift the same WIR JSON 10 times.
+2. Evaluate isomorphism (`spot::are_isomorphic`) across all 10 generated `M_code` instances.
+3. Verify all 10 instances are structurally and behaviorally identical.
+4. Report: `PASSED` (deterministic) or `FAILED` (inconsistent).
 
 ### 10.4 Mutation Sensitivity Analysis
 
 The pipeline's sensitivity to genuine structural defects is validated through:
-- **Benign mutation injection** (loop unrolling variants, variable renaming) → **must cluster** with originals.
-- **Structural anomaly injection** (omitted constraints, process drift) → **must isolate** as singletons.
-- **Divergent mutation injection** (`while True: pass`, infinite stutter) → **must fail** divergence-sensitivity checks.
+
+* **Benign mutation injection** (loop unrolling variants, variable renaming) → **must cluster** with originals.
+* **Structural anomaly injection** (omitted constraints, process drift) → **must isolate** as singletons.
+* **Divergent mutation injection** (`while True: pass`, infinite stutter) → **must fail** divergence-sensitivity checks.
 
 This confirms the engine's ability to **distinguish acceptable variation from genuine violation**.
 
 ### 10.5 Computational Complexity Benchmarking
 
 | BPMN Construct | BDD Variable Complexity | Baseline LTS States (Worst Case) | Post-Abstraction |
-|----------------|------------------------|----------------------------------|------------------|
+| --- | --- | --- | --- |
 | Sequential Tasks (n) | O(n) | O(n) | O(n) |
 | XOR Gateway (k branches) | O(k) | O(k · n) | O(k · n) |
 | Bounded Loop (bound m) | O(1) | O(m · n) | O(m · n) |
 | AND Gateway (k branches) | O(k) | O(k! · n) | **O(k)** |
 
 **Target benchmarks:**
-- Clustering overhead reduction: **O(num_scripts) → O(num_clusters)** (measured via profiling).
-- Partition refinement: maintain **O(m log n)** empirically (measured via timing instrumentation).
-- BDD memory compression: track BDD node count vs. explicit state representation.
+
+* Clustering overhead reduction: **O(num_scripts) → O(num_clusters)** (measured via profiling).
+* Partition refinement: maintain **O(m log n)** empirically (measured via timing instrumentation).
+* BDD memory compression: track BDD node count vs. explicit state representation.
 
 ### 10.6 Differential Validation (Trust Paradox Mitigation)
 
 To empirically bound the reliability of the equivalence engine itself:
+
 1. Select manually verified reference implementations from FLOW-BENCH.
 2. Guarantee algorithmically lifted `LTS_code` is strictly bisimilar to hand-crafted `LTS_ref`.
 3. Target: **≥ 95% accuracy** against ground-truth references.
@@ -786,9 +791,10 @@ To empirically bound the reliability of the equivalence engine itself:
 ### 10.7 EQI-Gated Verification Soundness
 
 The three-tier EQI certificate system provides **adaptive verification soundness**:
-- **Tier 1 (GREEN, EQI ≥ 0.90):** Full confidence in WIR accuracy → standard model checking produces definitive pass/fail.
-- **Tier 2 (YELLOW, 0.70 ≤ EQI < 0.90):** Conservative over-approximation of uncertain guards → if model passes, it is definitively safe but flagged for limited extraction visibility.
-- **Tier 3 (RED, EQI < 0.70):** Refusal to proceed → prevents unsound verification conclusions from low-quality extraction.
+
+* **Tier 1 (GREEN, EQI ≥ 0.90):** Full confidence in WIR accuracy → standard model checking produces definitive pass/fail.
+* **Tier 2 (YELLOW, 0.70 ≤ EQI < 0.90):** Conservative over-approximation of uncertain guards → if model passes, it is definitively safe but flagged for limited extraction visibility.
+* **Tier 3 (RED, EQI < 0.70):** Refusal to proceed → prevents unsound verification conclusions from low-quality extraction.
 
 This **prevents false positives** by refusing to issue verification verdicts on unreliable intermediate representations [Execution Plan, §4.3].
 
@@ -837,7 +843,3 @@ This **prevents false positives** by refusing to issue verification verdicts on 
 [32] C. K. Roy, J. R. Cordy, and R. Koschke, "Comparison and evaluation of code clone detection techniques and tools," *Science of Computer Programming*, vol. 74, no. 7, pp. 470–495, 2009.
 
 [33] M. Gabel, L. Jiang, and Z. Su, "Scalable detection of semantic clones," in *Proc. 30th ICSE*, 2008, pp. 321–330.
-
----
-
-*This document was prepared as Module 03 technical documentation for the VibeCheck Framework — a verified translation validation framework for LLM-generated Python workflow code. All terminology (M_spec, M_code, WIR, approx_proc, EQI, LTS_code, LTS_rep, tau, SPOT, BuDDy) is consistent with the VibeCheck Interim Report and associated technical blueprints.*
