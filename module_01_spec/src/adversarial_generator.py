@@ -51,9 +51,9 @@ class AdversarialGenerator:
             if len(trace) >= 2:
                 event_a = trace[0]
                 event_b = trace[-1]
-                # If trace is A then B, we kill it by forbidding B without A, 
-                # or just directly forbidding the exact sub-sequence.
-                # Simplified LTLf constraint against this anomaly:
-                killers.append(f"!(F({event_b} & !O({event_a})))")
+                # Since the LTLf evaluator doesn't support the Past operator O(...),
+                # we forbid the exact invalid transition (A directly followed by B)
+                # using the Next operator X(...) which is supported.
+                killers.append(f"!(F({event_a} & X({event_b})))")
         
         return killers

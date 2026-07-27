@@ -18,6 +18,7 @@ class SemanticExtractionEngine:
 
     EXECUTABLE_NODES = [
         'startEvent', 'endEvent', 'task', 'userTask', 'serviceTask', 'scriptTask', 'manualTask',
+        'receiveTask', 'sendTask', 'businessRuleTask',
         'exclusiveGateway', 'parallelGateway', 'inclusiveGateway', 'boundaryEvent',
         'subProcess', 'callActivity', 'eventBasedGateway',
         'intermediateCatchEvent', 'intermediateThrowEvent'
@@ -121,7 +122,7 @@ class SemanticExtractionEngine:
                     if 'task' in node_type.lower():
                         props = [f"start({clean_name})", f"done({clean_name})"]
                     else:
-                        props = [clean_name]
+                        props = [f"node({clean_name})"]
 
                     state_dict = {
                         "node_id": node_id,

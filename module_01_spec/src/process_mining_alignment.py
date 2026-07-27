@@ -7,8 +7,8 @@ class AlignmentException(Exception):
 class ProcessMiningAlignment:
     """
     Phase 5: Reverse Process Mining Alignment for Semantic Validation.
-    Computes Extraction Alignment Score (EAS) between LTLf traces and BPMN model.
-    Includes a Native Alignment Engine fallback for environments where PM4Py is blocked.
+    Computes Extraction Alignment Score (EAS) between LTLf traces and BPMN model
+    using a Native Alignment Engine.
     """
     def __init__(self, bpmn_xml: str, ltlf_traces: List[List[Set[str]]], semantic_graph: Dict[str, Any] = None):
         self.bpmn_xml = bpmn_xml
