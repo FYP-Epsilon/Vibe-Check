@@ -18,16 +18,16 @@
 
 ## Table of Contents
 
-1. [Description of the Module](https://www.google.com/search?q=%231-description-of-the-module)
-2. [Current Approaches (Literature / Previous Tryouts)](https://www.google.com/search?q=%232-current-approaches-literature--previous-tryouts)
-3. [Current Gap in the Field](https://www.google.com/search?q=%233-current-gap-in-the-field)
-4. [Our Approach to the Module](https://www.google.com/search?q=%234-our-approach-to-the-module)
-5. [Novelty & Scientific Contribution](https://www.google.com/search?q=%235-novelty--scientific-contribution)
-6. [What We Have Done So Far](https://www.google.com/search?q=%236-what-we-have-done-so-far)
-7. [What is Left to Do](https://www.google.com/search?q=%237-what-is-left-to-do)
-8. [About the Dataset](https://www.google.com/search?q=%238-about-the-dataset)
-9. [Dataset Handling and Processing](https://www.google.com/search?q=%239-dataset-handling-and-processing)
-10. [Validation Strategy](https://www.google.com/search?q=%2310-validation-strategy)
+1. [Description of the Module](#1-description-of-the-module)
+2. [Current Approaches (Literature / Previous Tryouts)](#2-current-approaches-literature--previous-tryouts)
+3. [Current Gap in the Field](#3-current-gap-in-the-field)
+4. [Our Approach to the Module](#4-our-approach-to-the-module)
+5. [Novelty & Scientific Contribution](#5-novelty--scientific-contribution)
+6. [What We Have Done So Far](#6-what-we-have-done-so-far)
+7. [What is Left to Do](#7-what-is-left-to-do)
+8. [About the Dataset](#8-about-the-dataset)
+9. [Dataset Handling and Processing](#9-dataset-handling-and-processing)
+10. [Validation Strategy](#10-validation-strategy)
 
 ---
 
