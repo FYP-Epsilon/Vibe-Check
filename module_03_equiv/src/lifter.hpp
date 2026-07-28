@@ -1,6 +1,6 @@
 //lifter.hpp
 //
-// Phase A + B: Lifting WIR → SPOT twa_graph + Stuttering Bisimulation
+// Phase A + B + D: Lifting WIR → SPOT twa_graph + Stuttering Bisimulation + Model Checking
 // =====================================================================
 // Core C++ engine for the VibeCheck 3-Phase Post-Hoc Auditor.
 // Transforms Module 02's Workflow Intermediate Representation (WIR)
@@ -212,6 +212,42 @@ private:
                                        const std::vector<unsigned>& partition,
                                        unsigned num_blocks);
 };
+
+// ---------------------------------------------------------------------------
+// Phase D — Compliance Result
+// ---------------------------------------------------------------------------
+
+/**
+ * @brief Result of checking a code automaton against an LTL specification.
+ *
+ * Produced by check_compliance(). If is_compliant is true, the code satisfies
+ * the property and counter_example_trace is empty. Otherwise, the trace
+ * contains a human-readable description of the accepting run of the
+ * synchronous product (code ⊗ ¬φ).
+ */
+struct ComplianceResult {
+    bool is_compliant = true;                   ///< True if PASS, false if FAIL.
+    std::string counter_example_trace;          ///< Empty if PASS; formatted trace if FAIL.
+};
+
+/**
+ * @brief Model-check a code automaton against an LTL property string.
+ *
+ * Algorithm:
+ *   1. Parse ltl_string via spot::parse_infix_psl().
+ *   2. Negate the formula (violation property).
+ *   3. Translate the negated formula into a Büchi automaton using the
+ *      SAME bdd_dict as code_aut (critical for correct product).
+ *   4. Compute the synchronous product: code_aut ⊗ violation_aut.
+ *   5. Run emptiness check on the product.
+ *   6. If the product is empty → PASS; otherwise → FAIL with counter-example.
+ *
+ * @param code_aut   The automaton to check (must have Büchi acceptance).
+ * @param ltl_string An LTL/PSL formula string (SPOT infix syntax).
+ * @return ComplianceResult with verdict and optional counter-example.
+ */
+ComplianceResult check_compliance(const spot::twa_graph_ptr& code_aut,
+                                  const std::string& ltl_string);
 
 // ---------------------------------------------------------------------------
 // Free function — convenience Pybind11 entry point

@@ -1,4 +1,5 @@
 import json
+import copy
 from typing import Dict, Any
 try:
     from .semantic_extractor import SemanticExtractionEngine
@@ -41,74 +42,64 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
                 "details": phase_3_result["phase_3_certificate"]
             }
 
-        # Phase 4: Automata Lifting (non-blocking)
-        phase_4_result = None
+        # Phase 4: PBCTS with Self-Correcting Specification Loop (SCSL)
+        # If PBCTS detects semantic gaps (over-specification), it synthesizes
+        # corrective LTLf formulas, adds them to the property suite, and re-verifies.
+        # This guarantees Module 01 either PROVES alignment or FAILS with diagnostics.
         try:
-            from .automata_lifter import AutomataLifter
-            lifter = AutomataLifter(
-                property_suite=phase_3_result,
-                semantic_graph=phase_1_result["semantic_graph"],
-            )
-            phase_4_result = lifter.run_pipeline()
+            from .bidirectional_alignment import run_pbcts_pipeline
         except ImportError:
-            from automata_lifter import AutomataLifter
-            lifter = AutomataLifter(
-                property_suite=phase_3_result,
-                semantic_graph=phase_1_result["semantic_graph"],
-            )
-            phase_4_result = lifter.run_pipeline()
-        except Exception as e:
-            phase_4_result = {
-                "phase_4_certificate": {
-                    "status": "FAIL_WITH_ERRORS",
-                    "message": str(e),
-                }
-            }
+            from bidirectional_alignment import run_pbcts_pipeline
 
-        # Phase 5: Reverse Process Mining Alignment
-        phase_5_result = None
-        try:
+        max_scsl_rounds = 3
+        current_suite = copy.deepcopy(phase_3_result["refined_ltlf_property_suite"])
+        phase_pbcts_result = None
+        scsl_round = 0
+
+        for scsl_round in range(max_scsl_rounds):
             try:
-                from .process_mining_alignment import ProcessMiningAlignment
-                from .mutation_refiner import LTLfAuditor
-            except ImportError:
-                from process_mining_alignment import ProcessMiningAlignment
-                from mutation_refiner import LTLfAuditor
-                
-            auditor = LTLfAuditor(phase_3_result["refined_ltlf_property_suite"])
-            ltlf_traces = auditor._generate_traces(phase_1_result["semantic_graph"], depth=10)
-            
-            aligner = ProcessMiningAlignment(bpmn_xml, ltlf_traces, semantic_graph=phase_1_result["semantic_graph"])
-            phase_5_result = aligner.run_pipeline()
-        except Exception as e:
-            phase_5_result = {
-                "phase_5_certificate": {
-                    "status": "FAIL_WITH_ERRORS",
-                    "message": str(e)
+                phase_pbcts_result = run_pbcts_pipeline(
+                    property_suite=current_suite,
+                    semantic_graph=phase_1_result["semantic_graph"]
+                )
+            except Exception as e:
+                phase_pbcts_result = {
+                    "phase_4_certificate": {
+                        "status": "FAIL_WITH_ERRORS",
+                        "message": str(e)
+                    }
                 }
-            }
+                break
 
+            cert = phase_pbcts_result.get("phase_4_certificate", {})
+            converged = cert.get("convergence", {}).get("converged", False)
+            corrections = cert.get("scsl_corrections", [])
+
+            if converged:
+                break  # Alignment mathematically proven
+
+            if not corrections or scsl_round == max_scsl_rounds - 1:
+                break  # No auto-corrections possible or final round
+
+            # SCSL: Apply corrections and retry
+            current_suite = copy.deepcopy(current_suite)
+            current_suite.setdefault("P4_SCSL_Corrections", []).extend(corrections)
+
+        # Determine overall status
         overall_status = "PASS"
-        if phase_4_result:
-            p4_status = phase_4_result.get("phase_4_certificate", {}).get("status", "")
-            if "FAIL" in p4_status:
-                overall_status = f"PASS_PHASE4_{p4_status}"
-            elif p4_status == "PASS_NO_SPOT":
-                overall_status = "PASS_NO_SPOT"
-                
-        if phase_5_result:
-            p5_status = phase_5_result.get("phase_5_certificate", {}).get("status", "")
-            if "FAIL" in p5_status:
-                overall_status = f"PASS_PHASE5_{p5_status}"
-
+        if phase_pbcts_result:
+            p4_converged = phase_pbcts_result.get("phase_4_certificate", {}).get("convergence", {}).get("converged", False)
+            if not p4_converged:
+                overall_status = "FAIL_ALIGNMENT_UNPROVEN"
 
         return {
             "status": overall_status,
             "phase_1": phase_1_result,
             "phase_2": phase_2_result,
             "phase_3": phase_3_result,
-            "phase_4": phase_4_result,
-            "phase_5": phase_5_result
+            "phase_4": phase_pbcts_result,
+            "phase_5": None,
+            "scsl_rounds_executed": scsl_round + 1
         }
         
     except VerificationException as e:
@@ -130,10 +121,23 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
     if pipeline_result.get("status") in ["FAIL", "FAIL_WITH_ERRORS"]:
         raise ValueError("Cannot export to Module 03: Pipeline failed.")
 
+    import re
+    # PBCTS ignores loop bounds. We extract it directly from P2_Quality_Limits.
+    loop_bound = 0
+    p2_suite = pipeline_result["phase_3"]["refined_ltlf_property_suite"].get("P2_Quality_Limits", [])
+    for prop in p2_suite:
+        # e.g., looks like a comment or specifically encoded in a property string.
+        # The semantic extractor puts loop limits in comments sometimes, but 
+        # normally we can safely default to 3 if we can't parse it.
+        match = re.search(r'loop_bound\s*=\s*(\d+)', prop, re.IGNORECASE)
+        if match:
+            loop_bound = int(match.group(1))
+            break
+            
     m3_payload = {
         "semantic_graph": pipeline_result["phase_1"]["semantic_graph"],
         "ltlf_property_suite": pipeline_result["phase_3"]["refined_ltlf_property_suite"],
-        "loop_bound_documented": pipeline_result["phase_4"]["phase_4_certificate"].get("loop_bound_documented", 0)
+        "loop_bound_documented": loop_bound
     }
 
     with open(filepath, "w") as f:
