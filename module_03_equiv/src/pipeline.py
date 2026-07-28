@@ -1,12 +1,12 @@
 """
 Module 03 — Equivalence Checking Engine: Main Pipeline Orchestrator
 =====================================================================
-Executes the full 4-phase pure Python pipeline:
+Executes the full 4-phase pipeline:
 
-    Phase A → WIR Lifter (lifter.py)
-    Phase B → Stuttering Bisimulation Engine (stuttering_engine.py)
-    Phase C → Pairwise Behavioural Clustering (clustering.py)
-    Phase D → Finite-Trace Reachability Model Checker (model_checker.py)
+    Phase A → WIR Lifter (lifter.py / C++ vibecheck_lifter)
+    Phase B → Stuttering Bisimulation Engine
+    Phase C → Pairwise Behavioural Clustering
+    Phase D → LTL Model Checking via Synchronous Product (C++)
 
 Usage::
 
@@ -54,6 +54,7 @@ def process_wir_batch(
     wir_json_strings: list[str],
     *,
     bpmn_tasks: list[str] | None = None,
+    ltl_property: str = 'G("approved")',
 ) -> dict:
     """
     Process a batch of WIR JSON strings through the C++ engine.
@@ -78,11 +79,11 @@ def process_wir_batch(
         A dict with keys:
             ``quotients``  — list of minimized TwaGraph objects.
             ``diagnostics`` — list of LifterDiagnostics (one per input).
-            ``clusters``   — dict[cluster_id] → {indices, representative}.
+            ``clusters``   — dict[cluster_id] → {indices, representative, compliance}.
 
-    Raises:
-        RuntimeError: If the C++ engine is not available.
-    """
+        Raises:
+            RuntimeError: If the C++ engine is not available.
+        """
     if not HAS_CPP_ENGINE:
         raise RuntimeError(
             "vibecheck_lifter C++ module not available. "
@@ -135,6 +136,38 @@ def process_wir_batch(
         len(wir_json_strings),
         len(clusters),
     )
+
+    # ── Step 5: Phase D — Model check each representative ───────────────
+    logger.info("Phase D: Model checking with LTL property: %s", ltl_property)
+
+    for cid, cluster_info in clusters.items():
+        rep = cluster_info["representative"]
+        try:
+            compliance = _cpp.check_compliance(rep, ltl_property)
+            cluster_info["compliance"] = {
+                "ltl_property": ltl_property,
+                "is_compliant": compliance.is_compliant,
+                "verdict": "PASS" if compliance.is_compliant else "FAIL",
+                "counter_example_trace": compliance.counter_example_trace,
+            }
+            verdict_icon = "✅" if compliance.is_compliant else "❌"
+            logger.info(
+                "  Cluster %d: %s %s",
+                cid,
+                verdict_icon,
+                "PASS" if compliance.is_compliant else "FAIL",
+            )
+        except Exception as exc:
+            logger.warning(
+                "  Cluster %d: Phase D error: %s", cid, exc
+            )
+            cluster_info["compliance"] = {
+                "ltl_property": ltl_property,
+                "is_compliant": None,
+                "verdict": "ERROR",
+                "counter_example_trace": "",
+                "error": str(exc),
+            }
 
     return {
         "quotients": quotients,
