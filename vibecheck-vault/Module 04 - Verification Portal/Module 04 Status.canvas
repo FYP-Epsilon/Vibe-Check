@@ -1,0 +1,85 @@
+{
+  "nodes": [
+    {
+      "id": "title",
+      "type": "text",
+      "text": "# Module 04 — Verification Portal: Status\nStreamlit UI (`ui-engine`, port 8501)",
+      "x": 230,
+      "y": -260,
+      "width": 480,
+      "height": 100,
+      "color": "6"
+    },
+    {
+      "id": "working-http",
+      "type": "text",
+      "text": "**Working: Modules 01/02 pages**\nSpec and Extract pages work fine — they call their engines over HTTP and the sidebar dots are real `GET /docs` health checks (2s timeout)",
+      "x": 0,
+      "y": -80,
+      "width": 420,
+      "height": 150,
+      "color": "4"
+    },
+    {
+      "id": "naming-fixed",
+      "type": "text",
+      "text": "**Fixed: naming collision**\nEarlier UI confused V1/V2/V3 verification layers with module numbers — resolved",
+      "x": 520,
+      "y": -80,
+      "width": 420,
+      "height": 150,
+      "color": "4"
+    },
+    {
+      "id": "broken-equiv",
+      "type": "text",
+      "text": "**BROKEN by construction: Equiv page**\nDoes in-process `import vibecheck_lifter` inside the `ui-engine` container, which has **no SPOT and no lifter module**. The error message itself tells the user to run it in the equiv-engine container",
+      "x": 0,
+      "y": 130,
+      "width": 420,
+      "height": 190,
+      "color": "1"
+    },
+    {
+      "id": "broken-artifact",
+      "type": "text",
+      "text": "**Improved, still dead on macOS**\nThe committed Linux x86-64 `.so` was removed from git (`*.so` gitignored) — but with no locally built lifter, the in-process import still fails on the maintainer's host",
+      "x": 520,
+      "y": 130,
+      "width": 420,
+      "height": 190,
+      "color": "1"
+    },
+    {
+      "id": "zero-tests",
+      "type": "text",
+      "text": "**Zero tests**\nNo test suite exists for Module 04",
+      "x": 0,
+      "y": 380,
+      "width": 420,
+      "height": 110,
+      "color": "1"
+    },
+    {
+      "id": "networkx",
+      "type": "text",
+      "text": "**Caveat: `networkx` unused**\nPresent in `module_04_ui/requirements.txt` but never imported — noted, not silently assumed dead",
+      "x": 520,
+      "y": 380,
+      "width": 420,
+      "height": 130,
+      "color": "3"
+    },
+    {
+      "id": "wiki-pending",
+      "type": "text",
+      "text": "**Pending: owner review**\nWiki page written directly from source (no design doc exists) — marked *pending owner review*",
+      "x": 260,
+      "y": 570,
+      "width": 420,
+      "height": 130,
+      "color": "3"
+    }
+  ],
+  "edges": []
+}

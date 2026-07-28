@@ -1,0 +1,17 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# Module 01 — Implementation Status\nAs of 2026-07-28 (main @ 7089711) — candid engineering status board","x":-360,"y":-480,"width":1520,"height":100,"color":"6"},
+		{"id":"status-done","type":"text","text":"## ✅ Done\n- **4-phase pipeline** (~1,950 LOC, 11 src files)\n- Phase 4 **PBCTS**: LTLf progression + trace synthesis + BDA + IDCD + SCSL → Formal Reliability Certificate v2.0\n- Dynamic extractor with recovery pass; multi-round Phase 3 self-healing","x":-360,"y":-300,"width":360,"height":180,"color":"4"},
+		{"id":"critical-gap","type":"text","text":"## ⛔ Handoff still one-sided\nExports exist: `module_03_input.json` (LTLf suite) + `module_02_input.json` (task_patterns — **Module 02 actually consumes this one**).\nBut **nothing in Module 03 ingests the LTLf suite** — and M03's `check_compliance` expects SPOT LTL (infinite-trace) while M01 produces LTLf (finite-trace): **no bridge**.\n\n**Blocks:** end-to-end spec ↔ code verification","x":60,"y":-320,"width":420,"height":220,"color":"1"},
+		{"id":"startup-bug","type":"text","text":"## ⛔ STARTUP BUG\n`main.py:11,16` still imports the deleted `automata_lifter` → FastAPI app (and Docker `uvicorn` CMD) raises `ModuleNotFoundError` on startup.\n**The spec-engine service is down.**\nAlso: status codes inconsistent (`FAIL_ALIGNMENT_UNPROVEN` vs `PASS_PBCTS_UNCONVERGED`).","x":980,"y":-300,"width":360,"height":200,"color":"1"},
+		{"id":"zero-tests","type":"text","text":"## ⛔ ZERO tests — 3rd cycle running\nSuite + eval harness were deleted last cycle; the PBCTS pivot then rewrote Phase 4/5 with **no tests added**.\nGates (100% coverage, δ ≥ 1.0, IDCD convergence) asserted, never exercised.","x":-360,"y":-60,"width":360,"height":180,"color":"1"},
+		{"id":"docs-mismatch","type":"text","text":"## ⚠ Docs & dead weight\n- `docs/` was **removed from the repo** (develop @ 05fae60) — copies survive in the vault ([[Module 01 Repo Docs Index]]); the module_summery page remains **doubly stale** there.\n- Dockerfile still builds SPOT 2.11.6 from source — nothing imports it anymore.\n- `formula_normalizer.py` docstrings still promise SPOT grammar.","x":60,"y":-60,"width":400,"height":180,"color":"3"},
+		{"id":"verdict","type":"text","text":"## Verdict\n**Real progress, real churn.** PBCTS is a cleaner, stdlib-only Phase 4 — but it replaced a SPOT implementation that was itself one day old, and the module ships with a startup crash and zero tests.","x":540,"y":-60,"width":400,"height":150,"color":"3"},
+		{"id":"module03-link","type":"text","text":"## Module 03 (Equivalence Engine)\nNow has **all 4 phases in C++** incl. SPOT model checking (`check_compliance`).\nWaiting on: LTLf→LTL bridge + ingestion of `module_03_input.json`.","x":540,"y":-300,"width":340,"height":140,"color":"5"},
+		{"id":"next-actions","type":"text","text":"## Next actions (implied)\n1. **Fix the `main.py` import** (service is down)\n2. Build LTLf→LTL bridge + wire the suite into M03 `process_wir_batch`\n3. Restore tests; drop SPOT from Dockerfile","x":60,"y":160,"width":400,"height":160,"color":"2"}
+	],
+	"edges":[
+		{"id":"e1","fromNode":"critical-gap","fromSide":"right","toNode":"module03-link","toSide":"left","label":"still blocks"},
+		{"id":"e2","fromNode":"status-done","fromSide":"right","toNode":"critical-gap","toSide":"left","label":"Phases ≠ wired"}
+	]
+}
