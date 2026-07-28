@@ -1,0 +1,91 @@
+VibeCheck LTLf->LTL bridge — raw verification log
+Generated: 2026-07-28T21:15:04Z
+SPOT build: /tmp/spot-2.11.6/bin/ltlfilt (spot) 2.11.6 (source tarball spot-2.11.6.tar.gz, configure.ac AC_INIT=2.11.6)
+Repo: /Users/kavindu/Projects/Vibe-Check @ b791f2d
+
+== E1: from_ltlf exists at 2.11.6 ==
+spot/tl/ltlf.hh:49  SPOT_API formula from_ltlf(formula f, const char* alive = "alive");
+spot/twaalgos/remprop.hh:55  to_finite(const_twa_graph_ptr, const char* alive = "alive");
+
+== E2: translation of each real M01 property ==
+  [OK] P0_Critical_Sentinels
+      ltlf : !done(Approve) W start(Approve)
+      sane : !done_Approve W start_Approve
+      ltl  : alive & ((!alive | !done_Approve) W start_Approve) & (alive U G!alive)
+  [OK] P0_Critical_Sentinels
+      ltlf : !done(Reject) W start(Reject)
+      sane : !done_Reject W start_Reject
+      ltl  : alive & ((!alive | !done_Reject) W start_Reject) & (alive U G!alive)
+  [OK] P1_Structural_Control_Flow
+      ltlf : !node(xor_gate) W node(start_event)
+      sane : !node_xor_gate W node_start_event
+      ltl  : alive & ((!alive | !node_xor_gate) W node_start_event) & (alive U G!alive)
+  [OK] P1_Structural_Control_Flow
+      ltlf : !start(Approve) W node(xor_gate)
+      sane : !start_Approve W node_xor_gate
+      ltl  : alive & ((!alive | !start_Approve) W node_xor_gate) & (alive U G!alive)
+  [OK] P1_Structural_Control_Flow
+      ltlf : !start(Reject) W node(xor_gate)
+      sane : !start_Reject W node_xor_gate
+      ltl  : alive & ((!alive | !start_Reject) W node_xor_gate) & (alive U G!alive)
+  [OK] P1_Structural_Control_Flow
+      ltlf : !node(end_event) W done(Approve)
+      sane : !node_end_event W done_Approve
+      ltl  : alive & ((!alive | !node_end_event) W done_Approve) & (alive U G!alive)
+  [OK] P1_Structural_Control_Flow
+      ltlf : !node(end_event) W done(Reject)
+      sane : !node_end_event W done_Reject
+      ltl  : alive & ((!alive | !node_end_event) W done_Reject) & (alive U G!alive)
+  [OK] P1_Structural_Control_Flow
+      ltlf : !node(end_event) W node(start_event)
+      sane : !node_end_event W node_start_event
+      ltl  : alive & ((!alive | !node_end_event) W node_start_event) & (alive U G!alive)
+  [OK] P1_Structural_Control_Flow
+      ltlf : !start(Approve) W node(start_event)
+      sane : !start_Approve W node_start_event
+      ltl  : alive & ((!alive | !start_Approve) W node_start_event) & (alive U G!alive)
+  [OK] P1_Structural_Control_Flow
+      ltlf : !start(Reject) W node(start_event)
+      sane : !start_Reject W node_start_event
+      ltl  : alive & ((!alive | !start_Reject) W node_start_event) & (alive U G!alive)
+  [OK] P1_Structural_Control_Flow
+      ltlf : G(start(Approve) -> !start(Reject))
+      sane : G(start_Approve -> !start_Reject)
+      ltl  : alive & G(!alive | (start_Approve -> !start_Reject)) & (alive U G!alive)
+  [OK] P2_Quality_Limits
+      ltlf : G(iteration_count <= 10 -> F(process_complete))
+      sane : G("iteration_count <= 10" -> F(process_complete))
+      ltl  : alive & G(!alive | ("iteration_count <= 10" -> F(alive & process_complete))) & (alive U G!alive)
+
+== E3: vacuity of current M03 pipeline (naive finite automaton) ==
+  naive code automaton (3 states, exit state has no outgoing edge, acceptance "t")
+  language of model alone            = EMPTY
+  product with !(raw LTLf property)  = EMPTY  => check_compliance verdict COMPLIANT
+  ground truth: the automaton fires done_Approve without start_Approve,
+                so it VIOLATES  !done_Approve W start_Approve  => FALSE PASS
+
+== E4: alive-instrumented automaton yields correct verdicts ==
+  violating model  -> VIOLATION (counterexample found)
+  compliant model  -> COMPLIANT
+
+== E5: differential validation M01 evaluate_ltlf vs SPOT(from_ltlf) ==
+agree=12600 disagree=0 rate=1.0000
+  (150 random formulas x 84 traces, depth 3, APs {a,b}; X mapped to X[!])
+
+== E6: strong-vs-weak X ==
+  spot bare X  : alive & X(a | !alive) & (alive U G!alive)
+  spot X[!]    : alive & X(a & alive) & (alive U G!alive)
+  M01 ltlf_eval.py:166-169  X at last index returns False  => STRONG X
+  spot ltlf.cc:37-39        op::X handled with (!alive | t(f0)) => WEAK X
+
+== E7: atom syntax acceptance by spot parser ==
+  !done(Approve) W start(Approve)                    => PARSE ERROR
+  !start_Approve W node(xor_gate)                    => PARSE ERROR
+  !done_Approve W start_Approve                      => PARSES
+  G(iteration_count <= 10 -> F(process_complete))    => PARSE ERROR
+  G("iteration_count <= 10" -> F(process_complete))  => PARSES
+
+== E8: divergent (never-terminating) code ==
+  alive-translated property is UNSATISFIABLE on any always-alive word
+  (conjunct 'alive U G!alive' forces eventual death)
+  => a while-True implementation is reported VIOLATION for every LTLf property

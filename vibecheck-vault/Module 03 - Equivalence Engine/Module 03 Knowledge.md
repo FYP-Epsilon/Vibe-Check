@@ -37,9 +37,20 @@ Verification behavior degrades according to Module 02's extraction confidence (E
 
 ## Status & Issues (2026-07-28, main @ `7089711`)
 
-- ✅ **C++/SPOT engine is now complete through Phase D** — real LTL model checking with counterexample extraction, wired into `process_wir_batch`; 113 tests total. The documented method is finally executable.
+- ✅ **C++/SPOT engine is now complete through Phase D** — real LTL model checking with counterexample extraction, wired into `process_wir_batch`; 113 tests total. The documented method is finally executable (caveat below — vacuous on non-looping automata until instrumented).
 - ✅ Resolved earlier: committed Linux `.so` removed from git; `module_summery` M03 doc rewritten.
 - ⛔ **Module 01 ingestion still missing:** zero references to `module_03_input.json` / property suites anywhere in `module_03_equiv`. `check_compliance` accepts SPOT infix **LTL** (infinite-trace semantics); Module 01 produces **LTLf** strings (finite-trace) — no LTLf→LTL bridge exists. The only caller passes the placeholder `'G("approved")'`, so spec↔code is mechanically possible but not integrated.
+- ⛔ **Latent vacuity bug in `check_compliance`, found via the P1.4 bridge investigation
+  (2026-07-29):** the lifter never sets an acceptance condition and exit states may have no
+  outgoing edge, so any non-looping (terminating) code automaton has an **empty ω-language** —
+  `check_compliance` returns `COMPLIANT` for *every* property, correct or not. Confirmed against
+  source (no `set_buchi`/`set_acceptance`/`set_generalized_buchi` anywhere in `lifter.cpp`;
+  `test_cpp_engine.py:404` documents it as intended semantics, `# vacuously true`). Dormant only
+  because the sole caller passes a hardcoded placeholder — becomes a silent false-PASS the
+  moment real properties are wired in. Also confirmed independently: code-side APs (bare BPMN
+  task names, e.g. `Approve`) and Module 01's spec-side atoms (`start_Approve`/`done_Approve`)
+  **do not intersect** — a second vacuity channel needing an event-lifecycle mapping layer.
+  Full findings: [[Bridge Investigation/P1.4 Bridge Findings|P1.4 Bridge Findings]].
 - ⚠ Phase D now exists in two flavors (legacy Python reachability in `run_pipeline`, SPOT LTL in `process_wir_batch`) — still no statement of which pipeline is canonical; `main.py` (80 LOC) remains the stale P1.1 milestone demo.
 
 ## Links
@@ -48,3 +59,4 @@ Verification behavior degrades according to Module 02's extraction confidence (E
 - [[Module 03 Architecture.canvas|Module 03 Architecture]]
 - [[Module 03 Status.canvas|Module 03 Status]]
 - [[Module 03 Repo Docs Index]]
+- [[Bridge Investigation/P1.4 Bridge Findings|P1.4 Bridge Findings]] — LTLf→LTL bridge investigation: vacuity bug, AP vocabulary gap

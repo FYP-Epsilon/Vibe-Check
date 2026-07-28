@@ -3,6 +3,10 @@
 > Post-hoc **verified translation validation**: formally checks whether LLM-generated Python workflow code conforms to its originating **BPMN 2.0** specification, producing a quantified, evidence-backed certificate rather than a proof.
 > FYP Group Epsilon, Faculty of IT, University of Moratuwa. Snapshot: **2026-07-28** (main @ `7089711`).
 
+## Roadmap
+
+- [[Next Steps]] — prioritized research roadmap: P0 breakage fixes → P1 wire M01→M03 (the headline e2e claim) → P2 measurement/CI → P3 hygiene + thesis parity
+
 ## Canvases
 
 - [[Project Architecture.canvas|Project Architecture]] — full dual-track pipeline, all four modules
