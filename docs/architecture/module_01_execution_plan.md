@@ -14,9 +14,9 @@ However, unlike traditional, passive parsers, Module 01 operates as a **Predicti
 
 ---
 
-## 2. The E2E Master Execution Pipeline (Phases 1–5)
+## 2. The E2E Master Execution Pipeline (Phases 1–4)
 
-Module 01 is structured into a rigorous 5-phase pipeline. Every phase enforces a mathematical **Quality Gate**. If a gate fails, the system halts with a detailed certificate of failure.
+Module 01 is structured into a rigorous 4-phase pipeline. Every phase enforces a mathematical **Quality Gate**. If a gate fails, the system halts with a detailed certificate of failure.
 
 ### Phase 1: Semantic Extraction (Syntactic Sanitization)
 **Objective:** Parse the BPMN XML, strip UI/DI elements, and extract a clean semantic Kripke structure.
@@ -34,14 +34,11 @@ Module 01 is structured into a rigorous 5-phase pipeline. Every phase enforces a
 * **PWBE (Property-Weighted Bisimulation Equivalence):** Intentionally mutates the semantic graph (e.g., swapping AND for XOR) to ensure the LTLf auditor successfully catches structural regressions.
 * **Adversarial Formal Specification:** Injects an LLM agent to hallucinate deceptive traces (e.g., skipping payment tasks while making the workflow look valid). The engine algorithmically compiles these hallucinations into `P3_Adversarial_Defenses` (Killer Properties).
 
-### Phase 4: Automata Lifting
-**Objective:** Convert the hardened LTLf formulas into deterministic Büchi Automata using the C++ `spot` library.
-* **Fail-Safe Logic:** If `spot` is unavailable (e.g., on Windows), the module gracefully degrades with a `PASS_NO_SPOT` certificate, passing the LTLf strings directly to Module 03 for downstream evaluation.
-
-### Phase 5: Reverse Process Mining Alignment
-**Objective:** A-priori Virtual Log verification.
-* **Virtual Tracing:** Uses the LTLf properties to generate thousands of theoretical execution logs before any actual code is written.
-* **EAS (Extraction Alignment Score):** Uses PM4PY to calculate trace fitness against the BPMN logic.
+### Phase 4: PBCTS (Progression-Based Constructive Trace Synthesis)
+**Objective:** A-priori Formal Verification without C++ or graph circularity.
+* **Inverted Progression Enumeration:** Synthesizes theoretical execution traces strictly from the LTLf formulas without generating automata.
+* **BDA (Bidirectional Differential Alignment):** Cross-compares formula traces against semantic graph traces to calculate exact set-difference extraction scores (EAS_BDA).
+* **IDCD (Iterative Deepening Convergence):** Automatically finds the necessary execution length bounds for completeness verification.
 
 ---
 
