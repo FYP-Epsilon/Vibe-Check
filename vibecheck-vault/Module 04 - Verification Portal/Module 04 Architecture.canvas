@@ -1,0 +1,221 @@
+{
+  "nodes": [
+    {
+      "id": "title",
+      "type": "text",
+      "text": "# Module 04 — Verification Portal Architecture\nStreamlit front end · `module_04_ui/src/app.py` (565 lines) · service `ui-engine` (python:3.11-slim, no SPOT)",
+      "x": 360,
+      "y": -340,
+      "width": 440,
+      "height": 130,
+      "color": "6"
+    },
+    {
+      "id": "browser",
+      "type": "text",
+      "text": "**User / Browser**\nOnly external entry point",
+      "x": 0,
+      "y": 0,
+      "width": 280,
+      "height": 110
+    },
+    {
+      "id": "ui-service",
+      "type": "text",
+      "text": "**`ui-engine` container**\nStreamlit app on host port **8501**\nThe *only* docker-compose service exposed on a host port — the three engines are internal services",
+      "x": 420,
+      "y": -40,
+      "width": 360,
+      "height": 170,
+      "color": "5"
+    },
+    {
+      "id": "page-dashboard",
+      "type": "text",
+      "text": "**Page: Dashboard**\nOverview + certificate figures",
+      "x": 880,
+      "y": -420,
+      "width": 320,
+      "height": 120
+    },
+    {
+      "id": "page-spec",
+      "type": "text",
+      "text": "**Page: Spec Engine**\nOne page per engine (1 of 3)",
+      "x": 880,
+      "y": -240,
+      "width": 320,
+      "height": 120
+    },
+    {
+      "id": "page-extract",
+      "type": "text",
+      "text": "**Page: Extract Engine**\nOne page per engine (2 of 3)",
+      "x": 880,
+      "y": -60,
+      "width": 320,
+      "height": 120
+    },
+    {
+      "id": "page-equiv",
+      "type": "text",
+      "text": "**Page: Equiv Engine**\nOne page per engine (3 of 3)\nThe only page that calls its engine **in-process**",
+      "x": 880,
+      "y": 120,
+      "width": 320,
+      "height": 150,
+      "color": "2"
+    },
+    {
+      "id": "spec-engine",
+      "type": "text",
+      "text": "**Spec Engine** (Module 01)\nInternal docker-compose service",
+      "x": 1360,
+      "y": -240,
+      "width": 320,
+      "height": 120
+    },
+    {
+      "id": "extract-engine",
+      "type": "text",
+      "text": "**Extract Engine** (Module 02)\nInternal docker-compose service",
+      "x": 1360,
+      "y": -60,
+      "width": 320,
+      "height": 120
+    },
+    {
+      "id": "equiv-call",
+      "type": "text",
+      "text": "**No HTTP call**\nEquiv page does `import vibecheck_lifter` directly in the UI process (`app.py`) — it never reaches the equiv-engine container",
+      "x": 1360,
+      "y": 120,
+      "width": 320,
+      "height": 170,
+      "color": "2"
+    },
+    {
+      "id": "health-http",
+      "type": "text",
+      "text": "**Sidebar status dots: Spec & Extract**\nReal HTTP health checks — `GET /docs`, 2s timeout. Dots reflect actual engine reachability",
+      "x": 420,
+      "y": 230,
+      "width": 360,
+      "height": 150,
+      "color": "4"
+    },
+    {
+      "id": "health-equiv",
+      "type": "text",
+      "text": "**Sidebar status dot: Equiv — asymmetric**\n'Health check' is just `import vibecheck_lifter` in the UI process. Reports the UI container's local state, **not** the equiv-engine container's reachability",
+      "x": 420,
+      "y": 420,
+      "width": 360,
+      "height": 180,
+      "color": "1"
+    },
+    {
+      "id": "cert-caveat",
+      "type": "text",
+      "text": "**Caveat: certificate figures**\nShown in UI as *'illustrative inputs, not a live run'*",
+      "x": 880,
+      "y": 340,
+      "width": 320,
+      "height": 120,
+      "color": "3"
+    },
+    {
+      "id": "novelty-caveat",
+      "type": "text",
+      "text": "**Scope disclaimer**\nExplicitly disclaims research novelty: *'a UI/integration layer, not a research contribution in itself'*",
+      "x": 1360,
+      "y": 340,
+      "width": 320,
+      "height": 140,
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "browser",
+      "fromSide": "right",
+      "toNode": "ui-service",
+      "toSide": "left",
+      "label": ":8501"
+    },
+    {
+      "id": "e2",
+      "fromNode": "ui-service",
+      "fromSide": "right",
+      "toNode": "page-dashboard",
+      "toSide": "left"
+    },
+    {
+      "id": "e3",
+      "fromNode": "ui-service",
+      "fromSide": "right",
+      "toNode": "page-spec",
+      "toSide": "left"
+    },
+    {
+      "id": "e4",
+      "fromNode": "ui-service",
+      "fromSide": "right",
+      "toNode": "page-extract",
+      "toSide": "left"
+    },
+    {
+      "id": "e5",
+      "fromNode": "ui-service",
+      "fromSide": "right",
+      "toNode": "page-equiv",
+      "toSide": "left"
+    },
+    {
+      "id": "e6",
+      "fromNode": "page-spec",
+      "fromSide": "right",
+      "toNode": "spec-engine",
+      "toSide": "left",
+      "label": "HTTP"
+    },
+    {
+      "id": "e7",
+      "fromNode": "page-extract",
+      "fromSide": "right",
+      "toNode": "extract-engine",
+      "toSide": "left",
+      "label": "HTTP"
+    },
+    {
+      "id": "e8",
+      "fromNode": "page-equiv",
+      "fromSide": "right",
+      "toNode": "equiv-call",
+      "toSide": "left",
+      "label": "in-process import"
+    },
+    {
+      "id": "e9",
+      "fromNode": "ui-service",
+      "fromSide": "bottom",
+      "toNode": "health-http",
+      "toSide": "top"
+    },
+    {
+      "id": "e10",
+      "fromNode": "ui-service",
+      "fromSide": "bottom",
+      "toNode": "health-equiv",
+      "toSide": "top"
+    },
+    {
+      "id": "e11",
+      "fromNode": "page-dashboard",
+      "fromSide": "bottom",
+      "toNode": "cert-caveat",
+      "toSide": "top"
+    }
+  ]
+}
