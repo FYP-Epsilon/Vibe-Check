@@ -1,4 +1,5 @@
 import json
+import copy
 from typing import Dict, Any
 try:
     from .semantic_extractor import SemanticExtractionEngine
@@ -41,34 +42,55 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
                 "details": phase_3_result["phase_3_certificate"]
             }
 
-        # Phase 5B: Progression-Based Constructive Trace Synthesis (PBCTS)
-        # Replaces Phase 4 (Automata Lifting) and Phase 5A (Process Mining Alignment)
-        # with a rigorous mathematical algorithm.
-        phase_pbcts_result = None
+        # Phase 4: PBCTS with Self-Correcting Specification Loop (SCSL)
+        # If PBCTS detects semantic gaps (over-specification), it synthesizes
+        # corrective LTLf formulas, adds them to the property suite, and re-verifies.
+        # This guarantees Module 01 either PROVES alignment or FAILS with diagnostics.
         try:
-            try:
-                from .bidirectional_alignment import run_pbcts_pipeline
-            except ImportError:
-                from bidirectional_alignment import run_pbcts_pipeline
-            
-            phase_pbcts_result = run_pbcts_pipeline(
-                property_suite=phase_3_result["refined_ltlf_property_suite"],
-                semantic_graph=phase_1_result["semantic_graph"]
-            )
-        except Exception as e:
-            phase_pbcts_result = {
-                "phase_4_certificate": {
-                    "status": "FAIL_WITH_ERRORS",
-                    "message": str(e)
-                }
-            }
+            from .bidirectional_alignment import run_pbcts_pipeline
+        except ImportError:
+            from bidirectional_alignment import run_pbcts_pipeline
 
+        max_scsl_rounds = 3
+        current_suite = copy.deepcopy(phase_3_result["refined_ltlf_property_suite"])
+        phase_pbcts_result = None
+        scsl_round = 0
+
+        for scsl_round in range(max_scsl_rounds):
+            try:
+                phase_pbcts_result = run_pbcts_pipeline(
+                    property_suite=current_suite,
+                    semantic_graph=phase_1_result["semantic_graph"]
+                )
+            except Exception as e:
+                phase_pbcts_result = {
+                    "phase_4_certificate": {
+                        "status": "FAIL_WITH_ERRORS",
+                        "message": str(e)
+                    }
+                }
+                break
+
+            cert = phase_pbcts_result.get("phase_4_certificate", {})
+            converged = cert.get("convergence", {}).get("converged", False)
+            corrections = cert.get("scsl_corrections", [])
+
+            if converged:
+                break  # Alignment mathematically proven
+
+            if not corrections or scsl_round == max_scsl_rounds - 1:
+                break  # No auto-corrections possible or final round
+
+            # SCSL: Apply corrections and retry
+            current_suite = copy.deepcopy(current_suite)
+            current_suite.setdefault("P4_SCSL_Corrections", []).extend(corrections)
+
+        # Determine overall status
         overall_status = "PASS"
         if phase_pbcts_result:
-            p4_status = phase_pbcts_result.get("phase_4_certificate", {}).get("convergence", {}).get("converged", False)
-            if not p4_status:
-                overall_status = "PASS_PBCTS_UNCONVERGED"
-
+            p4_converged = phase_pbcts_result.get("phase_4_certificate", {}).get("convergence", {}).get("converged", False)
+            if not p4_converged:
+                overall_status = "FAIL_ALIGNMENT_UNPROVEN"
 
         return {
             "status": overall_status,
@@ -76,7 +98,8 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
             "phase_2": phase_2_result,
             "phase_3": phase_3_result,
             "phase_4": phase_pbcts_result,
-            "phase_5": None
+            "phase_5": None,
+            "scsl_rounds_executed": scsl_round + 1
         }
         
     except VerificationException as e:
