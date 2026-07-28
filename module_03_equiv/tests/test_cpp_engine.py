@@ -324,7 +324,8 @@ class TestErrorHandling:
     def test_empty_wir_produces_empty_graph(self):
         """A WIR with no nodes should produce a graph with 0 states."""
         empty_wir = {"entry_node": "", "exit_node": "", "nodes": [], "edges": []}
-        graph = vibecheck_lifter.build_spot_automaton(json.dumps(empty_wir))
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(empty_wir))
         assert graph.num_states() == 0
 
 
@@ -332,6 +333,129 @@ class TestErrorHandling:
 # Test: Free function convenience wrapper
 # ---------------------------------------------------------------------------
  
+# ---------------------------------------------------------------------------
+# Test: Phase D — Model Checking via check_compliance
+# ---------------------------------------------------------------------------
+
+# A WIR with a cycle (loop back from T2→G) so Büchi acceptance is possible.
+# This models a workflow where a gateway loops until "approved" is set.
+LOOPING_WIR = {
+    "entry_node": "E",
+    "exit_node": "X",
+    "nodes": [
+        {"id": "E",  "type": "entry",   "successors": ["G"],  "predecessors": [],      "control_vars": [], "data_vars": []},
+        {"id": "G",  "type": "gateway", "successors": ["T1", "T2"], "predecessors": ["E", "T2"], "control_vars": ["approved"], "data_vars": [], "guard": "approved"},
+        {"id": "T1", "type": "task",    "successors": ["X"],  "predecessors": ["G"],   "control_vars": [], "data_vars": [],
+         "code": ["finalize()"]},
+        {"id": "T2", "type": "task",    "successors": ["G"],  "predecessors": ["G"],   "control_vars": [], "data_vars": [],
+         "code": ["retry()"]},
+        {"id": "X",  "type": "exit",    "successors": [],      "predecessors": ["T1"], "control_vars": [], "data_vars": []},
+    ],
+    "edges": [
+        {"source": "E",  "target": "G",  "guard": None,           "exception_type": None},
+        {"source": "G",  "target": "T1", "guard": "approved",     "exception_type": None},
+        {"source": "G",  "target": "T2", "guard": "not approved", "exception_type": None},
+        {"source": "T2", "target": "G",  "guard": None,           "exception_type": None},
+        {"source": "T1", "target": "X",  "guard": None,           "exception_type": None},
+    ],
+    "control_variables": ["approved"],
+    "data_variables": [],
+}
+
+
+class TestPhaseD:
+    """Tests for the Phase D LTL model checking engine (check_compliance).
+
+    Key semantic note: The code automata produced by the lifter are often
+    finite (terminate at exit nodes with no outgoing edges). Büchi acceptance
+    requires infinite (accepting) runs. A finite automaton with no cycles
+    vacuously satisfies ALL liveness/safety LTL properties because the
+    synchronous product has no accepting runs.
+
+    To test genuine FAIL verdicts, we use LOOPING_WIR which has a cycle
+    (the retry loop G→T2→G), enabling the product to find accepting runs.
+    """
+
+    def test_tautology_passes(self):
+        """Checking a tautological property G(1) should always PASS."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
+        result = vibecheck_lifter.check_compliance(graph, "1")
+        assert result.is_compliant is True
+        assert result.counter_example_trace == ""
+
+    def test_compliance_result_fields(self):
+        """ComplianceResult should expose is_compliant and counter_example_trace."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
+        result = vibecheck_lifter.check_compliance(graph, "1")
+        assert isinstance(result.is_compliant, bool)
+        assert isinstance(result.counter_example_trace, str)
+
+    def test_finite_automaton_passes_all_properties(self):
+        """A finite (non-looping) automaton vacuously satisfies all LTL properties.
+
+        This is correct Büchi semantics: no infinite runs → no accepting runs
+        in the product → product is empty → property holds.
+        """
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
+        result = vibecheck_lifter.check_compliance(graph, 'G("approved")')
+        assert result.is_compliant is True  # vacuously true
+
+    def test_looping_wir_fails_global_approved(self):
+        """G("approved") should FAIL on a looping WIR with a non-approved cycle.
+
+        The LOOPING_WIR has a cycle G→T2→G that loops when 'not approved'.
+        This infinite run violates G("approved") because "approved" does not
+        hold in the loop.
+        """
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(LOOPING_WIR))
+        result = vibecheck_lifter.check_compliance(graph, 'G("approved")')
+        assert result.is_compliant is False
+        assert len(result.counter_example_trace) > 0
+
+    def test_looping_wir_passes_tautology(self):
+        """A looping WIR should still PASS for tautological properties."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(LOOPING_WIR))
+        result = vibecheck_lifter.check_compliance(graph, "1")
+        assert result.is_compliant is True
+
+    def test_no_segfault_on_branching_wir(self):
+        """check_compliance must not segfault on a multi-branch automaton."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
+        result = vibecheck_lifter.check_compliance(graph, "1")
+        assert result.is_compliant is True
+
+    def test_repr_format(self):
+        """ComplianceResult __repr__ should contain verdict string."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
+        result = vibecheck_lifter.check_compliance(graph, "1")
+        r = repr(result)
+        assert "PASS" in r or "FAIL" in r
+
+    def test_minimized_quotient_compliance(self):
+        """Phase D should work on a Phase B quotient (minimized automaton)."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
+        quotient = lifter.minimize_stuttering(graph)
+        result = vibecheck_lifter.check_compliance(quotient, "1")
+        assert result.is_compliant is True
+
+    def test_counter_example_trace_content(self):
+        """A FAIL verdict should produce a trace with prefix and cycle sections."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(LOOPING_WIR))
+        result = vibecheck_lifter.check_compliance(graph, 'G("approved")')
+        assert result.is_compliant is False
+        assert "prefix" in result.counter_example_trace.lower()
+        assert "cycle" in result.counter_example_trace.lower()
+
+
 # ---------------------------------------------------------------------------
 # Standalone runner (for manual testing outside pytest)
 # ---------------------------------------------------------------------------
@@ -363,5 +487,9 @@ if __name__ == "__main__":
     print("\n--- Test: Self-equivalence ---")
     eq = lifter.check_stuttering_bisimulation(g, g)
     print(f"  Result: {'PASSED' if eq else 'FAILED'}")
+
+    print("\n--- Test: Phase D compliance (tautology) ---")
+    cr = vibecheck_lifter.check_compliance(g, "1")
+    print(f"  Verdict: {'PASS' if cr.is_compliant else 'FAIL'}")
 
     print("\n All manual tests completed.")

@@ -60,60 +60,34 @@ def verify_spec(payload: BPMNPayload):
                 }
             )
         
-        # Phase 4: Automata Lifting (non-blocking — SPOT may not be installed)
-        phase_4_result = None
-        try:
-            lifter = AutomataLifter(
-                property_suite=phase_3_result,
-                semantic_graph=phase_1_result["semantic_graph"],
-            )
-            phase_4_result = lifter.run_pipeline()
-        except Exception as e:
-            phase_4_result = {
-                "phase_4_certificate": {
-                    "status": "FAIL_WITH_ERRORS",
-                    "error_code": "PHASE_4_UNEXPECTED_ERROR",
-                    "message": str(e),
-                }
-            }
-
-        # Phase 5: Reverse Process Mining Alignment
-        phase_5_result = None
+        # Phase 5B: Progression-Based Constructive Trace Synthesis (PBCTS)
+        # Replaces Phase 4 and Phase 5A natively in the FastAPI route
+        phase_pbcts_result = None
         try:
             try:
-                from .process_mining_alignment import ProcessMiningAlignment
-                from .mutation_refiner import LTLfAuditor
+                from .bidirectional_alignment import run_pbcts_pipeline
             except ImportError:
-                from process_mining_alignment import ProcessMiningAlignment
-                from mutation_refiner import LTLfAuditor
-                
-            auditor = LTLfAuditor(phase_3_result["refined_ltlf_property_suite"])
-            ltlf_traces = auditor._generate_traces(phase_1_result["semantic_graph"], depth=10)
+                from bidirectional_alignment import run_pbcts_pipeline
             
-            aligner = ProcessMiningAlignment(bpmn_xml, ltlf_traces, semantic_graph=phase_1_result["semantic_graph"])
-            phase_5_result = aligner.run_pipeline()
+            phase_pbcts_result = run_pbcts_pipeline(
+                property_suite=phase_3_result["refined_ltlf_property_suite"],
+                semantic_graph=phase_1_result["semantic_graph"]
+            )
         except Exception as e:
-            phase_5_result = {
-                "phase_5_certificate": {
+            phase_pbcts_result = {
+                "phase_4_certificate": {
                     "status": "FAIL_WITH_ERRORS",
-                    "error_code": "PHASE_5_ALIGNMENT_FAIL",
+                    "error_code": "PHASE_4_PBCTS_ERROR",
                     "message": str(e)
                 }
             }
 
         # Determine overall status
         overall_status = "PASS"
-        if phase_4_result:
-            p4_status = phase_4_result.get("phase_4_certificate", {}).get("status", "")
-            if "FAIL" in p4_status:
-                overall_status = f"PASS_PHASE4_{p4_status}"
-            elif p4_status == "PASS_NO_SPOT":
-                overall_status = "PASS_NO_SPOT"
-                
-        if phase_5_result:
-            p5_status = phase_5_result.get("phase_5_certificate", {}).get("status", "")
-            if "FAIL" in p5_status:
-                overall_status = f"PASS_PHASE5_{p5_status}"
+        if phase_pbcts_result:
+            p4_status = phase_pbcts_result.get("phase_4_certificate", {}).get("convergence", {}).get("converged", False)
+            if not p4_status:
+                overall_status = "PASS_PBCTS_UNCONVERGED"
 
 
         return {
@@ -121,8 +95,8 @@ def verify_spec(payload: BPMNPayload):
             "phase_1": phase_1_result,
             "phase_2": phase_2_result,
             "phase_3": phase_3_result,
-            "phase_4": phase_4_result,
-            "phase_5": phase_5_result,
+            "phase_4": phase_pbcts_result,
+            "phase_5": None,
         }
         
     except VerificationException as e:
