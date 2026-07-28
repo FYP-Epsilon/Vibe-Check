@@ -1,0 +1,34 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# Module 02 — Verified IR Extraction (Architecture)\nThe **code track**: LLM-generated Python → WIR + 3-layer confidence certificate.\n~3,000 LOC across `module_02_extract/src/ast_extractor/`, `z3_sym_engine/`, `dynamic_tracer/`.","x":0,"y":-440,"width":560,"height":140,"color":"6"},
+		{"id":"input","type":"text","text":"**Input**\nLLM-generated Python workflow code","x":0,"y":-90,"width":300,"height":110,"color":"5"},
+		{"id":"cfg","type":"text","text":"**ASTExtractor**\n`module_02_extract/src/ast_extractor/cfg_extractor.py`\n`CFGExtractor` builds the control-flow graph from the AST.","x":420,"y":-100,"width":340,"height":130},
+		{"id":"wir","type":"text","text":"**WIR — Workflow Intermediate Representation**\nJSON control-flow graph per `shared_schemas/wir_schema.json`.\nNode types: entry / exit / block / gateway / loop / task / break / continue / return / except / finally / match.\nGuarded edges, dominators, control/data variable classification, nested per-function sub-WIRs.\nContract: `docs/module02/12_wir_and_certificate_contract.md`","x":840,"y":-170,"width":420,"height":260,"color":"5"},
+		{"id":"v3","type":"text","text":"**V3 — STRUCTURAL**\nAST / dominator validation.\nHard gate (`abort=True`) — gates the certificate.","x":1360,"y":-300,"width":340,"height":130,"color":"4"},
+		{"id":"v2","type":"text","text":"**V2 — SYMBOLIC**\n`module_02_extract/src/z3_sym_engine/`\nZ3 bounded concolic execution.","x":1360,"y":-110,"width":340,"height":130,"color":"4"},
+		{"id":"v1","type":"text","text":"**V1 — DYNAMIC**\n`module_02_extract/src/dynamic_tracer/`\nPEP 669 `sys.monitoring` differential tracing against a WIR reference interpreter; `settrace` fallback + parity test; LCS trace alignment; strict vs `task_only` comparison modes.","x":1360,"y":90,"width":380,"height":190,"color":"4"},
+		{"id":"eval","type":"text","text":"**Eval harness**\n`module_02_extract/eval/`","x":840,"y":300,"width":300,"height":100,"color":"3"},
+		{"id":"flowbench","type":"text","text":"**IBM FLOW-BENCH adapter**\n101 workflows","x":1240,"y":300,"width":300,"height":100},
+		{"id":"mutations","type":"text","text":"**Mutation operators**\n10 operators → 427 applicable mutants","x":1640,"y":300,"width":300,"height":100},
+		{"id":"calibration","type":"text","text":"**Calibration**\nStratified CALIB/EVAL split; Youden's J threshold selection + Clopper-Pearson CIs.","x":2040,"y":290,"width":320,"height":120},
+		{"id":"corpus","type":"text","text":"**Multi-LLM natural-bug corpus**\nllama-3.1-8b, mixtral-8x7b, qwen3-next-80b.\nBehavioral admission: 20 admitted / 164 rejected.","x":1240,"y":460,"width":380,"height":140},
+		{"id":"output","type":"text","text":"**Output → Module 03**\nWIR + confidence certificate, consumed by the equivalence checker.","x":2940,"y":-85,"width":340,"height":120,"color":"5"},
+		{"id":"fusion","type":"text","text":"**Certificate fusion**\n`combined = 1 − (1−v1)(1−v2)`; V3 gates.\nAcceptance threshold ≥ 0.95.\nOlder 3-term formula with a V3 term was removed — it made the verdict vacuous.","x":1980,"y":-110,"width":380,"height":170},
+		{"id":"robustness","type":"text","text":"**Robustness**\nWall-clock timeouts on `/verify`; typed per-layer statuses.","x":1860,"y":130,"width":360,"height":110}
+	],
+	"edges":[
+		{"id":"e1","fromNode":"input","fromSide":"right","toNode":"cfg","toSide":"left"},
+		{"id":"e2","fromNode":"cfg","fromSide":"right","toNode":"wir","toSide":"left"},
+		{"id":"e3","fromNode":"wir","fromSide":"right","toNode":"v3","toSide":"left"},
+		{"id":"e4","fromNode":"wir","fromSide":"right","toNode":"v2","toSide":"left"},
+		{"id":"e5","fromNode":"wir","fromSide":"right","toNode":"v1","toSide":"left"},
+		{"id":"e6","fromNode":"v3","fromSide":"right","toNode":"fusion","toSide":"left","label":"hard gate"},
+		{"id":"e7","fromNode":"v2","fromSide":"right","toNode":"fusion","toSide":"left","label":"v2"},
+		{"id":"e8","fromNode":"v1","fromSide":"right","toNode":"fusion","toSide":"left","label":"v1"},
+		{"id":"e9","fromNode":"fusion","fromSide":"right","toNode":"output","toSide":"left","label":"WIR + certificate"},
+		{"id":"e10","fromNode":"eval","fromSide":"right","toNode":"flowbench","toSide":"left"},
+		{"id":"e11","fromNode":"flowbench","fromSide":"right","toNode":"mutations","toSide":"left"},
+		{"id":"e12","fromNode":"mutations","fromSide":"right","toNode":"calibration","toSide":"left"},
+		{"id":"e13","fromNode":"eval","fromSide":"bottom","toNode":"corpus","toSide":"left"}
+	]
+}

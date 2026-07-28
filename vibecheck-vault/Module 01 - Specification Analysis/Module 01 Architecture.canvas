@@ -1,0 +1,25 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# Module 01 — Specification Analysis\n**Spec track of VibeCheck:** BPMN 2.0 XML → formal specification (LTLf property suite + PBCTS trace certificate)\nImplemented 4-phase architecture (post-pivot: PBCTS replaced the one-day-old SPOT/HOA Phase 4)","x":-360,"y":-560,"width":1900,"height":120,"color":"6"},
+		{"id":"phase3","type":"text","text":"## Phase 3 — Mutation Self-Validation\n`mutation_refiner.py` + `adversarial_generator.py`\n\n- 5 mutation operators; bounded iterative DFS traces (loops allowed)\n- **Multi-round self-healing (≤ 3)**; gates **C_struct ≥ 1.0**, kill ratio **δ ≥ 1.0**\n- **P3 adversarial tier** (round 0, simulated 'LLM')","x":860,"y":-300,"width":380,"height":200,"color":"4"},
+		{"id":"ltlf-props","type":"text","text":"**LTLf property set**\nTiered formal properties, mutation-validated","x":600,"y":-40,"width":280,"height":110},
+		{"id":"input-bpmn","type":"text","text":"## Input\n**BPMN 2.0 XML**\nProcess model to be verified against","x":-1000,"y":-270,"width":260,"height":140,"color":"5"},
+		{"id":"phase1","type":"text","text":"## Phase 1 — Semantic Extraction\n`semantic_extractor.py`\n\n- BPMN XML → semantic graph (Kripke labeling)\n- **Dynamic** coverage denominator (all id-bearing elements)\n- `_recovery_pass()` self-healing retry; gate **coverage ≥ 1.0**","x":-480,"y":-300,"width":360,"height":260,"color":"4"},
+		{"id":"phase2","type":"text","text":"## Phase 2 — LTLf Synthesis\n`ltlf_synthesizer.py`\n\n- Property tiers: **P0 safety / P1 liveness / P2 fairness**\n- **Implicit Else Inference** (guard resolution ≥ 1.0)\n- Template instantiation + P0/P2 sentinels","x":280,"y":-330,"width":360,"height":200,"color":"4"},
+		{"id":"semantic-graph","type":"text","text":"**Semantic graph (G)**\nIntermediate artifact between Phase 1 and Phase 2","x":-40,"y":50,"width":280,"height":110},
+		{"id":"claimed-novelty","type":"text","text":"## Novelty scoreboard (churned ×2)\n- **PBCTS / EAS_BDA / IDCD / SCSL** — implemented (new Phase 4 stack)\n- **Adversarial red-teaming** — implemented (simulated, no real LLM)\n- **SPOT/HOA lifting + process-mining EAS** — implemented, then **deleted after one day**\n- **SFI / ΔH / PWBE** — implemented, then removed earlier same cycle","x":600,"y":460,"width":460,"height":220,"color":"3"},
+		{"id":"service","type":"text","text":"## Service Layer\nFastAPI (`main.py`, v2.0.0), docker service `spec-engine`\n⛔ **currently crashes on startup** (imports deleted `automata_lifter`)\nDockerfile still builds SPOT 2.11.6 — dead weight","x":-480,"y":490,"width":380,"height":160,"color":"1"},
+		{"id":"mspec","type":"text","text":"## Output: LTLf suite + FRC\n`module_03_input.json` (LTLf strings) + Reliability Certificate v2.0 — feeds **Module 03**\n`module_02_input.json` (task_patterns) — **consumed by Module 02** ✅\n\n*(M03 ingestion + LTLf→LTL bridge not wired)*","x":1330,"y":180,"width":420,"height":160,"color":"5"},
+		{"id":"phase4","type":"text","text":"## Phase 4 — PBCTS + Alignment\n`ltlf_progression.py` + `trace_synthesizer.py` + `bidirectional_alignment.py`\n\n- **LTLf progression** (pure Python, no SPOT) → satisfying traces `T_spec` + **SCov**\n- Bidirectional alignment vs model traces → **EAS_BDA**; gate = **IDCD** (|ΔEAS| < 0.001, k ≤ 20)\n- **SCSL** self-correction (≤ 3 rounds) → **Formal Reliability Certificate v2.0**","x":1700,"y":-367,"width":420,"height":335,"color":"4"}
+	],
+	"edges":[
+		{"id":"e1","fromNode":"input-bpmn","fromSide":"right","toNode":"phase1","toSide":"left","label":"parse"},
+		{"id":"e2","fromNode":"phase1","fromSide":"right","toNode":"phase2","toSide":"left","label":"semantic graph G"},
+		{"id":"e3","fromNode":"phase2","fromSide":"right","toNode":"phase3","toSide":"left","label":"LTLf properties"},
+		{"id":"e4","fromNode":"phase3","fromSide":"right","toNode":"phase4","toSide":"left","label":"validated properties"},
+		{"id":"e5","fromNode":"phase4","fromSide":"bottom","toNode":"mspec","toSide":"top","label":"certify"},
+		{"id":"e6","fromNode":"phase1","fromSide":"bottom","toNode":"semantic-graph","toSide":"top"},
+		{"id":"e7","fromNode":"phase2","fromSide":"bottom","toNode":"ltlf-props","toSide":"top"},
+		{"id":"e8","fromNode":"service","fromSide":"right","toNode":"claimed-novelty","toSide":"left"}
+	]
+}
