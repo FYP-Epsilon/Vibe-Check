@@ -26,6 +26,27 @@ class PBCTSAlignmentPipeline:
             normalized.add(norm_trace)
         return normalized
 
+    def _compute_corrections(self, t_spec_only: set, t_model_only: set) -> list:
+        """
+        Self-Correcting Specification Loop (SCSL):
+        Synthesizes corrective LTLf formulas from semantic gaps.
+        Over-specification gaps (LTLf permits but BPMN doesn't) are converted
+        into restrictive formulas that forbid the invalid trace patterns.
+        """
+        corrections = []
+        seen = set()
+        for trace in list(t_spec_only)[:10]:
+            steps = list(trace)
+            for i in range(len(steps) - 1):
+                curr = sorted(steps[i])
+                nxt = sorted(steps[i + 1])
+                if curr and nxt:
+                    formula = f"!(F({curr[0]} & X({nxt[0]})))"
+                    if formula not in seen:
+                        seen.add(formula)
+                        corrections.append(formula)
+        return corrections
+
     def run_idcd(self, k_max: int = 20, epsilon: float = 0.001) -> Dict[str, Any]:
         """Iterative Deepening with Convergence Detection."""
         eas_prev = 0.0
@@ -93,6 +114,9 @@ class PBCTSAlignmentPipeline:
         t_spec_only = t_spec - t_model
         t_model_only = t_model - t_spec
         
+        # SCSL: Compute corrective formulas for over-specification gaps
+        scsl_corrections = self._compute_corrections(t_spec_only, t_model_only)
+        
         semantic_gaps = []
         for t in list(t_spec_only)[:5]:  # cap at 5 for report size
             semantic_gaps.append({
@@ -138,7 +162,8 @@ class PBCTSAlignmentPipeline:
             "reliability": {
                 "confidence": round(confidence, 4),
                 "completeness_statement": f"All traces of length <= {k_converged} fully enumerated." if converged else f"Exploration capped at length {k_max} without full convergence."
-            }
+            },
+            "scsl_corrections": scsl_corrections
         }
 
 def run_pbcts_pipeline(property_suite: Dict[str, List[str]], semantic_graph: Dict[str, Any]) -> Dict[str, Any]:
