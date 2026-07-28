@@ -4,7 +4,7 @@
 To ensure perfect, mathematically sound decoupling between Module 01 (Specification Extraction) and Modules 02/03 (Code Verification).
 
 ## API Orchestration (`api.py`)
-Module 01 is designed as a standalone orchestrator. When `run_module_01_pipeline()` is executed, it runs the entire 5-phase validation architecture, returning a JSON certificate of the results.
+Module 01 is designed as a standalone orchestrator. When `run_module_01_pipeline()` is executed, it runs the entire 4-phase validation architecture, returning a JSON certificate of the results.
 The pipeline outputs distinct JSON payloads for the downstream modules.
 
 ## Module 02 Output (`module_02_input.json`)

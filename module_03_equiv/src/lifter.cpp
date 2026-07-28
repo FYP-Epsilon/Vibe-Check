@@ -1,9 +1,10 @@
 //lifter.cpp
 //
-// Phase A + B Implementation
+// Phase A + B + D Implementation
 // ==========================
 // Phase A: WIR → SPOT twa_graph Lifter
 // Phase B: Divergence-Sensitive Stuttering Bisimulation (Groote–Vaandrager)
+// Phase D: LTL Model Checking via Synchronous Product
 //
 // See lifter.hpp for the public API contract.
 
@@ -28,6 +29,12 @@
 #include <spot/twaalgos/simulation.hh>
 #include <spot/twaalgos/postproc.hh>
 #include <spot/twaalgos/are_isomorphic.hh>
+#include <spot/twaalgos/translate.hh>
+#include <spot/twaalgos/product.hh>
+#include <spot/twaalgos/emptiness.hh>
+#include <spot/tl/parse.hh>
+#include <spot/tl/formula.hh>
+#include <spot/twa/bddprint.hh>
 #include <spot/misc/hash.hh>
 
 namespace py = pybind11;
@@ -1051,6 +1058,76 @@ std::unordered_map<unsigned, ClusterEntry> cluster_implementations(
     return clusters;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// Phase D — LTL Model Checking: check_compliance()
+// ═══════════════════════════════════════════════════════════════════════════
+
+ComplianceResult check_compliance(const spot::twa_graph_ptr& code_aut,
+                                  const std::string& ltl_string) {
+    ComplianceResult result;
+
+    // ── 1. Parse the LTL formula ─────────────────────────────────────────────
+    auto parsed = spot::parse_infix_psl(ltl_string);
+    if (!parsed.errors.empty()) {
+        std::ostringstream err;
+        err << "LTL parse error in '" << ltl_string << "': ";
+        parsed.format_errors(err);
+        throw std::invalid_argument(err.str());
+    }
+    spot::formula phi = parsed.f;
+
+    // ── 2. Negate the formula (violation property: ¬φ) ───────────────────
+    spot::formula neg_phi = spot::formula::Not(phi);
+
+    // ── 3. Translate ¬φ into a Büchi automaton ──────────────────────────
+    //    CRITICAL: Use the SAME bdd_dict as the code automaton so that
+    //    AP BDD variables are shared and the product is well-defined.
+    spot::translator trans(code_aut->get_dict());
+    trans.set_type(spot::postprocessor::Buchi);
+    auto violation_aut = trans.run(neg_phi);
+
+    // ── 4. Synchronous product: code_aut ⊗ violation_aut ───────────────
+    auto prod = spot::product(code_aut, violation_aut);
+
+    // ── 5. Emptiness check ─────────────────────────────────────────────
+    if (prod->is_empty()) {
+        // Product is empty ⇒ no violation ⇒ code satisfies φ
+        result.is_compliant = true;
+        result.counter_example_trace = "";
+    } else {
+        // Product is non-empty ⇒ violation exists
+        result.is_compliant = false;
+
+        // Extract counter-example trace from the accepting run
+        auto run = prod->accepting_run();
+        if (run) {
+            std::ostringstream trace;
+            trace << "Counter-example trace (prefix):";
+            unsigned step_idx = 0;
+            for (const auto& step : run->prefix) {
+                trace << "\n  [" << step_idx++ << "] state=" << step.s->hash();
+                // Format the BDD label into a readable string
+                std::ostringstream lbl_os;
+                spot::bdd_print_formula(lbl_os, prod->get_dict(), step.label);
+                trace << " label=" << lbl_os.str();
+            }
+            trace << "\nCounter-example trace (cycle):";
+            step_idx = 0;
+            for (const auto& step : run->cycle) {
+                trace << "\n  [" << step_idx++ << "] state=" << step.s->hash();
+                std::ostringstream lbl_os;
+                spot::bdd_print_formula(lbl_os, prod->get_dict(), step.label);
+                trace << " label=" << lbl_os.str();
+            }
+            result.counter_example_trace = trace.str();
+        } else {
+            result.counter_example_trace = "FAIL (non-empty product, but no explicit run extracted)";
+        }
+    }
+
+    return result;
+}
+
 } // namespace vibecheck
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1058,7 +1135,7 @@ std::unordered_map<unsigned, ClusterEntry> cluster_implementations(
 // ═══════════════════════════════════════════════════════════════════════════
 
 PYBIND11_MODULE(vibecheck_lifter, m) {
-    m.doc() = "VibeCheck C++ Engine — Phase A (Lifter) + Phase B (Stuttering Bisimulation) + Phase C (Clustering)";
+    m.doc() = "VibeCheck C++ Engine — Phase A (Lifter) + Phase B (Stuttering Bisimulation) + Phase C (Clustering) + Phase D (Model Checking)";
 
     // -- LifterDiagnostics (Phase A) --------------------------------------
     py::class_<vibecheck::LifterDiagnostics>(m, "LifterDiagnostics")
@@ -1164,5 +1241,22 @@ PYBIND11_MODULE(vibecheck_lifter, m) {
           "Group quotient automata by graph isomorphism (Phase C).\n"
           "All graphs MUST share the same bdd_dict (use a single AdvancedLifter).\n"
           "Returns dict[cluster_id] → ClusterEntry.");
+
+    // -- ComplianceResult (Phase D) ----------------------------------------
+    py::class_<vibecheck::ComplianceResult>(m, "ComplianceResult")
+        .def(py::init<>())
+        .def_readonly("is_compliant",           &vibecheck::ComplianceResult::is_compliant)
+        .def_readonly("counter_example_trace",  &vibecheck::ComplianceResult::counter_example_trace)
+        .def("__repr__", [](const vibecheck::ComplianceResult& r) {
+            return "<ComplianceResult verdict=" + std::string(r.is_compliant ? "PASS" : "FAIL")
+                 + (r.counter_example_trace.empty() ? "" : " has_trace=true") + ">";
+        });
+
+    // -- Phase D free function (model checking) ----------------------------
+    m.def("check_compliance", &vibecheck::check_compliance,
+          py::arg("code_aut"), py::arg("ltl_string"),
+          "Model-check a code automaton against an LTL property.\n"
+          "Returns ComplianceResult with is_compliant and counter_example_trace.\n"
+          "CRITICAL: The translator uses the code_aut's bdd_dict.");
 
 }

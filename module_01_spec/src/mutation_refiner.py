@@ -164,20 +164,26 @@ class LTLfAuditor:
         all_paths = []
         try:
             for start in start_states:
-                if start in nx_graph:
-                    for node in end_nodes:
-                        if node in nx_graph:
-                            generator = nx.all_simple_paths(nx_graph, source=start, target=node, cutoff=path_cutoff)
-                            pair_paths = 0
-                            for path in generator:
-                                all_paths.append(path)
-                                pair_paths += 1
-                                if pair_paths >= 50 or len(all_paths) >= 100:
-                                    break
-                            if len(all_paths) >= 100:
-                                break
-                    if len(all_paths) >= 100:
-                        break
+                if start not in nx_graph: continue
+                
+                # Bounded DFS to allow loops (unlike simple_paths)
+                stack = [(start, [start])]
+                while stack:
+                    curr, path = stack.pop()
+                    
+                    if curr in end_nodes:
+                        all_paths.append(path)
+                        if len(all_paths) >= 100:
+                            break
+                            
+                    if len(path) >= path_cutoff:
+                        continue
+                        
+                    for neighbor in nx_graph.successors(curr):
+                        stack.append((neighbor, path + [neighbor]))
+                        
+                if len(all_paths) >= 100:
+                    break
         except Exception as e:
             print(f"Trace generation error: {e}")
         
@@ -228,39 +234,61 @@ class MutationValidator:
         self.adversarial_gen = AdversarialGenerator()
         self.adversarial_killers = []
 
-    def execute_validation_pipeline(self, seed: int = 42):
+    def execute_validation_pipeline(self, seed: int = 42, max_rounds: int = 3):
         # 1. Generate Mutants
         mutants = self.engine.generate_mutants(20, seed=seed)
         
-        # 2. Audit & Refine
-        for i, mutant in enumerate(mutants):
-            killed, cex = self.auditor.is_killed(mutant)
-            if killed:
-                self.mutants_killed += 1
-            else:
-                # Survival detected! Recursive Refinement.
-                self.refinement_loops += 1
-                killer = self._synthesize_killer(mutant)
-                if killer != "no killer found":
-                    self.synthesized_killers.append(killer)
-                    self.suite["P1_Structural_Control_Flow"].append(killer)
-                else:
-                    self.synthesized_killers.append("no killer found")
-                
-                # Re-audit current mutant with new killer
-                temp_suite = copy.deepcopy(self.suite)
-                self.auditor = LTLfAuditor(temp_suite)
-                killed_now, _ = self.auditor.is_killed(mutant)
-                if killed_now:
+        # 2. Multi-Round Audit & Refine (Self-Healing)
+        certificate = None
+        surviving_mutants = []
+        for round_idx in range(max_rounds):
+            self.mutants_killed = 0
+            surviving_mutants = []
+            
+            # Re-initialize auditor with current (potentially enriched) suite
+            self.auditor = LTLfAuditor(copy.deepcopy(self.suite))
+            
+            for i, mutant in enumerate(mutants):
+                killed, cex = self.auditor.is_killed(mutant)
+                if killed:
                     self.mutants_killed += 1
+                else:
+                    surviving_mutants.append(mutant)
+                    # Survival detected! Recursive Refinement.
+                    self.refinement_loops += 1
+                    killer = self._synthesize_killer(mutant)
+                    if killer != "no killer found":
+                        self.synthesized_killers.append(killer)
+                        self.suite.setdefault("P1_Structural_Control_Flow", []).append(killer)
+                    else:
+                        self.synthesized_killers.append("no killer found")
+                    
+                    # Immediately re-audit current mutant with new killer
+                    temp_suite = copy.deepcopy(self.suite)
+                    self.auditor = LTLfAuditor(temp_suite)
+                    killed_now, _ = self.auditor.is_killed(mutant)
+                    if killed_now:
+                        self.mutants_killed += 1
 
-        # 2.5 Adversarial Red-Teaming (Predictive Defense)
-        deceptive_traces = self.adversarial_gen.generate_deceptive_traces(self.graph)
-        new_killers = self.adversarial_gen.synthesize_killer_properties(deceptive_traces)
-        self.adversarial_killers.extend(new_killers)
+            # 2.5 Adversarial Red-Teaming (Predictive Defense) - Run once
+            if round_idx == 0:
+                deceptive_traces = self.adversarial_gen.generate_deceptive_traces(self.graph)
+                new_killers = self.adversarial_gen.synthesize_killer_properties(deceptive_traces)
+                if new_killers:
+                    self.adversarial_killers.extend(new_killers)
+                    self.suite.setdefault("P3_Adversarial_Defenses", []).extend(new_killers)
 
-        # 3. Quality Gate Certification
-        certificate = self._certify()
+            # 3. Quality Gate Certification
+            certificate = self._certify(surviving_mutants)
+            
+            # If we achieved 100% kill ratio, no need for further rounds
+            if certificate["phase_3_certificate"]["status"] == "PASS":
+                break
+                
+        # Add the number of rounds it took to self-heal
+        if certificate:
+            certificate["phase_3_certificate"]["self_healing_rounds"] = round_idx + 1
+            
         return certificate
 
     def _synthesize_killer(self, mutant: Dict[str, Any]) -> str:
@@ -317,7 +345,7 @@ class MutationValidator:
                 return s["atomic_propositions"]
         return [node_id]
 
-    def _certify(self) -> Dict[str, Any]:
+    def _certify(self, surviving_mutants: List[Dict[str, Any]] = None) -> Dict[str, Any]:
         # C_struct calculation
         nodes_with_props = [s for s in self.graph["states"] if s["atomic_propositions"]]
         node_cov = len(nodes_with_props) / len(self.graph["states"]) if self.graph["states"] else 1.0
@@ -332,14 +360,26 @@ class MutationValidator:
         
         status = "PASS" if c_struct >= 1.0 and killed_ratio >= 1.0 else "FAIL"
         
+        cert = {
+            "status": status,
+            "C_struct_coefficient": round(c_struct, 4),
+            "mutants_generated": actual_count,
+            "mutants_killed_ratio": killed_ratio,
+            "refinement_loops_executed": self.refinement_loops
+        }
+
+        if status == "FAIL" and surviving_mutants:
+            # Output detailed diagnostics so the human operator can manually fix it
+            cert["unresolved_vulnerabilities"] = []
+            for m in surviving_mutants[:3]: # Show up to 3 worst surviving mutants
+                cert["unresolved_vulnerabilities"].append({
+                    "mutant_id": m.get("id", "unknown"),
+                    "mutated_edges": m.get("edges", []),
+                    "human_action_required": "Manually inspect this mutant's trace. It bypasses current LTLf rules. Fix the BPMN graph structure or manually add a killer rule."
+                })
+
         return {
-            "phase_3_certificate": {
-                "status": status,
-                "C_struct_coefficient": round(c_struct, 4),
-                "mutants_generated": actual_count,
-                "mutants_killed_ratio": killed_ratio,
-                "refinement_loops_executed": self.refinement_loops
-            },
+            "phase_3_certificate": cert,
             "refined_ltlf_property_suite": {
                 "P0_Critical_Sentinels": self.suite.get("P0_Critical_Sentinels", []),
                 "P1_Structural_Control_Flow": self.suite.get("P1_Structural_Control_Flow", []),
