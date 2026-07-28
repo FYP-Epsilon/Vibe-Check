@@ -78,11 +78,24 @@ class SemanticExtractionEngine:
             except ValueError:
                 pass
 
-        # Identify all executable control-flow nodes in the raw XML for coverage metrics
+        # Identify all nodes in the raw XML for strict coverage metrics
+        # Any element with an ID that isn't a purely structural/visual tag
+        # is considered an 'executable node' that MUST be mapped.
+        NON_NODE_TAGS = {
+            'sequenceFlow', 'process', 'definitions', 'conditionExpression',
+            'extensionElements', 'incoming', 'outgoing', 'documentation',
+            'ioSpecification', 'dataInputAssociation', 'dataOutputAssociation',
+            'property', 'dataObjectReference', 'dataObject', 'laneSet', 'lane',
+            'collaboration', 'participant', 'messageFlow', 'association',
+            'textAnnotation', 'multiInstanceLoopCharacteristics',
+            'standardLoopCharacteristics', 'BPMNDiagram', 'BPMNPlane',
+            'BPMNShape', 'BPMNEdge', 'Bounds', 'waypoint'
+        }
         self.executable_nodes_count = 0
-        for node_type in self.EXECUTABLE_NODES:
-            nodes = self.root.findall(f'.//bpmn:{node_type}', self.NS)
-            self.executable_nodes_count += len(nodes)
+        for elem in self.root.iter():
+            tag_local = elem.tag.split('}')[-1]
+            if elem.get('id') and tag_local not in NON_NODE_TAGS:
+                self.executable_nodes_count += 1
 
     def _layer_v2_construct_and_label(self):
         """
@@ -164,41 +177,6 @@ class SemanticExtractionEngine:
                     self.states.append(state_dict)
                     self.mapped_nodes_count += 1
 
-            # 1.5 Adaptive Dynamic Discovery
-            # Any BPMN element with an ID that wasn't captured by the
-            # known EXECUTABLE_NODES list gets a generic Kripke label.
-            # This guarantees 100% node coverage on ANY BPMN diagram.
-            NON_NODE_TAGS = {
-                'sequenceFlow', 'process', 'definitions', 'conditionExpression',
-                'extensionElements', 'incoming', 'outgoing', 'documentation',
-                'ioSpecification', 'dataInputAssociation', 'dataOutputAssociation',
-                'property', 'dataObjectReference', 'dataObject', 'laneSet', 'lane',
-                'collaboration', 'participant', 'messageFlow', 'association',
-                'textAnnotation', 'multiInstanceLoopCharacteristics',
-                'standardLoopCharacteristics'
-            }
-            mapped_ids = {s["node_id"] for s in self.states}
-            for elem in process.iter():
-                if not elem.tag.startswith(f"{{{self.NS['bpmn']}}}"):
-                    continue
-                tag_local = elem.tag.split('}')[-1]
-                node_id = elem.get('id')
-                if (node_id
-                        and node_id not in mapped_ids
-                        and tag_local not in NON_NODE_TAGS
-                        and tag_local not in self.EXECUTABLE_NODES):
-                    node_name = elem.get('name', node_id)
-                    clean_name = node_name.replace(" ", "_").replace("\n", "_")
-                    self.states.append({
-                        "node_id": node_id,
-                        "node_type": tag_local,
-                        "atomic_propositions": [f"node({clean_name})"],
-                        "dynamically_discovered": True
-                    })
-                    self.mapped_nodes_count += 1
-                    self.executable_nodes_count += 1
-                    mapped_ids.add(node_id)
-
             # 2. Edge Mapping (Sequence Flow)
             sequence_flows = process.findall('.//bpmn:sequenceFlow', self.NS)
             for flow in sequence_flows:
@@ -263,7 +241,6 @@ class SemanticExtractionEngine:
                     "recovered": True
                 })
                 self.mapped_nodes_count += 1
-                self.executable_nodes_count += 1
                 mapped_ids.add(node_id)
 
     def _layer_v1_certify(self) -> Dict[str, Any]:
