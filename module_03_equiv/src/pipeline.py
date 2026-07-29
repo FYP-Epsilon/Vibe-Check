@@ -1,17 +1,33 @@
 """
 Module 03 — Equivalence Checking Engine: Main Pipeline Orchestrator
 =====================================================================
-Executes the full 4-phase pipeline:
+This file holds two independent implementations of the 4-phase pipeline.
+Only one is canonical:
 
-    Phase A → WIR Lifter (lifter.py / C++ vibecheck_lifter)
-    Phase B → Stuttering Bisimulation Engine
-    Phase C → Pairwise Behavioural Clustering
-    Phase D → LTL Model Checking via Synchronous Product (C++)
+    process_wir_batch()  — CANONICAL. SPOT/C++-backed (Phases A-D all via
+                            ``vibecheck_lifter``). This is what every real
+                            caller uses: module_03_equiv's own ``/check``
+                            HTTP endpoint (src/main.py), ``demo/e2e_demo.py``,
+                            and every corpus-scale run this project has done.
+
+    run_pipeline()        — LEGACY. Pure-Python reachability-BFS (lifter.py /
+                            stuttering_engine.py / clustering.py /
+                            model_checker.py). Has no real caller besides its
+                            own CLI (``main()``, below) and the direct
+                            component tests in test_pipeline.py. Kept for
+                            those tests and as the home of one capability
+                            ``process_wir_batch`` does NOT (yet) reproduce:
+                            loop-bound safety checking (see run_pipeline's
+                            own docstring for what that means and why it
+                            isn't just "the same but slower").
+
+Decided 2026-07-30 — see vibecheck-vault/Module 03 - Equivalence Engine/
+Module 03 Knowledge.md and Next Steps.md item #5 for the full writeup.
 
 Usage::
 
-    python -m src.pipeline              # default demo WIR
-    python -m src.pipeline input.json   # from file
+    python -m src.pipeline              # runs the LEGACY run_pipeline(),
+    python -m src.pipeline input.json   # not the canonical process_wir_batch
 """
 
 from __future__ import annotations
@@ -28,7 +44,11 @@ from .clustering import BehavioralClusterer, ClusterResult
 from .model_checker import ModelChecker, PropertyMonitor, VerificationVerdict
 from .property_ingest import PropertySuite
 
-# Optional C++ engine — gracefully degrade to pure-Python if not compiled
+# Optional C++ engine. NOTE: there is no pure-Python fallback for
+# process_wir_batch() itself — when this import fails, process_wir_batch()
+# raises RuntimeError (see below). The pure-Python path that actually exists
+# in this file is run_pipeline(), a separately-maintained legacy pipeline,
+# not a degraded mode of process_wir_batch().
 try:
     import vibecheck_lifter as _cpp
     HAS_CPP_ENGINE = True
@@ -301,7 +321,27 @@ DEMO_WIR: dict = {
 
 def run_pipeline(wir_json: dict) -> dict:
     """
-    Execute the full 4-phase equivalence-checking pipeline.
+    LEGACY — not the canonical Phase D. See process_wir_batch() for that.
+
+    This is the original pure-Python 4-phase pipeline (finite-trace
+    reachability-BFS model checking via ModelChecker/PropertyMonitor,
+    lifter.py's WIRLifter, stuttering_engine.py, clustering.py). Nothing in
+    this codebase calls it except this module's own CLI (``main()``) and
+    test_pipeline.py's direct component tests — those tests stay, since they
+    validate real bisimulation/clustering logic, but this function itself is
+    not part of any production request path.
+
+    Why it isn't simply redundant: its Phase D checks two things —
+    (1) reachability of forbidden labels ("error"/"abort"/"panic"), which
+    IS expressible as an LTL safety property and so is subsumed by
+    ``process_wir_batch``'s ``check_compliance``; and
+    (2) loop-bound safety (``PropertyMonitor.from_loop_bound_check()``),
+    which has no equivalent in the canonical path today — property_ingest.py
+    excludes P2_Quality_Limits from conformance checking, and there is no
+    LTL encoding of "this loop is bounded" in the current property suite.
+    Deprecating this function therefore leaves loop-bound checking with no
+    home anywhere in the pipeline; that gap is real and open, not silently
+    papered over by process_wir_batch.
 
     Returns a summary dict suitable for JSON serialisation.
     """
@@ -465,10 +505,16 @@ def run_pipeline(wir_json: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    """CLI entry point."""
+    """CLI entry point for the LEGACY pure-Python pipeline (run_pipeline).
+
+    The canonical pipeline (process_wir_batch) is only reachable via the
+    module_03_equiv HTTP service (src/main.py's /check endpoint) — it has
+    no standalone CLI of its own.
+    """
     print("═" * 62)
     print("  VibeCheck — Module 03: Equivalence Checking Engine")
-    print("  Pure Python 4-Phase Pipeline")
+    print("  LEGACY Pure Python 4-Phase Pipeline (not the canonical Phase D —")
+    print("  see process_wir_batch() / module_03_equiv/src/main.py's /check)")
     print("═" * 62)
 
     if len(sys.argv) > 1:
