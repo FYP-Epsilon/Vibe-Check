@@ -50,26 +50,30 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
 
 ## P0 — Unblock what's broken (hours, not days)
 
-1. **Fix M01 startup crash.** `main.py:11,16` imports the deleted `automata_lifter`; the FastAPI app and Docker `uvicorn` CMD raise `ModuleNotFoundError` on startup. The `/verify` route never uses the import — delete it. The spec-engine service is down until this lands.
-2. **Fix M04 equivalence page.** It does an in-process `import vibecheck_lifter` inside the `ui-engine` container, which has no SPOT — broken by construction. Route it over HTTP to the equiv-engine container like the Spec/Extract pages, and make the health check symmetric (`GET /docs`, not a local import).
+1. ✅ **Fix M01 startup crash — done 2026-07-29.** `main.py:11,16` imported the deleted `automata_lifter`; deleted, the app now imports and constructs cleanly, all 4 existing tests pass.
+2. ⛔ **Fix M04 equivalence page — deferred until after item 3, not just cheap.** Bigger than originally scoped: `module_03_equiv` has **no HTTP service at all** (`src/main.py` is a print-and-exit demo script, no FastAPI anywhere in the module, `docker-compose.yml` declares no ports for `equiv-engine`) — this needs a service built, not an import swapped. Deferred deliberately: the service's API contract is whatever `property_ingest`/`process_wir_batch` produce, so building it before ingestion landed would mean wrapping a placeholder pipeline and rewriting the service once ingestion existed. Now that ingestion has landed (item 3), this is next.
 
 ## P1 — Close the end-to-end loop (the research-critical path)
 
-3. **M03 ingestion of `module_03_input.json`.** Zero references to it exist in `module_03_equiv`. Add the loader and feed the real property suite into `process_wir_batch()` in place of the placeholder. This is mostly plumbing.
-4. **LTLf→LTL semantic bridge — scope revised 2026-07-29 after investigation**
+3. ✅ **M03 ingestion of `module_03_input.json` — done 2026-07-29.** New `property_ingest.py` (tier-gated, normalized, deduplicated, quoted for SPOT's parser) wired into `process_wir_batch()` via a new optional `property_suite` parameter; the legacy single-string path is untouched. First real end-to-end FLOW-BENCH run completed (definition-order lifting, 58 checks, provisional — see [[Module 03 - Equivalence Engine/Module 03 Knowledge|Module 03 Knowledge]]).
+4. **LTLf→LTL semantic bridge — a/b/d/e done 2026-07-29; c remains the open lifting-scope item.**
    ([[Module 03 - Equivalence Engine/Bridge Investigation/P1.4 Bridge Findings|full findings]]).
    Confirmed: SPOT 2.11.6 (the exact vendored version) ships `spot::from_ltlf()`, so formula
    translation itself is close to solved. But translation alone is **worse than useless** —
    `check_compliance` is vacuously `COMPLIANT` on any non-looping automaton today, because the
    lifter never sets an acceptance condition (confirmed against source); shipping only the
    formula bridge would produce a confident, uniformly-passing verdict on arbitrary code. This
-   item is now four sub-parts, not one:
-   a. Sanitize + translate LTLf → LTL via `spot::from_ltlf`, after rewriting strong `X` to
-      `X[!]` (Module 01's `X` is strong, SPOT's bare `X` is weak — silent mismatch otherwise).
-      Replace the dead, incomplete `FormulaNormalizer` rather than extending it.
-   b. Instrument lifted automata with the `alive` AP on the Phase D path only — leave Phases
-      B/C untouched, since Phase B's divergence-sensitivity is a deliberate result that
-      shouldn't be perturbed by a Phase D concern.
+   item is four sub-parts, not one:
+   a. ✅ **Done.** Sanitize + translate LTLf → LTL via `spot::from_ltlf`, applied to individual
+      properties inside `check_compliance` (not a bulk pre-translation pass) and, for the atom
+      side, in `property_ingest.py` (Option B — collapse and quote lifecycle atoms). The strong-`X`
+      rewrite noted here didn't end up needed: today's checkable P1 tier uses only `!`/`W`, and
+      only P3 (out of scope, see (c)'s sibling exclusion) uses `X` at all.
+   b. ✅ **Done, but check-local, not lifted-automaton-wide.** Rather than instrumenting every
+      lifted automaton with `alive` at Phase A (perturbing Phase B/C, exactly the risk this bullet
+      flagged), `check_compliance` builds a fresh `alive`-extended *copy* of `code_aut` internally
+      (`instrument_alive_extension()`) only when needed, and only when the automaton has no genuine
+      cycle. Phases A/B/C are untouched. See [[Module 03 - Equivalence Engine/Module 03 Knowledge|Module 03 Knowledge]] for the full mechanism and the mutual-exclusion bug this surfaced and fixed in the same pass.
    c. **Superseded — the vocabulary gap turned out to be a symptom, not the root cause.**
       Follow-up investigation found the actual obstruction is graph *scope*, not atom naming: a
       WIR `task` node is a function definition, and the C++ lifter never reads inside function
@@ -79,23 +83,24 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
       changing what Phase A lifts (call-sites instead of definitions) and connecting orchestrator
       to callee sub-CFGs — sized but explicitly **not recommended for implementation yet**, see
       the reprioritization flag above and the linked findings note.
-   d. Add a vacuity guard before trusting any `COMPLIANT` verdict (non-empty language + every
-      formula AP present on some edge), and decide how to report the `NON_TERMINATING` case
-      (see risk below) separately from an ordinary property violation.
-   e. **New, safe to do now, independent of (c)'s scope decision:** reclassify Module 01's P0
-      tier as a lifting self-test rather than evidence about code correctness — it's now proven
-      (not just observed) unfalsifiable under *any* lifting design, since the property and the
-      faithful-lifting invariant are logically identical. And gate atom matching: any property
-      referencing an atom absent from the code automaton should report `INCONCLUSIVE`, never
-      `VIOLATION` — confirmed that unmatched atoms currently produce false violations on
-      *correct* code, which is worse than the vacuity problem it sits alongside.
-   Also still applies: test edge cases (empty traces, loop-bound interaction with M01's
+   d. ✅ **Done.** Vacuity guard: `check_compliance` no longer trusts a `COMPLIANT` verdict on a
+      non-empty-but-dead-ending automaton without genuinely checking it (the acceptance-condition
+      fix). `NON_TERMINATING` reporting (a real loop vs. an ordinary violation) is **still an open,
+      explicit design decision** — the fix only bridges the finite/dead-ending case; a genuine
+      cycle skips the bridge and uses the original unbridged check, deliberately not deciding what
+      it should report against a property that itself requires termination.
+   e. ✅ **Done.** P0 reclassified as a lifting self-test (`tier_semantics`); atom-matching gate
+      reports `INCONCLUSIVE`, never `VIOLATION`, on an atom absent from the code automaton (PR #67).
+   Still applies: test edge cases (empty traces, loop-bound interaction with M01's
    `loop_bound_documented` field — note the investigation found this field currently defaults
    to `0` in practice, not the documented `3`, a separate bug worth filing).
-   **Caution carried over from the investigation itself:** do not treat "wire the P1 tier" as a
-   safe near-term step on its own — P1's flagship shape is an ordering property, and the ordering
-   defect in (c) makes any wiring unreliable while it stands. Only (d) and (e) above are safe to
-   do independent of the scope decision.
+   **Caution from the investigation, and how it was actually resolved:** the investigation said do
+   not treat "wire the P1 tier" as a safe step while (c)'s ordering defect stands. It has now been
+   wired anyway (2026-07-29, item 3) — deliberately, as the walking-skeleton's proof-of-wiring step,
+   with results reported explicitly as **definition-order, provisional** rather than a conformance
+   claim. The first real run (58 checks, `{VIOLATION: 18, COMPLIANT: 17, INCONCLUSIVE: 23}`) is the
+   real-failure data (c)'s "wait and see" was for — CP1 (below) is now decidable from it, not from
+   the earlier emulated projection.
 5. **Declare the canonical Phase D.** Two flavors now coexist: legacy Python reachability-BFS in `run_pipeline` and SPOT LTL in `process_wir_batch`. Pick one, mark the other deprecated, and say so in the docs — ambiguity here will be challenged at defense.
 6. **First end-to-end demo.** One BPMN spec → M01 suite → M03 check against a conforming and a non-conforming LLM implementation → PASS, and FAIL + readable counterexample. This is the money shot for the thesis and the demo.
 
