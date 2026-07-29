@@ -17,6 +17,33 @@ in. Whether that should reorder P0–P3 below, or become its own P0/P1-adjacent 
 to make, not something restructured here unilaterally — flagging it prominently so it doesn't get
 lost inside P1.4's entry.
 
+## Update 2026-07-29 (E2E session + independent verification)
+
+A follow-up Claude Science round designed the full M01+M02+M03 integration, a FLOW-BENCH e2e
+evaluation harness, and a real-world demo — see
+[[Module 03 - Equivalence Engine/Bridge Investigation/E2E Integration Verification Findings|full
+findings]]. Independently re-verified against the repo, including **the first working local
+compiled build of `vibecheck_lifter` on this machine**. Three things change the picture above:
+
+- **Item 4's vacuity guard (4.d) is not optional or a future risk — it is confirmed, live, and now
+  the actual blocker above everything else in P1.** `check_compliance()` still returns vacuous
+  `COMPLIANT` on every non-looping automaton regardless of atom matching, confirmed on the compiled
+  engine, and **0 of 43 eligible-corpus variants have any top-level cycle** — so real detection is
+  currently zero, for any lifting scheme, until the `alive`/stutter-extension bridge from 4.a/4.b
+  actually lands. Item 6 ("first e2e demo") and P2.7 ("e2e eval") are both blocked on this, not just
+  on ingestion (P1.3).
+- **The gateway question (item 4.c's scope decision, and the corpus-scope question generally) is
+  resolved, not just deferred:** Module 01 hard-fails on all 19 `<exclusiveGateway>`-bearing specs,
+  and every one of those gateways' BPMN source genuinely lacks a default flow or any condition
+  expression — confirmed by direct XML inspection, not just by reading the gate's error message.
+  The eligible e2e corpus is 29 sequential specs; scoping branching out of the thesis is the
+  evidence-backed choice, not a workaround.
+- **Only 45 of 412 exported properties (17.6% of P1, 0% of P2/P3) are checkable against code at
+  all**, and the dominant real-corpus divergence mode is task *omission* (23/43 pairs), which the
+  existing P1 property shape is structurally blind to — a task-coverage tier is a prerequisite for
+  a defensible e2e number, not a nice-to-have. See the findings note for the full property-tier
+  breakdown and the design (D1 §6) for what that tier would look like.
+
 ## The one thing that matters most
 
 **Wire Module 01 → Module 03.** Both mechanisms exist today: M01 exports an LTLf property suite (`module_03_input.json`) and M03's C++ `check_compliance` model-checks any SPOT LTL string with counterexample extraction. The only caller passes a hardcoded `'G("approved")'` placeholder. Until this is connected, the thesis's central claim is two halves, not a system.
