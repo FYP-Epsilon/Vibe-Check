@@ -26,6 +26,7 @@ from .lifter import LTS, LifterConfig, QualityGateError, WIRLifter
 from .stuttering_engine import StutteringEngine, StutteringResult
 from .clustering import BehavioralClusterer, ClusterResult
 from .model_checker import ModelChecker, PropertyMonitor, VerificationVerdict
+from .property_ingest import PropertySuite
 
 # Optional C++ engine — gracefully degrade to pure-Python if not compiled
 try:
@@ -55,6 +56,7 @@ def process_wir_batch(
     *,
     bpmn_tasks: list[str] | None = None,
     ltl_property: str = 'G("approved")',
+    property_suite: PropertySuite | None = None,
 ) -> dict:
     """
     Process a batch of WIR JSON strings through the C++ engine.
@@ -70,16 +72,29 @@ def process_wir_batch(
            ``minimize_stuttering()`` — producing the quotient automaton.
         3. Collect all quotients into a list.
         4. Pass the list to ``cluster_implementations()`` (C++).
+        5. Model-check each cluster representative. If ``property_suite`` is
+           given, check every one of its ``conformance_properties()`` and
+           record one result per property (``cluster_info["compliance_results"]``,
+           a list). Otherwise fall back to the single ``ltl_property`` string
+           (``cluster_info["compliance"]``, one dict) — kept for the existing
+           single-string callers/tests; a real property suite is Milestone-1's
+           actual ingestion path (see property_ingest.py).
 
     Args:
         wir_json_strings: List of WIR JSON strings (one per LLM implementation).
         bpmn_tasks: Optional list of BPMN task names for semantic matching.
+        ltl_property: Single-property fallback, used only when property_suite
+            is not given.
+        property_suite: A ``PropertySuite`` from ``property_ingest.load_property_suite()``.
+            When given, every one of its conformance-checkable properties is
+            checked against every cluster representative.
 
     Returns:
         A dict with keys:
             ``quotients``  — list of minimized TwaGraph objects.
             ``diagnostics`` — list of LifterDiagnostics (one per input).
-            ``clusters``   — dict[cluster_id] → {indices, representative, compliance}.
+            ``clusters``   — dict[cluster_id] → {indices, representative,
+                              compliance | compliance_results}.
 
         Raises:
             RuntimeError: If the C++ engine is not available.
@@ -138,40 +153,81 @@ def process_wir_batch(
     )
 
     # ── Step 5: Phase D — Model check each representative ───────────────
-    logger.info("Phase D: Model checking with LTL property: %s", ltl_property)
+    verdict_icon = {
+        "COMPLIANT": "✅",
+        "VIOLATION": "❌",
+        "INCONCLUSIVE": "❓",
+    }
 
-    for cid, cluster_info in clusters.items():
-        rep = cluster_info["representative"]
-        try:
-            compliance = _cpp.check_compliance(rep, ltl_property)
-            cluster_info["compliance"] = {
-                "ltl_property": ltl_property,
-                "verdict": compliance.verdict,
-                "counter_example_trace": compliance.counter_example_trace,
-                "unmatched_atoms": list(compliance.unmatched_atoms),
-            }
-            verdict_icon = {
-                "COMPLIANT": "✅",
-                "VIOLATION": "❌",
-                "INCONCLUSIVE": "❓",
-            }.get(compliance.verdict, "❓")
+    if property_suite is not None:
+        properties = property_suite.conformance_properties()
+        logger.info(
+            "Phase D: Model checking %d conformance-eligible propert%s per cluster",
+            len(properties), "y" if len(properties) == 1 else "ies",
+        )
+        for cid, cluster_info in clusters.items():
+            rep = cluster_info["representative"]
+            results = []
+            for prop in properties:
+                try:
+                    compliance = _cpp.check_compliance(rep, prop.formula)
+                    results.append({
+                        "tier": prop.tier,
+                        "origin_formula": prop.origin_formula,
+                        "ltl_property": prop.formula,
+                        "verdict": compliance.verdict,
+                        "counter_example_trace": compliance.counter_example_trace,
+                        "unmatched_atoms": list(compliance.unmatched_atoms),
+                    })
+                except Exception as exc:
+                    logger.warning(
+                        "  Cluster %d, property %r: Phase D error: %s",
+                        cid, prop.origin_formula, exc,
+                    )
+                    results.append({
+                        "tier": prop.tier,
+                        "origin_formula": prop.origin_formula,
+                        "ltl_property": prop.formula,
+                        "verdict": "ERROR",
+                        "counter_example_trace": "",
+                        "unmatched_atoms": [],
+                        "error": str(exc),
+                    })
+            cluster_info["compliance_results"] = results
             logger.info(
-                "  Cluster %d: %s %s",
+                "  Cluster %d: %s",
                 cid,
-                verdict_icon,
-                compliance.verdict,
+                ", ".join(f"{verdict_icon.get(r['verdict'], '❓')}{r['verdict']}" for r in results) or "(no properties)",
             )
-        except Exception as exc:
-            logger.warning(
-                "  Cluster %d: Phase D error: %s", cid, exc
-            )
-            cluster_info["compliance"] = {
-                "ltl_property": ltl_property,
-                "verdict": "ERROR",
-                "counter_example_trace": "",
-                "unmatched_atoms": [],
-                "error": str(exc),
-            }
+    else:
+        logger.info("Phase D: Model checking with LTL property: %s", ltl_property)
+        for cid, cluster_info in clusters.items():
+            rep = cluster_info["representative"]
+            try:
+                compliance = _cpp.check_compliance(rep, ltl_property)
+                cluster_info["compliance"] = {
+                    "ltl_property": ltl_property,
+                    "verdict": compliance.verdict,
+                    "counter_example_trace": compliance.counter_example_trace,
+                    "unmatched_atoms": list(compliance.unmatched_atoms),
+                }
+                logger.info(
+                    "  Cluster %d: %s %s",
+                    cid,
+                    verdict_icon.get(compliance.verdict, "❓"),
+                    compliance.verdict,
+                )
+            except Exception as exc:
+                logger.warning(
+                    "  Cluster %d: Phase D error: %s", cid, exc
+                )
+                cluster_info["compliance"] = {
+                    "ltl_property": ltl_property,
+                    "verdict": "ERROR",
+                    "counter_example_trace": "",
+                    "unmatched_atoms": [],
+                    "error": str(exc),
+                }
 
     return {
         "quotients": quotients,
