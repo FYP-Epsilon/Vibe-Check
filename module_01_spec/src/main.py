@@ -8,12 +8,10 @@ try:
     from .semantic_extractor import SemanticExtractionEngine
     from .ltlf_synthesizer import FLTLSynthesizer
     from .mutation_refiner import MutationValidator, VerificationException
-    from .automata_lifter import AutomataLifter
 except ImportError:
     from semantic_extractor import SemanticExtractionEngine
     from ltlf_synthesizer import FLTLSynthesizer
     from mutation_refiner import MutationValidator, VerificationException
-    from automata_lifter import AutomataLifter
 
 app = FastAPI(title="VibeCheck Spec Engine", version="2.0.0")
 
