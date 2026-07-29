@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import sys
 try:
-    from .ast_extractor import CFGExtractor, _unparse
+    from ..ast_extractor import CFGExtractor, _unparse
 except ImportError:
     from ast_extractor import CFGExtractor, _unparse
 from .safe_exec import SAFE_BUILTINS, _safe_eval, _safe_exec
