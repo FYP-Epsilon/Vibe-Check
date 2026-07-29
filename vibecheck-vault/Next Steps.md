@@ -74,15 +74,32 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
       flagged), `check_compliance` builds a fresh `alive`-extended *copy* of `code_aut` internally
       (`instrument_alive_extension()`) only when needed, and only when the automaton has no genuine
       cycle. Phases A/B/C are untouched. See [[Module 03 - Equivalence Engine/Module 03 Knowledge|Module 03 Knowledge]] for the full mechanism and the mutual-exclusion bug this surfaced and fixed in the same pass.
-   c. **Superseded — the vocabulary gap turned out to be a symptom, not the root cause.**
+   c. ✅ **CP1 decided and D2 implemented 2026-07-29 — call-order lifting is required, not optional, and is now live.**
       Follow-up investigation found the actual obstruction is graph *scope*, not atom naming: a
       WIR `task` node is a function definition, and the C++ lifter never reads inside function
       bodies at all, so task atoms (function names) and gateway atoms (guard text) **never share
       a single automaton** (confirmed 0/184 on the real corpus, independently reproduced).
       No renaming scheme fixes two atoms living in different graphs. Closing this for real means
       changing what Phase A lifts (call-sites instead of definitions) and connecting orchestrator
-      to callee sub-CFGs — sized but explicitly **not recommended for implementation yet**, see
-      the reprioritization flag above and the linked findings note.
+      to callee sub-CFGs. Cross-tabbing the first real 58-check run against independently-derived
+      ground truth (actual call order, not definition order) settled CP1: **13/18 `VIOLATION`
+      verdicts (72%) are spurious or contradicted by real call order; 12/17 `COMPLIANT` verdicts
+      (71%) ride on omission-blindness. Only ~10/35 (29%) definitive verdicts are trustworthy
+      as-is.** See [[Module 03 - Equivalence Engine/Bridge Investigation/CP1 Lifting-Scope Decision|CP1 Lifting-Scope Decision]]
+      for the full cross-tab and script. Note the scope split this finding surfaced: call-order
+      lifting fixes the ordering side (the 13/18) but **not** the omission side (the 12/17) — that
+      needs the separate coverage-tier property class (item 4a's `F`-bearing family, M4.1 in the
+      Claude Science D4 plan), not D2 itself. **Implemented**: new `derive_call_order_wir()`
+      (`module_02_extract/src/ast_extractor/call_order_view.py`), additive alongside
+      `CFGExtractor.extract()` — lifts the driver function's own CFG (reusing existing branch/guard
+      machinery) instead of module-level definition order, and marks call-sites to sibling
+      top-level functions as task boundaries. Validated against the discriminating uid 44/uid 77
+      pair and the full 29-variant corpus: verdicts moved exactly as CP1 predicted (`{VIOLATION: 5,
+      COMPLIANT: 10, INCONCLUSIVE: 43}`, down from `{18, 17, 23}`), with no regressions in either
+      module's test suite. Full detail: [[Module 03 - Equivalence Engine/Bridge Investigation/CP1 Lifting-Scope Decision|CP1 Lifting-Scope Decision]].
+      **Not yet done**: no committed caller wires this into a real end-to-end run yet — the
+      corpus re-run used a scratchpad script, same gap item 7 (E2E evaluation harness) already
+      names.
    d. ✅ **Done.** Vacuity guard: `check_compliance` no longer trusts a `COMPLIANT` verdict on a
       non-empty-but-dead-ending automaton without genuinely checking it (the acceptance-condition
       fix). `NON_TERMINATING` reporting (a real loop vs. an ordinary violation) is **still an open,
@@ -116,6 +133,7 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
 11. **Drop SPOT from M01's Dockerfile** (dead weight since the PBCTS pivot; nothing imports it) and fix `formula_normalizer.py` docstrings that still promise "SPOT-compatible grammar."
 12. **M02 certificate honesty items:** V2 contributes ≈ nothing on the current corpus (certificate is V1-driven), equivalent-mutant specificity is 0.1111, numeric-boundary bugs are a known blind spot. Either expand the corpus to exercise V2 or reframe the "multi-modal" claim in the thesis. The eval already states these openly — keep it that way.
 13. **Cleanup:** unused `networkx` in M04 requirements; M03 `main.py` is a stale P1.1 milestone demo — replace with the real pipeline entrypoint or remove.
+13a. **M02 test suite hang, found 2026-07-29, not yet diagnosed.** `pytest module_02_extract/tests/test_ast_extractor.py::TestWIRDataLayer` (and, apparently, `TestV3Certificate`/`TestEndToEnd` — all three call `run_v3_pipeline`) hangs indefinitely under Python 3.9 rather than failing or passing. Confirmed pre-existing and unrelated to the D2 lifting-scope change via `git stash` (reproduces identically on HEAD without it). Not diagnosed further — worth a real look, since a hang (vs. a clean failure) is exactly the kind of thing that silently breaks CI.
 14. **Thesis parity:** only M02 has a Chapter 5 draft. Once P1 lands, M01/M03 need equivalent write-ups (PBCTS/EAS_BDA/IDCD/SCSL on one side, divergence-sensitive bisimulation + SPOT compliance on the other).
 
 ## Risks to manage
