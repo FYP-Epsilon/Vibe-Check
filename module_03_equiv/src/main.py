@@ -1,80 +1,132 @@
-import json
-import time
-import os
-import sys
+"""
+main.py -- Module 03 Equivalence Engine HTTP service.
 
-# Ensure the 'src' directory is in the path for the compiled .so
+Mirrors module_01_spec's FastAPI pattern (`uvicorn src.main:app`). Replaces
+the old print-and-exit demo script, whose in-process `import vibecheck_lifter`
+only ever worked when run directly inside this container -- M04's UI runs in
+a *different* container with no compiled `.so`, so that import always failed
+there (vibecheck-vault/Next Steps.md item #2).
+
+Two endpoints, deliberately not conflated:
+
+- ``/lift``: the actual fix for item #2 -- WIR type-lifting + tiered semantic
+  action matching (the P1.1/P1.2 milestone demo), now reachable over HTTP
+  instead of requiring the caller to have the compiled module itself.
+- ``/check``: the real Phase A-D conformance check (property_ingest +
+  process_wir_batch). This is the start of item #6 (first e2e demo), not
+  part of #2's fix -- flagged explicitly because of a real constraint: this
+  container only has module_03_equiv's own source (see property_ingest.py's
+  own docstring on dual-track independence), so it cannot itself turn a
+  definition-order WIR into a call-order one (module_02_extract's
+  ``derive_call_order_wir``, the D2 fix, lives in the *other* container).
+  The caller is responsible for posting an already call-order-lifted WIR;
+  posting a definition-order one silently reproduces the pre-D2 bug.
+"""
+
+import json
+import sys
+import os
+from typing import Any, Optional
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
 sys.path.append(os.path.dirname(__file__))
 
 try:
-    # Attempt to import the compiled C++ Pybind11 module
     import vibecheck_lifter
-    print("✅ Successfully imported vibecheck_lifter")
-except ImportError as e:
-    print(f"❌ Failed to import vibecheck_lifter: {e}")
-    # Print diagnostic info
-    print(f"Current Directory: {os.getcwd()}")
-    print(f"Files in current dir: {os.listdir('.')}")
-    if os.path.exists('src'):
-        print(f"Files in src/: {os.listdir('src')}")
-    sys.exit(1)
+    HAS_CPP_ENGINE = True
+except ImportError:
+    vibecheck_lifter = None  # type: ignore[assignment]
+    HAS_CPP_ENGINE = False
 
-def main():
-    print("\n--- VibeCheck Equivalence Engine (Module 03) ---")
-    print("Initializing Advanced Lifter (Milestone P1.1 Verification)...")
-    
-    # Instantiate the AdvancedLifter C++ class
+from .pipeline import process_wir_batch
+from .property_ingest import load_property_suite
+
+app = FastAPI(title="VibeCheck Equivalence Engine", version="1.0.0")
+
+
+def _require_cpp_engine() -> None:
+    if not HAS_CPP_ENGINE:
+        raise HTTPException(
+            status_code=503,
+            detail="vibecheck_lifter C++ module not available in this container.",
+        )
+
+
+class LiftPayload(BaseModel):
+    wir: dict[str, Any]
+    bpmn_tasks: list[str] = []
+    action: Optional[str] = None
+
+
+@app.post("/lift")
+def lift(payload: LiftPayload):
+    """WIR type-lifting (P1.1) + tiered semantic action matching (P1.2)."""
+    _require_cpp_engine()
+
     lifter = vibecheck_lifter.AdvancedLifter()
-    
-    # Mock JSON payload adhering to shared_schemas/wir_schema.json
-    # Test case: variables with concrete types vs unresolved types (Any)
-    mock_wir = {
-        "control_variables": ["loan_approved", "credit_score"],
-        "data_variables": ["requested_amount"],
-        "types": {
-            "loan_approved": "bool",
-            "credit_score": "int",
-            "requested_amount": "float",
-            "risk_profile": "Any"  # Triggers conservative over-approximation (P1.1)
-        }
-    }
-    
-    wir_json_str = json.dumps(mock_wir)
-    
-    print(f"Parsing mock WIR types...")
-    # ... existing verification ...
     try:
-        lifter.parse_wir_types(wir_json_str)
-        var_map = lifter.get_variable_map()
-        
-        print("\n[BDD Variable Registry]")
-        for var, idx in sorted(var_map.items()):
-            print(f"  {var} => BDD Index: {idx}")
-        
-        # Verify the over-approximation logic
-        if "risk_profile_ANY" in var_map:
-            print("\n✅ Verification Success: 'risk_profile_ANY' correctly mapped as non-deterministic choice.")
-        
-        # --- Milestone P1.2 Verification: Semantic Action Label Mapping ---
-        print("\nInitializing Semantic Matcher (Milestone P1.2)...")
-        bpmn_tasks = ["Check Funds", "Approve Loan", "Verify Identity"]
-        lifter.set_bpmn_tasks(bpmn_tasks)
-        
-        test_actions = [
-            ("check_funds", "Lexical"),          # Exact lexical (normalized)
-            ("VerifyIdent", "Levenshtein"),       # Levenshtein distance 2
-            ("validate_bank_balance", "NLP")     # NLP similarity (Sentence-BERT)
-        ]
-        
-        for action, tier in test_actions:
-            matched = lifter.semantic_match(action)
-            print(f"  Action: '{action}' ({tier} tier) => Matched: '{matched}'")
+        lifter.parse_wir_types(json.dumps(payload.wir))
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"WIR type parsing failed: {exc}")
 
-    except Exception as e:
-        print(f"❌ Execution Error: {e}")
+    result: dict[str, Any] = {"variable_map": lifter.get_variable_map()}
 
-    print("\nModule 03: Build verification complete. Standing by for JSON WIR inputs...")
-    time.sleep(2)
+    if payload.bpmn_tasks:
+        lifter.set_bpmn_tasks(payload.bpmn_tasks)
+        if payload.action:
+            result["matched_action"] = lifter.semantic_match(payload.action)
 
-if __name__ == "__main__":
-    main()
+    return result
+
+
+class CheckPayload(BaseModel):
+    wir: dict[str, Any]
+    bpmn_tasks: list[str] = []
+    ltlf_property_suite: dict[str, list[str]]
+    tier_semantics: dict[str, dict]
+
+
+@app.post("/check")
+def check(payload: CheckPayload):
+    """
+    Full Phase A-D conformance check for a single WIR.
+
+    ``wir`` must already be call-order-lifted (see this module's docstring)
+    -- this endpoint does not and cannot do that lifting itself.
+    """
+    _require_cpp_engine()
+
+    try:
+        suite = load_property_suite({
+            "ltlf_property_suite": payload.ltlf_property_suite,
+            "tier_semantics": payload.tier_semantics,
+        })
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    try:
+        result = process_wir_batch(
+            [json.dumps(payload.wir)],
+            bpmn_tasks=payload.bpmn_tasks,
+            property_suite=suite,
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"Phase A-D processing failed: {exc}")
+
+    cluster = next(iter(result["clusters"].values()))
+    return {
+        "compliance_results": cluster["compliance_results"],
+        "excluded_properties": [
+            {"tier": e.tier, "origin_formula": e.origin_formula, "reason": e.reason}
+            for e in suite.excluded_properties()
+        ],
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "cpp_engine": HAS_CPP_ENGINE}
