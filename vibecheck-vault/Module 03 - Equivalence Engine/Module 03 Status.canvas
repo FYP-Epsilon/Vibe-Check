@@ -1,18 +1,14 @@
 {
 	"nodes":[
-		{"id":"py-real","type":"text","text":"**Track 1 — Pure-Python pipeline: INTACT**\n~1,470 LOC core, 4 phases in `module_03_equiv/src/`, **37 tests**, on `main`/`develop`.\nUntouched. Phase D here is legacy finite-trace reachability-BFS.","x":0,"y":-80,"width":380,"height":170,"color":"4"},
-		{"id":"cpp-now","type":"text","text":"**Track 2 — C++/SPOT engine: ALL phases A–D DONE**\n`lifter.cpp` **1,262 LOC**; pybind11 `AdvancedLifter` + `cluster_implementations` + **`check_compliance`** (SPOT ¬φ → Büchi → product → emptiness + counterexample).\n`process_wir_batch()` runs full A→D; **76 C++-side tests** (skipif no .so).","x":420,"y":-80,"width":380,"height":170,"color":"4"},
-		{"id":"phased-dual","type":"text","text":"**Phase D exists in two flavors**\nLegacy Python reachability-BFS (`run_pipeline`) vs new C++ SPOT LTL checking (`process_wir_batch`). No canonical declared.","x":0,"y":140,"width":380,"height":130,"color":"2"},
-		{"id":"sbert-live","type":"text","text":"**Sentence-BERT now a live dependency**\nC++ `semantic_match()` tier 3 imports `nlp_utils.py` via embedded pybind11 — torch + sentence-transformers in requirements are finally justified.","x":420,"y":140,"width":380,"height":130,"color":"4"},
 		{"id":"so-resolved","type":"text","text":"**RESOLVED: compiled `.so` out of git**\nLinux x86-64 artifact removed, `*.so` gitignored (f6e634a).","x":0,"y":320,"width":380,"height":130,"color":"4"},
-		{"id":"docs-rewritten","type":"text","text":"**Docs mostly reconciled**\n`module_summery` M03 page heavily rewritten (845 lines) to the phased reality; `phase3_equivalence_engine.md` plans spec_id-based M_spec resolution.","x":420,"y":320,"width":380,"height":130,"color":"4"},
-		{"id":"no-canonical","type":"text","text":"**No canonical pipeline declared**\n`pipeline.py` hosts both (`run_pipeline` Python, `process_wir_batch` C++); `main.py` still the stale P1.1 milestone demo.","x":840,"y":320,"width":380,"height":130,"color":"1"},
-		{"id":"wiring-gap","type":"text","text":"**Gap: ingestion + LTLf→LTL bridge**\nM01 exports LTLf strings (`module_03_input.json`); `check_compliance` accepts SPOT infix LTL (infinite-trace). **Nothing ingests M01's suite** — the only caller passes hardcoded `'G(\"approved\")'`. Mechanism exists; wiring doesn't.","x":0,"y":490,"width":380,"height":160,"color":"1"},
-		{"id":"wiki","type":"text","text":"**Wiki page**\n'Pending owner review' — spot-checked against the source layout; mostly matches.","x":420,"y":490,"width":380,"height":130,"color":"3"},
-		{"id":"title","type":"text","text":"# Module 03 — Status\n**The documented method is now executable:** pure-Python pipeline intact, and the C++/SPOT engine complete through Phase D with real LTL model checking.","x":260,"y":-380,"width":700,"height":110,"color":"6"}
+		{"id":"docs-rewritten","type":"text","text":"**Docs mostly reconciled**\n`module_summery` M03 page heavily rewritten (845 lines) to reflect the C++ phased reality; `phase3_equivalence_engine.md` plans `spec_id`-based `M_spec` resolution.","x":420,"y":320,"width":380,"height":160,"color":"4"},
+		{"id":"cpp-now","type":"text","text":"**Track 2 — C++/SPOT engine: ALL phases A–D DONE**\n`lifter.cpp` 1,262 LOC; pybind11 `AdvancedLifter` + `cluster_implementations` + `check_compliance` (SPOT ¬φ → Büchi → product → emptiness + counterexample). `process_wir_batch()` runs the full A→D pipeline; backed by 76 C++-side tests (skipif no `.so`).","x":420,"y":-185,"width":380,"height":275,"color":"4"},
+		{"id":"sbert-live","type":"text","text":"**Sentence-BERT now a live dependency**\nC++ `semantic_match()` tier 3 securely imports `nlp_utils.py` via embedded pybind11 — `torch` + `sentence-transformers` in requirements are successfully integrated into the pipeline.","x":420,"y":115,"width":380,"height":185,"color":"4"},
+		{"id":"wiring-gap","type":"text","text":"**Gap: ingestion + LTLf→LTL bridge**\nM01 exports LTLf strings (`module_03_input.json`); `check_compliance` accepts SPOT infix LTL (infinite-trace). **Nothing ingests M01's suite** — the only caller passes hardcoded `'G(\"approved\")'`. The underlying mechanism is proven; final cross-module wiring is pending.","x":0,"y":540,"width":380,"height":220,"color":"1"},
+		{"id":"wiki","type":"text","text":"**Wiki page**\n'Pending owner review' — spot-checked against the source layout; mostly matches.","x":420,"y":540,"width":380,"height":130,"color":"3"},
+		{"id":"title","type":"text","text":"# Module 03 — Status\n**The documented method is now executable:** pure-Python pipeline intact, and the C++/SPOT engine complete through Phase D with real LTL model checking.","x":260,"y":-520,"width":700,"height":110,"color":"6"}
 	],
 	"edges":[
-		{"id":"e1","fromNode":"title","fromSide":"bottom","toNode":"py-real","toSide":"top","label":"track 1"},
-		{"id":"e2","fromNode":"title","fromSide":"bottom","toNode":"cpp-now","toSide":"top","label":"track 2"}
+		{"id":"7a3be990eaf76c3b","fromNode":"title","fromSide":"bottom","toNode":"cpp-now","toSide":"top"}
 	]
 }

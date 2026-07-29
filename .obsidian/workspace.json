@@ -1,27 +1,27 @@
 {
   "main": {
-    "id": "c681071a1ed7e423",
+    "id": "ff2e00f8cc48f63f",
     "type": "split",
     "children": [
       {
-        "id": "ebdb8c1edfd18fc9",
+        "id": "4184d34c77070045",
         "type": "tabs",
         "children": [
           {
-            "id": "7f4f400fa059d7dd",
+            "id": "f5b52209eb3ece60",
             "type": "leaf",
             "state": {
               "type": "canvas",
               "state": {
-                "file": "Module 03 - Equivalence Engine/Module 03 Status.canvas",
+                "file": "vibecheck-vault/Module 03 - Equivalence Engine/Module 03 Architecture.canvas",
                 "viewState": {
-                  "x": 480,
-                  "y": 120,
-                  "zoom": -0.9319546125769012
+                  "x": 1350,
+                  "y": 250,
+                  "zoom": -1.4001344349535252
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "Module 03 Status"
+              "title": "Module 03 Architecture"
             }
           }
         ]
@@ -30,15 +30,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "69a57be937a800a5",
+    "id": "0cfca028e3cd8270",
     "type": "split",
     "children": [
       {
-        "id": "ab18278b91f0d1cf",
+        "id": "1fbc15fb63804d4b",
         "type": "tabs",
         "children": [
           {
-            "id": "c61b65fe6621a0c3",
+            "id": "4d92f9b43535cb95",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -51,7 +51,7 @@
             }
           },
           {
-            "id": "d9479a053b9c8561",
+            "id": "d50d83a48a91b171",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -68,7 +68,7 @@
             }
           },
           {
-            "id": "66518f524fb1fc21",
+            "id": "dc72540cc3ec0720",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -84,20 +84,20 @@
     "width": 300
   },
   "right": {
-    "id": "811c17007418fdb9",
+    "id": "4eef8219ceb0c792",
     "type": "split",
     "children": [
       {
-        "id": "76ed79bca509edcc",
+        "id": "745d81c1bfbe50ff",
         "type": "tabs",
         "children": [
           {
-            "id": "4c6358571705fb29",
+            "id": "5738774b68ebf9c7",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
+                "file": "vibecheck-vault/Module 03 - Equivalence Engine/Module 03 Status.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -107,25 +107,25 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Module 02 Architecture"
+              "title": "Backlinks for Module 03 Status"
             }
           },
           {
-            "id": "056b68a453aa5da7",
+            "id": "dac18b1c6643a1f5",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
+                "file": "vibecheck-vault/Module 03 - Equivalence Engine/Module 03 Status.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Module 02 Architecture"
+              "title": "Outgoing links from Module 03 Status"
             }
           },
           {
-            "id": "80eb10536f11a59b",
+            "id": "c81e55add2fc3321",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -140,7 +140,7 @@
             }
           },
           {
-            "id": "146f8e2f0cd2eb47",
+            "id": "dbe33c8930c24dd3",
             "type": "leaf",
             "state": {
               "type": "all-properties",
@@ -154,18 +154,18 @@
             }
           },
           {
-            "id": "02f73d0941c770c2",
+            "id": "3ff4be1c04d01aa7",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
+                "file": "vibecheck-vault/Module 03 - Equivalence Engine/Module 03 Status.canvas",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Module 02 Architecture"
+              "title": "Outline of Module 03 Status"
             }
           }
         ]
@@ -186,54 +186,10 @@
       "bases:Create new base": false
     }
   },
-  "active": "7f4f400fa059d7dd",
+  "active": "f5b52209eb3ece60",
   "lastOpenFiles": [
-    "Module 03 - Equivalence Engine/Module 03 Knowledge.md",
-    "Module 03 - Equivalence Engine/Module 03 Architecture.canvas",
-    "Module 03 - Equivalence Engine/Module 03 Changes Made.md",
-    "Module 03 - Equivalence Engine/Module 03 Status.canvas",
-    "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
-    "Module 01 - Specification Analysis/Module 01 Architecture.canvas",
-    "Module 01 - Specification Analysis/Module 01 Knowledge.md",
-    "Module 01 - Specification Analysis/Module 01 Status.canvas",
-    "Module 01 - Specification Analysis/Repo Docs/05_integration.md",
-    "Module 01 - Specification Analysis/Repo Docs/04_pbcts_trace_synthesis.md",
-    "Module 01 - Specification Analysis/Repo Docs/03_mutation_and_red_teaming.md",
-    "Module 01 - Specification Analysis/Repo Docs/02_ltlf_synthesis.md",
-    "Module 01 - Specification Analysis/Repo Docs/01_semantic_extraction.md",
-    "Module 01 - Specification Analysis/Repo Docs/00_overview.md",
-    "Project Architecture.canvas",
-    "Module 03 - Equivalence Engine/Repo Docs/Module 03 Repo Docs Index.md",
-    "Module 02 - Verified IR Extraction/Repo Docs/Module 02 Repo Docs Index.md",
-    "Module 01 - Specification Analysis/Repo Docs/Module 01 Repo Docs Index.md",
-    "Repo Docs/Project Repo Docs Index.md",
-    "Repo Docs/Thesis/figures/fig_e3_scatter.png",
-    "Repo Docs/Thesis/figures/fig_e3_scatter.pdf",
-    "Repo Docs/Thesis/figures/fig_detection_climb.png",
-    "Repo Docs/Thesis/figures/fig_detection_climb.pdf",
-    "Repo Docs/Thesis/module02_chapter_outline.md",
-    "Repo Docs/Thesis/module02_chapter_draft.md",
-    "Repo Docs/Thesis/figures",
-    "Repo Docs/Architecture/module_03_execution_plan.md",
-    "Repo Docs/Architecture/module_02_execution_plan.md",
-    "Repo Docs/Architecture/module_01_execution_plan.md",
-    "Repo Docs/Architecture/Interim Report.pdf",
-    "Repo Docs/API and Schemas/wir_schema_docs.md",
-    "Repo Docs/Thesis",
-    "Repo Docs/README.md",
-    "Repo Docs/Architecture",
-    "Repo Docs/API and Schemas",
-    "Repo Docs",
-    "Module 03 - Equivalence Engine/Repo Docs/phase3_equivalence_engine.md",
-    "Module 03 - Equivalence Engine/Repo Docs/Module_03_Equivalence_Engine.md",
-    "Module 03 - Equivalence Engine/Repo Docs",
-    "Module 02 - Verified IR Extraction/Repo Docs/Module_02_Verified_IR_Extraction.md",
-    "Module 02 - Verified IR Extraction/Repo Docs/12_wir_and_certificate_contract.md",
-    "Module 02 - Verified IR Extraction/Repo Docs/11_multi_impl_corpus_contract.md",
-    "Module 02 - Verified IR Extraction/Repo Docs",
-    "Project Status.canvas",
-    "Module 02 - Verified IR Extraction/Module 02 Status.canvas",
-    "Module 04 - Verification Portal/Module 04 Status.canvas",
-    "Module 04 - Verification Portal/Module 04 Architecture.canvas"
+    "vibecheck-vault/Module 03 - Equivalence Engine/Module 03 Status.canvas",
+    "vibecheck-vault/Module 03 - Equivalence Engine/Module 03 Knowledge.md",
+    "vibecheck-vault/Module 03 - Equivalence Engine/Module 03 Architecture.canvas"
   ]
 }
