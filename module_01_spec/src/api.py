@@ -165,6 +165,36 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
                 "conformance_check": True,
                 "note": "Quality/iteration-bound properties, genuinely falsifiable against code.",
             },
+            # Found while building the first real e2e demo: this dict only ever
+            # covered 3 of the 5 tiers refined_ltlf_property_suite can actually
+            # contain (mutation_refiner.py's _certify() emits all 5). A suite
+            # with any P3/synthesized_mutant_killers property -- the common
+            # case, since Phase 3's own adversarial red-teaming and mutation
+            # self-healing populate them -- made Module 03's load_property_suite
+            # hard-error ("tier has properties but no entry in tier_semantics"),
+            # because it requires every present tier to have a policy here.
+            "P3_Adversarial_Defenses": {
+                "role": "adversarial_self_test",
+                "conformance_check": False,
+                "note": (
+                    "Killer properties synthesized from adversarially-generated "
+                    "deceptive traces (Phase 3's own red-teaming) -- validates the "
+                    "property suite's own robustness, not generated code. Also "
+                    "commonly needs the LTLf->LTL X-operator bridge Module 03's "
+                    "current ingestion does not yet implement."
+                ),
+            },
+            "synthesized_mutant_killers": {
+                "role": "audit_trail",
+                "conformance_check": False,
+                "note": (
+                    "Bookkeeping list of killer properties Phase 3's mutation "
+                    "self-healing synthesized during its own refinement loop -- "
+                    "each one is already duplicated into P1_Structural_Control_Flow "
+                    "when synthesized, so this tier is an audit trail, not an "
+                    "independent conformance check."
+                ),
+            },
         },
     }
 
