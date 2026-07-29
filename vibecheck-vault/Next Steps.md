@@ -393,7 +393,65 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
     a remaining task: `main.py` was rewritten into the real FastAPI
     service (`/lift`, `/check`, `/health`) back in PR #74, earlier this
     session, before this item was ever reached.
-13a. **M02 test suite is Python-version-sensitive in more than one place, not yet diagnosed.** `pytest module_02_extract/tests/test_ast_extractor.py::TestWIRDataLayer` (and, apparently, `TestV3Certificate`/`TestEndToEnd` — all three call `run_v3_pipeline`) hangs indefinitely under Python 3.9 rather than failing or passing (found 2026-07-29; confirmed pre-existing and unrelated to the D2 lifting-scope change via `git stash`, reproduces identically on HEAD without it). Separately, confirmed 2026-07-29 by actually running the suite under Python 3.11 (matching `module_02_extract/Dockerfile`'s `python:3.11-slim`): `run_v3_pipeline` itself works correctly there (no hang, no `ast.TryStar`/`match`-statement failure — those were pure 3.9-venv artifacts), but `test_dynamic_tracer_parity.py`'s 9 `test_monitoring_matches_settrace` cases fail outright with `AssertionError: sys.monitoring expected on 3.12+` — that test hard-requires Python 3.12 (`sys.monitoring`, PEP 669), one minor version ahead of the Dockerfile's pinned 3.11. Not diagnosed further — worth a real look (likely either bump the Dockerfile to 3.12+ or gate the sys.monitoring path behind a version check), since either the 3.9 hang or the 3.11/3.12 mismatch is exactly the kind of thing that silently breaks CI once item #9 exists.
+13a. ✅ **M02 test suite Python-version-sensitivity — diagnosed and fixed
+     2026-07-30.** Both gaps traced to real, distinct root causes rather
+     than left as "not yet diagnosed":
+     - **The 3.9 hang (real bug, now fixed).** Root cause is
+       **networkx-version-dependent, not Python-version-dependent per
+       se** — the two only correlate in this project's two dev venvs.
+       `nx.immediate_dominators`'s entry-node convention differs across
+       networkx releases: confirmed `idom[entry] == entry` on networkx
+       3.2.1 (this project's Python-3.9 venv, where the hang was
+       reproduced and pinned via `SIGABRT` + `faulthandler`, landing the
+       stuck frame inside `dominators.py`'s `_dominates`), and entry
+       simply omitted from the dict on networkx 3.6.1 (the Python-3.11
+       venv, where it doesn't hang). `compute_dominance_frontier()` built
+       its own `idoms` dict raw from whichever networkx returns, unlike
+       `compute_immediate_dominators()` next to it, which already
+       normalized self-mapping to `None` — so on a self-mapping networkx
+       version, the frontier walk's `idoms.get(cur)` climb never reaches
+       `None` once it hits `entry`, looping forever. Fixed by applying
+       the same normalization in both places
+       (`module_02_extract/src/ast_extractor/dominators.py`).
+       **A second, independent correctness bug was found while fixing
+       the first**: the frontier loop's stopping condition compared
+       `_dominates(node, runner)` instead of the textbook Cytron et al.
+       `runner != idom(node)`. Domination only flows ancestor→descendant
+       in the idom tree, so a node essentially never dominates its own
+       idom-chain ancestors — the old condition almost never fired, so
+       the walk over-ran all the way to the root. Confirmed wrong on a
+       plain diamond CFG (produced `frontier[entry] = {merge}`, when
+       entry — dominating the entire reachable graph — must have an
+       empty frontier) and fixed to compare against the node's own
+       immediate dominator directly. `compute_dominance_frontier()`'s
+       output (`wir["dominance_frontier"]`) is currently inert in
+       production — confirmed by grep, nothing downstream reads it, and
+       it isn't in `shared_schemas/wir_schema.json` — but the infinite
+       loop itself was a real, live risk: `run_v3_pipeline` (module_02's
+       actual `/verify` entrypoint) calls straight into it, so any real
+       request hitting a self-mapping networkx version could have hung
+       the extract-engine process indefinitely. Zero prior test coverage
+       for `dominators.py` — new `test_dominators.py` (8 tests) pins both
+       fixes on diamond and nested-diamond CFGs, cross-version-safe
+       (checks via `.get()`, not exact dict shape, since the
+       entry-key-presence quirk itself differs across networkx
+       versions).
+     - **The 3.11/3.12 `sys.monitoring` mismatch (fixed).**
+       `test_dynamic_tracer_parity.py`'s `test_monitoring_matches_settrace`
+       hard-`assert`ed `sys.monitoring is not None`, which doesn't exist
+       at all before Python 3.12 (PEP 669) — a hard fail, not a graceful
+       skip, on the Dockerfile's pinned 3.11. The runtime tracer's own
+       settrace fallback on <3.12 is real, intentional, documented
+       behavior (see the module's own docstring), not a gap this test
+       should fail on. Replaced the hard assert with
+       `@pytest.mark.skipif(getattr(sys, "monitoring", None) is None,
+       ...)`, so the 9 parametrized cases now skip cleanly instead of
+       failing. This closes the loop item #9 opened: removed the
+       `--deselect` workaround from `.github/workflows/ci.yml` now that
+       the test handles its own version gate.
+     Full `module_02_extract` suite after both fixes: 169 passed, 9
+     skipped (the now-gracefully-skipped `sys.monitoring` cases), 0
+     failures — under both the Python 3.9 and 3.11 dev venvs.
 14. **Thesis parity:** only M02 has a Chapter 5 draft. Once P1 lands, M01/M03 need equivalent write-ups (PBCTS/EAS_BDA/IDCD/SCSL on one side, divergence-sensitive bisimulation + SPOT compliance on the other).
 
 ## Risks to manage

@@ -133,10 +133,20 @@ def _collect(source, config, inputs):
     }
 
 
+@pytest.mark.skipif(
+    getattr(sys, "monitoring", None) is None,
+    reason=(
+        "sys.monitoring (PEP 669) doesn't exist before Python 3.12 -- there is "
+        "no second backend to test parity against on this interpreter. The "
+        "runtime tracer's settrace fallback is real, intentional, documented "
+        "behavior on <3.12 (see this file's own module docstring and "
+        "module_02_extract's own Dockerfile, pinned to python:3.11-slim), not "
+        "a gap this test should hard-fail on (Next Steps.md item #13a)."
+    ),
+)
 @pytest.mark.parametrize("label,source,config,inputs", CASES, ids=[c[0] for c in CASES])
 def test_monitoring_matches_settrace(label, source, config, inputs, monkeypatch):
     # Path A: sys.monitoring (default runtime path).
-    assert getattr(sys, "monitoring", None) is not None, "sys.monitoring expected on 3.12+"
     mon_result = _collect(source, config, inputs)
 
     # Path B: force the sys.settrace fallback by hiding sys.monitoring.
