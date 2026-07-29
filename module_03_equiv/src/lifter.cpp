@@ -34,6 +34,7 @@
 #include <spot/twaalgos/emptiness.hh>
 #include <spot/tl/parse.hh>
 #include <spot/tl/formula.hh>
+#include <spot/tl/apcollect.hh>
 #include <spot/twa/bddprint.hh>
 #include <spot/misc/hash.hh>
 
@@ -1076,27 +1077,55 @@ ComplianceResult check_compliance(const spot::twa_graph_ptr& code_aut,
     }
     spot::formula phi = parsed.f;
 
-    // ── 2. Negate the formula (violation property: ¬φ) ───────────────────
+    // ── 2. Atom-matching gate ─────────────────────────────────────────────
+    //    An atomic proposition the code automaton's edges never mention is
+    //    UNCONSTRAINED in the product computed below: nothing on the code
+    //    side rules out either value, so the emptiness search is free to
+    //    resolve it however proves a violation, regardless of what the code
+    //    under test actually does. That produces a confident-looking
+    //    VIOLATION verdict on code that never exhibits the flagged behavior.
+    //    Refuse to model-check when this can happen; report INCONCLUSIVE
+    //    with the offending atom names instead.
+    spot::atomic_prop_set formula_aps;
+    spot::atomic_prop_collect(phi, &formula_aps);
+
+    std::unordered_set<std::string> code_ap_names;
+    for (const auto& ap : code_aut->ap()) {
+        code_ap_names.insert(ap.ap_name());
+    }
+
+    for (const auto& ap : formula_aps) {
+        if (code_ap_names.find(ap.ap_name()) == code_ap_names.end()) {
+            result.unmatched_atoms.push_back(ap.ap_name());
+        }
+    }
+
+    if (!result.unmatched_atoms.empty()) {
+        result.verdict = "INCONCLUSIVE";
+        return result;
+    }
+
+    // ── 3. Negate the formula (violation property: ¬φ) ───────────────────
     spot::formula neg_phi = spot::formula::Not(phi);
 
-    // ── 3. Translate ¬φ into a Büchi automaton ──────────────────────────
+    // ── 4. Translate ¬φ into a Büchi automaton ──────────────────────────
     //    CRITICAL: Use the SAME bdd_dict as the code automaton so that
     //    AP BDD variables are shared and the product is well-defined.
     spot::translator trans(code_aut->get_dict());
     trans.set_type(spot::postprocessor::Buchi);
     auto violation_aut = trans.run(neg_phi);
 
-    // ── 4. Synchronous product: code_aut ⊗ violation_aut ───────────────
+    // ── 5. Synchronous product: code_aut ⊗ violation_aut ───────────────
     auto prod = spot::product(code_aut, violation_aut);
 
-    // ── 5. Emptiness check ─────────────────────────────────────────────
+    // ── 6. Emptiness check ─────────────────────────────────────────────
     if (prod->is_empty()) {
         // Product is empty ⇒ no violation ⇒ code satisfies φ
-        result.is_compliant = true;
+        result.verdict = "COMPLIANT";
         result.counter_example_trace = "";
     } else {
         // Product is non-empty ⇒ violation exists
-        result.is_compliant = false;
+        result.verdict = "VIOLATION";
 
         // Extract counter-example trace from the accepting run
         auto run = prod->accepting_run();
@@ -1245,18 +1274,22 @@ PYBIND11_MODULE(vibecheck_lifter, m) {
     // -- ComplianceResult (Phase D) ----------------------------------------
     py::class_<vibecheck::ComplianceResult>(m, "ComplianceResult")
         .def(py::init<>())
-        .def_readonly("is_compliant",           &vibecheck::ComplianceResult::is_compliant)
+        .def_readonly("verdict",                &vibecheck::ComplianceResult::verdict)
         .def_readonly("counter_example_trace",  &vibecheck::ComplianceResult::counter_example_trace)
+        .def_readonly("unmatched_atoms",        &vibecheck::ComplianceResult::unmatched_atoms)
         .def("__repr__", [](const vibecheck::ComplianceResult& r) {
-            return "<ComplianceResult verdict=" + std::string(r.is_compliant ? "PASS" : "FAIL")
-                 + (r.counter_example_trace.empty() ? "" : " has_trace=true") + ">";
+            return "<ComplianceResult verdict=" + r.verdict
+                 + (r.counter_example_trace.empty() ? "" : " has_trace=true")
+                 + (r.unmatched_atoms.empty() ? "" : " unmatched_atoms=" + std::to_string(r.unmatched_atoms.size()))
+                 + ">";
         });
 
     // -- Phase D free function (model checking) ----------------------------
     m.def("check_compliance", &vibecheck::check_compliance,
           py::arg("code_aut"), py::arg("ltl_string"),
           "Model-check a code automaton against an LTL property.\n"
-          "Returns ComplianceResult with is_compliant and counter_example_trace.\n"
+          "Returns ComplianceResult with verdict (COMPLIANT/VIOLATION/INCONCLUSIVE),\n"
+          "counter_example_trace, and unmatched_atoms.\n"
           "CRITICAL: The translator uses the code_aut's bdd_dict.");
 
 }

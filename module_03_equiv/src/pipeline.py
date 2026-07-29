@@ -146,16 +146,20 @@ def process_wir_batch(
             compliance = _cpp.check_compliance(rep, ltl_property)
             cluster_info["compliance"] = {
                 "ltl_property": ltl_property,
-                "is_compliant": compliance.is_compliant,
-                "verdict": "PASS" if compliance.is_compliant else "FAIL",
+                "verdict": compliance.verdict,
                 "counter_example_trace": compliance.counter_example_trace,
+                "unmatched_atoms": list(compliance.unmatched_atoms),
             }
-            verdict_icon = "✅" if compliance.is_compliant else "❌"
+            verdict_icon = {
+                "COMPLIANT": "✅",
+                "VIOLATION": "❌",
+                "INCONCLUSIVE": "❓",
+            }.get(compliance.verdict, "❓")
             logger.info(
                 "  Cluster %d: %s %s",
                 cid,
                 verdict_icon,
-                "PASS" if compliance.is_compliant else "FAIL",
+                compliance.verdict,
             )
         except Exception as exc:
             logger.warning(
@@ -163,9 +167,9 @@ def process_wir_batch(
             )
             cluster_info["compliance"] = {
                 "ltl_property": ltl_property,
-                "is_compliant": None,
                 "verdict": "ERROR",
                 "counter_example_trace": "",
+                "unmatched_atoms": [],
                 "error": str(exc),
             }
 
