@@ -47,4 +47,4 @@ RUN mkdir build && cd build && \
 # Ensure the library is in the python path
 ENV PYTHONPATH="${PYTHONPATH}:/app/src"
 
-CMD ["python3", "-m", "src.main"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
