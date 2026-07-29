@@ -33,11 +33,11 @@ Verification behavior degrades according to Module 02's extraction confidence (E
 
 ## Tests
 
-**113 test functions total**: `test_pipeline.py` 37 (pure Python, Phases A–D + e2e), `test_cpp_engine.py` 29 (Phase A C++ + new `TestPhaseD` — tautologies, looping-WIR failures, counterexample content, quotient compliance, segfault guards), `test_phase_b.py` 28, `test_phase_c.py` 19. All C++-side tests `skipif` the `.so` isn't compiled.
+**118 test functions total** (2026-07-29 count): `test_pipeline.py` 37 (pure Python, Phases A–D + e2e), `test_cpp_engine.py` 34 (Phase A C++ + `TestPhaseD` — tautologies, looping-WIR failures, counterexample content, quotient compliance, segfault guards, the atom-matching gate, and the vacuity/mutual-exclusion regression guards), `test_phase_b.py` 28, `test_phase_c.py` 19. 115 pass; 2 fail on a pre-existing, unrelated gap (`compute_deterministic_hash` doesn't exist yet); 1 skip. All C++-side tests `skipif` the `.so` isn't compiled.
 
 ## Status & Issues (2026-07-28, main @ `7089711`)
 
-- ✅ **C++/SPOT engine is now complete through Phase D** — real LTL model checking with counterexample extraction, wired into `process_wir_batch`; 113 tests total. The documented method is finally executable (caveats below — vacuous on non-looping automata until instrumented, and Phase A's action atoms are function definitions, not business actions).
+- ✅ **C++/SPOT engine is now complete through Phase D** — real LTL model checking with counterexample extraction, wired into `process_wir_batch`; 118 tests total (115 passing, 2 pre-existing unrelated failures, 1 skip). The documented method is finally executable, and (2026-07-29) the non-looping vacuity channel is fixed and empirically validated (see below) — the remaining caveat is Phase A's action atoms still being function definitions, not business actions.
 - ✅ Resolved earlier: committed Linux `.so` removed from git; `module_summery` M03 doc rewritten.
 - ⛔ **Module 01 ingestion still missing:** zero references to `module_03_input.json` / property suites anywhere in `module_03_equiv`. `check_compliance` accepts SPOT infix **LTL** (infinite-trace semantics); Module 01 produces **LTLf** strings (finite-trace) — no LTLf→LTL bridge exists. The only caller passes the placeholder `'G("approved")'`, so spec↔code is mechanically possible but not integrated.
 - ⛔ **Latent vacuity bug in `check_compliance`, found via the P1.4 bridge investigation
@@ -68,15 +68,46 @@ Verification behavior degrades according to Module 02's extraction confidence (E
   regardless (reclassifying P0 as a lifting self-test; gating unmatched atoms to `INCONCLUSIVE`
   instead of `VIOLATION`): [[Bridge Investigation/AP Vocabulary and Lifting Scope Findings|AP Vocabulary and Lifting Scope Findings]].
 - ⚠ Phase D now exists in two flavors (legacy Python reachability in `run_pipeline`, SPOT LTL in `process_wir_batch`) — still no statement of which pipeline is canonical; `main.py` (80 LOC) remains the stale P1.1 milestone demo.
-- ⛔ **The non-looping vacuity channel is still open, now confirmed live on a real compiled build
-  (2026-07-29):** first successful local build of `vibecheck_lifter` on this machine (Homebrew
-  SPOT 2.15.1 + pybind11), and `check_compliance()` still returns `COMPLIANT` for `G(!B)` on a
-  2-action, non-looping automaton where `B` provably executes and both atoms are matched
-  (`unmatched_atoms: []`) — the atom-gate fix (PR #67) closed a different channel and was never
-  meant to close this one. Confirmed the whole eligible FLOW-BENCH corpus is exposed to it: 0 of 43
-  top-level WIR graphs contain a cycle. Consequence: real detection on this corpus is currently
-  **zero**, for any lifting scheme, until the automaton's acceptance condition is instrumented
-  (the LTLf→LTL "alive"/stutter-extension bridge this project's own investigation already named).
+- ✅ **The non-looping vacuity channel is now fixed (2026-07-29).** Confirmed live on a real
+  compiled build first (Homebrew SPOT 2.15.1 + pybind11): `check_compliance()` returned
+  `COMPLIANT` for `G(!B)` on a 2-action, non-looping automaton where `B` provably executes and
+  both atoms matched (`unmatched_atoms: []`) — the atom-gate fix (PR #67) closed a different
+  channel and was never meant to close this one. Fixed via `instrument_alive_extension()` in
+  `lifter.cpp`: when `code_aut` has no genuine cycle (`spot::scc_info`, all-trivial check — true
+  for 0/43 of the eligible FLOW-BENCH corpus's top-level WIR graphs), `check_compliance` now
+  negates `spot::from_ltlf(phi, "alive")` (De Giacomo & Vardi, IJCAI'13) against an "alive-extended"
+  copy of the automaton (every edge ANDed with `alive=true`, every dead-end state given a
+  `!alive` self-loop) instead of negating `phi` against the raw, dead-ending automaton. A genuine
+  cycle (e.g. `LOOPING_WIR`) skips the bridge and uses the original unbridged check — `from_ltlf`'s
+  own well-formedness obligation assumes the trace it bridges eventually terminates, and a real
+  infinite loop doesn't, so bridging it manufactures a violation unrelated to the property (caught
+  empirically: `test_looping_wir_passes_tautology` — literal `"1"` — regressed to `VIOLATION` before
+  this branch was added).
+  **A second, closely-related bug surfaced and was fixed in the same pass:** Phase A's edge labels
+  only ever assert the positive literal for whatever fired on that edge (`resolve_task_label` /
+  `resolve_edge_label`) — every *other* registered atom is left completely unconstrained on that
+  edge, including the entry transition where nothing happens at all. Once terminating automata
+  became checkable, this let the emptiness search pick a convenient value for an unrelated atom on
+  an edge where nothing asserts it — e.g. `B=true` on the entry edge — to manufacture a violation
+  of `!B W A` on code that genuinely calls `A` then `B` in the correct order. Same failure class as
+  the atom-matching gate targets (a confident violation the code never exhibits), reached through
+  an atom that *is* on the automaton somewhere, just not asserted false where it should be.
+  `instrument_alive_extension()` now closes every edge under mutual exclusion first (forces every
+  registered atom not already required true by an edge's own condition to false on that edge)
+  before adding the alive-extension. Verified end-to-end against Module 01's own `evaluate_ltlf`
+  oracle across all 29 eligible specs (58 real property checks): **100% agreement on every check
+  that produced a real verdict (35/35); the remaining 23 were legitimate `INCONCLUSIVE`s** (the
+  property references a task genuinely never called in that variant — the atom-gate correctly
+  refusing, not a bug).
+  **Also found, not fixed here (a caller/ingestion concern, not a `check_compliance` engine
+  concern):** SPOT's infix parser reads an unquoted atom starting with a reserved LTL operator
+  letter (`G`, `F`, `X`, `U`, `W`, `R`, `M`) as that operator applied to the remaining suffix —
+  e.g. `GitHub_thing` parses as `G(itHub_thing)`. Any future ingestion code building LTL strings
+  from task names must double-quote atoms (`"GitHub_thing"`) to avoid this.
+  **Still explicitly deferred, not decided:** what a genuinely non-terminating trace (a real retry
+  loop, or a hallucinated `while True`) should report against a property that itself requires
+  termination — this is the vacuity-vs-divergence risk already on record. This fix only changes
+  behavior for the *finite/dead-ending* case; looping automata are untouched.
   Full findings, cross-verification of a fresh Claude Science design round (M01→M03 integration,
   FLOW-BENCH eval harness, real-world demo), and one resolved owner-decision (the gateway
   default-flow question): [[Bridge Investigation/E2E Integration Verification Findings|E2E
