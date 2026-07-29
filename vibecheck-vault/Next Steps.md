@@ -220,7 +220,34 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
 
 ## P2 — Make it measurable and defensible
 
-7. **E2E evaluation harness.** Extend M02's eval methodology (the strongest part of the project) to the full pipeline: FLOW-BENCH's 101 BPMN workflows give spec↔code pairs for free. Measure spec-conformance detection rate, false-alarm rate, and counterexample quality/usefulness. Report with CIs, as M02 already does.
+7. ✅ **E2E evaluation harness — done 2026-07-30.** `demo/eval_e2e/` (`mutate.py` +
+   `harness.py` + tests). Ground truth: FLOW-BENCH has no native correctness labels
+   (`.claude/memory/flowbench_groundtruth_finding.md`), so this extends M02's own
+   mutation-based methodology (Clopper-Pearson CIs, ported not imported — see
+   harness.py's module docstring for the Python-3.9-vs-3.10+ reason) to the full
+   M01→M02→M03 pipeline: 6 real (BPMN, LLM-implementation) pairs confirmed
+   end-to-end `COMPLIANT` serve as "gold," mutated two ways — `drop_step`/
+   `swap_adjacent` (order-changing, candidate detection-rate positives) and
+   `perturb_constant` (verified order-preserving, false-alarm-rate negatives).
+   First real run (26 order-mutation trials, 2 perturbation trials — n is small,
+   reported with CIs throughout, not hidden):
+   - **Real finding, checked not assumed:** dropping a task's call entirely often
+     makes that task's own atom unobservable, so the pipeline correctly abstains
+     (`INCONCLUSIVE`) rather than emitting a wrong `COMPLIANT` — **not** a
+     detection failure. Abstention rate 0.462 (95% CI [0.27, 0.67], n=26),
+     reported separately and excluded from the detection-rate denominator.
+   - **Detection rate** (of decisive trials only): 0.357 (95% CI [0.13, 0.65],
+     n=14). By kind: `drop_step` 0/16 detected (12 abstained, 4 genuine misses),
+     `swap_adjacent` 5/10 detected.
+   - **False-alarm rate**: 0/2 (95% CI [0.00, 0.84]) — small n, wide interval,
+     stated plainly.
+   - **Counterexample quality** (does the rendered counterexample name every task
+     the violated property's own formula references — a narrow, mechanical
+     yes/no, not a subjective rubric): 0.8 (95% CI [0.28, 0.99], n=5).
+   Full report: `demo/eval_e2e/results/e2e_eval_report.md` /
+   `e2e_eval_results.json`. Regression tests: `test_mutate.py` (pure AST logic,
+   always runs) + `test_harness.py` (pins uid 77's exact mutation outcomes,
+   skipped like `test_cpp_engine.py` if the C++ engine isn't compiled).
 8. **Module 01 tests — third cycle with zero.** Gates, PBCTS convergence (IDCD), SCSL rounds, and the status codes are entirely unexercised. Minimum: gate boundary tests, a converging and a non-converging PBCTS fixture, and a regression test for the startup bug. No more Phase rewrites without tests landing in the same commit.
 9. **CI.** `.github/` holds only CODEOWNERS. Add a workflow: per-module tests + a docker-compose build check. M01's startup crash would have been caught by a one-line `uvicorn` smoke test — as would `extract-engine`'s container never having started at all, found 2026-07-30 (item #6) only by actually running `docker compose up` for the first time this project's history.
 10. **Fix M01 status-code inconsistency** — `FAIL_ALIGNMENT_UNPROVEN` (api.py) vs `PASS_PBCTS_UNCONVERGED` (main.py) for the same outcome. Downstream consumers need one vocabulary.
