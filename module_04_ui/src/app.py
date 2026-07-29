@@ -93,11 +93,11 @@ def _check_spec_engine() -> str:
 
 
 def _check_equiv_engine() -> str:
-    """Equiv Engine is a CLI binary – check if the C++ module is importable."""
+    """Check if Equiv Engine (Module 03) is online via its HTTP API."""
     try:
-        import vibecheck_lifter  # noqa: F401
-        return "online"
-    except ImportError:
+        r = requests.get("http://equiv-engine:8000/health", timeout=2)
+        return "online" if r.status_code == 200 else "idle"
+    except Exception:
         return "idle"
 
 
@@ -505,7 +505,13 @@ elif st.session_state.active_page == "equiv_engine":
         )
 
         st.markdown('<p class="section-header">Docker Service</p>', unsafe_allow_html=True)
-        st.code("equiv-engine  ·  ubuntu:22.04  ·  g++ / cmake / SPOT  ·  CMD python3 -m src.main", language="text")
+        st.code("equiv-engine  ·  ubuntu:22.04  ·  g++ / cmake / SPOT  ·  FastAPI  ·  uvicorn :8000", language="text")
+        st.markdown(
+            "`POST /lift` — WIR type-lifting + semantic action matching (this demo).  \n"
+            "`POST /check` — full Phase A–D conformance check against a property suite. "
+            "Requires a call-order-lifted WIR (see `module_02_extract`'s `derive_call_order_wir`) — "
+            "not yet produced by extract-engine's own HTTP API, so this endpoint has no UI demo here yet."
+        )
 
     with demo_tab:
         st.markdown("### Equivalence Engine Demo")
@@ -539,27 +545,29 @@ elif st.session_state.active_page == "equiv_engine":
 
         if st.button("Run Equiv Engine", type="primary"):
             try:
-                import vibecheck_lifter
-                lifter = vibecheck_lifter.AdvancedLifter()
-
                 wir_data = json.loads(wir_input)
-                lifter.parse_wir_types(json.dumps(wir_data))
-                var_map = lifter.get_variable_map()
+                tasks = [t.strip() for t in bpmn_tasks_input.split(",") if t.strip()]
+                response = requests.post(
+                    "http://equiv-engine:8000/lift",
+                    json={
+                        "wir": wir_data,
+                        "bpmn_tasks": tasks,
+                        "action": action_input.strip() or None,
+                    },
+                    timeout=10,
+                )
+                response.raise_for_status()
+                result = response.json()
 
                 st.subheader("BDD Variable Registry")
-                st.json(var_map)
+                st.json(result["variable_map"])
 
-                if bpmn_tasks_input.strip():
-                    tasks = [t.strip() for t in bpmn_tasks_input.split(",")]
-                    lifter.set_bpmn_tasks(tasks)
-                    matched = lifter.semantic_match(action_input.strip())
+                if "matched_action" in result:
                     st.subheader("Semantic Match Result")
-                    st.success(f"Action `{action_input}` → Matched: **{matched}**")
+                    st.success(f"Action `{action_input}` → Matched: **{result['matched_action']}**")
 
-            except ImportError:
-                st.error(
-                    "Cannot import `vibecheck_lifter`. "
-                    "The C++ module must be compiled — run this inside the equiv-engine Docker container."
-                )
+            except requests.exceptions.RequestException as exc:
+                st.error(f"Cannot reach equiv-engine: {exc}")
+                st.info("Check if equiv-engine is running at http://equiv-engine:8000")
             except Exception as e:
                 st.error(f"Equiv Engine Error: {str(e)}")

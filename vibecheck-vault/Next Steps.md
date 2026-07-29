@@ -51,12 +51,31 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
 ## P0 — Unblock what's broken (hours, not days)
 
 1. ✅ **Fix M01 startup crash — done 2026-07-29.** `main.py:11,16` imported the deleted `automata_lifter`; deleted, the app now imports and constructs cleanly, all 4 existing tests pass.
-2. ⛔ **Fix M04 equivalence page — deferred until after item 3, not just cheap.** Bigger than originally scoped: `module_03_equiv` has **no HTTP service at all** (`src/main.py` is a print-and-exit demo script, no FastAPI anywhere in the module, `docker-compose.yml` declares no ports for `equiv-engine`) — this needs a service built, not an import swapped. Deferred deliberately: the service's API contract is whatever `property_ingest`/`process_wir_batch` produce, so building it before ingestion landed would mean wrapping a placeholder pipeline and rewriting the service once ingestion existed. Now that ingestion has landed (item 3), this is next.
+2. ✅ **Fix M04 equivalence page — done 2026-07-29.** `module_03_equiv/src/main.py` rewritten as a
+   FastAPI service (`uvicorn src.main:app`, mirroring M01's pattern; no host port needed — same as
+   spec-engine/extract-engine, reachable over the docker network by container name). Two endpoints,
+   deliberately not conflated: `POST /lift` (the literal fix — WIR type-lifting + semantic action
+   matching, the old P1.1/P1.2 demo, now over HTTP instead of an in-process `import vibecheck_lifter`
+   that could never succeed in the `ui-engine` container) and `POST /check` (the real Phase A-D
+   conformance check, wrapping `property_ingest`/`process_wir_batch` — this is the start of item #6,
+   not part of #2's fix, and is explicitly documented as requiring an already call-order-lifted WIR:
+   this container only has `module_03_equiv`'s own source, so it cannot itself run
+   `derive_call_order_wir` — no committed caller produces one over HTTP yet). `module_04_ui/src/app.py`'s
+   `_check_equiv_engine()` and the equivalence page's demo button now call `/lift` over HTTP, matching
+   the existing spec-engine/extract-engine pattern. Verified locally: started the service with the
+   scratchpad-built `.so` + `DYLD_LIBRARY_PATH`, hit `/health`, `/lift` (same output as the old demo),
+   and `/check` with the uid 77 call-order WIR — returned the same `COMPLIANT`/`INCONCLUSIVE` verdicts
+   already validated in-process. **Not verified**: the actual `docker-compose` build (SPOT-from-source
+   is too slow to build in this environment) and the Streamlit page in a browser — flagged explicitly,
+   not claimed.
 
 ## P1 — Close the end-to-end loop (the research-critical path)
 
 3. ✅ **M03 ingestion of `module_03_input.json` — done 2026-07-29.** New `property_ingest.py` (tier-gated, normalized, deduplicated, quoted for SPOT's parser) wired into `process_wir_batch()` via a new optional `property_suite` parameter; the legacy single-string path is untouched. First real end-to-end FLOW-BENCH run completed (definition-order lifting, 58 checks, provisional — see [[Module 03 - Equivalence Engine/Module 03 Knowledge|Module 03 Knowledge]]).
-4. **LTLf→LTL semantic bridge — a/b/d/e done 2026-07-29; c remains the open lifting-scope item.**
+4. ✅ **LTLf→LTL semantic bridge — all five sub-parts (a–e) done 2026-07-29.** Two residual,
+   explicitly-flagged gaps remain inside it (not separate roadmap items): the `NON_TERMINATING`
+   verdict design decision (d) and untested edge cases — empty traces, the loop-bound/
+   `loop_bound_documented` interaction (e).
    ([[Module 03 - Equivalence Engine/Bridge Investigation/P1.4 Bridge Findings|full findings]]).
    Confirmed: SPOT 2.11.6 (the exact vendored version) ships `spot::from_ltlf()`, so formula
    translation itself is close to solved. But translation alone is **worse than useless** —
