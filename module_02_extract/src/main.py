@@ -269,7 +269,16 @@ def _run_verification(source: str) -> dict:
     # pre-extraction source validation (a syntax error IS a V3 failure).
     # ------------------------------------------------------------------
     try:
-        source = source.replace('\\n', '\n').replace('\\t', '\t')
+        # No literal-escape normalization here: JSON already decodes
+        # source_code to the exact literal text the client's file contains.
+        # A blanket source.replace('\\n', '\n') (removed -- found via the
+        # first real HTTP-chain run, see Next Steps.md item #6) corrupted
+        # any source whose *own* string literals contain a genuine \n or \t
+        # escape sequence (an f-string like f"a\nb" is valid Python; the
+        # replace turned its literal backslash-n into a real newline
+        # character in the *source text*, breaking the string literal and
+        # making ast.parse fail) -- confirmed against 13/184 real FLOW-BENCH
+        # corpus variants.
         if len(source) > 50000:
             raise ValueError("Source code exceeds maximum length of 50,000 characters.")
         try:

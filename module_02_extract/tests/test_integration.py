@@ -100,6 +100,34 @@ class TestTypedLayerStatuses:
         assert result["layers"]["v1"]["status"] == "SKIPPED"
 
 
+class TestLiteralEscapesInStringLiteralsNotCorrupted:
+    """Regression: _run_verification used to blanket-replace('\\n', '\n')
+    on the incoming source, which corrupts any source whose *own* string
+    literals contain a genuine \\n/\\t escape sequence -- found via the
+    first real HTTP-chain run against 13/184 real FLOW-BENCH corpus
+    variants (an f-string like f"a\\nb" is valid Python; the replace broke
+    it into invalid source text, failing ast.parse with a false "not valid
+    Python syntax" v3 error)."""
+
+    def test_fstring_with_newline_escape_parses_correctly(self):
+        source = (
+            "def workflow(x):\n"
+            "    msg = f'value: {x}\\nnext line'\n"
+            "    return msg\n"
+        )
+        result = _run_verification(source)
+        assert result["layers"]["v3"]["status"] == "OK"
+
+    def test_string_with_tab_escape_parses_correctly(self):
+        source = (
+            "def workflow(x):\n"
+            "    msg = 'a\\tb'\n"
+            "    return msg\n"
+        )
+        result = _run_verification(source)
+        assert result["layers"]["v3"]["status"] == "OK"
+
+
 class TestCallOrderWir:
     """/verify additionally returns a call-order-linearized WIR alongside
     the existing definition-order ``wir`` (see ast_extractor/call_order_view.py
