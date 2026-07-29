@@ -3,8 +3,23 @@ import re
 
 class FormulaNormalizer:
     """
-    Normalizes hand-rolled LTLf strings into SPOT-compatible grammar,
-    and provides a round-trip denormalization method.
+    UNUSED — not part of the real pipeline. Never imported by api.py or
+    main.py; confirmed by grep, not assumed (Next Steps.md item #11).
+    Module 03's property_ingest.py ports its own LTLf normalization
+    instead of importing this class (dual-track independence: Module 03
+    deploys as its own container with no access to Module 01's source),
+    and that ported version does something different from this one —
+    it collapses start(T)/done(T) into a single flat, quoted atom per
+    task, whereas this class keeps them as separate start_X/done_X
+    atoms. So even setting aside that this is dead code, its specific
+    output format is not what real SPOT ingestion actually expects
+    today; do not resurrect this class as-is under the assumption its
+    grammar still matches property_ingest.py's.
+
+    Original docstring, describing what the code below still does if
+    called directly: normalizes hand-rolled LTLf strings into
+    SPOT-compatible grammar, and provides a round-trip denormalization
+    method.
 
     Normalization rules:
         && -> &
