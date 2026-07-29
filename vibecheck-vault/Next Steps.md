@@ -138,22 +138,45 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
    real-failure data (c)'s "wait and see" was for — CP1 (below) is now decidable from it, not from
    the earlier emulated projection.
 5. **Declare the canonical Phase D.** Two flavors now coexist: legacy Python reachability-BFS in `run_pipeline` and SPOT LTL in `process_wir_batch`. Pick one, mark the other deprecated, and say so in the docs — ambiguity here will be challenged at defense.
-6. **First end-to-end demo.** One BPMN spec → M01 suite → M03 check against a conforming and a non-conforming LLM implementation → PASS, and FAIL + readable counterexample. This is the money shot for the thesis and the demo.
-   **Progress 2026-07-29**: closed the specific gap PR #74 flagged — `extract-engine`'s `/verify`
-   now also returns `call_order_wir` (alongside the existing, untouched `wir` key), computed via
-   `derive_call_order_wir()` right after V3 succeeds. Without this, `equiv-engine`'s `/check`
-   endpoint had no real HTTP caller that could feed it a call-order-lifted WIR — every demo would
-   have had to go through a scratchpad script, same as the CP1 corpus re-run. Verified the
-   `derive_call_order_wir` call itself in isolation (matches PR #73's already-validated output);
-   **could not locally verify `_run_verification`'s new code path end-to-end** — this venv is
-   Python 3.9, and `run_v3_pipeline`'s own import chain requires 3.10+ (`ast.TryStar`) and 3.11+
-   (`match` in `z3_sym_engine/registry.py`), a pre-existing, unrelated gap (item #13a already
-   flags the same root cause). The real deployment is `python:3.11-slim` (Dockerfile), where this
-   is expected to run correctly — flagging the local-verification gap rather than claiming it.
-   **Still not done**: no committed script/UI wires M01 (spec-engine `/verify`) → M02 (extract-engine
-   `/verify`'s new `call_order_wir`) → M03 (equiv-engine `/check`) together end-to-end. That chain,
-   plus a conforming/non-conforming pair of real LLM variants and a readable counterexample
-   presentation, is what's left of item #6.
+6. ✅ **First end-to-end demo — done 2026-07-30.** `demo/e2e_demo.py`: BPMN spec → Module 01's real
+   `export_for_module_03()` → Module 02's `derive_call_order_wir()` (the D2 fix) → Module 03's
+   `process_wir_batch`/`check_compliance` → PASS/FAIL + a readable counterexample, run against the
+   real FLOW-BENCH corpus and the real compiled `vibecheck_lifter` engine (no mocks, no scratchpad
+   hardcoding). Verified end-to-end, output reproduced below. Regression tests:
+   `demo/test_e2e_demo.py` (3 tests, skipped like `test_cpp_engine.py` if the C++ engine isn't
+   compiled).
+   - **In-process, by design, not the HTTP chain**: this script imports all three modules' Python
+     packages directly in one process, honestly documented in its own docstring as crossing the
+     module boundary *for demo convenience* — production still deploys each module as its own
+     container with no access to the others' source (`docker-compose.yml`), unchanged by this.
+     Layering an HTTP-chain version (spec-engine → extract-engine → equiv-engine, using the `/verify`
+     and `/check` endpoints from PRs #74/#75) on top is still open, and needs `docker-compose build`
+     verified — this environment couldn't (SPOT-from-source is too slow here).
+   - **"Conforming vs non-conforming" is two specs, not one, stated plainly**: cross-tabbing the
+     real corpus (`second_real_run_results.json`) found no single spec where different real LLM
+     implementations produce different verdicts — every spec's variants behave identically. The
+     demo shows uid 44 (real ordering violations, both real LLM variants) and uid 77 (a real
+     compliant case) rather than hand-mutating a variant to force one spec to show both.
+   - **Two real bugs found and fixed while building this, not just wiring**:
+     1. `export_for_module_03()`'s `tier_semantics` only ever covered 3 of the 5 tiers
+        `refined_ltlf_property_suite` can contain (`mutation_refiner.py`'s `_certify()` always emits
+        all 5) — so the **real** M01 export function, unlike every prior scratchpad script's
+        hardcoded complete dict, made `load_property_suite` hard-error on any real spec whose suite
+        included a `P3_Adversarial_Defenses` or `synthesized_mutant_killers` property. Fixed in
+        `module_01_spec/src/api.py`; regression test added
+        (`test_real_export_is_ingestible_by_module_03`).
+     2. `check_compliance`'s raw `counter_example_trace` is a full BDD state dump (every registered
+        atom, positive or negated, including the `alive` bridging atom and unrelated gateway
+        guards) — not remotely what "readable counterexample" means. New
+        `module_03_equiv/src/counterexample.py` (`format_counterexample`) is a presentation layer
+        that filters the raw trace down to just the violated property's own atoms and renders a
+        plain task sequence (e.g. `PriceLevel → SalesOrder`). Does not change what
+        `check_compliance` itself returns — the raw trace is still the ground truth underneath.
+   - **Real output** (uid 44, `44__llama-3.1-8b.py`): 2 `VIOLATION` (readable counterexamples:
+     `PriceLevel → SalesOrder`; `Invoice` alone, since `PriceLevel` never occurs at all in this
+     run — a real, correctly-detected omission-as-violation case), 1 `COMPLIANT` → **OVERALL: FAIL**.
+     uid 77 (`77__llama-3.1-8b.py`): 1 `COMPLIANT`, 1 `INCONCLUSIVE` (the never-called
+     `COPY_OBJECT` task, correctly not claimed as a verdict) → **OVERALL: PASS**.
 
 ## P2 — Make it measurable and defensible
 
@@ -167,7 +190,7 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
 11. **Drop SPOT from M01's Dockerfile** (dead weight since the PBCTS pivot; nothing imports it) and fix `formula_normalizer.py` docstrings that still promise "SPOT-compatible grammar."
 12. **M02 certificate honesty items:** V2 contributes ≈ nothing on the current corpus (certificate is V1-driven), equivalent-mutant specificity is 0.1111, numeric-boundary bugs are a known blind spot. Either expand the corpus to exercise V2 or reframe the "multi-modal" claim in the thesis. The eval already states these openly — keep it that way.
 13. **Cleanup:** unused `networkx` in M04 requirements; M03 `main.py` is a stale P1.1 milestone demo — replace with the real pipeline entrypoint or remove.
-13a. **M02 test suite hang, found 2026-07-29, not yet diagnosed.** `pytest module_02_extract/tests/test_ast_extractor.py::TestWIRDataLayer` (and, apparently, `TestV3Certificate`/`TestEndToEnd` — all three call `run_v3_pipeline`) hangs indefinitely under Python 3.9 rather than failing or passing. Confirmed pre-existing and unrelated to the D2 lifting-scope change via `git stash` (reproduces identically on HEAD without it). Not diagnosed further — worth a real look, since a hang (vs. a clean failure) is exactly the kind of thing that silently breaks CI.
+13a. **M02 test suite is Python-version-sensitive in more than one place, not yet diagnosed.** `pytest module_02_extract/tests/test_ast_extractor.py::TestWIRDataLayer` (and, apparently, `TestV3Certificate`/`TestEndToEnd` — all three call `run_v3_pipeline`) hangs indefinitely under Python 3.9 rather than failing or passing (found 2026-07-29; confirmed pre-existing and unrelated to the D2 lifting-scope change via `git stash`, reproduces identically on HEAD without it). Separately, confirmed 2026-07-29 by actually running the suite under Python 3.11 (matching `module_02_extract/Dockerfile`'s `python:3.11-slim`): `run_v3_pipeline` itself works correctly there (no hang, no `ast.TryStar`/`match`-statement failure — those were pure 3.9-venv artifacts), but `test_dynamic_tracer_parity.py`'s 9 `test_monitoring_matches_settrace` cases fail outright with `AssertionError: sys.monitoring expected on 3.12+` — that test hard-requires Python 3.12 (`sys.monitoring`, PEP 669), one minor version ahead of the Dockerfile's pinned 3.11. Not diagnosed further — worth a real look (likely either bump the Dockerfile to 3.12+ or gate the sys.monitoring path behind a version check), since either the 3.9 hang or the 3.11/3.12 mismatch is exactly the kind of thing that silently breaks CI once item #9 exists.
 14. **Thesis parity:** only M02 has a Chapter 5 draft. Once P1 lands, M01/M03 need equivalent write-ups (PBCTS/EAS_BDA/IDCD/SCSL on one side, divergence-sensitive bisimulation + SPOT compliance on the other).
 
 ## Risks to manage
