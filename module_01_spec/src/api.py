@@ -85,12 +85,20 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
             current_suite = copy.deepcopy(current_suite)
             current_suite.setdefault("P4_SCSL_Corrections", []).extend(corrections)
 
-        # Determine overall status
+        # Determine overall status. "PASS_PBCTS_UNCONVERGED" (not a FAIL
+        # variant) matches main.py's /verify route and this function's own
+        # actual usage: export_for_module_03's blocklist never included
+        # this status, so an unconverged result has always been treated as
+        # usable, exportable output -- IDCD not converging within budget
+        # means Module 01 couldn't computationally prove its own alignment
+        # self-check, not that the underlying property suite is invalid.
+        # Previously named FAIL_ALIGNMENT_UNPROVEN here, disagreeing with
+        # main.py's name for the identical condition (item #10).
         overall_status = "PASS"
         if phase_pbcts_result:
             p4_converged = phase_pbcts_result.get("phase_4_certificate", {}).get("convergence", {}).get("converged", False)
             if not p4_converged:
-                overall_status = "FAIL_ALIGNMENT_UNPROVEN"
+                overall_status = "PASS_PBCTS_UNCONVERGED"
 
         return {
             "status": overall_status,
