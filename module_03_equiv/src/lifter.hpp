@@ -220,14 +220,23 @@ private:
 /**
  * @brief Result of checking a code automaton against an LTL specification.
  *
- * Produced by check_compliance(). If is_compliant is true, the code satisfies
- * the property and counter_example_trace is empty. Otherwise, the trace
- * contains a human-readable description of the accepting run of the
- * synchronous product (code ⊗ ¬φ).
+ * Produced by check_compliance(). verdict is one of:
+ *   - "COMPLIANT"    the code satisfies the property; counter_example_trace is empty.
+ *   - "VIOLATION"    the code violates the property; counter_example_trace describes
+ *                    the accepting run of the synchronous product (code ⊗ ¬φ).
+ *   - "INCONCLUSIVE" the property mentions at least one atomic proposition that
+ *                    never appears anywhere in code_aut. Emptiness was NOT checked in
+ *                    this case: an atom the code automaton's edges never mention is
+ *                    unconstrained in the product, which lets the emptiness search
+ *                    resolve it in whichever direction proves a violation, producing a
+ *                    confident-looking VIOLATION on code that never actually exhibits
+ *                    the behavior being flagged. unmatched_atoms lists the offending
+ *                    proposition names.
  */
 struct ComplianceResult {
-    bool is_compliant = true;                   ///< True if PASS, false if FAIL.
-    std::string counter_example_trace;          ///< Empty if PASS; formatted trace if FAIL.
+    std::string verdict = "COMPLIANT";
+    std::string counter_example_trace;          ///< Empty unless verdict == "VIOLATION".
+    std::vector<std::string> unmatched_atoms;   ///< Populated only when verdict == "INCONCLUSIVE".
 };
 
 /**
@@ -235,16 +244,22 @@ struct ComplianceResult {
  *
  * Algorithm:
  *   1. Parse ltl_string via spot::parse_infix_psl().
- *   2. Negate the formula (violation property).
- *   3. Translate the negated formula into a Büchi automaton using the
+ *   2. Collect the property's atomic propositions and compare against code_aut's
+ *      registered APs (code_aut->ap()). If any propositions in the formula never
+ *      appear on code_aut, return INCONCLUSIVE without model-checking — an atom the
+ *      code side never mentions is unconstrained in the product, so the emptiness
+ *      search can resolve it however proves a violation, regardless of what the code
+ *      under test actually does.
+ *   3. Negate the formula (violation property).
+ *   4. Translate the negated formula into a Büchi automaton using the
  *      SAME bdd_dict as code_aut (critical for correct product).
- *   4. Compute the synchronous product: code_aut ⊗ violation_aut.
- *   5. Run emptiness check on the product.
- *   6. If the product is empty → PASS; otherwise → FAIL with counter-example.
+ *   5. Compute the synchronous product: code_aut ⊗ violation_aut.
+ *   6. Run emptiness check on the product.
+ *   7. If the product is empty → COMPLIANT; otherwise → VIOLATION with counter-example.
  *
  * @param code_aut   The automaton to check (must have Büchi acceptance).
  * @param ltl_string An LTL/PSL formula string (SPOT infix syntax).
- * @return ComplianceResult with verdict and optional counter-example.
+ * @return ComplianceResult with verdict and optional counter-example / unmatched atoms.
  */
 ComplianceResult check_compliance(const spot::twa_graph_ptr& code_aut,
                                   const std::string& ltl_string);
