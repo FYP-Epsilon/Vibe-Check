@@ -362,7 +362,28 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
     does today (collapses `start`/`done` into one flat quoted atom per
     task) — so this class couldn't be resurrected as-is even if it were
     wired back in.
-12. **M02 certificate honesty items:** V2 contributes ≈ nothing on the current corpus (certificate is V1-driven), equivalent-mutant specificity is 0.1111, numeric-boundary bugs are a known blind spot. Either expand the corpus to exercise V2 or reframe the "multi-modal" claim in the thesis. The eval already states these openly — keep it that way.
+12. ✅ **M02 certificate honesty items — done 2026-07-30.** Checked before
+    writing anything: the deep technical writeup
+    (`Module_02_Verified_IR_Extraction.md` §10.6/§10.7) and the informal
+    `Module 02 Knowledge.md` already stated the V2-near-zero-contribution
+    finding and the 0.1111 equivalent-mutant specificity honestly — "the
+    eval already states these openly" was already true there. The gap was
+    in the *prominent, early* claims a reader hits first: `00_overview.md`
+    (Module 02's architecture-overview doc, no limitations section at all)
+    and the novelty section (§5.1) and novelty summary table (§5.5) of the
+    comprehensive writeup both presented "multi-modal certificate" as an
+    unqualified three-way combination, only pointing forward to §10.6/§10.7
+    without stating the finding — a reader who stopped at the architecture
+    or novelty sections would come away thinking all three modalities
+    meaningfully combine. Added an inline caveat to `00_overview.md`
+    (stated at the point the three-layer table itself is introduced, not
+    buried afterward) and strengthened §5.1 and the §5.5 table in
+    `Module_02_Verified_IR_Extraction.md` to state the V1-dominance finding
+    directly rather than only cross-reference it. Chose "reframe the claim"
+    over "expand the corpus" — expanding the corpus to genuinely exercise
+    V2 is a real eval-design effort, out of scope for a documentation-
+    honesty pass. No code changed; `Module 02 Knowledge.md` and the eval
+    reports themselves were already correct and left untouched.
 13. **Cleanup:** unused `networkx` in M04 requirements; M03 `main.py` is a stale P1.1 milestone demo — replace with the real pipeline entrypoint or remove.
 13a. **M02 test suite is Python-version-sensitive in more than one place, not yet diagnosed.** `pytest module_02_extract/tests/test_ast_extractor.py::TestWIRDataLayer` (and, apparently, `TestV3Certificate`/`TestEndToEnd` — all three call `run_v3_pipeline`) hangs indefinitely under Python 3.9 rather than failing or passing (found 2026-07-29; confirmed pre-existing and unrelated to the D2 lifting-scope change via `git stash`, reproduces identically on HEAD without it). Separately, confirmed 2026-07-29 by actually running the suite under Python 3.11 (matching `module_02_extract/Dockerfile`'s `python:3.11-slim`): `run_v3_pipeline` itself works correctly there (no hang, no `ast.TryStar`/`match`-statement failure — those were pure 3.9-venv artifacts), but `test_dynamic_tracer_parity.py`'s 9 `test_monitoring_matches_settrace` cases fail outright with `AssertionError: sys.monitoring expected on 3.12+` — that test hard-requires Python 3.12 (`sys.monitoring`, PEP 669), one minor version ahead of the Dockerfile's pinned 3.11. Not diagnosed further — worth a real look (likely either bump the Dockerfile to 3.12+ or gate the sys.monitoring path behind a version check), since either the 3.9 hang or the 3.11/3.12 mismatch is exactly the kind of thing that silently breaks CI once item #9 exists.
 14. **Thesis parity:** only M02 has a Chapter 5 draft. Once P1 lands, M01/M03 need equivalent write-ups (PBCTS/EAS_BDA/IDCD/SCSL on one side, divergence-sensitive bisimulation + SPOT compliance on the other).
