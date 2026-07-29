@@ -68,6 +68,19 @@ Verification behavior degrades according to Module 02's extraction confidence (E
   regardless (reclassifying P0 as a lifting self-test; gating unmatched atoms to `INCONCLUSIVE`
   instead of `VIOLATION`): [[Bridge Investigation/AP Vocabulary and Lifting Scope Findings|AP Vocabulary and Lifting Scope Findings]].
 - ⚠ Phase D now exists in two flavors (legacy Python reachability in `run_pipeline`, SPOT LTL in `process_wir_batch`) — still no statement of which pipeline is canonical; `main.py` (80 LOC) remains the stale P1.1 milestone demo.
+- ⛔ **The non-looping vacuity channel is still open, now confirmed live on a real compiled build
+  (2026-07-29):** first successful local build of `vibecheck_lifter` on this machine (Homebrew
+  SPOT 2.15.1 + pybind11), and `check_compliance()` still returns `COMPLIANT` for `G(!B)` on a
+  2-action, non-looping automaton where `B` provably executes and both atoms are matched
+  (`unmatched_atoms: []`) — the atom-gate fix (PR #67) closed a different channel and was never
+  meant to close this one. Confirmed the whole eligible FLOW-BENCH corpus is exposed to it: 0 of 43
+  top-level WIR graphs contain a cycle. Consequence: real detection on this corpus is currently
+  **zero**, for any lifting scheme, until the automaton's acceptance condition is instrumented
+  (the LTLf→LTL "alive"/stutter-extension bridge this project's own investigation already named).
+  Full findings, cross-verification of a fresh Claude Science design round (M01→M03 integration,
+  FLOW-BENCH eval harness, real-world demo), and one resolved owner-decision (the gateway
+  default-flow question): [[Bridge Investigation/E2E Integration Verification Findings|E2E
+  Integration Verification Findings]].
 
 ## Links
 
@@ -77,3 +90,4 @@ Verification behavior degrades according to Module 02's extraction confidence (E
 - [[Module 03 Repo Docs Index]]
 - [[Bridge Investigation/P1.4 Bridge Findings|P1.4 Bridge Findings]] — LTLf→LTL bridge investigation: vacuity bug, AP vocabulary gap
 - [[Bridge Investigation/AP Vocabulary and Lifting Scope Findings|AP Vocabulary and Lifting Scope Findings]] — the deeper finding: task nodes are function definitions, sub-CFGs unread, order wrong ~46% of the time
+- [[Bridge Investigation/E2E Integration Verification Findings|E2E Integration Verification Findings]] — first real compiled build; the non-looping vacuity channel confirmed live; gateway default-flow question resolved
