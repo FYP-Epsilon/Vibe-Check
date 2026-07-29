@@ -318,7 +318,25 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
    deselect, module_03 59 passed + 83 skipped, demo 8 passed + 6 skipped —
    the skips are the existing, intentional `skipif(not HAS_MODULE)` convention
    for the uncompiled C++ engine, not new gaps).
-10. **Fix M01 status-code inconsistency** — `FAIL_ALIGNMENT_UNPROVEN` (api.py) vs `PASS_PBCTS_UNCONVERGED` (main.py) for the same outcome. Downstream consumers need one vocabulary.
+10. ✅ **Fix M01 status-code inconsistency — done 2026-07-30.** `api.py`'s
+    `run_module_01_pipeline()` said `FAIL_ALIGNMENT_UNPROVEN`, `main.py`'s
+    `/verify` said `PASS_PBCTS_UNCONVERGED`, for the identical outcome
+    (PBCTS completed, IDCD just didn't converge within budget). Unified on
+    `PASS_PBCTS_UNCONVERGED` — confirmed correct, not just consistent:
+    `export_for_module_03`'s own FAIL-blocklist (`["FAIL",
+    "FAIL_WITH_ERRORS"]`) never included either variant, so an unconverged
+    result has always been treated as valid, exportable output by this
+    codebase's own actual behavior. The `FAIL_ALIGNMENT_UNPROVEN` name was
+    the one disagreeing with reality, not `PASS_PBCTS_UNCONVERGED`.
+    New test (`test_status_code_consistency.py`, 2 tests) runs one real
+    BPMN fixture through both `run_module_01_pipeline()` and `verify_spec()`
+    and confirms they now genuinely agree, plus confirms the unconverged
+    result stays exportable. `impact()` on `run_module_01_pipeline` flagged
+    HIGH risk (its usual callgraph-fanout position, not this change
+    specifically) — cross-checked: none of the 3 real callers
+    (`demo/e2e_demo.py`, `demo/eval_e2e/harness.py`) inspect the `status`
+    string at all, so behavior is unchanged for all of them. Full
+    `module_01_spec` suite: 28/28 pass.
 
 ## P3 — Hygiene and honest accounting
 
