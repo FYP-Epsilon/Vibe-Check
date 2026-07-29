@@ -326,6 +326,57 @@ class TestProcessWirBatch:
             assert hasattr(rep, "num_states")
             assert rep.num_states() > 0
 
+    def test_default_ltl_property_path_still_populates_compliance(self):
+        """The pre-ingestion single-string path is unaffected by property_suite."""
+        from src.pipeline import process_wir_batch
+
+        result = process_wir_batch([json.dumps(LINEAR_WIR)])
+        cluster = list(result["clusters"].values())[0]
+        assert "compliance" in cluster
+        assert "compliance_results" not in cluster
+        assert cluster["compliance"]["verdict"] in ("COMPLIANT", "VIOLATION", "INCONCLUSIVE")
+
+    def test_property_suite_populates_compliance_results_per_property(self):
+        """A real PropertySuite checks every conformance property per cluster,
+        under compliance_results (a list), not the legacy compliance dict."""
+        from src.pipeline import process_wir_batch
+        from src.property_ingest import load_property_suite
+
+        payload = {
+            "ltlf_property_suite": {
+                "P1_Structural_Control_Flow": [
+                    '!start(approve_loan) W done(approve_loan)',
+                    '!start(reject_loan) W done(approve_loan)',
+                ],
+                "P0_Critical_Sentinels": [], "P2_Quality_Limits": [],
+                "P3_Adversarial_Defenses": [], "synthesized_mutant_killers": [],
+            },
+            "tier_semantics": {
+                "P0_Critical_Sentinels": {"conformance_check": False},
+                "P1_Structural_Control_Flow": {"conformance_check": True},
+                "P2_Quality_Limits": {"conformance_check": True},
+                "P3_Adversarial_Defenses": {"conformance_check": False},
+                "synthesized_mutant_killers": {"conformance_check": False},
+            },
+        }
+        suite = load_property_suite(payload)
+        assert len(suite.conformance_properties()) == 2
+
+        result = process_wir_batch(
+            [json.dumps(LINEAR_WIR)],
+            bpmn_tasks=["approve_loan", "reject_loan"],
+            property_suite=suite,
+        )
+        cluster = list(result["clusters"].values())[0]
+        assert "compliance_results" in cluster
+        assert "compliance" not in cluster
+        results = cluster["compliance_results"]
+        assert len(results) == 2
+        for r in results:
+            assert r["verdict"] in ("COMPLIANT", "VIOLATION", "INCONCLUSIVE", "ERROR")
+            assert r["tier"] == "P1_Structural_Control_Flow"
+            assert r["ltl_property"].startswith('!"')  # Option-B quoted atom, not start(...)
+
 
 # ---------------------------------------------------------------------------
 # Test: Shared bdd_dict invariant
