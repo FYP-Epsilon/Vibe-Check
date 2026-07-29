@@ -27,12 +27,9 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r module_02_extract/requirements.txt pytest
-      # test_monitoring_matches_settrace asserts `sys.monitoring` (Python
-      # 3.12+ only) -- a known, separately-tracked pre-existing gap
-      # (vibecheck-vault/Next Steps.md item #13a), not something this
-      # workflow should paper over silently or leave permanently red.
-      # Remove this deselect once #13a is resolved.
-      - run: pytest module_02_extract/tests/ -v --deselect module_02_extract/tests/test_dynamic_tracer_parity.py::test_monitoring_matches_settrace
+      # test_monitoring_matches_settrace now self-skips on <3.12 (fixed in
+      # item #13a) rather than needing a workflow-level deselect here.
+      - run: pytest module_02_extract/tests/ -v
 
   test-module-03:
     name: Module 03 (Equivalence Engine) tests
