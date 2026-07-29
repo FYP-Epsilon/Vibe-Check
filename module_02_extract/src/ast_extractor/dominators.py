@@ -76,32 +76,50 @@ class DominatorAnalyzer:
         reachable = nx.descendants(self.g, entry) | {entry}
         sub = self.g.subgraph(reachable).copy()
 
-        idoms = nx.immediate_dominators(sub, entry)
+        # nx.immediate_dominators's entry-node convention is version-
+        # dependent: confirmed idom[entry] == entry on networkx 3.2.1,
+        # confirmed entry omitted from the dict entirely on networkx 3.6.1
+        # (see test_dominators.py's module docstring for how this was
+        # diagnosed). Either way, the frontier walk below climbs this
+        # chain via idoms.get(cur) expecting to eventually hit None -- on
+        # a version where entry maps to itself, idoms.get(entry) keeps
+        # returning entry forever once the climb reaches it, an infinite
+        # loop, not a slow computation. Normalize the same way
+        # compute_immediate_dominators() already does, so entry's chain
+        # ends at None on every networkx version, not just the ones that
+        # already omit or already null out the key.
+        raw_idoms = nx.immediate_dominators(sub, entry)
+        idoms = {node: (dom if dom != node else None) for node, dom in raw_idoms.items()}
 
         # Build dominator tree
         dom_tree: dict[str, set[str]] = {n: set() for n in sub.nodes()}
         for node, dom in idoms.items():
-            if dom != node:
+            if dom is not None:
                 dom_tree[dom].add(node)
 
-        # Compute frontier
+        # Compute frontier -- textbook Cytron et al. algorithm: for each
+        # node with >=2 predecessors, walk each predecessor's own idom
+        # chain up to (but not including) the node's own immediate
+        # dominator, adding the node to every runner's frontier along the
+        # way. The previous version compared `_dominates(node, runner)`
+        # instead of `runner == idoms.get(node)` -- domination only flows
+        # from ancestor to descendant in the idom tree, so a node almost
+        # never dominates any of its own idom-chain ancestors, meaning
+        # that check essentially never fired and the walk ran all the way
+        # to the root instead of stopping at the node's immediate
+        # dominator. Confirmed wrong on a plain diamond CFG (entry -> A,
+        # entry -> B, A -> merge, B -> merge): produced frontier[entry] =
+        # {merge}, when entry -- dominating the entire reachable graph --
+        # must have an empty frontier.
         frontier: dict[str, set[str]] = {n: set() for n in sub.nodes()}
-
-        def _dominates(d: str, n: str) -> bool:
-            """True if *d* dominates *n* (including strict equality)."""
-            cur: Optional[str] = n
-            while cur is not None:
-                if cur == d:
-                    return True
-                cur = idoms.get(cur)
-            return False
 
         for node in sub.nodes():
             preds = list(sub.predecessors(node))
             if len(preds) >= 2:
+                node_idom = idoms.get(node)
                 for pred in preds:
-                    runner = pred
-                    while runner is not None and not _dominates(node, runner):
+                    runner: Optional[str] = pred
+                    while runner is not None and runner != node_idom:
                         frontier[runner].add(node)
                         runner = idoms.get(runner)
 
