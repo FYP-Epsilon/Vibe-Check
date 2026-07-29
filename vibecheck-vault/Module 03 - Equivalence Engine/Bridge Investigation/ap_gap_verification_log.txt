@@ -1,0 +1,89 @@
+VibeCheck AP-vocabulary gap — verification log
+Generated: 2026-07-28T22:03:22Z
+Repo: /Users/kavindu/Projects/Vibe-Check @ 6d4c47b
+SPOT: /tmp/spot-2.11.6/bin/ltlfilt (spot) 2.11.6  [static build from pinned 2.11.6 tarball]
+NOTE: module_03_equiv has NO compiled .so on this machine. No claim below
+      involves executing the project's own C++ engine.
+
+== F1 (SOURCE): lifter emits ONE atom per task, no lifecycle ==
+  lifter.cpp:261-297  resolve_task_label(): for each action, semantic_match()
+                      then ensure_ap(aut, matched). Multi-action tasks CONJOIN
+                      (result &= ap_bdd) onto ONE label -- no new states.
+  lifter.cpp:432-459  task label attaches to the task's OUTGOING edge,
+                      conjoined with the guard label.
+  grep 'start_|done_|lifecycle' over lifter.cpp, lifter.py => NO MATCHES
+
+== F2 (SOURCE): the Python track never labels task actions at all ==
+  lifter.py:284-319  _create_transitions() reads ONLY edge guards;
+                     label = 'tau' when guard is None/empty.
+  grep for 'code' in lifter.py => single hit at :274 (copied into state meta,
+                     never turned into a label).
+  => the pure-Python 37-test track has NO task APs whatsoever; the AP gap
+     is 100% a C++-track concern, and option (b) must be implemented twice
+     or declared C++-only.
+
+== F3 (EXPERIMENT): option (a)/(c) collapse makes the P0 sentinel a TAUTOLOGY ==
+  Evaluated with Module 01's OWN evaluate_ltlf over all 30 non-empty finite
+  traces of length<=4 over a single atom:
+    '!Approve W Approve'  => {True} for every trace  => detects nothing
+  Two-atom control '!d W s' => {True,False}; falsifying trace [['d']]
+
+== F4 (EXPERIMENT): option (d) simultaneity is VACUOUS BY CONSTRUCTION ==
+  property under test: !done_Approve W start_Approve
+  translated:          alive & ((!alive | !done_Approve) W start_Approve) & (alive U G!alive)
+  Hand-built alive-instrumented words through the real Phase D algorithm:
+    start&done simultaneous          -> COMPLIANT
+    done alone, start never appears  -> VIOLATION   (so (d) is not TOTALLY blind)
+    neither fires                    -> COMPLIANT
+  BUT the decisive test: (d) guarantees the structural invariant
+    G(done_Approve <-> start_Approve)
+  because both APs are conjoined onto the SAME transition. Intersecting that
+  invariant with the negated property:
+    => EMPTY. No (d)-shaped automaton can EVER violate the sentinel.
+  Cross-check with Module 01's evaluator over the 14 simultaneity-respecting
+  traces: '!d W s' => {True} => VACUOUS.
+  The 'done alone' VIOLATION above is UNREACHABLE under (d): the lifter would
+  never emit done without start, since it conjoins them onto one edge.
+
+== F5 (EXPERIMENT): option (b) two-step split DOES discriminate ==
+    start then done (correct order) -> COMPLIANT
+    done then start (inverted)      -> VIOLATION
+  Ordering is observable, so the sentinel retains its meaning.
+
+== F6 (SOURCE): Phase B tau tests are label-based; split adds OBSERVABLE steps ==
+  C++  lifter.cpp:551-557  is_tau(cond): true iff cond==bddtrue or cond is a
+                           registered tau var.
+  Py   stuttering_engine.py:170 and :344  silent iff lbl in ('tau','true')
+  => a start_X/done_X-labeled edge is NOT tau, so the synthetic state is not
+     absorbed by stuttering collapse; it survives into the quotient.
+
+== F7 (SOURCE): Phase C isomorphism compares edge CONDITIONS and counts ==
+  are_isomorphic.hh:37-41  bijection must preserve transition condition AND
+                           acceptance set.
+  are_isomorphic.cc:101-105 trivially_different(): different num_states or
+                           num_edges => immediately not isomorphic.
+  => uniform splitting changes state/edge counts for ALL models equally
+     (order-preserving), but SELECTIVE splitting would split some models and
+     not others => breaks cluster membership. See memo section 5.
+
+== F8 (SOURCE): tests that hard-code counts and WOULD break under (b) ==
+  test_cpp_engine.py:127  assert graph.num_states() == 3   (SIMPLE_LINEAR_WIR, 1 task)
+  test_cpp_engine.py:133  assert graph.num_edges()  == 2
+  test_cpp_engine.py:145  assert graph.num_states() == 5   (BRANCHING_WIR, 2 tasks)
+  test_cpp_engine.py:151  assert graph.num_edges()  == 5
+  test_phase_b.py:434     assert collapsed.num_states() == graph.num_states()-1
+  test_pipeline.py:193    assert lts.num_states() == 3     (PYTHON track: UNAFFECTED, see F2)
+  test_pipeline.py:202    assert lts.num_states() == 5     (PYTHON track: UNAFFECTED)
+  Test totals by file: cpp_engine 29, phase_b 28, phase_c 19, pipeline 37
+
+== F9 (SOURCE): a spec->code vocabulary channel ALREADY exists ==
+  lifter.cpp:101-103 set_bpmn_tasks(); pipeline.py:96-97 passes bpmn_tasks through.
+  => the lifter already receives spec-side task names; option (b) needs no new
+     plumbing to know WHICH tasks matter.
+
+== F10 (SOURCE): multi-action tasks conjoin onto one label ==
+  lifter.cpp:279-295 loop: result &= ap_bdd for each matched action.
+  MULTI_ACTION_TASK_WIR (test_cpp_engine.py:81-96) has 3 code lines in one task
+  node: verify_identity(user), approve_loan(data), print('done').
+  => 'which action is the start and which the done' is UNDEFINED for such nodes.
+     Open question, see memo section 8.
