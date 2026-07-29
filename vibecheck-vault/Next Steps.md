@@ -248,7 +248,45 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
    `e2e_eval_results.json`. Regression tests: `test_mutate.py` (pure AST logic,
    always runs) + `test_harness.py` (pins uid 77's exact mutation outcomes,
    skipped like `test_cpp_engine.py` if the C++ engine isn't compiled).
-8. **Module 01 tests — third cycle with zero.** Gates, PBCTS convergence (IDCD), SCSL rounds, and the status codes are entirely unexercised. Minimum: gate boundary tests, a converging and a non-converging PBCTS fixture, and a regression test for the startup bug. No more Phase rewrites without tests landing in the same commit.
+8. ✅ **Module 01 tests — done 2026-07-30.** 4 new files, 26 tests total
+   (module_01_spec/tests/), covering exactly the roadmap's stated minimum:
+   - `test_phase1_gate.py` (6 tests) — Phase 1's node-coverage gate boundary
+     (`_layer_v1_certify`), both directly (white-box, hits the exact `>= 1.0`
+     threshold) and via real BPMN XML, including the self-healing recovery
+     pass and a genuine unrecoverable-FAIL case (a non-BPMN-namespaced element
+     with an `id`, which V3's namespace-blind counting flags but neither V2
+     nor the recovery pass — both BPMN-namespace-scoped — can ever map).
+   - `test_phase3_gate.py` (5 tests) — Phase 3's mutation-kill gate boundary
+     (`MutationValidator._certify`, `C_struct >= 1.0 AND killed_ratio >= 1.0`)
+     plus one real end-to-end `execute_validation_pipeline()` run.
+   - `test_pbcts_convergence.py` (4 tests) — IDCD convergence (a real
+     converging fixture, and `k_max=1` as the cleanest deterministic way to
+     pin the non-converging path, since the convergence check itself requires
+     `k > 1`) and SCSL correction synthesis (`_compute_corrections`), both a
+     genuine-gap case and a no-correction case.
+   - `test_main_api.py` (6 tests) — the startup-bug regression (`main.py`
+     must always import cleanly) plus the status-code vocabulary across all
+     paths: 400 (empty XML), 500 `UNEXPECTED_ERROR` (malformed XML — no
+     specific handler exists for this, noted as a gap item #10 should also
+     cover), 422 `PHASE_1_GATE_FAIL`, and the happy path's `PASS` /
+     `PASS_PBCTS_UNCONVERGED` vocabulary.
+   Two real things found while writing these, not assumed:
+   - An empty/degenerate diagram (0 executable nodes) **fails** Phase 1's
+     gate rather than vacuously passing — the `> 0` guard only prevents
+     division by zero, it doesn't special-case coverage to 1.0.
+   - `module_01_spec/src/main.py` and `module_03_equiv/src/main.py` share the
+     bare module name `main` — running both modules' test suites in one
+     pytest session, a plain `import main` after
+     `test_export_for_module_03.py`'s `test_real_export_is_ingestible_by_module_03`
+     (which inserts `module_03_equiv/src` onto `sys.path` ahead of
+     `module_01_spec/src`) silently resolves to the *wrong* file. Worked
+     around in `test_main_api.py` via `importlib.util.spec_from_file_location`
+     under a private module name; not fixed at the source level (renaming
+     either `main.py` would be a larger, unrelated change) — flagged here in
+     case a future CI run (item #9) hits the same collision.
+   Full suite: 26/26 pass; cross-checked against module_02_extract/tests/ and
+   demo/ in the same pytest session for further collisions — only the
+   pre-existing, unrelated `sys.monitoring` gap (item #13a) shows up.
 9. **CI.** `.github/` holds only CODEOWNERS. Add a workflow: per-module tests + a docker-compose build check. M01's startup crash would have been caught by a one-line `uvicorn` smoke test — as would `extract-engine`'s container never having started at all, found 2026-07-30 (item #6) only by actually running `docker compose up` for the first time this project's history.
 10. **Fix M01 status-code inconsistency** — `FAIL_ALIGNMENT_UNPROVEN` (api.py) vs `PASS_PBCTS_UNCONVERGED` (main.py) for the same outcome. Downstream consumers need one vocabulary.
 
