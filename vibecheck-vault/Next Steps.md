@@ -287,7 +287,37 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
    Full suite: 26/26 pass; cross-checked against module_02_extract/tests/ and
    demo/ in the same pytest session for further collisions — only the
    pre-existing, unrelated `sys.monitoring` gap (item #13a) shows up.
-9. **CI.** `.github/` holds only CODEOWNERS. Add a workflow: per-module tests + a docker-compose build check. M01's startup crash would have been caught by a one-line `uvicorn` smoke test — as would `extract-engine`'s container never having started at all, found 2026-07-30 (item #6) only by actually running `docker compose up` for the first time this project's history.
+9. ✅ **CI — done 2026-07-30.** `.github/workflows/ci.yml`: 4 per-module test
+   jobs (module_01, module_02, module_03, cross-module `demo/`) on Python 3.11
+   matching each service's own Dockerfile, plus a 5th job that is the actual
+   point of this item — `docker-compose-smoke` — which does not stop at
+   `docker compose build`. Both real incidents this item exists to prevent
+   (M01's deleted-`automata_lifter` import crash, item #6's discovery that
+   `extract-engine` had never once started in this project's history) built
+   their images cleanly and only crashed at `uvicorn` startup, so a
+   build-only check would have caught neither. The smoke job instead: brings
+   the real stack up (`docker compose up -d`), fails if `docker compose ps`
+   shows any container outside the `running` state (the one check that
+   would have caught both incidents directly, verified locally against a
+   real `docker compose up` run before committing), then confirms each
+   service actually answers a request — `spec-engine`'s `/`, `extract-engine`'s
+   `/docs` (its only route is `POST /verify`, so this is the most
+   business-logic-neutral proof `uvicorn` is routing), `equiv-engine`'s
+   `/health`, all three reached via `docker compose exec` + Python `urllib`
+   from inside the compose network since only `ui-engine`'s port is
+   published to the host in `docker-compose.yml`; `ui-engine` itself is
+   curled directly on `localhost:8501`. Every one of these commands was run
+   for real against this repo's actual containers before being committed to
+   the workflow, not just written and hoped to work.
+   `module_02_extract/tests/test_dynamic_tracer_parity.py::test_monitoring_matches_settrace`
+   is explicitly `--deselect`-ed with an inline comment citing item #13a
+   (asserts `sys.monitoring`, Python 3.12+ only — CI runs 3.11 to match
+   production) rather than either left permanently red or silently hidden;
+   remove the deselect once #13a is resolved. All 4 test jobs pass cleanly
+   in this configuration (module_01 26/26, module_02 161/161 after the
+   deselect, module_03 59 passed + 83 skipped, demo 8 passed + 6 skipped —
+   the skips are the existing, intentional `skipif(not HAS_MODULE)` convention
+   for the uncompiled C++ engine, not new gaps).
 10. **Fix M01 status-code inconsistency** — `FAIL_ALIGNMENT_UNPROVEN` (api.py) vs `PASS_PBCTS_UNCONVERGED` (main.py) for the same outcome. Downstream consumers need one vocabulary.
 
 ## P3 — Hygiene and honest accounting
