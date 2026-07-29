@@ -250,15 +250,32 @@ struct ComplianceResult {
  *      code side never mentions is unconstrained in the product, so the emptiness
  *      search can resolve it however proves a violation, regardless of what the code
  *      under test actually does.
- *   3. Negate the formula (violation property).
- *   4. Translate the negated formula into a Büchi automaton using the
- *      SAME bdd_dict as code_aut (critical for correct product).
- *   5. Compute the synchronous product: code_aut ⊗ violation_aut.
+ *   3. If code_aut has no genuine cycle (the common case: the lifter's automata
+ *      terminate at the WIR's exit node, which has no outgoing edge), bridge the
+ *      finite-trace formula onto an infinite-trace check via the standard LTLf->LTL
+ *      construction (De Giacomo & Vardi, IJCAI'13; spot::from_ltlf()): negate
+ *      from_ltlf(phi), and check it against an "alive-extended" copy of code_aut
+ *      (instrument_alive_extension() — every edge conjoined with alive=true and
+ *      closed under mutual exclusion, every dead-end state given a "!alive"
+ *      self-loop). Without this, a terminating automaton has no infinite run at
+ *      all, so the emptiness check below is trivially (and wrongly) satisfied for
+ *      every property regardless of what the code does. If code_aut DOES have a
+ *      genuine cycle, skip the bridge and negate phi directly — from_ltlf's
+ *      well-formedness obligation assumes the trace it bridges eventually and
+ *      permanently stops, which a real loop does not satisfy, and applying it
+ *      anyway manufactures a violation unrelated to phi.
+ *   4. Translate the negated (possibly bridged) formula into a Büchi automaton
+ *      using the SAME bdd_dict as code_aut (critical for correct product).
+ *   5. Compute the synchronous product: (code_aut or its alive-extension) ⊗ violation_aut.
  *   6. Run emptiness check on the product.
  *   7. If the product is empty → COMPLIANT; otherwise → VIOLATION with counter-example.
  *
  * @param code_aut   The automaton to check (must have Büchi acceptance).
- * @param ltl_string An LTL/PSL formula string (SPOT infix syntax).
+ * @param ltl_string An LTL/PSL formula string (SPOT infix syntax). Atom names that
+ *                    collide with a reserved LTL operator letter (G, F, X, U, W, R,
+ *                    M) must be double-quoted or SPOT's parser will misread them
+ *                    (e.g. unquoted GitHub_x parses as G(itHub_x) — the caller's
+ *                    responsibility, not something this function can detect).
  * @return ComplianceResult with verdict and optional counter-example / unmatched atoms.
  */
 ComplianceResult check_compliance(const spot::twa_graph_ptr& code_aut,
