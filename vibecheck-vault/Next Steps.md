@@ -384,7 +384,15 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
     V2 is a real eval-design effort, out of scope for a documentation-
     honesty pass. No code changed; `Module 02 Knowledge.md` and the eval
     reports themselves were already correct and left untouched.
-13. **Cleanup:** unused `networkx` in M04 requirements; M03 `main.py` is a stale P1.1 milestone demo — replace with the real pipeline entrypoint or remove.
+13. ✅ **Cleanup — done 2026-07-30.** Removed `networkx` from
+    `module_04_ui/requirements.txt` — confirmed genuinely unused (grep,
+    zero hits anywhere in `module_04_ui/src/`, the module's only Python
+    file), then rebuilt and started `ui-engine` for real and confirmed it
+    still serves `200` on `/` without it. The item's other half — "M03
+    `main.py` is a stale P1.1 milestone demo" — is now stale wording, not
+    a remaining task: `main.py` was rewritten into the real FastAPI
+    service (`/lift`, `/check`, `/health`) back in PR #74, earlier this
+    session, before this item was ever reached.
 13a. **M02 test suite is Python-version-sensitive in more than one place, not yet diagnosed.** `pytest module_02_extract/tests/test_ast_extractor.py::TestWIRDataLayer` (and, apparently, `TestV3Certificate`/`TestEndToEnd` — all three call `run_v3_pipeline`) hangs indefinitely under Python 3.9 rather than failing or passing (found 2026-07-29; confirmed pre-existing and unrelated to the D2 lifting-scope change via `git stash`, reproduces identically on HEAD without it). Separately, confirmed 2026-07-29 by actually running the suite under Python 3.11 (matching `module_02_extract/Dockerfile`'s `python:3.11-slim`): `run_v3_pipeline` itself works correctly there (no hang, no `ast.TryStar`/`match`-statement failure — those were pure 3.9-venv artifacts), but `test_dynamic_tracer_parity.py`'s 9 `test_monitoring_matches_settrace` cases fail outright with `AssertionError: sys.monitoring expected on 3.12+` — that test hard-requires Python 3.12 (`sys.monitoring`, PEP 669), one minor version ahead of the Dockerfile's pinned 3.11. Not diagnosed further — worth a real look (likely either bump the Dockerfile to 3.12+ or gate the sys.monitoring path behind a version check), since either the 3.9 hang or the 3.11/3.12 mismatch is exactly the kind of thing that silently breaks CI once item #9 exists.
 14. **Thesis parity:** only M02 has a Chapter 5 draft. Once P1 lands, M01/M03 need equivalent write-ups (PBCTS/EAS_BDA/IDCD/SCSL on one side, divergence-sensitive bisimulation + SPOT compliance on the other).
 
