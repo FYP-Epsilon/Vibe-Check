@@ -137,7 +137,35 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
     m3_payload = {
         "semantic_graph": pipeline_result["phase_1"]["semantic_graph"],
         "ltlf_property_suite": pipeline_result["phase_3"]["refined_ltlf_property_suite"],
-        "loop_bound_documented": loop_bound
+        "loop_bound_documented": loop_bound,
+        # Found by the Module 01 <-> Module 03 bridge investigation: P0 sentinels
+        # of the shape '!done(T) W start(T)' are unfalsifiable under any lifting
+        # faithful to task semantics -- the invariant that makes a lifting faithful
+        # IS the property. A violation there means the Module 03 lifter has a bug,
+        # not that the generated code is wrong. Encoded here so any future
+        # Module 03 ingestion code inherits the correct handling by construction
+        # rather than by tribal knowledge.
+        "tier_semantics": {
+            "P0_Critical_Sentinels": {
+                "role": "lifting_self_test",
+                "conformance_check": False,
+                "note": (
+                    "Unfalsifiable under any faithful lifting. Do not report as a "
+                    "passed/failed conformance verdict against generated code; use "
+                    "only to self-test the Module 03 lifter."
+                ),
+            },
+            "P1_Structural_Control_Flow": {
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Cross-task ordering/exclusivity properties, genuinely falsifiable against code.",
+            },
+            "P2_Quality_Limits": {
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Quality/iteration-bound properties, genuinely falsifiable against code.",
+            },
+        },
     }
 
     with open(filepath, "w") as f:
