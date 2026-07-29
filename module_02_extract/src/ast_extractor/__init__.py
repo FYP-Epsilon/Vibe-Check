@@ -10,6 +10,7 @@ from .schema import _CANDIDATE_SCHEMA_PATHS, _WIR_SCHEMA
 from .models import WIRNode, WIREdge, Literal, CNF
 from .helpers import _unparse, _extract_name, _collect_vars
 from .cfg_extractor import CFGExtractor
+from .call_order_view import derive_call_order_wir
 from .dominators import DominatorAnalyzer
 from .guards import GuardExtractor
 from .data_layer import WIRDataLayer
@@ -27,6 +28,7 @@ __all__ = [
     "_extract_name",
     "_collect_vars",
     "CFGExtractor",
+    "derive_call_order_wir",
     "DominatorAnalyzer",
     "GuardExtractor",
     "WIRDataLayer",
