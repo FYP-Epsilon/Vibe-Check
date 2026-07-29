@@ -1,0 +1,144 @@
+VibeCheck Session-3 — gateway atoms & sentinel falsifiability — verification log
+Generated: 2026-07-29T06:59:51Z
+Repo: /Users/kavindu/Projects/Vibe-Check @ af28e52
+SPOT: /tmp/spot-2.11.6/bin/ltlfilt (spot) 2.11.6  [static build from pinned 2.11.6 tarball]
+
+SCOPE LIMIT: module_03_equiv has NO compiled extension on this machine. No claim below
+  executes VibeCheck's C++ engine. Module 02's CFGExtractor and Module 01's evaluate_ltlf
+  ARE executed directly (real code, real output). C++ lifter behaviour is established by
+  reading lifter.cpp and simulating its documented logic in Python where noted.
+
+==============================================================================
+PART 1 — Q1: gateway atoms
+==============================================================================
+
+== G1 (SOURCE, CORRECTS Session-2 premise): gateway nodes DO carry guard text ==
+  cfg_extractor.py:335-338  visit_If: cond_block = _make_block(node_type='gateway')
+                            cond_block.guard = _unparse(node.test)
+  cfg_extractor.py:357-358  _link(cond_block, then_entry, guard=cond_text)
+                            _link(cond_block, else_entry, guard='not (cond_text)')
+  Session 2 recorded gateways as carrying bddtrue labels. That was WRONG:
+  the guard text reaches the lifter as an EDGE guard, and resolve_edge_label
+  (lifter.cpp:222-259) turns it into an AP via sanitisation.
+  => a gateway ALREADY produces an atom today, e.g. 'score_50' from 'score > 50'.
+  The Q1 premise 'gateways get bddtrue' is false; the real gap is that the atom is
+  a sanitised GUARD EXPRESSION, not M01's node(...) identity.
+
+== G2 (EXECUTED, OVERTURNS a premise shared by all 3 briefs): ==
+     WIR 'task' nodes are FUNCTION DEFINITIONS, not business actions.
+  cfg_extractor.py:474-475  node_type='task' is set ONLY in visit_FunctionDef;
+                            n.code.append(f'def {node.name}(...)')
+  grep 'node_type=' cfg_extractor.py -> task appears at :474 and nowhere else.
+  Business calls become type='block' (visit_Expr), which resolve_task_label
+  (lifter.cpp:264-266) SKIPS because it returns bddtrue unless type=='task'.
+
+  Executed CFGExtractor on:
+      def run(score):
+          if score > 50: approve_loan(score)
+          else:          reject_loan(score)
+  TOP-LEVEL graph (the only graph the C++ lifter reads):
+      node_1 entry | node_2 exit | node_3 task code=['def run(...)']
+  sub-CFG 'run' (C++ lifter never reads it):
+      node_1 gateway guard='score > 50'
+      node_2 block   code=['approve_loan(score)']
+      node_3 block   code=['reject_loan(score)']
+  => the atom the lifter emits is 'run' (the DEFINITION), not approve_loan/reject_loan.
+
+== G3 (SOURCE): the C++ lifter never reads the 'functions' sub-CFGs at all ==
+  grep 'functions' over lifter.cpp -> NO MATCHES.
+  lifter.py:153 DOES iterate wir_json['functions'] and lifts each as a SEPARATE LTS
+  (one disconnected LTS per function, appended to a list).
+  => C++ track: real control flow invisible.
+     Python track: real control flow present but split across disconnected automata,
+     so no single automaton contains a cross-function ordering to check.
+
+== G4 (EXECUTED, real FLOW-BENCH): lifted order is DEFINITION order, not execution order ==
+  Variant 1__qwen3-next-80b.py defines GitHub_..._create_Repository, then
+  Jira_..._create_Issue, then workflow(); workflow() calls Jira FIRST, then GitHub.
+  Lifted top-level chain: entry -> GitHub -> Jira -> workflow -> exit  (definition order)
+  Actual execution order: Jira -> GitHub                               (INVERTED)
+
+  Measured across all 184 normalized FLOW-BENCH variants (0 parse errors):
+      variants with an orchestrating function : 181
+      definition order == call order          : 95
+      definition order != call order          : 86   => 47.5%
+  => for ~half the corpus, any ordering property checked against the top-level
+     automaton is checked against the WRONG SEQUENCE.
+
+== G5 (EXECUTED): gateways and task-nodes NEVER share a graph ==
+  Across all 184 variants (881 graphs total):
+      variants with a gateway ANYWHERE          : 62
+      variants with a gateway at TOP level      :  0
+      'task'-type nodes inside a sub-CFG        :  0
+      variants where gateway+task share a graph :  0
+  per-graph type combinations:
+      (none of gateway/task/loop): 626 | [task]: 184 | [gateway]: 41
+      [loop]: 30 | [gateway,loop]: 21
+  => task atoms live ONLY at top level; gateway atoms live ONLY in sub-CFGs.
+     A property mentioning both a task atom and a gateway atom can NEVER be
+     checked, because the two atoms are structurally in DIFFERENT automata.
+     This is not a labelling gap; adding node(...) atoms to gateways CANNOT fix it.
+
+==============================================================================
+PART 2 — Q2: is the self-referential sentinel fixable?
+==============================================================================
+
+== S1 (EXPERIMENT, answers Q2 for the P0 shape): NO — unfalsifiable for ANY lifting ==
+  Any lifting that is FAITHFUL to task semantics enforces the invariant
+      'every occurrence of done_T is preceded by start_T'.
+  That invariant is LOGICALLY IDENTICAL to the property !done_T W start_T.
+  Formally: intersect(negation of property, models satisfying invariant) = EMPTY.
+      product states: 4;  --is-empty => EMPTY.
+  => the P0 self-referential sentinel is unfalsifiable not because of a lifting
+     DESIGN FLAW but because the property asks the code to contradict the very
+     invariant that makes the lifting faithful. No construction can fix it.
+     Session 2's reviewer was right about (b), and the result generalises to ALL
+     constructions, including any future one.
+
+== S2 (EXPERIMENT, the constructive half of the answer): ==
+     CROSS-TASK properties ARE genuinely checkable under the same invariant.
+  M01's P1 sequence-flow shape (ltlf_synthesizer.py:119,127-128) is
+      !start(B) W done(A)
+  which relates TWO DIFFERENT tasks. Under the faithful-lifting invariant
+      (!done_A W start_A) & (!done_B W start_B)
+  the negated property is still satisfiable:
+      product NON-EMPTY; witness word from SPOT:
+        alive & !done_A & start_A & start_B; cycle{!alive}
+      (B starts in the same step A starts, before A is done -> real violation)
+  Cross-checked with M01's OWN evaluate_ltlf over the 1979 faithful traces of
+  length<=3 (of 4368 total):
+      !done_A W start_A   -> {True}         UNFALSIFIABLE
+      !start_B W done_A   -> {True,False}   FALSIFIABLE, witness [['start_B']]
+  Two tools, two trace semantics (infinite-trace SPOT, finite-trace evaluate_ltlf),
+  same verdict.
+
+== S3 (EXPERIMENT): falsifiability of EVERY M01 property shape under faithful lifting ==
+  Method: intersect(!translated_property, faithful-lifting invariant); non-empty=checkable.
+      P0 self-ref  !done_A W start_A          UNFALSIFIABLE (vacuous)
+      P1 seq flow  !start_B W done_A          FALSIFIABLE  (checkable)
+      P1 XOR excl  G(done_A -> !done_B)       FALSIFIABLE  (checkable)
+      P1 AND sync  G(start_A <-> start_B)     FALSIFIABLE  (checkable)
+      P1 AND sync  G(done_A <-> done_B)       FALSIFIABLE  (checkable)
+  => exactly ONE of the five shapes is inherently vacuous, and it is the P0 tier.
+     The P1 tier carries all the genuine checking power.
+
+== S4 (EXPERIMENT, confirms the brief's 'dangerous category'): ==
+     an UNMATCHED atom on the RHS of a weak-until is a FALSE-POSITIVE generator.
+  If done_A is never matched by the lifter, its AP is permanently false, so
+      !start_B W done_A   collapses to   G(!start_B).
+  Evaluated with M01's evaluate_ltlf:
+      correct code, B starts, A's done unobservable -> FALSE (reports VIOLATION)
+      correct code, B never starts                  -> TRUE
+  => whenever start_B matches but done_A does not, CORRECT code is reported
+     non-compliant. This is worse than vacuity: vacuity yields false GREEN,
+     this yields false RED, and G5 shows the atoms are in different automata
+     precisely when this shape arises.
+
+== S5 (EXECUTED): one action, several call sites — no done-without-start ==
+  Retry shape (try: approve_loan / except: log_retry; approve_loan) sub-CFG 'workflow':
+      node_2 block ['approve_loan(data)']   (try path)
+      node_5 block ['approve_loan(data)']   (except path)
+      EDGE node_1 -> node_4 exc='TimeoutError'
+  Two distinct call sites for the SAME action; the WIR keeps them as separate nodes.
+  => a per-CALL-SITE split would emit start/done twice, which is faithful; it still
+     never produces done without a preceding start, so S1 stands.

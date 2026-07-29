@@ -108,8 +108,30 @@ CONSTRAINTS
 - Deliverable is a design memo (markdown), not code.
 ```
 
+## Evidence discipline, refined across three sessions — answer to "save this as a skill?"
+
+Yes — worth doing, but only with one addition the three-session bridge investigation proved
+necessary, not as originally stated. Each session's evidence-class labeling (VERIFIED-SOURCE /
+VERIFIED-EXPERIMENT / REASONED, later extended to BUILD-DEPENDENT and NOT-ESTABLISHED) made every
+memo *look* airtight — and yet Session 2's own recommended option carried an unreachability flaw
+of exactly the kind its own reachability check had just caught in a rejected option, and it took
+an external review pass to catch it, not the discipline itself catching it on the recommended
+option. Session 3 later proved the same instinct generalizes ("no invariant-respecting model
+produces the counterexample") and explicitly applied it to its own conclusion — that's the version
+worth codifying.
+
+**The rule to add, verbatim, to Agent Context or a saved skill:**
+*For any discrimination or detection claim — including, and especially, about whatever you are
+about to recommend, not just the options you reject — verify that the counterexample trace is
+producible by the actual construction, not merely that the abstract property can be violated by
+some hand-built word. Apply this check recursively to your own conclusion before presenting it.*
+
+Without that line, the evidence-class labeling is necessary but not sufficient — it documents
+*how confident* a claim is, not whether the claim's own logic was checked against itself.
+
 ## Links
 
 - [[Home]]
 - [[Next Steps]]
+- [[Module 03 - Equivalence Engine/Bridge Investigation/AP Vocabulary and Lifting Scope Findings|AP Vocabulary and Lifting Scope Findings]] — where this rule came from
 - [[Project Status.canvas|Project Status]]
