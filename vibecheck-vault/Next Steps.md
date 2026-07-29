@@ -340,7 +340,28 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
 
 ## P3 — Hygiene and honest accounting
 
-11. **Drop SPOT from M01's Dockerfile** (dead weight since the PBCTS pivot; nothing imports it) and fix `formula_normalizer.py` docstrings that still promise "SPOT-compatible grammar."
+11. ✅ **Drop SPOT from M01's Dockerfile — done 2026-07-30.** Confirmed dead
+    weight before removing anything: `formula_normalizer.py` is the only
+    file mentioning SPOT, only in docstrings/comments, and is never
+    imported by `api.py`/`main.py` (grep, zero hits) — `impact()` on
+    `FormulaNormalizer` independently confirms 0 upstream callers, LOW risk.
+    Removed the entire from-source SPOT 2.11.6 build (`wget`/`configure`/
+    `make install`, several minutes per build) and the `apt-get` toolchain
+    that existed only to support it (`build-essential`, `g++`, `cmake`,
+    `pkg-config`, `wget`, `tar`, `python3-dev`) — none of `fastapi`/
+    `uvicorn`/`networkx` need compilation, confirmed by the trimmed
+    Dockerfile's build log installing pure wheels only. Rebuilt
+    `spec-engine` for real (~8s vs. several minutes before), started it,
+    and ran a full real `/verify` request through all 4 phases inside the
+    container — `PASS_PBCTS_UNCONVERGED` end to end, not just a root-route
+    ping. Also fixed `formula_normalizer.py`'s docstring: it now states
+    plainly that the class is unused, and — a separate, more important
+    fact than just being dead code — that its own normalization scheme
+    (`start(X)` → `start_X`/`done(X)` → `done_X`, kept as separate atoms)
+    doesn't even match what `property_ingest.py`'s real, ported normalizer
+    does today (collapses `start`/`done` into one flat quoted atom per
+    task) — so this class couldn't be resurrected as-is even if it were
+    wired back in.
 12. **M02 certificate honesty items:** V2 contributes ≈ nothing on the current corpus (certificate is V1-driven), equivalent-mutant specificity is 0.1111, numeric-boundary bugs are a known blind spot. Either expand the corpus to exercise V2 or reframe the "multi-modal" claim in the thesis. The eval already states these openly — keep it that way.
 13. **Cleanup:** unused `networkx` in M04 requirements; M03 `main.py` is a stale P1.1 milestone demo — replace with the real pipeline entrypoint or remove.
 13a. **M02 test suite is Python-version-sensitive in more than one place, not yet diagnosed.** `pytest module_02_extract/tests/test_ast_extractor.py::TestWIRDataLayer` (and, apparently, `TestV3Certificate`/`TestEndToEnd` — all three call `run_v3_pipeline`) hangs indefinitely under Python 3.9 rather than failing or passing (found 2026-07-29; confirmed pre-existing and unrelated to the D2 lifting-scope change via `git stash`, reproduces identically on HEAD without it). Separately, confirmed 2026-07-29 by actually running the suite under Python 3.11 (matching `module_02_extract/Dockerfile`'s `python:3.11-slim`): `run_v3_pipeline` itself works correctly there (no hang, no `ast.TryStar`/`match`-statement failure — those were pure 3.9-venv artifacts), but `test_dynamic_tracer_parity.py`'s 9 `test_monitoring_matches_settrace` cases fail outright with `AssertionError: sys.monitoring expected on 3.12+` — that test hard-requires Python 3.12 (`sys.monitoring`, PEP 669), one minor version ahead of the Dockerfile's pinned 3.11. Not diagnosed further — worth a real look (likely either bump the Dockerfile to 3.12+ or gate the sys.monitoring path behind a version check), since either the 3.9 hang or the 3.11/3.12 mismatch is exactly the kind of thing that silently breaks CI once item #9 exists.
