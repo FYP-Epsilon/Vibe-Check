@@ -145,13 +145,38 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
    hardcoding). Verified end-to-end, output reproduced below. Regression tests:
    `demo/test_e2e_demo.py` (3 tests, skipped like `test_cpp_engine.py` if the C++ engine isn't
    compiled).
-   - **In-process, by design, not the HTTP chain**: this script imports all three modules' Python
+   - **`demo/e2e_demo.py` itself is in-process, by design**: it imports all three modules' Python
      packages directly in one process, honestly documented in its own docstring as crossing the
-     module boundary *for demo convenience* — production still deploys each module as its own
+     module boundary *for demo convenience*. Production still deploys each module as its own
      container with no access to the others' source (`docker-compose.yml`), unchanged by this.
-     Layering an HTTP-chain version (spec-engine → extract-engine → equiv-engine, using the `/verify`
-     and `/check` endpoints from PRs #74/#75) on top is still open, and needs `docker-compose build`
-     verified — this environment couldn't (SPOT-from-source is too slow here).
+   - **The real HTTP chain (spec-engine → extract-engine → equiv-engine, docker-compose) is now
+     also verified — done 2026-07-30.** `docker compose build && docker compose up -d` (all 4
+     images build and run; Docker Desktop turned out to be available in this environment after
+     all — the earlier "too slow to build here" note was based on a non-Docker local SPOT build,
+     not an actual attempt). Ran the exact same uid 44 / uid 77 chain over real HTTP calls between
+     the real containers (`spec-engine:8000/verify` → `extract-engine:8000/verify` →
+     `equiv-engine:8000/check`) and got **identical results** to the in-process demo:
+     `{2 VIOLATION, 1 COMPLIANT} / FAIL` for uid 44, `{1 COMPLIANT, 1 INCONCLUSIVE} / PASS` for
+     uid 77. Two more real, previously-undiscovered production bugs found and fixed in the process
+     — **`extract-engine`'s container had never successfully started until now**:
+     1. `z3_sym_engine/__init__.py`, `z3_sym_engine/{tracer,evaluator,concolic}.py`, and
+        `dynamic_tracer/__init__.py` all had `from .ast_extractor import ...` (single dot) where
+        `ast_extractor` is a *sibling* of `z3_sym_engine`/`dynamic_tracer`, not a child — needed
+        `from ..ast_extractor import ...` (two dots). The relative import raised `ImportError`,
+        silently caught by each file's own `except ImportError: from ast_extractor import ...`
+        fallback, which *also* failed in the container (only `/app` is on `sys.path`, not
+        `/app/src`) with a misleading `ModuleNotFoundError: No module named 'ast_extractor'` that
+        masked the real bug. Pre-existing since the `54cc3a2` z3_sym_engine-package-split refactor;
+        unrelated to anything this session touched in those files. Fixed all 5 occurrences.
+     2. `_run_verification`'s unconditional `source.replace('\\n', '\n').replace('\\t', '\t')`
+        corrupted any source whose *own* string literals contain a genuine `\n`/`\t` escape (an
+        f-string like `f"a\nb"` is valid Python; the replace turned its literal backslash-n into a
+        real newline character in the source *text*, breaking the literal and failing
+        `ast.parse`) — confirmed against **13/184 real FLOW-BENCH corpus variants**, all 13 now
+        parse correctly after removing the line entirely (no legitimate reason for a JSON API to
+        need it — `requests`/any proper JSON client already decodes `source_code` to the exact
+        literal text the client's file contains; M04's own `app.py` already sends it correctly).
+        Regression tests added (`TestLiteralEscapesInStringLiteralsNotCorrupted`).
    - **"Conforming vs non-conforming" is two specs, not one, stated plainly**: cross-tabbing the
      real corpus (`second_real_run_results.json`) found no single spec where different real LLM
      implementations produce different verdicts — every spec's variants behave identically. The
@@ -182,7 +207,7 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
 
 7. **E2E evaluation harness.** Extend M02's eval methodology (the strongest part of the project) to the full pipeline: FLOW-BENCH's 101 BPMN workflows give spec↔code pairs for free. Measure spec-conformance detection rate, false-alarm rate, and counterexample quality/usefulness. Report with CIs, as M02 already does.
 8. **Module 01 tests — third cycle with zero.** Gates, PBCTS convergence (IDCD), SCSL rounds, and the status codes are entirely unexercised. Minimum: gate boundary tests, a converging and a non-converging PBCTS fixture, and a regression test for the startup bug. No more Phase rewrites without tests landing in the same commit.
-9. **CI.** `.github/` holds only CODEOWNERS. Add a workflow: per-module tests + a docker-compose build check. M01's startup crash would have been caught by a one-line `uvicorn` smoke test.
+9. **CI.** `.github/` holds only CODEOWNERS. Add a workflow: per-module tests + a docker-compose build check. M01's startup crash would have been caught by a one-line `uvicorn` smoke test — as would `extract-engine`'s container never having started at all, found 2026-07-30 (item #6) only by actually running `docker compose up` for the first time this project's history.
 10. **Fix M01 status-code inconsistency** — `FAIL_ALIGNMENT_UNPROVEN` (api.py) vs `PASS_PBCTS_UNCONVERGED` (main.py) for the same outcome. Downstream consumers need one vocabulary.
 
 ## P3 — Hygiene and honest accounting
