@@ -1,0 +1,253 @@
+{
+  "n_gold_specs": 6,
+  "gold_uids": [
+    45,
+    72,
+    76,
+    77,
+    84,
+    85
+  ],
+  "skipped": [
+    "uid 72: no eligible literal for perturb_constant",
+    "uid 76: no eligible literal for perturb_constant",
+    "uid 84: no eligible literal for perturb_constant",
+    "uid 85: no eligible literal for perturb_constant"
+  ],
+  "detection_rate": 0.35714285714285715,
+  "detection_ci": [
+    0.1275984298591593,
+    0.6486198893840085
+  ],
+  "n_decisive_trials": 14,
+  "abstention_rate": 0.46153846153846156,
+  "abstention_ci": [
+    0.26587121742295106,
+    0.6662917815247078
+  ],
+  "n_order_trials": 26,
+  "by_mutation_kind": {
+    "drop_step": {
+      "n": 16,
+      "detected": 0,
+      "missed": 4,
+      "abstained": 12
+    },
+    "swap_adjacent": {
+      "n": 10,
+      "detected": 5,
+      "missed": 5,
+      "abstained": 0
+    }
+  },
+  "false_alarm_rate": 0.0,
+  "false_alarm_ci": [
+    0.0,
+    0.841886116991581
+  ],
+  "n_perturb_trials": 2,
+  "counterexample_quality_rate": 0.8,
+  "counterexample_quality_ci": [
+    0.28358206388191054,
+    0.9949492366205319
+  ],
+  "n_detected": 5,
+  "trials": [
+    {
+      "uid": 45,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to GitHub_Comment__3_0_0__create_Comment)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 45,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to GitHub_Branch__3_0_0__retrievewithwhere_Branch)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 45,
+      "kind": "drop_step",
+      "label": "drop stmt 2 (call to GitHub_Pullrequest__3_0_0__create_Pullrequest)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 45,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (GitHub_Comment__3_0_0__create_Comment <-> GitHub_Branch__3_0_0__retrievewithwhere_Branch)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 45,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 1<->2 (GitHub_Branch__3_0_0__retrievewithwhere_Branch <-> GitHub_Pullrequest__3_0_0__create_Pullrequest)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": false
+    },
+    {
+      "uid": 45,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Coupa_invoices__4_0_0__retrievewithwhere_invoices)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Coupa_suppliers__4_0_0__create_suppliers)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "drop_step",
+      "label": "drop stmt 2 (call to Coupa_purchase_orders__4_0_0__retrievewithwhere_purchase_orders)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "drop_step",
+      "label": "drop stmt 3 (call to Coupa_users__4_0_0__retrievewithwhere_users)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Coupa_invoices__4_0_0__retrievewithwhere_invoices <-> Coupa_suppliers__4_0_0__create_suppliers)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 1<->2 (Coupa_suppliers__4_0_0__create_suppliers <-> Coupa_purchase_orders__4_0_0__retrievewithwhere_purchase_orders)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 2<->3 (Coupa_purchase_orders__4_0_0__retrievewithwhere_purchase_orders <-> Coupa_users__4_0_0__retrievewithwhere_users)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": true
+    },
+    {
+      "uid": 76,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to GitHub_Comment__3_0_0__create_Comment)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 76,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Jira_Issue__2_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 76,
+      "kind": "drop_step",
+      "label": "drop stmt 2 (call to Jira_Status__2_0_0__retrievewithwhere_Status)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 76,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (GitHub_Comment__3_0_0__create_Comment <-> Jira_Issue__2_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 76,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 1<->2 (Jira_Issue__2_0_0__retrievewithwhere_Issue <-> Jira_Status__2_0_0__retrievewithwhere_Status)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": true
+    },
+    {
+      "uid": 77,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 77,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Amazon_S3_object__2_0_0__create_object)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 77,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket <-> Amazon_S3_object__2_0_0__create_object)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": true
+    },
+    {
+      "uid": 77,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 84,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to bambooHR_employees__2_0_0__retrievewithwhere_employees)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 84,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to bambooHR_dependents__2_0_0__retrievewithwhere_dependents)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 84,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (bambooHR_employees__2_0_0__retrievewithwhere_employees <-> bambooHR_dependents__2_0_0__retrievewithwhere_dependents)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": true
+    },
+    {
+      "uid": 85,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Trello_Board__2_0_0__create_Board)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 85,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to GitHub_Issue__3_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 85,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Trello_Board__2_0_0__create_Board <-> GitHub_Issue__3_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    }
+  ]
+}
