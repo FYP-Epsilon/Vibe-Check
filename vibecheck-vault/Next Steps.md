@@ -139,6 +139,21 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
    the earlier emulated projection.
 5. **Declare the canonical Phase D.** Two flavors now coexist: legacy Python reachability-BFS in `run_pipeline` and SPOT LTL in `process_wir_batch`. Pick one, mark the other deprecated, and say so in the docs — ambiguity here will be challenged at defense.
 6. **First end-to-end demo.** One BPMN spec → M01 suite → M03 check against a conforming and a non-conforming LLM implementation → PASS, and FAIL + readable counterexample. This is the money shot for the thesis and the demo.
+   **Progress 2026-07-29**: closed the specific gap PR #74 flagged — `extract-engine`'s `/verify`
+   now also returns `call_order_wir` (alongside the existing, untouched `wir` key), computed via
+   `derive_call_order_wir()` right after V3 succeeds. Without this, `equiv-engine`'s `/check`
+   endpoint had no real HTTP caller that could feed it a call-order-lifted WIR — every demo would
+   have had to go through a scratchpad script, same as the CP1 corpus re-run. Verified the
+   `derive_call_order_wir` call itself in isolation (matches PR #73's already-validated output);
+   **could not locally verify `_run_verification`'s new code path end-to-end** — this venv is
+   Python 3.9, and `run_v3_pipeline`'s own import chain requires 3.10+ (`ast.TryStar`) and 3.11+
+   (`match` in `z3_sym_engine/registry.py`), a pre-existing, unrelated gap (item #13a already
+   flags the same root cause). The real deployment is `python:3.11-slim` (Dockerfile), where this
+   is expected to run correctly — flagging the local-verification gap rather than claiming it.
+   **Still not done**: no committed script/UI wires M01 (spec-engine `/verify`) → M02 (extract-engine
+   `/verify`'s new `call_order_wir`) → M03 (equiv-engine `/check`) together end-to-end. That chain,
+   plus a conforming/non-conforming pair of real LLM variants and a readable counterexample
+   presentation, is what's left of item #6.
 
 ## P2 — Make it measurable and defensible
 
