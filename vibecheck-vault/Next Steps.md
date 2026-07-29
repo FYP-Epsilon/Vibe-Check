@@ -137,7 +137,22 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
    claim. The first real run (58 checks, `{VIOLATION: 18, COMPLIANT: 17, INCONCLUSIVE: 23}`) is the
    real-failure data (c)'s "wait and see" was for — CP1 (below) is now decidable from it, not from
    the earlier emulated projection.
-5. **Declare the canonical Phase D.** Two flavors now coexist: legacy Python reachability-BFS in `run_pipeline` and SPOT LTL in `process_wir_batch`. Pick one, mark the other deprecated, and say so in the docs — ambiguity here will be challenged at defense.
+5. ✅ **Canonical Phase D declared — done 2026-07-30.** `process_wir_batch` (SPOT/C++) is canonical —
+   every real caller already used it (module_03_equiv's `/check` endpoint, `demo/e2e_demo.py`, every
+   corpus run). `run_pipeline` (legacy Python reachability-BFS) is now marked LEGACY in its own
+   docstring, `pipeline.py`'s module docstring, and its CLI banner; `test_pipeline.py`'s 37 direct
+   component tests are untouched (deprecated ≠ untested — they validate real bisimulation/clustering
+   logic). Also fixed an adjacent false comment (`# gracefully degrade to pure-Python if not
+   compiled` on the `vibecheck_lifter` import) — `process_wir_batch` actually raises `RuntimeError`
+   when the C++ engine is missing; there is no fallback relationship between the two pipelines.
+   **Named, not silently dropped: loop-bound safety checking has no home in the canonical path.**
+   `run_pipeline`'s Phase D checks two things — forbidden-label reachability (subsumed by
+   `check_compliance`, expressible as an LTL safety property) and loop-bound safety
+   (`PropertyMonitor.from_loop_bound_check()`, which is NOT expressible via the current property
+   suite — `property_ingest.py` excludes P2_Quality_Limits from conformance checking). Declaring
+   `run_pipeline` legacy therefore leaves loop-bound checking unimplemented anywhere in the real
+   pipeline; that's an open gap, tracked here rather than papered over. See [[Module 03 -
+   Equivalence Engine/Module 03 Knowledge|Module 03 Knowledge]] for the doc-level decision record.
 6. ✅ **First end-to-end demo — done 2026-07-30.** `demo/e2e_demo.py`: BPMN spec → Module 01's real
    `export_for_module_03()` → Module 02's `derive_call_order_wir()` (the D2 fix) → Module 03's
    `process_wir_batch`/`check_compliance` → PASS/FAIL + a readable counterexample, run against the
