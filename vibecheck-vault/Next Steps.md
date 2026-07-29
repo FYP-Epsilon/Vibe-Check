@@ -3,6 +3,20 @@
 > Synthesized from the vault snapshot **2026-07-28** (main @ `7089711`): [[Project Status.canvas|Project Status]], [[Module 01 - Specification Analysis/Module 01 Knowledge|M01]], [[Module 02 - Verified IR Extraction/Module 02 Knowledge|M02]], [[Module 03 - Equivalence Engine/Module 03 Knowledge|M03]], [[Module 04 - Verification Portal/Module 04 Knowledge|M04]].
 > Ordered by *research leverage first*: the project's headline claim — end-to-end spec↔code verified translation validation — is mechanically possible for the first time, but not wired. Everything below serves getting that claim demonstrated, measured, and defensible.
 
+## Reprioritization flag (2026-07-29, pending your sign-off)
+
+The bridge investigation (three Claude Science sessions, see
+[[Module 03 - Equivalence Engine/Bridge Investigation/AP Vocabulary and Lifting Scope Findings|full findings]])
+surfaced something bigger than P1.4 was scoped to find: Module 03's C++ Phase A currently lifts a
+chain of **function definitions**, in **definition order**, and never reads inside function
+bodies at all — so its action atoms are function names, not business actions, and their order
+disagrees with real execution order in ~46% of a real 184-variant corpus (measured, then
+independently reproduced with a different method). This is arguably foundational to whether the
+C++ track models real program behavior *at all*, independent of whether Module 01 is ever wired
+in. Whether that should reorder P0–P3 below, or become its own P0/P1-adjacent item, is your call
+to make, not something restructured here unilaterally — flagging it prominently so it doesn't get
+lost inside P1.4's entry.
+
 ## The one thing that matters most
 
 **Wire Module 01 → Module 03.** Both mechanisms exist today: M01 exports an LTLf property suite (`module_03_input.json`) and M03's C++ `check_compliance` model-checks any SPOT LTL string with counterexample extraction. The only caller passes a hardcoded `'G("approved")'` placeholder. Until this is connected, the thesis's central claim is two halves, not a system.
@@ -29,17 +43,32 @@
    b. Instrument lifted automata with the `alive` AP on the Phase D path only — leave Phases
       B/C untouched, since Phase B's divergence-sensitivity is a deliberate result that
       shouldn't be perturbed by a Phase D concern.
-   c. Close the vocabulary gap: code-side APs are bare task names (`Approve`); spec-side atoms
-      are lifecycle events (`start_Approve`/`done_Approve`) — **confirmed from source these do
-      not intersect**. Needs an event-lifecycle mapping layer (one code action ↦ start/done AP
-      pair) — the biggest sub-task, likely deserves its own design pass rather than being
-      folded into this one.
+   c. **Superseded — the vocabulary gap turned out to be a symptom, not the root cause.**
+      Follow-up investigation found the actual obstruction is graph *scope*, not atom naming: a
+      WIR `task` node is a function definition, and the C++ lifter never reads inside function
+      bodies at all, so task atoms (function names) and gateway atoms (guard text) **never share
+      a single automaton** (confirmed 0/184 on the real corpus, independently reproduced).
+      No renaming scheme fixes two atoms living in different graphs. Closing this for real means
+      changing what Phase A lifts (call-sites instead of definitions) and connecting orchestrator
+      to callee sub-CFGs — sized but explicitly **not recommended for implementation yet**, see
+      the reprioritization flag above and the linked findings note.
    d. Add a vacuity guard before trusting any `COMPLIANT` verdict (non-empty language + every
       formula AP present on some edge), and decide how to report the `NON_TERMINATING` case
       (see risk below) separately from an ordinary property violation.
+   e. **New, safe to do now, independent of (c)'s scope decision:** reclassify Module 01's P0
+      tier as a lifting self-test rather than evidence about code correctness — it's now proven
+      (not just observed) unfalsifiable under *any* lifting design, since the property and the
+      faithful-lifting invariant are logically identical. And gate atom matching: any property
+      referencing an atom absent from the code automaton should report `INCONCLUSIVE`, never
+      `VIOLATION` — confirmed that unmatched atoms currently produce false violations on
+      *correct* code, which is worse than the vacuity problem it sits alongside.
    Also still applies: test edge cases (empty traces, loop-bound interaction with M01's
    `loop_bound_documented` field — note the investigation found this field currently defaults
    to `0` in practice, not the documented `3`, a separate bug worth filing).
+   **Caution carried over from the investigation itself:** do not treat "wire the P1 tier" as a
+   safe near-term step on its own — P1's flagship shape is an ordering property, and the ordering
+   defect in (c) makes any wiring unreliable while it stands. Only (d) and (e) above are safe to
+   do independent of the scope decision.
 5. **Declare the canonical Phase D.** Two flavors now coexist: legacy Python reachability-BFS in `run_pipeline` and SPOT LTL in `process_wir_batch`. Pick one, mark the other deprecated, and say so in the docs — ambiguity here will be challenged at defense.
 6. **First end-to-end demo.** One BPMN spec → M01 suite → M03 check against a conforming and a non-conforming LLM implementation → PASS, and FAIL + readable counterexample. This is the money shot for the thesis and the demo.
 
@@ -83,5 +112,6 @@ P0.1  →  P0.2  →  P1.3 (ingestion)  →  P1.4 (LTLf→LTL bridge)  →  P1.6
 - [[Home]]
 - [[Claude Science Plan]] — how a Claude Science project applies to executing this roadmap, incl. a ready-to-use P1.4 bridge-design prompt
 - [[Module 03 - Equivalence Engine/Bridge Investigation/P1.4 Bridge Findings|P1.4 Bridge Findings]] — the bridge investigation's output: vacuity bug, AP vocabulary gap, revised scope
+- [[Module 03 - Equivalence Engine/Bridge Investigation/AP Vocabulary and Lifting Scope Findings|AP Vocabulary and Lifting Scope Findings]] — the deeper finding: task=function-definition, sub-CFGs unread, ~46% ordering mismatch
 - [[Project Status.canvas|Project Status]]
 - [[Module 01 - Specification Analysis/Module 01 Knowledge]] · [[Module 02 - Verified IR Extraction/Module 02 Knowledge]] · [[Module 03 - Equivalence Engine/Module 03 Knowledge]] · [[Module 04 - Verification Portal/Module 04 Knowledge]]
