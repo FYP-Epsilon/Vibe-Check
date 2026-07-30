@@ -1,20 +1,20 @@
 {
 	"nodes":[
-		{"id":"title","type":"text","text":"# Module 02 — Status\nMost mature, evidence-backed module. Implemented and merged.","x":0,"y":-320,"width":520,"height":110,"color":"6"},
-		{"id":"merged","type":"text","text":"**Implemented & merged**\n`module_02_extract/src/` — `ast_extractor/`, `z3_sym_engine/`, `dynamic_tracer/`.","x":0,"y":-140,"width":340,"height":120,"color":"4"},
-		{"id":"tests","type":"text","text":"**Tests**\n5 files in `tests/` + 10 in `eval/`; docs claim 246 passing.","x":400,"y":-140,"width":340,"height":120,"color":"4"},
-		{"id":"wiki","type":"text","text":"**Docs**\nWiki page is the only fully authoritative one — maintained directly against source.","x":800,"y":-140,"width":340,"height":120,"color":"4"},
-		{"id":"detection","type":"text","text":"**Genuine-bug detection**\n0.9952 (n=210)","x":0,"y":40,"width":340,"height":100,"color":"4"},
-		{"id":"falsealarm","type":"text","text":"**False-alarm rate**\n0.0588 (n=51)","x":400,"y":40,"width":340,"height":100,"color":"4"},
-		{"id":"f1","type":"text","text":"**WIR structural F1**\n1.0000","x":800,"y":40,"width":340,"height":100,"color":"4"},
-		{"id":"natural","type":"text","text":"**Natural-bug detection**\n1.0 strict / 0.9329 `task_only`","x":0,"y":200,"width":340,"height":110,"color":"4"},
-		{"id":"fix","type":"text","text":"**Return-value observability fix**\nLogic-bug detection: 91.18% → 100% (same-lineage); 77.94% → 88.24% (cross-implementation).\nCross-implementation false alarms 25% → 10% under `task_only` (sensitivity cost stated openly).","x":400,"y":180,"width":380,"height":200,"color":"4"},
-		{"id":"audit","type":"text","text":"**Evidence trail**\nMeasured results committed in `eval/results/*.md`; archived pre-fix reports kept as an audit trail.","x":800,"y":200,"width":360,"height":130,"color":"4"},
-		{"id":"qce","type":"text","text":"**Dead QCE code excised**\nSymbolic-state-merging code removed rather than overclaimed; rationale documented.","x":0,"y":400,"width":360,"height":120,"color":"4"},
-		{"id":"v2weak","type":"text","text":"**V2 symbolic ≈ no contribution**\nContainer-shaped inputs force V1 fallback on the current corpus — the 'multi-modal' certificate is effectively V1-driven.","x":400,"y":390,"width":380,"height":140,"color":"2"},
-		{"id":"eqmut","type":"text","text":"**Equivalent-mutant specificity**\nOnly 0.1111.","x":800,"y":400,"width":340,"height":100,"color":"1"},
+		{"id":"title","type":"text","text":"# Module 02 — Status\nMost mature, evidence-backed module. Snapshot: 2026-07-30, `main-demo` @ `5c65046` (FINAL).","x":0,"y":-320,"width":520,"height":110,"color":"6"},
+		{"id":"merged","type":"text","text":"**Implemented & merged**\n`module_02_extract/src/` (~5,200 LOC) — `ast_extractor/` (incl. `call_order_view.py`, the D2 lifting), `z3_sym_engine/`, `dynamic_tracer/`, FastAPI `main.py` (545 LOC, `POST /verify`).","x":0,"y":-140,"width":340,"height":150,"color":"4"},
+		{"id":"tests","type":"text","text":"**Tests — verified 2026-07-29**\n`tests/` 169 passed + 9 skipped (`sys.monitoring` parity below 3.12) · `eval/` 87 passed → **256 total, ~2s**.\nKnown gap: `pyyaml` used by eval/ but missing from requirements.txt.","x":400,"y":-140,"width":340,"height":150,"color":"4"},
+		{"id":"fixes","type":"text","text":"**Fixed this cycle**\n- extract-engine container **never started** — sibling relative-import bug + escape-sequence corruption (PR #76), verified over real docker-compose HTTP\n- Dominance-frontier infinite loop (networkx idom convention, PR #85)\n- Call-order WIR exposed additively from `/verify` (PR #75 on #73)\n- V1-dominance caveat promoted to prominent docs (PR #83)","x":800,"y":-160,"width":360,"height":230,"color":"4"},
+		{"id":"detection","type":"text","text":"**Genuine-bug detection**\n0.9952 (n=210)","x":0,"y":60,"width":340,"height":100,"color":"4"},
+		{"id":"falsealarm","type":"text","text":"**False-alarm rate**\n0.0588 (n=51)","x":400,"y":60,"width":340,"height":100,"color":"4"},
+		{"id":"f1","type":"text","text":"**WIR structural F1**\n1.0000 (all 101 base programs)","x":800,"y":120,"width":340,"height":100,"color":"4"},
+		{"id":"natural","type":"text","text":"**Natural-bug detection**\n1.0 strict / 0.9329 `task_only`\n(3 LLM families; 20 admitted / 164 rejected)","x":0,"y":220,"width":340,"height":120,"color":"4"},
+		{"id":"fix","type":"text","text":"**Return-value observability fix**\nLogic-bug detection: 91.18% → 100% (same-lineage); 77.94% → 88.24% (cross-implementation).\nCross-implementation false alarms 25% → 10% under `task_only` (sensitivity cost stated openly).","x":400,"y":200,"width":380,"height":180,"color":"4"},
+		{"id":"e2e","type":"text","text":"**E2E harness built on this module's methodology (PR #77)**\n`demo/eval_e2e/` — mutation operators + Clopper-Pearson CIs ported to the full M01→M02→M03 chain: abstention 0.462 (n=26), detection 0.357 (n=14), false-alarm 0.000 (n=2), cx quality 0.800 (n=5).","x":800,"y":280,"width":360,"height":190,"color":"3"},
+		{"id":"audit","type":"text","text":"**Evidence trail**\nMeasured results committed in `eval/results/*.md`; archived pre-fix reports kept as an audit trail; re-verified byte-identical in Session B's combined re-run.","x":0,"y":400,"width":360,"height":140,"color":"4"},
+		{"id":"v2weak","type":"text","text":"**V2 symbolic ≈ no contribution**\nContainer-shaped inputs force V1 fallback on the current corpus — the 'multi-modal' certificate is effectively V1-driven. Now stated in the prominent docs (PR #83), not just the eval reports.","x":400,"y":420,"width":380,"height":150,"color":"2"},
+		{"id":"eqmut","type":"text","text":"**Equivalent-mutant specificity**\nOnly 0.1111.","x":800,"y":510,"width":340,"height":100,"color":"1"},
 		{"id":"numeric","type":"text","text":"**Numeric-boundary blind spot**\n`<` vs `<=` at a threshold (e.g. `credit_score=600`): V1 samples ints uniformly from −100..100 and V2 is not a per-input oracle.","x":0,"y":580,"width":400,"height":150,"color":"1"},
-		{"id":"gil","type":"text","text":"**Timeout limit**\nCPython timeout cannot preempt a C-level statement holding the GIL.","x":460,"y":580,"width":360,"height":110,"color":"2"}
+		{"id":"gil","type":"text","text":"**Timeout limit**\nThread-based B3 timeout bounds GIL-releasing hangs only; a GIL-monopolizing C-level statement is not preemptible without process isolation — the named honest leftover.","x":460,"y":610,"width":360,"height":150,"color":"2"}
 	],
 	"edges":[]
 }

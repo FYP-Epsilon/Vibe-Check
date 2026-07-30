@@ -3,7 +3,7 @@
     {
       "id": "title",
       "type": "text",
-      "text": "# Module 04 — Verification Portal Architecture\nStreamlit front end · `module_04_ui/src/app.py` (565 lines) · service `ui-engine` (python:3.11-slim, no SPOT)",
+      "text": "# Module 04 — Verification Portal Architecture\nStreamlit front end · `module_04_ui/src/app.py` (573 lines) · service `ui-engine` (python:3.11-slim) · 2026-07-29 (main-demo @ 5c65046)",
       "x": 360,
       "y": -340,
       "width": 440,
@@ -32,7 +32,7 @@
     {
       "id": "page-dashboard",
       "type": "text",
-      "text": "**Page: Dashboard**\nOverview + certificate figures",
+      "text": "**Page: Dashboard**\nOverview, engine cards, quick-launch radio",
       "x": 880,
       "y": -420,
       "width": 320,
@@ -41,30 +41,30 @@
     {
       "id": "page-spec",
       "type": "text",
-      "text": "**Page: Spec Engine**\nOne page per engine (1 of 3)",
+      "text": "**Page: Spec Engine**\nOne page per engine (1 of 3)\n`POST spec-engine:8000/verify` (BPMN XML)",
       "x": 880,
       "y": -240,
       "width": 320,
-      "height": 120
+      "height": 130
     },
     {
       "id": "page-extract",
       "type": "text",
-      "text": "**Page: Extract Engine**\nOne page per engine (2 of 3)",
+      "text": "**Page: Extract Engine**\nOne page per engine (2 of 3)\n`POST extract-engine:8000/verify` (Python source)",
       "x": 880,
       "y": -60,
       "width": 320,
-      "height": 120
+      "height": 130
     },
     {
       "id": "page-equiv",
       "type": "text",
-      "text": "**Page: Equiv Engine**\nOne page per engine (3 of 3)\nThe only page that calls its engine **in-process**",
+      "text": "**Page: Equiv Engine**\nOne page per engine (3 of 3)\nCalls its engine over HTTP like the others — `POST equiv-engine:8000/lift` demo (fixed in PR #74)",
       "x": 880,
       "y": 120,
       "width": 320,
-      "height": 150,
-      "color": "2"
+      "height": 160,
+      "color": "4"
     },
     {
       "id": "spec-engine",
@@ -87,47 +87,46 @@
     {
       "id": "equiv-call",
       "type": "text",
-      "text": "**No HTTP call**\nEquiv page does `import vibecheck_lifter` directly in the UI process (`app.py`) — it never reaches the equiv-engine container",
+      "text": "**Equiv Engine** (Module 03)\nInternal docker-compose service\nReal FastAPI service since PR #74: `POST /lift`, `POST /check`, `GET /health` (uvicorn :8000)",
       "x": 1360,
       "y": 120,
       "width": 320,
-      "height": 170,
-      "color": "2"
+      "height": 170
     },
     {
       "id": "health-http",
       "type": "text",
-      "text": "**Sidebar status dots: Spec & Extract**\nReal HTTP health checks — `GET /docs`, 2s timeout. Dots reflect actual engine reachability",
+      "text": "**Sidebar status dots: all three engines**\nReal HTTP health checks — `GET /docs` (Spec, Extract), `GET /health` (Equiv), 2s timeout. Dots reflect actual engine reachability — the old asymmetry is gone",
       "x": 420,
       "y": 230,
       "width": 360,
-      "height": 150,
+      "height": 160,
       "color": "4"
     },
     {
       "id": "health-equiv",
       "type": "text",
-      "text": "**Sidebar status dot: Equiv — asymmetric**\n'Health check' is just `import vibecheck_lifter` in the UI process. Reports the UI container's local state, **not** the equiv-engine container's reachability",
+      "text": "**Gap: `POST /check` has no UI demo**\nFull Phase A–D conformance check needs a call-order-lifted WIR, which extract-engine's own HTTP API doesn't produce yet — the equiv page documents this itself",
       "x": 420,
       "y": 420,
       "width": 360,
       "height": 180,
-      "color": "1"
+      "color": "3"
     },
     {
       "id": "cert-caveat",
       "type": "text",
-      "text": "**Caveat: certificate figures**\nShown in UI as *'illustrative inputs, not a live run'*",
+      "text": "**Gap: zero tests**\nNo test suite exists for Module 04 — the whole module is one 573-line `app.py`, a 12-line Dockerfile, and a 2-line requirements.txt",
       "x": 880,
       "y": 340,
       "width": 320,
-      "height": 120,
-      "color": "3"
+      "height": 140,
+      "color": "1"
     },
     {
       "id": "novelty-caveat",
       "type": "text",
-      "text": "**Scope disclaimer**\nExplicitly disclaims research novelty: *'a UI/integration layer, not a research contribution in itself'*",
+      "text": "**Scope disclaimer**\nStill explicitly disclaims research novelty: *'a UI/integration layer, not a research contribution in itself'*",
       "x": 1360,
       "y": 340,
       "width": 320,
@@ -194,7 +193,7 @@
       "fromSide": "right",
       "toNode": "equiv-call",
       "toSide": "left",
-      "label": "in-process import"
+      "label": "HTTP"
     },
     {
       "id": "e9",
@@ -212,7 +211,7 @@
     },
     {
       "id": "e11",
-      "fromNode": "page-dashboard",
+      "fromNode": "ui-service",
       "fromSide": "bottom",
       "toNode": "cert-caveat",
       "toSide": "top"

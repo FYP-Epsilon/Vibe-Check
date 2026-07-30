@@ -1,5 +1,7 @@
 # Module 03 — Equivalence Engine
 
+> Snapshot: 2026-07-30 — branch `main-demo` @ `5c65046` (declared FINAL implementation). Previous snapshot: 2026-07-28 (main @ `7089711`).
+
 Module 03 is the **convergence point of VibeCheck**. It compares the spec automaton (**M_spec**, produced by Module 01) against the code's **WIR** (produced by Module 02) and returns **PASS**, or **FAIL plus a counterexample trace** showing where the code's behavior diverges from the BPMN 2.0 specification.
 
 ## The Four Phases
@@ -17,10 +19,13 @@ Module 03 is the **convergence point of VibeCheck**. It compares the spec automa
 - `clustering.py` (241) — Phase C (`BehavioralClusterer`)
 - `model_checker.py` (352) — Phase D legacy (BFS product + `PropertyMonitor`)
 
-**Track 2 — C++/SPOT engine (ALL four phases A–D implemented)**:
-- `lifter.cpp` **1,262 LOC**, `lifter.hpp` 294 LOC; real SPOT throughout (`scc_info`, `simulation`, `postproc`, `are_isomorphic`, `translator`, `product`, `emptiness`).
-- Pybind11 module `vibecheck_lifter` exposes `AdvancedLifter`: **Phase A** (`parse_wir_types`, `lift_to_lts`, `build_spot_automaton`, diagnostics), **Phase B** (`detect_divergent_states`, `compute_bisimulation_full`, `check_stuttering_bisimulation`, `tarjan_tau_collapse`), plus free functions **`cluster_implementations`** (Phase C) and **`check_compliance`** (Phase D, added in 12be72c).
-- `pipeline.py` (432 LOC): `process_wir_batch()` now runs the **full A→D chain** — Step 5 model-checks each cluster representative against an `ltl_property` parameter and attaches `{is_compliant, verdict, counter_example_trace}`. ⚠ The default property is a **hardcoded placeholder** `'G("approved")'`.
+**Track 2 — C++/SPOT engine (ALL four phases A–D implemented; the canonical path)**:
+- `lifter.cpp` **1,423 LOC**, `lifter.hpp` 326 LOC; real SPOT throughout (`scc_info`, `simulation`, `postproc`, `are_isomorphic`, `translator`, `product`, `emptiness`, `from_ltlf`).
+- Pybind11 module `vibecheck_lifter` exposes `AdvancedLifter`: **Phase A** (`parse_wir_types`, `lift_to_lts`, `build_spot_automaton`, diagnostics), **Phase B** (`detect_divergent_states`, `minimize_stuttering`, `compute_bisimulation_full`, `check_stuttering_bisimulation`, `tarjan_tau_collapse`), plus free functions **`cluster_implementations`** (Phase C) and **`check_compliance`** (Phase D, added in 12be72c; atom-gated INCONCLUSIVE in PR #67, alive-extension LTLf→LTL bridge in PR #70).
+- `pipeline.py` (538 LOC): `process_wir_batch()` — **declared the canonical Phase D** (PR #77) — runs the full A→D chain; Step 5 model-checks each cluster representative against either a `property_suite` (M01 ingestion path → `cluster_info["compliance_results"]`, a list) or the legacy single `ltl_property` string (default `'G("approved")'`, kept only for old callers/tests). `run_pipeline()` in the same file is explicitly LEGACY.
+- `property_ingest.py` (205 LOC) — the M01→M03 bridge (PR #72): loads `module_03_input.json`, tier-gates, normalizes LTLf → SPOT infix (Option B, quoted flat atoms).
+- `main.py` (132 LOC) — **real FastAPI HTTP service** (PR #74, replacing the stale P1.1 demo): `POST /lift`, `POST /check` (property_ingest + process_wir_batch), `GET /health`; Docker `CMD` is `uvicorn src.main:app` on port 8000.
+- `counterexample.py` (90 LOC) — presentation layer rendering `check_compliance`'s raw BDD trace as a readable task sequence, filtered to the violated property's own atoms.
 - `nlp_utils.py` (31 lines, `all-MiniLM-L6-v2`) is a live dependency: C++ `semantic_match()` tier 3 imports it via embedded pybind11.
 
 ## Why Divergence-Sensitivity Matters
@@ -33,15 +38,15 @@ Verification behavior degrades according to Module 02's extraction confidence (E
 
 ## Tests
 
-**118 test functions total** (2026-07-29 count): `test_pipeline.py` 37 (pure Python, Phases A–D + e2e), `test_cpp_engine.py` 34 (Phase A C++ + `TestPhaseD` — tautologies, looping-WIR failures, counterexample content, quotient compliance, segfault guards, the atom-matching gate, and the vacuity/mutual-exclusion regression guards), `test_phase_b.py` 28, `test_phase_c.py` 19. 115 pass; 2 fail on a pre-existing, unrelated gap (`compute_deterministic_hash` doesn't exist yet); 1 skip. All C++-side tests `skipif` the `.so` isn't compiled.
+**142 test functions total** (2026-07-30 count, 6 files): `test_pipeline.py` 37 (pure Python, Phases A–D + e2e), `test_cpp_engine.py` 34 (Phase A C++ + `TestPhaseD` — tautologies, looping-WIR failures, counterexample content, quotient compliance, segfault guards, the atom-matching gate, and the vacuity/mutual-exclusion regression guards), `test_phase_b.py` 28, `test_phase_c.py` 21, `test_property_ingest.py` 17 (the M01 ingestion bridge — tier gating, Option B normalization, SPOT-grammar rejection), `test_counterexample.py` 5 (readable-trace rendering). Known pre-existing gap unchanged: `test_phase_b.py` references `compute_deterministic_hash`, which still doesn't exist in `lifter.py`. All C++-side tests `skipif` the `.so` isn't compiled.
 
-## Status & Issues (2026-07-28, main @ `7089711`)
+## Status & Issues (2026-07-30, `main-demo` @ `5c65046` — FINAL)
 
 - ✅ **C++/SPOT engine is now complete through Phase D** — real LTL model checking with counterexample extraction, wired into `process_wir_batch`; 118 tests total (115 passing, 2 pre-existing unrelated failures, 1 skip). The documented method is finally executable, and (2026-07-29) the non-looping vacuity channel is fixed and empirically validated (see below) — the remaining caveat is Phase A's action atoms still being function definitions, not business actions.
 - ✅ Resolved earlier: committed Linux `.so` removed from git; `module_summery` M03 doc rewritten.
 - ✅ **Module 01 ingestion now wired (2026-07-29).** New `property_ingest.py`: loads the exported suite, tier-gates (P0 excluded, only `node()`-free P1 checkable — 17.6% of the tier — P2/P3 excluded), de-duplicates, normalizes to SPOT-ready syntax (`start(T)`/`done(T)` → a single flat, **quoted** atom — quoting matters, SPOT misparses an atom starting with a reserved operator letter like `GitHub_thing` → `G(itHub_thing)`). Ported rather than cross-imported from Module 01's own `FormulaNormalizer`, since `module_03_equiv` deploys as its own container with no access to `module_01_spec`'s source. `process_wir_batch()` gained an optional `property_suite` parameter (`cluster_info["compliance_results"]`, a list); the original single-string path is untouched. **First real end-to-end FLOW-BENCH run** (M01 → ingestion → the real compiled `check_compliance`) over all 29 eligible specs: 22/29 have ≥1 checkable property, 29 variants, 58 checks, `{VIOLATION: 18, COMPLIANT: 17, INCONCLUSIVE: 23}` — matches an independent oracle-validation tally exactly. **This is definition-order lifting** (D2's lifting-scope fix is separate, unimplemented) — a walking-skeleton proof, not yet a conformance-detection measurement. That's the next real decision (CP1): whether the lifting-scope fix is worth doing, from real failures now available.
-- ⛔ **Latent vacuity bug in `check_compliance`, found via the P1.4 bridge investigation
-  (2026-07-29):** the lifter never sets an acceptance condition and exit states may have no
+- ✅ **RESOLVED — latent vacuity bug in `check_compliance`, found via the P1.4 bridge investigation
+  (2026-07-29), fixed the same cycle (see the alive-extension bullet below; atom-gate half in PR #67):** the lifter never sets an acceptance condition and exit states may have no
   outgoing edge, so any non-looping (terminating) code automaton has an **empty ω-language** —
   `check_compliance` returns `COMPLIANT` for *every* property, correct or not. Confirmed against
   source (no `set_buchi`/`set_acceptance`/`set_generalized_buchi` anywhere in `lifter.cpp`;
@@ -51,7 +56,7 @@ Verification behavior degrades according to Module 02's extraction confidence (E
   task names, e.g. `Approve`) and Module 01's spec-side atoms (`start_Approve`/`done_Approve`)
   **do not intersect** — a second vacuity channel needing an event-lifecycle mapping layer.
   Full findings: [[Bridge Investigation/P1.4 Bridge Findings|P1.4 Bridge Findings]].
-- ⛔ **Larger finding, found via the same investigation (2026-07-29), likely more foundational
+- ✅ **RESOLVED via D2 call-order lifting (PR #73) — larger finding, found via the same investigation (2026-07-29), was more foundational
   than the M01 bridge itself:** a WIR `task` node is a **function definition**, not a business
   action (`cfg_extractor.py:474`, its own docstring: *"a function definition is an opaque task
   boundary... the body is not inlined"*). Business calls (`approve_loan(score)`) become `block`
@@ -67,6 +72,12 @@ Verification behavior degrades according to Module 02's extraction confidence (E
   model-checks the wrong automaton. Full findings, including which near-term fixes are safe
   regardless (reclassifying P0 as a lifting self-test; gating unmatched atoms to `INCONCLUSIVE`
   instead of `VIOLATION`): [[Bridge Investigation/AP Vocabulary and Lifting Scope Findings|AP Vocabulary and Lifting Scope Findings]].
+  **Resolution:** Module 02's `call_order_view.py` (D2, PRs #73/#75) derives a **call-order WIR** — the
+  driver function's own CFG with sibling call sites as task boundaries, so atoms are business actions
+  in execution order, gateways and tasks in one graph — exposed additively as `call_order_wir` from
+  `/verify`. Every real Phase D caller (`demo/e2e_demo.py`, `demo/eval_e2e/harness.py`, the `/check`
+  endpoint's documented contract) now feeds the call-order view; posting a definition-order WIR
+  silently reproduces the pre-D2 bug, which is why `/check`'s docstring calls it out.
 - ✅ **Canonical Phase D declared (2026-07-30).** `process_wir_batch` (SPOT/C++) is canonical — it's the only path any real caller uses (module_03_equiv's own `/check` HTTP endpoint, `demo/e2e_demo.py`, every corpus-scale run this project has done). `run_pipeline` (legacy pure-Python reachability-BFS) is now explicitly marked LEGACY in its own docstring and in `pipeline.py`'s module docstring; kept only because `test_pipeline.py`'s 37 tests exercise its components directly and because it's the only place loop-bound safety checking (`PropertyMonitor.from_loop_bound_check()`) currently lives — that check has **no equivalent in `process_wir_batch`** today (`property_ingest.py` excludes P2_Quality_Limits from conformance checking), so deprecating `run_pipeline` leaves loop-bound checking with no home anywhere; that gap is real and open, not silently dropped. `main.py` is **no longer** the stale P1.1 milestone demo — it was rewritten (PR #74) into module_03_equiv's real FastAPI service (`/lift`, `/check`, `/health`); `pipeline.py`'s own `main()` CLI (which calls the legacy `run_pipeline`) is a separate, unrelated entry point that predates and is untouched by that rewrite.
 - ✅ **The non-looping vacuity channel is now fixed (2026-07-29).** Confirmed live on a real
   compiled build first (Homebrew SPOT 2.15.1 + pybind11): `check_compliance()` returned
@@ -116,6 +127,7 @@ Verification behavior degrades according to Module 02's extraction confidence (E
 ## Links
 
 - [[Home]]
+- [[Module 03 Novelty]] — research positioning vs prior art
 - [[Module 03 Architecture.canvas|Module 03 Architecture]]
 - [[Module 03 Status.canvas|Module 03 Status]]
 - [[Module 03 Repo Docs Index]]

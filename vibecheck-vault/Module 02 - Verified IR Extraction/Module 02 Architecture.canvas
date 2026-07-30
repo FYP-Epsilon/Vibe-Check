@@ -1,20 +1,23 @@
 {
 	"nodes":[
-		{"id":"title","type":"text","text":"# Module 02 — Verified IR Extraction (Architecture)\nThe **code track**: LLM-generated Python → WIR + 3-layer confidence certificate.\n~3,000 LOC across `module_02_extract/src/ast_extractor/`, `z3_sym_engine/`, `dynamic_tracer/`.","x":0,"y":-440,"width":560,"height":140,"color":"6"},
+		{"id":"title","type":"text","text":"# Module 02 — Verified IR Extraction (Architecture)\nThe **code track**: LLM-generated Python → WIR + call-order WIR + 3-layer confidence certificate.\n~5,200 lines in `module_02_extract/src/` across `ast_extractor/`, `z3_sym_engine/`, `dynamic_tracer/`, plus the FastAPI entry point `main.py`.\nSnapshot: 2026-07-29, `main-demo` @ `5c65046` (FINAL).","x":0,"y":-440,"width":560,"height":180,"color":"6"},
 		{"id":"input","type":"text","text":"**Input**\nLLM-generated Python workflow code","x":0,"y":-90,"width":300,"height":110,"color":"5"},
 		{"id":"cfg","type":"text","text":"**ASTExtractor**\n`module_02_extract/src/ast_extractor/cfg_extractor.py`\n`CFGExtractor` builds the control-flow graph from the AST.","x":420,"y":-100,"width":340,"height":130},
-		{"id":"wir","type":"text","text":"**WIR — Workflow Intermediate Representation**\nJSON control-flow graph per `shared_schemas/wir_schema.json`.\nNode types: entry / exit / block / gateway / loop / task / break / continue / return / except / finally / match.\nGuarded edges, dominators, control/data variable classification, nested per-function sub-WIRs.\nContract: `docs/module02/12_wir_and_certificate_contract.md`","x":840,"y":-170,"width":420,"height":260,"color":"5"},
-		{"id":"v3","type":"text","text":"**V3 — STRUCTURAL**\nAST / dominator validation.\nHard gate (`abort=True`) — gates the certificate.","x":1360,"y":-300,"width":340,"height":130,"color":"4"},
-		{"id":"v2","type":"text","text":"**V2 — SYMBOLIC**\n`module_02_extract/src/z3_sym_engine/`\nZ3 bounded concolic execution.","x":1360,"y":-110,"width":340,"height":130,"color":"4"},
-		{"id":"v1","type":"text","text":"**V1 — DYNAMIC**\n`module_02_extract/src/dynamic_tracer/`\nPEP 669 `sys.monitoring` differential tracing against a WIR reference interpreter; `settrace` fallback + parity test; LCS trace alignment; strict vs `task_only` comparison modes.","x":1360,"y":90,"width":380,"height":190,"color":"4"},
+		{"id":"wir","type":"text","text":"**WIR — Workflow Intermediate Representation**\nJSON control-flow graph per `shared_schemas/wir_schema.json`.\nNode types: entry / exit / block / gateway / loop / task / break / continue / return / except / finally / match.\nGuarded edges, dominators, control/data variable classification, nested per-function sub-WIRs.\nContract: `docs/` removed from repo @ `05fae60` — vault copy only.","x":840,"y":-170,"width":420,"height":260,"color":"5"},
+		{"id":"callorder","type":"text","text":"**Call-order WIR (D2)**\n`ast_extractor/call_order_view.py` (123 LOC).\nLifts the driver function's own CFG; sibling-function call sites become task boundaries — ordered and branched the way the code actually executes, not definition order.\nExposed additively as `call_order_wir` from `/verify` (PR #75, on PR #73); `wir` stays definition-order for existing consumers.","x":840,"y":-500,"width":420,"height":240,"color":"4"},
+		{"id":"v3","type":"text","text":"**V3 — STRUCTURAL**\nAST / dominator validation.\nHard gate (`abort=True`) — gates the certificate.\nDominance-frontier infinite loop (networkx-version-dependent idom convention) fixed in PR #85.","x":1360,"y":-330,"width":340,"height":190,"color":"4"},
+		{"id":"v2","type":"text","text":"**V2 — SYMBOLIC**\n`module_02_extract/src/z3_sym_engine/`\nZ3 bounded concolic execution.\nCandid caveat: measured contribution ≈ 0 on the current corpus (container-shaped inputs force V1 fallback) — stated openly in the prominent docs (PR #83).","x":1360,"y":-110,"width":340,"height":190,"color":"4"},
+		{"id":"v1","type":"text","text":"**V1 — DYNAMIC**\n`module_02_extract/src/dynamic_tracer/`\nPEP 669 `sys.monitoring` differential tracing against a WIR reference interpreter; `settrace` fallback + parity test (skips cleanly on <3.12); LCS trace alignment; strict vs `task_only` comparison modes; return values as first-class trace events.","x":1360,"y":110,"width":380,"height":200,"color":"4"},
 		{"id":"eval","type":"text","text":"**Eval harness**\n`module_02_extract/eval/`","x":840,"y":300,"width":300,"height":100,"color":"3"},
 		{"id":"flowbench","type":"text","text":"**IBM FLOW-BENCH adapter**\n101 workflows","x":1240,"y":300,"width":300,"height":100},
 		{"id":"mutations","type":"text","text":"**Mutation operators**\n10 operators → 427 applicable mutants","x":1640,"y":300,"width":300,"height":100},
-		{"id":"calibration","type":"text","text":"**Calibration**\nStratified CALIB/EVAL split; Youden's J threshold selection + Clopper-Pearson CIs.","x":2040,"y":290,"width":320,"height":120},
-		{"id":"corpus","type":"text","text":"**Multi-LLM natural-bug corpus**\nllama-3.1-8b, mixtral-8x7b, qwen3-next-80b.\nBehavioral admission: 20 admitted / 164 rejected.","x":1240,"y":460,"width":380,"height":140},
-		{"id":"output","type":"text","text":"**Output → Module 03**\nWIR + confidence certificate, consumed by the equivalence checker.","x":2940,"y":-85,"width":340,"height":120,"color":"5"},
+		{"id":"calibration","type":"text","text":"**Calibration**\nStratified CALIB/EVAL split; Youden's J threshold selection + Clopper-Pearson CIs.\nFrozen: tau=0.1, J=0.96, differential-corrected.","x":2040,"y":290,"width":320,"height":150},
+		{"id":"corpus","type":"text","text":"**Multi-LLM natural-bug corpus**\nllama-3.1-8b, mixtral-8x7b, qwen3-next-80b.\n294/303 generations (documented qwen NIM outage), 184 clean.\nBehavioral admission: 20 admitted / 164 rejected.","x":1240,"y":460,"width":380,"height":160},
+		{"id":"e2e","type":"text","text":"**E2E eval harness (PR #77)**\n`demo/eval_e2e/` — extends the mutation methodology to the full M01→M02→M03 chain; 6 gold spec/impl pairs.\nAbstention 0.462 (n=26), detection 0.357 (n=14), false-alarm 0.000 (n=2) — small n, CIs reported with every rate.","x":840,"y":460,"width":380,"height":170,"color":"3"},
+		{"id":"api","type":"text","text":"**extract-engine service**\nFastAPI `src/main.py` (545 LOC), single `POST /verify`: returns certificate + `wir` + `call_order_wir` + typed per-layer statuses (`layers`: OK / ERROR / SKIPPED + reason).\n30s wall-clock timeout (`VERIFY_TIMEOUT_S`); source guards (50k chars / 5k AST nodes); SAFE_BUILTINS exec sandbox.\nDocker container fixed in PR #76 — had never started since the package-split refactor (sibling relative-import bug); real HTTP chain verified over docker-compose.","x":1860,"y":470,"width":400,"height":290,"color":"4"},
+		{"id":"output","type":"text","text":"**Output → Module 03**\nWIR + call-order WIR + confidence certificate, consumed by the equivalence checker.","x":2940,"y":-85,"width":340,"height":130,"color":"5"},
 		{"id":"fusion","type":"text","text":"**Certificate fusion**\n`combined = 1 − (1−v1)(1−v2)`; V3 gates.\nAcceptance threshold ≥ 0.95.\nOlder 3-term formula with a V3 term was removed — it made the verdict vacuous.","x":1980,"y":-110,"width":380,"height":170},
-		{"id":"robustness","type":"text","text":"**Robustness**\nWall-clock timeouts on `/verify`; typed per-layer statuses.","x":1860,"y":130,"width":360,"height":110}
+		{"id":"robustness","type":"text","text":"**Robustness**\nWall-clock timeouts on `/verify`; typed per-layer statuses.\nHonest leftover: thread-based timeout bounds GIL-releasing hangs only — a GIL-monopolizing C-level statement is not preemptible without process isolation.","x":1860,"y":110,"width":380,"height":170,"color":"3"}
 	],
 	"edges":[
 		{"id":"e1","fromNode":"input","fromSide":"right","toNode":"cfg","toSide":"left"},
@@ -29,6 +32,10 @@
 		{"id":"e10","fromNode":"eval","fromSide":"right","toNode":"flowbench","toSide":"left"},
 		{"id":"e11","fromNode":"flowbench","fromSide":"right","toNode":"mutations","toSide":"left"},
 		{"id":"e12","fromNode":"mutations","fromSide":"right","toNode":"calibration","toSide":"left"},
-		{"id":"e13","fromNode":"eval","fromSide":"bottom","toNode":"corpus","toSide":"left"}
+		{"id":"e13","fromNode":"eval","fromSide":"bottom","toNode":"corpus","toSide":"left"},
+		{"id":"e14","fromNode":"cfg","fromSide":"top","toNode":"callorder","toSide":"left"},
+		{"id":"e15","fromNode":"callorder","fromSide":"right","toNode":"output","toSide":"top","label":"call-order WIR"},
+		{"id":"e16","fromNode":"eval","fromSide":"bottom","toNode":"e2e","toSide":"top"},
+		{"id":"e17","fromNode":"v1","fromSide":"bottom","toNode":"api","toSide":"top","label":"served by"}
 	]
 }
