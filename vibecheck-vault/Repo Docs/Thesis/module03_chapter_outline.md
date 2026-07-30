@@ -441,17 +441,24 @@ Impact.md`; `RPT` = `demo/eval_e2e/results/e2e_eval_report.md`; `JSON` =
 
 - **F6.1** Four-phase pipeline diagram (WIR → LTS → quotient → clusters → verdict), annotated with
   the SPOT primitive used at each step and which track implements it.
+  Rendered as `figures/fig_m03_pipeline.pdf`.
 - **F6.2** The two vacuity channels side by side: for each, the mechanism, why the test suite was
   silent, the fix, and the evidence that the fix works. This is the chapter's centerpiece.
+  Rendered as `figures/fig_m03_two_vacuity_channels.pdf`.
 - **F6.3** Verdict-shift Sankey: pre-fix `{18, 17, 23}` → post-fix `{5, 10, 43}` with the traced
-  per-bucket flows from `CP1`.
+  per-bucket flows from `CP1`. Rendered as `figures/fig_m03_verdict_shift.pdf`.
 - **F6.4** The end-to-end rates as a forest plot — abstention, detection, false alarm,
   counterexample quality — each with its Clopper–Pearson interval, so interval width is the visual
-  message rather than a footnote.
+  message rather than a footnote. Rendered as `figures/fig_m03_forest_ci.pdf`.
 - **F6.5** Detection by mutation kind, stacked (detected / missed / abstained) for drop-step and
   swap-adjacent, making the 0/16 omission result immediately visible.
+  Rendered as `figures/fig_m03_detection_by_kind.pdf`.
 - **F6.6** Worked alive-extension example: raw dead-ending automaton beside its alive-extended copy,
-  with the manufactured-violation edge annotated.
+  with the manufactured-violation edge annotated. Rendered as
+  `figures/fig_m03_alive_extension_example.pdf`, using the exact entry->A()->B()->exit / G(!B)
+  example from `E2E Integration Verification Findings.md`'s own VERIFIED-EXPERIMENT block (chosen
+  over reconstructing `BRANCHING_WIR` from `lifter.cpp` directly, since the simpler example is the
+  one already independently verified in the docs).
 - **T6.1** Master numbers table (above). **T6.2** Tier gating decisions with the exclusion reason per
   tier. **T6.3** Correction trail (above). **T6.4** Verdict cross-tabulation from `CP1`.
 

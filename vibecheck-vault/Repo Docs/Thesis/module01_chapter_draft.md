@@ -117,6 +117,8 @@ architecturally interesting part: each phase refuses to hand its output downstre
 condition holds, so a specification that emerges at the far end has passed four separate
 admissibility tests, and a specification that does not emerge can be attributed to exactly one of
 them. §4.4 is entirely an analysis of which gate stops what.
+*(Rendered as Figure 4.2, `figures/fig_m01_pipeline.pdf`, with the measured pass count from §4.4
+annotated at each boundary.)*
 
 ### 4.3.1 Phase 1 — semantic extraction
 
@@ -359,6 +361,10 @@ The 29 exporting specifications synthesize **412 properties**, distributed as:
 | `P3_Adversarial_Defenses` | 48 |
 | `synthesized_mutant_killers` | 0 |
 
+*(Rendered as Figure 4.3, `figures/fig_m01_tier_census.pdf`; the rendered version shows five
+disjoint segments summing to 412, not the duplicate count as a separate overlay — see the outline's
+note on this simplification.)*
+
 Two defects are visible in the census itself, before any property is examined.
 
 First, the export's own `tier_semantics` field describes **three** of the five tiers it ships. A
@@ -494,6 +500,7 @@ Collecting §4.4 and §4.5 into one shape:
 This figure is the chapter. Every arrow has a cause, every cause has a source file, and the shape of
 the loss is the finding: the two largest cuts are a benchmark underspecification and a property-family
 choice, and neither is a matter of synthesis quality in the sense the phrase usually implies.
+*(Rendered as Figure 4.1, `figures/fig_m01_checkability_funnel.pdf`.)*
 
 ---
 

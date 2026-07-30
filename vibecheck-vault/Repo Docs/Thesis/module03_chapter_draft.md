@@ -122,6 +122,7 @@ The module exists in two tracks. A pure-Python implementation (~1,470 lines, 37 
 phases without external dependencies. A C++ implementation built on SPOT covers all four phases and
 is the canonical path. Both are maintained; the two-track situation is discussed in §6.3.4, since it
 has a live consequence.
+*(Rendered as Figure 6.1, `figures/fig_m03_pipeline.pdf`.)*
 
 ### 6.3.1 Phase A — lifting the WIR to a labeled transition system
 
@@ -342,6 +343,9 @@ pybind11; the vendored container build is 2.11.6). On a two-action non-looping a
 action `B` provably executes, the property `G(!B)` — "B never happens" — returned **`COMPLIANT`**, with
 `unmatched_atoms` empty, confirming that both atoms had matched and that the verdict was not an
 artifact of the atom gate. The predicted behavior, observed directly, on the real engine.
+*(Worked in full as Figure 6.6, `figures/fig_m03_alive_extension_example.pdf`; independently
+re-confirmed on uid 44's real extracted WIR, a genuine total task-order reversal, in
+`E2E Integration Verification Findings.md`.)*
 
 The fix is the alive extension of §6.4. Extending the automaton gives it infinite runs, so its
 ω-language is non-empty, so the product is no longer trivially empty, so emptiness of the product
@@ -416,6 +420,10 @@ subsequently confirmed on a real build in the equivalent form: **58 of 58** prop
 `INCONCLUSIVE` when unstripped lifecycle atoms reached the checker. The emulated count and the
 real-build confirmation agree, and the prose keeps them distinguishable rather than merging them into
 a single unqualified claim.
+
+*(Figure 6.2, `figures/fig_m03_two_vacuity_channels.pdf`, sets Channel 1 (§6.5) and Channel 2 (this
+section) side by side: mechanism, why the passing test suite missed it, the fix, and the evidence
+that the fix works.)*
 
 **Two ways to close it, both costed.** Option A adds lifecycle propositions on the code side: a task
 node contributes `start_T` on entry and `done_T` on exit, making the code automaton semantically
@@ -580,6 +588,9 @@ check by check, it is the predicted behavior:
   cross-tabulation.
 - **Old `INCONCLUSIVE` (23):** all 23 unchanged. No regressions.
 
+*(Rendered as Figure 6.3, `figures/fig_m03_verdict_shift.pdf`: the flows above as an alluvial
+diagram, each band traced from its pre-fix bucket to its post-fix one.)*
+
 Two acceptance cases were named and predicted *before* the change was implemented, and both behaved
 as predicted: uid 44, where both atoms are genuinely called and real order does violate the
 precedence, stays `VIOLATION`; uid 77 flips to `COMPLIANT`.
@@ -662,6 +673,8 @@ The aggregate is less informative than the split:
 | `drop_step` | 16 | **0** | 4 | 12 |
 | `swap_adjacent` | 10 | **5** | 5 | 0 |
 
+*(Rendered as Figure 6.5, `figures/fig_m03_detection_by_kind.pdf`.)*
+
 Read this way the result is not "the pipeline detects about a third of defects." It is that the
 pipeline detects *reordering* half the time it commits, and detects *task omission* **never — 0 of
 16**. That is the structural blindness Chapter 4 §4.6 derives from the property shape, arriving here
@@ -705,6 +718,10 @@ At n = 5 this is an existence result with a wide interval, not a characterizatio
 establishes is that witnesses generally name the right tasks; what it cannot establish is a rate.
 
 ### 6.8.7 What these numbers license
+
+*(The four rates above — abstention, detection, false alarm, counterexample quality — are collected
+as a forest plot in Figure 6.4, `figures/fig_m03_forest_ci.pdf`; interval width, not the point
+estimate, is the figure's point.)*
 
 **They license:** the assembled pipeline runs end to end on real BPMN specifications and real
 LLM-generated implementations and returns verdicts; it detects injected reordering defects when its
