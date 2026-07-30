@@ -452,7 +452,26 @@ compiled build of `vibecheck_lifter` on this machine**. Three things change the 
      Full `module_02_extract` suite after both fixes: 169 passed, 9
      skipped (the now-gracefully-skipped `sys.monitoring` cases), 0
      failures — under both the Python 3.9 and 3.11 dev venvs.
-14. **Thesis parity:** only M02 has a Chapter 5 draft. Once P1 lands, M01/M03 need equivalent write-ups (PBCTS/EAS_BDA/IDCD/SCSL on one side, divergence-sensitive bisimulation + SPOT compliance on the other).
+14. ✅ **Thesis parity — done 2026-07-30.** Offloaded to Claude Science
+    (`/Users/kavindu/Documents/prompts/thesis-parity-m01-m03-prompt.md`); M01
+    (Ch4, checkability/admissibility framing) and M03 (Ch6, the two
+    independent vacuity channels) chapter drafts + outlines + a cross-chapter
+    parity note produced, independently re-verified against live repo state
+    (three passes: cross-file consistency, claims-vs-repo, and a full live
+    re-run of M01's synthesis pipeline over all 48 FLOW-BENCH specs), 7
+    citation/transcription errors found and corrected before placement — see
+    `vibecheck-vault/Repo Docs/Thesis/thesis_parity_note.md` for the full
+    list and the per-chapter master numbers tables. Merged via PR #86.
+    **Not yet done, deliberately deferred to actual thesis assembly** (per
+    the parity note's own §5 "known drift risks" / "should verify" items):
+    provisional chapter numbers (4/5/6), `file.py:line`-style citations that
+    should become symbol names, and the snapshot test-run counts
+    (118/115/2/1) that were flagged but not re-verified. Two evaluation
+    gaps are named as future work rather than measured (Phase A/B/C
+    behavioral-equivalence eval; corpus-scale witness-validity on the
+    corrected engine) — confirm the FYP committee doesn't expect these
+    measured. M04 (UI/demo) has no chapter of its own — confirm that's
+    consistent with the program's required thesis structure.
 
 ## Risks to manage
 
