@@ -303,11 +303,14 @@ Findings.md`; `M01K` = `vibecheck-vault/Module 01 - Specification Analysis/Modul
 - **F4.1** The admissibility/checkability funnel: 48 specs → 29 export → 22 with ≥1 checkable
   property → 45 checkable properties → 6 gold specs (the last arrow forward-referencing Chapter 6).
   Each arrow annotated with cause and source file. This is the chapter's centerpiece figure.
+  Rendered as `figures/fig_m01_checkability_funnel.pdf`.
 - **F4.2** Four-phase pipeline diagram with the gate condition on each phase boundary and the
-  measured pass count at each gate.
+  measured pass count at each gate. Rendered as `figures/fig_m01_pipeline.pdf`.
 - **F4.3** Tier census stacked bar (412 properties), segmented by disposition: checkable (45),
   `node()`-bearing (211), P0 self-test (79), P2 unparseable (29), P3 unbridged (48), duplicates
-  overlaid (34).
+  overlaid (34). Rendered as `figures/fig_m01_tier_census.pdf` (the duplicate overlay is not yet
+  in the rendered version — 412 is shown as five disjoint segments, not four plus an overlay;
+  flag at final assembly if the duplicate-overlay treatment matters to the point being made).
 - **T4.1** Admission table: outcome × construct present (the 19/29/0 cross-tabulation, with the
   set-equality result stated).
 - **T4.2** The vacuous-truth table for the P1 precedence shape (5 rows, verbatim).
