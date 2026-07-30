@@ -24,6 +24,17 @@ class SemanticExtractionEngine:
         'intermediateCatchEvent', 'intermediateThrowEvent'
     ]
 
+    NON_NODE_TAGS = {
+        'sequenceFlow', 'process', 'definitions', 'conditionExpression',
+        'extensionElements', 'incoming', 'outgoing', 'documentation',
+        'ioSpecification', 'dataInputAssociation', 'dataOutputAssociation',
+        'property', 'dataObjectReference', 'dataObject', 'laneSet', 'lane',
+        'collaboration', 'participant', 'messageFlow', 'association',
+        'textAnnotation', 'multiInstanceLoopCharacteristics',
+        'standardLoopCharacteristics', 'BPMNDiagram', 'BPMNPlane',
+        'BPMNShape', 'BPMNEdge', 'Bounds', 'waypoint'
+    }
+
     def __init__(self, xml_string: str):
         self.xml_string = xml_string
         try:
@@ -81,20 +92,12 @@ class SemanticExtractionEngine:
         # Identify all nodes in the raw XML for strict coverage metrics
         # Any element with an ID that isn't a purely structural/visual tag
         # is considered an 'executable node' that MUST be mapped.
-        NON_NODE_TAGS = {
-            'sequenceFlow', 'process', 'definitions', 'conditionExpression',
-            'extensionElements', 'incoming', 'outgoing', 'documentation',
-            'ioSpecification', 'dataInputAssociation', 'dataOutputAssociation',
-            'property', 'dataObjectReference', 'dataObject', 'laneSet', 'lane',
-            'collaboration', 'participant', 'messageFlow', 'association',
-            'textAnnotation', 'multiInstanceLoopCharacteristics',
-            'standardLoopCharacteristics', 'BPMNDiagram', 'BPMNPlane',
-            'BPMNShape', 'BPMNEdge', 'Bounds', 'waypoint'
-        }
         self.executable_nodes_count = 0
         for elem in self.root.iter():
+            if not elem.tag.startswith(f"{{{self.NS['bpmn']}}}"):
+                continue
             tag_local = elem.tag.split('}')[-1]
-            if elem.get('id') and tag_local not in NON_NODE_TAGS:
+            if elem.get('id') and tag_local not in self.NON_NODE_TAGS:
                 self.executable_nodes_count += 1
 
     def _layer_v2_construct_and_label(self):
@@ -206,15 +209,6 @@ class SemanticExtractionEngine:
         extraction. This handles BPMN tools that place elements outside
         <bpmn:process> scope.
         """
-        NON_NODE_TAGS = {
-            'sequenceFlow', 'process', 'definitions', 'conditionExpression',
-            'extensionElements', 'incoming', 'outgoing', 'documentation',
-            'ioSpecification', 'dataInputAssociation', 'dataOutputAssociation',
-            'property', 'dataObjectReference', 'dataObject', 'laneSet', 'lane',
-            'collaboration', 'participant', 'messageFlow', 'association',
-            'textAnnotation', 'multiInstanceLoopCharacteristics',
-            'standardLoopCharacteristics'
-        }
         mapped_ids = {s["node_id"] for s in self.states}
 
         # Search from ROOT, not just within process elements
@@ -225,7 +219,7 @@ class SemanticExtractionEngine:
             node_id = elem.get('id')
             if (node_id
                     and node_id not in mapped_ids
-                    and tag_local not in NON_NODE_TAGS):
+                    and tag_local not in self.NON_NODE_TAGS):
                 node_name = elem.get('name', node_id)
                 clean_name = node_name.replace(" ", "_").replace("\n", "_")
 

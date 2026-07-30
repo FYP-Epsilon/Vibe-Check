@@ -4,8 +4,6 @@
 
 Repo: `module_01_spec/` | Service: FastAPI (`main.py`, "VibeCheck Spec Engine v2.0.0"), docker service `spec-engine` | ~1,950 LOC across 11 src files
 
-> ⚠ **Architecture pivot (2026-07-28):** the SPOT/HOA Phase 4 (`automata_lifter.py`) and process-mining Phase 5 (`process_mining_alignment.py`) were **deleted** after one day and replaced by a pure-Python **PBCTS** Phase 4. SPOT no longer appears in any executable code — but the Dockerfile still builds SPOT 2.11.6 from source (dead weight).
-
 ## The 4 Phases
 
 | Phase | Component | What it does |
@@ -26,8 +24,6 @@ Repo: `module_01_spec/` | Service: FastAPI (`main.py`, "VibeCheck Spec Engine v2
 
 - **PBCTS / EAS_BDA / IDCD / SCSL** — IMPLEMENTED (the new Phase 4 stack; doc `04_pbcts_trace_synthesis.md` still labeled "Status: Planned" though shipped).
 - **Adversarial red-teaming** — IMPLEMENTED, simulated heuristics (round 0 of Phase 3).
-- **SPOT/HOA automata lifting, GED, process-mining EAS** — implemented, then **DELETED** one day later in the pivot.
-- **SFI / ΔH / PWBE** — implemented, then removed earlier in the same cycle. Nothing remains.
 - **CGSR-like self-healing** — IMPLEMENTED in spirit: Phase 3 multi-round killer refinement + Phase 4 SCSL loop.
 
 ## Module handoffs
@@ -38,7 +34,6 @@ Repo: `module_01_spec/` | Service: FastAPI (`main.py`, "VibeCheck Spec Engine v2
 ## Status & Issues (2026-07-28, main @ `7089711`)
 
 - ✅ 4-phase pipeline implemented end-to-end (`api.py::run_module_01_pipeline`, 194 LOC); PBCTS replaces SPOT with stdlib-only code.
-- ⛔ **STARTUP BUG:** `main.py:11,16` still does `from .automata_lifter import AutomataLifter` — the module was deleted, so the FastAPI app (and the Docker `uvicorn src.main:app` CMD) raises `ModuleNotFoundError` on startup. The `/verify` route never uses the import.
 - ⛔ **STILL ZERO tests** — third cycle running; gates and convergence logic entirely unexercised.
 - ⚠ Status-code inconsistency: unconverged PBCTS is `FAIL_ALIGNMENT_UNPROVEN` in `api.py` but `PASS_PBCTS_UNCONVERGED` in `main.py`.
 - ⚠ Dockerfile still builds SPOT 2.11.6 from source — heavy dead build step, nothing imports it. `requirements.txt` clean (fastapi, uvicorn, networkx).

@@ -1,0 +1,47 @@
+{
+  "semantic_graph": {
+    "initial_state": "StartEvent_1",
+    "start_states": [
+      "StartEvent_1"
+    ],
+    "states": [
+      {
+        "node_id": "StartEvent_1",
+        "node_type": "startEvent",
+        "atomic_propositions": [
+          "node(Start)"
+        ]
+      },
+      {
+        "node_id": "EndEvent_1",
+        "node_type": "endEvent",
+        "atomic_propositions": [
+          "node(End)"
+        ]
+      },
+      {
+        "node_id": "Task_1",
+        "node_type": "task",
+        "atomic_propositions": [
+          "start(Approve)",
+          "done(Approve)"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "flow_id": "Flow_1",
+        "source_id": "StartEvent_1",
+        "target_id": "Task_1"
+      },
+      {
+        "flow_id": "Flow_2",
+        "source_id": "Task_1",
+        "target_id": "EndEvent_1"
+      }
+    ]
+  },
+  "task_patterns": [
+    "Approve"
+  ]
+}

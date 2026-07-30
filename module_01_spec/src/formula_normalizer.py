@@ -3,7 +3,7 @@ import re
 
 class FormulaNormalizer:
     """
-    Normalizes hand-rolled LTLf strings into SPOT-compatible grammar,
+    Normalizes hand-rolled LTLf strings into a standardized grammar,
     and provides a round-trip denormalization method.
 
     Normalization rules:
@@ -16,7 +16,7 @@ class FormulaNormalizer:
     @staticmethod
     def normalize(formula: str) -> str:
         """
-        Converts M01 LTLf string to SPOT grammar.
+        Converts M01 LTLf string to standard grammar.
         - && -> &  (but not a bare & that was already single)
         - || -> |
         - start(X) -> start_X
@@ -32,7 +32,7 @@ class FormulaNormalizer:
         def _mangle_atom(match: re.Match) -> str:
             prefix = match.group(1)  # 'start' or 'done'
             name = match.group(2)
-            # Clean special chars to underscores for SPOT identifiers
+            # Clean special chars to underscores for standard identifiers
             clean = re.sub(r'[^a-zA-Z0-9_]', '_', name)
             return f"{prefix}_{clean}"
 
@@ -43,7 +43,7 @@ class FormulaNormalizer:
     @staticmethod
     def denormalize(formula: str) -> str:
         """
-        Reverts SPOT grammar back to M01 LTLf string.
+        Reverts standard grammar back to M01 LTLf string.
         - Single & (not already &&) -> &&
         - Single | (not already ||) -> ||
         - start_X -> start(X)

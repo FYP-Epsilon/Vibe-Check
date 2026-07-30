@@ -8,12 +8,10 @@ try:
     from .semantic_extractor import SemanticExtractionEngine
     from .ltlf_synthesizer import FLTLSynthesizer
     from .mutation_refiner import MutationValidator, VerificationException
-    from .automata_lifter import AutomataLifter
 except ImportError:
     from semantic_extractor import SemanticExtractionEngine
     from ltlf_synthesizer import FLTLSynthesizer
     from mutation_refiner import MutationValidator, VerificationException
-    from automata_lifter import AutomataLifter
 
 app = FastAPI(title="VibeCheck Spec Engine", version="2.0.0")
 
@@ -87,7 +85,7 @@ def verify_spec(payload: BPMNPayload):
         if phase_pbcts_result:
             p4_status = phase_pbcts_result.get("phase_4_certificate", {}).get("convergence", {}).get("converged", False)
             if not p4_status:
-                overall_status = "PASS_PBCTS_UNCONVERGED"
+                overall_status = "FAIL_ALIGNMENT_UNPROVEN"
 
 
         return {

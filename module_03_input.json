@@ -1,0 +1,61 @@
+{
+  "semantic_graph": {
+    "initial_state": "StartEvent_1",
+    "start_states": [
+      "StartEvent_1"
+    ],
+    "states": [
+      {
+        "node_id": "StartEvent_1",
+        "node_type": "startEvent",
+        "atomic_propositions": [
+          "node(Start)"
+        ]
+      },
+      {
+        "node_id": "EndEvent_1",
+        "node_type": "endEvent",
+        "atomic_propositions": [
+          "node(End)"
+        ]
+      },
+      {
+        "node_id": "Task_1",
+        "node_type": "task",
+        "atomic_propositions": [
+          "start(Approve)",
+          "done(Approve)"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "flow_id": "Flow_1",
+        "source_id": "StartEvent_1",
+        "target_id": "Task_1"
+      },
+      {
+        "flow_id": "Flow_2",
+        "source_id": "Task_1",
+        "target_id": "EndEvent_1"
+      }
+    ]
+  },
+  "ltlf_property_suite": {
+    "P0_Critical_Sentinels": [
+      "!done(Approve) W start(Approve)"
+    ],
+    "P1_Structural_Control_Flow": [
+      "!start(Approve) W node(Start)",
+      "!node(End) W done(Approve)",
+      "!node(End) W node(Start)",
+      "!start(Approve) W node(Start)"
+    ],
+    "P2_Quality_Limits": [
+      "G(iteration_count <= 10 -> F(process_complete))"
+    ],
+    "P3_Adversarial_Defenses": [],
+    "synthesized_mutant_killers": []
+  },
+  "loop_bound_documented": 0
+}

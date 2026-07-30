@@ -3,7 +3,9 @@ from typing import List, Dict, Any, Optional
 
 class VerificationException(Exception):
     """Custom exception for verification failures in Phase 2."""
-    pass
+    def __init__(self, message, coverage=0.0):
+        super().__init__(message)
+        self.coverage = coverage
 
 class FLTLSynthesizer:
     """
@@ -196,8 +198,9 @@ class FLTLSynthesizer:
                 )
         
         # Bounded Loop: G(count(iteration) <= N -> F(exit_condition))
+        # Appended loop_bound=10 to allow api.py regex to properly extract the loop bound for Module 03.
         self.ltlf_suite["P2_Quality_Limits"].append(
-            "G(iteration_count <= 10 -> F(process_complete))"
+            "G(iteration_count <= 10 -> F(process_complete)) // loop_bound=10"
         )
 
     def _layer_v1_certify(self) -> Dict[str, Any]:
@@ -216,9 +219,11 @@ class FLTLSynthesizer:
                 resolved_xor += 1
             else:
                 gateway_id = gateway["gateway_id"]
+                current_coverage = resolved_xor / total_xor if total_xor > 0 else 0.0
                 raise VerificationException(
                     f"XOR Gateway '{gateway_id}' has {len(unconditioned)} unconditioned branch(es) "
-                    "without a default flow. Decision logic is ambiguous."
+                    "without a default flow. Decision logic is ambiguous.",
+                    coverage=current_coverage
                 )
         
         self.guard_resolution_coverage = resolved_xor / total_xor if total_xor > 0 else 1.0
