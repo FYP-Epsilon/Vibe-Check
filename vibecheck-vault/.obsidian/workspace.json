@@ -4,19 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "46ec3bebfcbfd7a9",
+        "id": "f85b6ecd403eaa5c",
         "type": "tabs",
         "children": [
           {
-            "id": "66b9902243e21026",
+            "id": "b6b59fd463b74c09",
             "type": "leaf",
             "state": {
-              "type": "pdf",
-              "state": {
-                "file": "Repo Docs/Thesis/figures/fig_m01_tier_census.pdf"
-              },
-              "icon": "lucide-file-text",
-              "title": "fig_m01_tier_census"
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
             }
           }
         ]
@@ -39,7 +37,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -181,8 +181,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "66b9902243e21026",
+  "active": "b6b59fd463b74c09",
   "lastOpenFiles": [
+    "Repo Docs/Thesis/figures/fig_m01_tier_census.pdf",
     "Repo Docs/Thesis/figures/fig_m01_tier_census.png",
     "Repo Docs/Thesis/figures/fig_m01_checkability_funnel.pdf",
     "Repo Docs/Thesis/figures/fig_m01_pipeline.png",
@@ -202,7 +203,6 @@
     "Repo Docs/Thesis/figures/fig_m03_detection_by_kind.png",
     "Repo Docs/Thesis/figures/fig_m03_alive_extension_example.pdf",
     "Repo Docs/Thesis/figures/fig_m03_alive_extension_example.png",
-    "Repo Docs/Thesis/figures/fig_m01_tier_census.pdf",
     "Repo Docs/Thesis/figures/fig_m01_pipeline.pdf",
     "Repo Docs/Thesis/figures/fig_e3_scatter.png",
     "Repo Docs/Thesis/thesis_parity_note.md",

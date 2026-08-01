@@ -14,5 +14,10 @@ build/
 .pytest_cache/
 **/.pytest_cache/
 
+#IDE
+.idea/
+.vscode/
+.DS_Store
+
 
 
