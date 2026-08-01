@@ -52,8 +52,8 @@ class AdversarialGenerator:
                 event_a = trace[0]
                 event_b = trace[-1]
                 # Since the LTLf evaluator doesn't support the Past operator O(...),
-                # we forbid the exact invalid transition (A directly followed by B)
-                # using the Next operator X(...) which is supported.
-                killers.append(f"!(F({event_a} & X({event_b})))")
+                # and Module 03 does not bridge the Next operator X(...),
+                # we forbid event_b from ever happening after event_a using G(...).
+                killers.append(f"G({event_a} -> !F({event_b}))")
         
         return killers

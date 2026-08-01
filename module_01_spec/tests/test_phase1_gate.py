@@ -124,11 +124,9 @@ class TestGateEndToEnd:
         assert len(recovered) == 1
         assert recovered[0]["node_id"] == "Task_A"
 
-    def test_unmappable_non_bpmn_extension_element_is_a_genuine_unrecoverable_fail(self):
-        """A non-BPMN-namespaced element with an id is counted toward
-        executable_nodes_count by V3's namespace-blind scan, but neither
-        V2 nor the recovery pass (both BPMN-namespace-scoped) can ever map
-        it -- confirmed to survive self-healing, not just assumed."""
+    def test_unmappable_non_bpmn_extension_element_is_safely_ignored(self):
+        """A non-BPMN-namespaced element with an id is safely ignored 
+        by V3's namespace-aware scan, so it does not falsely reduce coverage."""
         result = SemanticExtractionEngine(_UNMAPPABLE_EXTENSION_XML).run_pipeline()
-        assert result["phase_1_certificate"]["status"] == "FAIL"
-        assert result["phase_1_certificate"]["node_coverage_Y_Struct"] < 1.0
+        assert result["phase_1_certificate"]["status"] == "PASS"
+        assert result["phase_1_certificate"]["node_coverage_Y_Struct"] == 1.0
