@@ -109,6 +109,14 @@ def verify_spec(payload: BPMNPayload):
     except HTTPException:
         # Re-raise FastAPIs HTTPExceptions
         raise
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error_code": "SYNTAX_ERROR",
+                "message": str(e)
+            }
+        )
     except Exception as e:
         raise HTTPException(
             status_code=500,

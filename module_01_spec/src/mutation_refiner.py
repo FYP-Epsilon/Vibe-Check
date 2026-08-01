@@ -385,6 +385,7 @@ class MutationValidator:
                 "P1_Structural_Control_Flow": self.suite.get("P1_Structural_Control_Flow", []),
                 "P2_Quality_Limits": self.suite.get("P2_Quality_Limits", []),
                 "P3_Adversarial_Defenses": self.adversarial_killers,
+                "P4_Task_Coverage": self.suite.get("P4_Task_Coverage", []),
                 "synthesized_mutant_killers": self.synthesized_killers
             }
         }
