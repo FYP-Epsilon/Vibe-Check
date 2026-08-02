@@ -43,7 +43,131 @@ using json = nlohmann::json;
 namespace vibecheck {
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Construction / Dictionary Management
+// WIR JSON Deserialization (ADL from_json overloads for nlohmann::json)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * @brief Parse a JSON value that is either a string or null into
+ *        std::optional<std::string>.
+ *
+ * This is the single choke-point that prevents the null→get<string>()
+ * segfault (Risk ❶). Every nullable-string field in WirNode/WirEdge
+ * routes through here.
+ *
+ * Coercion policy:
+ *   null       → std::nullopt
+ *   string     → the string value
+ *   other type → json::dump() representation (defensive, not silent loss)
+ */
+static std::optional<std::string> parse_nullable_string(const json& j) {
+    if (j.is_null())   return std::nullopt;
+    if (j.is_string()) return j.get<std::string>();
+    // Defensive: coerce unexpected types (bool, int, object) to their
+    // serialized form rather than crashing or silently discarding.
+    return j.dump();
+}
+
+/**
+ * @brief Deserialize a JSON object into a WirNode.
+ *
+ * Tolerates:
+ *   - Missing keys (safe defaults via .value() or .contains() guard)
+ *   - null guards/ast_type (routed through parse_nullable_string)
+ *   - Integer id fields (coerced via dump() — Risk ❹)
+ */
+void from_json(const json& j, WirNode& n) {
+    // id — required, but tolerate integer producers
+    if (j.contains("id")) {
+        const auto& jid = j["id"];
+        n.id = jid.is_string() ? jid.get<std::string>() : jid.dump();
+    }
+
+    // type — optional with safe default
+    n.type = j.value("type", "block");
+
+    // ast_type — optional, nullable (Risk ❷ prevention: never operator[] on absent key)
+    if (j.contains("ast_type")) {
+        n.ast_type = parse_nullable_string(j.at("ast_type"));
+    }
+
+    // guard — optional, nullable (Risk ❶ prevention)
+    if (j.contains("guard")) {
+        n.guard = parse_nullable_string(j.at("guard"));
+    }
+}
+
+/**
+ * @brief Deserialize a JSON object into a WirEdge.
+ *
+ * source/target are structurally required — edges missing either
+ * endpoint will have an empty string, which the caller should
+ * validate and skip.
+ */
+void from_json(const json& j, WirEdge& e) {
+    // source — required
+    if (j.contains("source")) {
+        const auto& js = j["source"];
+        e.source = js.is_string() ? js.get<std::string>() : js.dump();
+    }
+
+    // target — required
+    if (j.contains("target")) {
+        const auto& jt = j["target"];
+        e.target = jt.is_string() ? jt.get<std::string>() : jt.dump();
+    }
+
+    // guard — nullable (Risk ❶ prevention)
+    if (j.contains("guard")) {
+        e.guard = parse_nullable_string(j.at("guard"));
+    }
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SpotAutomatonBuilder — Safe bdd_dict + twa_graph lifecycle
+// ═══════════════════════════════════════════════════════════════════════════
+
+SpotAutomatonBuilder::SpotAutomatonBuilder() {
+    dict_ = spot::make_bdd_dict();
+    if (!dict_) {
+        throw std::runtime_error(
+            "SpotAutomatonBuilder: failed to allocate bdd_dict.");
+    }
+    graph_ = spot::make_twa_graph(dict_);
+    if (!graph_) {
+        throw std::runtime_error(
+            "SpotAutomatonBuilder: failed to allocate twa_graph.");
+    }
+}
+
+SpotAutomatonBuilder::~SpotAutomatonBuilder() {
+    // CRITICAL: Reset the graph FIRST so it unregisters all APs
+    // from the dict before the dict's assert_emptiness() fires.
+    // This is the explicit guarantee — we do NOT rely on member
+    // declaration order alone.
+    graph_.reset();
+    // dict_ is destroyed by the compiler-generated member destructor
+    // after this explicit destructor body completes.
+}
+
+spot::twa_graph_ptr SpotAutomatonBuilder::get_graph() const {
+    return graph_;
+}
+
+spot::bdd_dict_ptr SpotAutomatonBuilder::get_dict() const {
+    return dict_;
+}
+
+unsigned SpotAutomatonBuilder::num_states() const {
+    return graph_->num_states();
+}
+
+unsigned SpotAutomatonBuilder::num_edges() const {
+    return graph_->num_edges();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AdvancedLifter — Construction / Dictionary Management
 // ═══════════════════════════════════════════════════════════════════════════
 
 AdvancedLifter::AdvancedLifter() {
@@ -53,6 +177,15 @@ AdvancedLifter::AdvancedLifter() {
     }
     registry_aut_ = spot::make_twa_graph(dict_);
 }
+
+AdvancedLifter::~AdvancedLifter() {
+    // Same pattern as SpotAutomatonBuilder: explicitly destroy the graph
+    // before the dict to guarantee assert_emptiness() succeeds.
+    // Previously `= default`, which only worked because dict_ was declared
+    // before registry_aut_ (reverse destruction order). This is now explicit.
+    registry_aut_.reset();
+}
+
 
 spot::bdd_dict_ptr AdvancedLifter::get_dict() const {
     return dict_;
@@ -545,7 +678,69 @@ spot::twa_graph_ptr build_spot_automaton(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Phase A: Targeted Function-Block Parser
+// ═══════════════════════════════════════════════════════════════════════════
+
+std::pair<std::vector<WirNode>, std::vector<WirEdge>>
+AdvancedLifter::parse_wir_function(const std::string& wir_json_str,
+                                   const std::string& function_key) {
+    json root;
+    try {
+        root = json::parse(wir_json_str);
+    } catch (const json::parse_error& e) {
+        throw std::invalid_argument(
+            std::string("WIR JSON parsing failed: ") + e.what());
+    }
+
+    // ── Risk ❸ prevention: validate each navigation level explicitly ──
+    if (!root.contains("functions") || !root["functions"].is_object()) {
+        throw std::invalid_argument(
+            "WIR JSON has no 'functions' dictionary at root level.");
+    }
+
+    const auto& functions = root["functions"];
+    if (!functions.contains(function_key)) {
+        throw std::invalid_argument(
+            "Function key '" + function_key + "' not found in WIR functions. "
+            "Available keys: " + functions.dump());
+    }
+
+    const auto& fn_block = functions[function_key];
+
+    // ── Parse nodes ──
+    std::vector<WirNode> nodes;
+    if (fn_block.contains("nodes") && fn_block["nodes"].is_array()) {
+        nodes.reserve(fn_block["nodes"].size());
+        for (const auto& jnode : fn_block["nodes"]) {
+            if (jnode.is_object()) {
+                nodes.push_back(jnode.get<WirNode>());
+            }
+            // Silently skip non-object entries (e.g., bare string IDs in
+            // legacy flat-node format — those lack ast_type/guard anyway).
+        }
+    }
+
+    // ── Parse edges ──
+    std::vector<WirEdge> edges;
+    if (fn_block.contains("edges") && fn_block["edges"].is_array()) {
+        edges.reserve(fn_block["edges"].size());
+        for (const auto& jedge : fn_block["edges"]) {
+            if (jedge.is_object()) {
+                auto edge = jedge.get<WirEdge>();
+                // Validate structural requirement: both endpoints present
+                if (!edge.source.empty() && !edge.target.empty()) {
+                    edges.push_back(std::move(edge));
+                }
+            }
+        }
+    }
+
+    return {std::move(nodes), std::move(edges)};
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Shared: Tau detection
+
 // ═══════════════════════════════════════════════════════════════════════════
 
 bool AdvancedLifter::is_tau(bdd cond) {
@@ -1157,7 +1352,96 @@ PYBIND11_MODULE(vibecheck_lifter, m) {
                  + " unreachable=" + std::to_string(d.unreachable_states) + ">";
         });
 
+    // -- WirNode (Phase A — WIR Deserialization) ------------------------------
+    py::class_<vibecheck::WirNode>(m, "WirNode",
+        "A single WIR control-flow node.\n\n"
+        "Attributes:\n"
+        "    id (str): Unique node identifier.\n"
+        "    type (str): CFG node type (entry/exit/task/gateway/loop/block).\n"
+        "    ast_type (str | None): Python AST type (For, If, While…); None on non-branch nodes.\n"
+        "    guard (str | None): Guard condition; None means unconditional / tau.")
+        .def(py::init<>())
+        .def_readwrite("id",   &vibecheck::WirNode::id)
+        .def_readwrite("type", &vibecheck::WirNode::type)
+        .def_property_readonly("ast_type", [](const vibecheck::WirNode& n) -> py::object {
+            if (n.ast_type.has_value()) return py::cast(n.ast_type.value());
+            return py::none();
+        })
+        .def_property_readonly("guard", [](const vibecheck::WirNode& n) -> py::object {
+            if (n.guard.has_value()) return py::cast(n.guard.value());
+            return py::none();
+        })
+        .def("__repr__", [](const vibecheck::WirNode& n) {
+            std::string r = "<WirNode id='" + n.id + "' type='" + n.type + "'";
+            if (n.ast_type.has_value()) r += " ast_type='" + n.ast_type.value() + "'";
+            if (n.guard.has_value())    r += " guard='" + n.guard.value() + "'";
+            r += ">";
+            return r;
+        })
+        .def("__eq__", [](const vibecheck::WirNode& a, const vibecheck::WirNode& b) {
+            return a.id == b.id && a.type == b.type
+                && a.ast_type == b.ast_type && a.guard == b.guard;
+        })
+        .def("__hash__", [](const vibecheck::WirNode& n) {
+            return std::hash<std::string>{}(n.id);
+        });
+
+    // -- WirEdge (Phase A — WIR Deserialization) ------------------------------
+    py::class_<vibecheck::WirEdge>(m, "WirEdge",
+        "A single WIR control-flow edge.\n\n"
+        "Attributes:\n"
+        "    source (str): Source node ID.\n"
+        "    target (str): Target node ID.\n"
+        "    guard (str | None): Guard condition; None means unconditional / tau.")
+        .def(py::init<>())
+        .def_readwrite("source", &vibecheck::WirEdge::source)
+        .def_readwrite("target", &vibecheck::WirEdge::target)
+        .def_property_readonly("guard", [](const vibecheck::WirEdge& e) -> py::object {
+            if (e.guard.has_value()) return py::cast(e.guard.value());
+            return py::none();
+        })
+        .def("__repr__", [](const vibecheck::WirEdge& e) {
+            std::string r = "<WirEdge '" + e.source + "' -> '" + e.target + "'";
+            if (e.guard.has_value()) r += " guard='" + e.guard.value() + "'";
+            r += ">";
+            return r;
+        })
+        .def("__eq__", [](const vibecheck::WirEdge& a, const vibecheck::WirEdge& b) {
+            return a.source == b.source && a.target == b.target && a.guard == b.guard;
+        })
+        .def("__hash__", [](const vibecheck::WirEdge& e) {
+            size_t h = std::hash<std::string>{}(e.source);
+            h ^= std::hash<std::string>{}(e.target) + 0x9e3779b9 + (h << 6) + (h >> 2);
+            return h;
+        });
+
+    // -- SpotAutomatonBuilder (Phase A — safe lifecycle) -----------------------
+    py::class_<vibecheck::SpotAutomatonBuilder,
+               std::shared_ptr<vibecheck::SpotAutomatonBuilder>>(m, "SpotAutomatonBuilder",
+        "Safe builder for SPOT twa_graph automata.\n\n"
+        "Encapsulates bdd_dict + twa_graph lifecycle to prevent\n"
+        "assertion failures on destruction. The destructor explicitly\n"
+        "resets the graph before the dict dies.\n\n"
+        "Attributes:\n"
+        "    Use get_graph() and get_dict() to access the underlying\n"
+        "    SPOT objects with proper shared ownership.")
+        .def(py::init<>())
+        .def("get_graph", &vibecheck::SpotAutomatonBuilder::get_graph,
+             "Returns the underlying TwaGraph (shared ownership).")
+        .def("get_dict", &vibecheck::SpotAutomatonBuilder::get_dict,
+             "Returns the BDD dictionary (shared ownership).")
+        .def("num_states", &vibecheck::SpotAutomatonBuilder::num_states,
+             "Number of states in the automaton.")
+        .def("num_edges", &vibecheck::SpotAutomatonBuilder::num_edges,
+             "Number of edges in the automaton.")
+        .def("__repr__", [](const vibecheck::SpotAutomatonBuilder& b) {
+            return "<SpotAutomatonBuilder states=" + std::to_string(b.num_states())
+                 + " edges=" + std::to_string(b.num_edges()) + ">";
+        });
+
     // -- BisimulationResult (Phase B) -------------------------------------
+
+
     py::class_<vibecheck::BisimulationResult>(m, "BisimulationResult")
         .def(py::init<>())
         .def_readonly("quotient",             &vibecheck::BisimulationResult::quotient)
@@ -1193,7 +1477,18 @@ PYBIND11_MODULE(vibecheck_lifter, m) {
              py::arg("wir_json_str"),
              "Single-call Phase A entry point.")
         .def("get_last_diagnostics", &vibecheck::AdvancedLifter::get_last_diagnostics)
+        .def("parse_wir_function", &vibecheck::AdvancedLifter::parse_wir_function,
+             py::arg("wir_json_str"), py::arg("function_key"),
+             "Parse a function block from WIR JSON into typed (nodes, edges) vectors.\n\n"
+             "Args:\n"
+             "    wir_json_str: Full WIR JSON string.\n"
+             "    function_key: Key inside the 'functions' dictionary.\n\n"
+             "Returns:\n"
+             "    Tuple of (list[WirNode], list[WirEdge]).\n\n"
+             "Raises:\n"
+             "    ValueError: If JSON is malformed or function_key is not found.")
         // Phase B
+
         .def("detect_divergent_states", &vibecheck::AdvancedLifter::detect_divergent_states,
              py::arg("graph"),
              "Detect divergent states using spot::scc_info on the silent subgraph.")

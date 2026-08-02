@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <memory>
+#include <optional>
 
 namespace vibecheck {
 
@@ -41,6 +42,92 @@ struct LifterDiagnostics {
     unsigned unreachable_states = 0;
     std::vector<std::string> matched_aps;
     std::vector<std::string> unmatched_actions;
+};
+
+// ---------------------------------------------------------------------------
+// Phase A - WIR Deserialization Types
+// ---------------------------------------------------------------------------
+
+/**
+ * @brief Safe container for a single WIR node parsed from JSON.
+ *
+ * Schema contract:
+ *   { "id": string, "type": string, "ast_type": string|null, "guard": string|null }
+ *
+ * Design:
+ *   - `guard` and `ast_type` use std::optional<std::string> to map JSON null
+ *     to std::nullopt without ever calling json::get<std::string>() on null.
+ *   - `ast_type` is optional because non-branching nodes (entry, exit, task)
+ *     frequently omit it in real WIR payloads.
+ */
+struct WirNode {
+    std::string                 id;                         ///< Unique node identifier.
+    std::string                 type      = "block";        ///< CFG node type (entry/exit/task/gateway/loop/block).
+    std::optional<std::string>  ast_type  = std::nullopt;   ///< Python AST type (For, If, While…); absent on non-branch nodes.
+    std::optional<std::string>  guard     = std::nullopt;   ///< Guard condition; null means unconditional / tau.
+};
+
+/**
+ * @brief Safe container for a single WIR edge parsed from JSON.
+ *
+ * Schema contract:
+ *   { "source": string, "target": string, "guard": string|null }
+ *
+ * Design:
+ *   - source/target are non-optional — an edge without endpoints is
+ *     structurally invalid and must be rejected at parse time.
+ *   - guard follows the same std::optional pattern as WirNode::guard.
+ */
+struct WirEdge {
+    std::string                 source;                     ///< Source node ID.
+    std::string                 target;                     ///< Target node ID.
+    std::optional<std::string>  guard     = std::nullopt;   ///< Guard condition; null means unconditional / tau.
+};
+
+// ---------------------------------------------------------------------------
+// Phase A - SpotAutomatonBuilder (safe bdd_dict + twa_graph encapsulation)
+// ---------------------------------------------------------------------------
+
+/**
+ * @brief Safe encapsulation of SPOT's bdd_dict + twa_graph lifecycle.
+ *
+ * Manages construction of an empty SPOT automaton and guarantees
+ * that the twa_graph is destroyed BEFORE the bdd_dict, preventing
+ * assert_emptiness() failures regardless of member declaration order
+ * or Python GC timing.
+ *
+ * Invariants:
+ *   - dict_ is always non-null after construction.
+ *   - graph_ is always non-null after construction.
+ *   - graph_ internally holds a shared_ptr to dict_ (SPOT's design).
+ *   - Destructor explicitly resets graph_ before dict_ dies.
+ */
+class SpotAutomatonBuilder {
+public:
+    SpotAutomatonBuilder();
+    ~SpotAutomatonBuilder();
+
+    // Non-copyable, non-movable (shared_ptr holder handles sharing)
+    SpotAutomatonBuilder(const SpotAutomatonBuilder&) = delete;
+    SpotAutomatonBuilder& operator=(const SpotAutomatonBuilder&) = delete;
+
+    /// Access the underlying automaton (never null after construction).
+    spot::twa_graph_ptr get_graph() const;
+
+    /// Access the BDD dictionary (never null after construction).
+    spot::bdd_dict_ptr get_dict() const;
+
+    /// Number of states currently in the automaton.
+    unsigned num_states() const;
+
+    /// Number of edges currently in the automaton.
+    unsigned num_edges() const;
+
+private:
+    // ORDER MATTERS for fallback safety, but the explicit destructor
+    // makes this a defense-in-depth rather than the sole protection.
+    spot::bdd_dict_ptr  dict_;    ///< Destroyed LAST  (declared first).
+    spot::twa_graph_ptr graph_;   ///< Destroyed FIRST (declared second).
 };
 
 // ---------------------------------------------------------------------------
@@ -70,7 +157,7 @@ struct BisimulationResult {
 class AdvancedLifter {
 public:
     AdvancedLifter();
-    ~AdvancedLifter() = default;
+    ~AdvancedLifter();
 
     AdvancedLifter(const AdvancedLifter&) = delete;
     AdvancedLifter& operator=(const AdvancedLifter&) = delete;
@@ -81,6 +168,25 @@ public:
     spot::twa_graph_ptr lift_to_lts(const std::string& wir_json_str);
     spot::twa_graph_ptr build_spot_automaton(const std::string& wir_json_str);
     LifterDiagnostics get_last_diagnostics() const;
+
+    /**
+     * @brief Parse a specific function block from the WIR JSON into typed
+     *        WirNode and WirEdge vectors.
+     *
+     * Navigates root["functions"][function_key], extracts only nodes/edges,
+     * and ignores all other top-level noise (dominators, certificate, etc.).
+     *
+     * @param wir_json_str  Full WIR JSON string (root object).
+     * @param function_key  Key inside the "functions" dictionary to extract.
+     * @return Pair of (nodes, edges) vectors.
+     *
+     * @throws std::invalid_argument  If JSON is malformed or the function key
+     *                                 is not found.
+     */
+    std::pair<std::vector<WirNode>, std::vector<WirEdge>>
+    parse_wir_function(const std::string& wir_json_str,
+                       const std::string& function_key);
+
 
     // ── Phase B — Divergence Detection ───────────────────────────────────
 
