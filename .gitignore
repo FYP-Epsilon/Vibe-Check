@@ -19,5 +19,5 @@ build/
 .vscode/
 .DS_Store
 
-
-
+# Poster
+docs/poster/
