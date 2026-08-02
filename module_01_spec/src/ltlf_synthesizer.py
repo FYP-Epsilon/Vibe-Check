@@ -5,6 +5,19 @@ class VerificationException(Exception):
     """Custom exception for verification failures in Phase 2."""
     pass
 
+
+# Default bound applied to the P2 bounded-loop property. Previously this value
+# was carried in-band as a C-style comment prefixed to the formula string
+# ("/* loop_bound=10 */ G(...)"), which made the property unparseable by this
+# module's own LTLf evaluator (ltlf_eval has no comment syntax in TOKEN_SPEC),
+# killing Phase 4 on every diagram. The bound is now a structured field on the
+# synthesizer's output (see FLTLSynthesizer.spec_metadata) and the formula is
+# left as a well-formed LTLf string.
+DEFAULT_LOOP_BOUND = 10
+
+# BPMN node types treated as tasks for P4 completion obligations.
+TASK_NODE_TYPES = ["task", "userTask", "serviceTask", "scriptTask", "manualTask"]
+
 class FLTLSynthesizer:
     """
     Implicit Guard Resolution & FLTL Property Synthesis.
@@ -18,6 +31,7 @@ class FLTLSynthesizer:
         self.initial_state = self.graph.get("initial_state", "")
         
         self.inferred_guards: List[Dict[str, str]] = []
+        self._mandatory_cache: Optional[set] = None
         self.ltlf_suite: Dict[str, List[str]] = {
             "P0_Critical_Sentinels": [],
             "P1_Structural_Control_Flow": [],
@@ -26,6 +40,13 @@ class FLTLSynthesizer:
         }
         self.xor_gateways: List[Dict[str, Any]] = []
         self.guard_coverage: float = 0.0
+        # Structured, out-of-band specification metadata. Numeric limits that
+        # downstream consumers need (loop bounds, etc.) live here as typed
+        # fields -- never encoded in-band inside an LTLf formula string, which
+        # is a formula the module's own evaluator has to be able to tokenize.
+        self.spec_metadata: Dict[str, Any] = {
+            "loop_bound_documented": DEFAULT_LOOP_BOUND,
+        }
 
     def run_pipeline(self) -> Dict[str, Any]:
         """Executes the Phase 2 synthesis pipeline."""
@@ -41,7 +62,8 @@ class FLTLSynthesizer:
         return {
             "phase_2_certificate": certificate,
             "ltlf_property_suite": self.ltlf_suite,
-            "inferred_implicit_guards": self.inferred_guards
+            "inferred_implicit_guards": self.inferred_guards,
+            "spec_metadata": self.spec_metadata
         }
 
     def _layer_v3_identify_decisions(self):
@@ -206,6 +228,52 @@ class FLTLSynthesizer:
                                 f"G({b_i_done} <-> {b_j_done})"
                             )
 
+    def _mandatory_node_ids(self) -> set:
+        """Node ids that lie on EVERY complete start->end path.
+
+        Used to decide which tasks may carry an unconditional F(done(X))
+        obligation. Computed as the intersection of all simple start->end
+        paths, which matches exactly how LTLfAuditor._generate_traces
+        enumerates traces -- the two must agree, or the synthesiser will
+        again emit properties its own auditor rejects.
+
+        Cached: called once per task node during sentinel generation.
+        """
+        if self._mandatory_cache is not None:
+            return self._mandatory_cache
+
+        adjacency: Dict[str, List[str]] = {}
+        for edge in self.edges:
+            adjacency.setdefault(edge["source_id"], []).append(edge["target_id"])
+
+        starts = self.graph.get("start_states") or (
+            [self.initial_state] if self.initial_state else []
+        )
+        ends = [s["node_id"] for s in self.states if s.get("node_type") == "endEvent"]
+
+        path_node_sets: List[set] = []
+        for start in starts:
+            # Iterative DFS over simple paths (no recursion limit risk, and no
+            # networkx dependency in this module).
+            stack = [(start, [start], {start})]
+            while stack:
+                node, path, seen = stack.pop()
+                if node in ends:
+                    path_node_sets.append(set(path))
+                    continue
+                for nxt in adjacency.get(node, []):
+                    if nxt not in seen:
+                        stack.append((nxt, path + [nxt], seen | {nxt}))
+
+        if not path_node_sets:
+            # No complete path (disconnected or end-less graph): no task can be
+            # proven to complete on every execution, so claim nothing
+            # unconditionally.
+            self._mandatory_cache = set()
+        else:
+            self._mandatory_cache = set.intersection(*path_node_sets)
+        return self._mandatory_cache
+
     def _generate_sentinels(self):
         """Generates P0 Critical Sentinels and P2 Quality Limits."""
         # Sentinel Guard: !forbidden_state W prerequisite_met
@@ -218,12 +286,33 @@ class FLTLSynthesizer:
                 self.ltlf_suite["P0_Critical_Sentinels"].append(
                     f"!{done_prop} W {start_prop}"
                 )
-                if state.get("node_type") in ["task", "userTask", "serviceTask", "scriptTask", "manualTask"]:
-                    self.ltlf_suite["P4_Task_Coverage"].append(f"F({done_prop})")
+                if state.get("node_type") in TASK_NODE_TYPES:
+                    # Tier-correct completion obligation. F(done(X)) asserts that
+                    # X completes on EVERY execution, which is only true for a
+                    # task that lies on every start->end path. Emitting it for
+                    # tasks behind a gateway made the suite reject the very
+                    # diagram it was derived from: _generate_traces enumerates
+                    # each branch separately, and a task on the untaken branch
+                    # never completes on that trace. Measured: 0/50 branching
+                    # diagrams had a sound suite before this change.
+                    if state.get("node_id") in self._mandatory_node_ids():
+                        self.ltlf_suite["P4_Task_Coverage"].append(f"F({done_prop})")
+                    else:
+                        # Optional task: the honest claim is conditional --
+                        # if it starts, it must finish. Weaker than F(done), but
+                        # true on every branch, so the obligation is kept rather
+                        # than dropped.
+                        self.ltlf_suite["P4_Task_Coverage"].append(
+                            f"G({start_prop} -> F({done_prop}))"
+                        )
         
-        # Bounded Loop: Extractable and parseable template
+        # Bounded Loop: a well-formed LTLf formula. The associated numeric bound
+        # is published out-of-band on self.spec_metadata rather than embedded in
+        # the formula text, so the formula stays parseable by ltlf_eval and the
+        # bound stays machine-readable without regexing formula strings.
+        self.spec_metadata["loop_bound_documented"] = DEFAULT_LOOP_BOUND
         self.ltlf_suite["P2_Quality_Limits"].append(
-            "/* loop_bound=10 */ G(start -> F(done))"
+            "G(start -> F(done))"
         )
 
     def _layer_v1_certify(self) -> Dict[str, Any]:

@@ -11,6 +11,15 @@ TOKEN_SPEC = [
     ('LTL_OP', r'\b[GfFXUW]\b'),
     ('START_ATOM', r'\bstart\([^)]+\)'),
     ('DONE_ATOM', r'\bdone\([^)]+\)'),
+    # node(...) is the atomic-proposition form emitted by semantic_extractor
+    # for every non-task node (see semantic_extractor.py's `node({clean_name})`).
+    # Without this rule the tokenizer split it into IDENT_ATOM + LPAREN and the
+    # parser raised on the nested paren, so every P0/P1 property over a node
+    # proposition was unparseable. That was masked until the malformed P2
+    # comment property was removed, because P2 failed first on every diagram.
+    # Matches START_ATOM/DONE_ATOM in accepting any non-paren payload, so names
+    # containing ':' or '.' tokenize as one atom rather than a MISMATCH.
+    ('NODE_ATOM', r'\bnode\([^)]+\)'),
     ('COMP_ATOM', r'\b[a-zA-Z_][a-zA-Z0-9_]*\s*(?:<=|>=|<|>|==)\s*[a-zA-Z0-9_]+'),
     ('IDENT_ATOM', r'\b[a-zA-Z_][a-zA-Z0-9_]*'),
     ('LPAREN', r'\('),
@@ -132,7 +141,7 @@ class LTLfParser:
             node = self.parse_implies()
             self.consume('RPAREN')
             return node
-        elif tok[0] in ('START_ATOM', 'DONE_ATOM', 'COMP_ATOM', 'IDENT_ATOM'):
+        elif tok[0] in ('START_ATOM', 'DONE_ATOM', 'NODE_ATOM', 'COMP_ATOM', 'IDENT_ATOM'):
             atom_tok = self.consume()
             return ASTNode('ATOM', atom_tok[1])
         else:
