@@ -37,10 +37,22 @@ _REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."
 def _first_corpus_diagram():
     """A real FLOW-BENCH diagram, not a hand-written fixture: the defect was
     measured corpus-wide, so the regression is pinned against the same kind
-    of input that exhibited it."""
-    matches = sorted(glob.glob(os.path.join(_REPO_ROOT, "flow-bench", "data", "output", "*.bpmn")))
-    assert matches, "FLOW-BENCH corpus missing; this test needs a real diagram"
-    with open(matches[0]) as f:
+    of input that exhibited it.
+
+    REPINNED by FlowBench defect #3 (P4 tier semantics). This was originally
+    whichever diagram sorted first (uid_100). Once the over-strong
+    F(done(X)) obligation was removed, uid_100's suite could no longer kill
+    every mutant and the pipeline began aborting at the Phase 3 gate -- so
+    the result dict has no "phase_2"/"phase_4" keys and these tests errored
+    with KeyError. That is a true finding about uid_100's suite, not a
+    regression in defect #1's fix (see the defect #3 test module for the
+    corpus-wide numbers). uid_11 is a measured diagram that still completes
+    all five phases, so the defect #1 assertions below are exercised
+    end-to-end as originally intended.
+    """
+    path = os.path.join(_REPO_ROOT, "flow-bench", "data", "output", "uid_11_output.bpmn")
+    assert os.path.exists(path), "FLOW-BENCH corpus missing; this test needs a real diagram"
+    with open(path) as f:
         return f.read()
 
 
