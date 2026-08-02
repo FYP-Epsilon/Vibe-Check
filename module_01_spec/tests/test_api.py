@@ -1,5 +1,10 @@
 import pytest
-from src.api import run_module_01_pipeline, export_for_module_03, export_for_module_02
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
+
+from api import run_module_01_pipeline, export_for_module_03, export_for_module_02
 import os
 
 def test_api_pipeline():

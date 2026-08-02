@@ -141,18 +141,9 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
         if match:
             loop_bound = int(match.group(1))
             break
-    try:
-        from .formula_normalizer import FormulaNormalizer
-    except ImportError:
-        from formula_normalizer import FormulaNormalizer
-        
-    normalized_suite = {}
-    for tier, props in pipeline_result["phase_3"]["refined_ltlf_property_suite"].items():
-        normalized_suite[tier] = [FormulaNormalizer.normalize(p) for p in props]
-
     m3_payload = {
         "semantic_graph": pipeline_result["phase_1"]["semantic_graph"],
-        "ltlf_property_suite": normalized_suite,
+        "ltlf_property_suite": pipeline_result["phase_3"]["refined_ltlf_property_suite"],
         "loop_bound_documented": loop_bound,
         # Found by the Module 01 <-> Module 03 bridge investigation: P0 sentinels
         # of the shape '!done(T) W start(T)' are unfalsifiable under any lifting

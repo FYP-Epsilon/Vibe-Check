@@ -1,5 +1,10 @@
 import pytest
-from src.mutation_refiner import MutationValidator
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
+
+from mutation_refiner import MutationValidator
 
 def test_mutation_validator():
     graph = {
