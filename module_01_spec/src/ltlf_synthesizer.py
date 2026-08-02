@@ -5,6 +5,16 @@ class VerificationException(Exception):
     """Custom exception for verification failures in Phase 2."""
     pass
 
+
+# Default bound applied to the P2 bounded-loop property. Previously this value
+# was carried in-band as a C-style comment prefixed to the formula string
+# ("/* loop_bound=10 */ G(...)"), which made the property unparseable by this
+# module's own LTLf evaluator (ltlf_eval has no comment syntax in TOKEN_SPEC),
+# killing Phase 4 on every diagram. The bound is now a structured field on the
+# synthesizer's output (see FLTLSynthesizer.spec_metadata) and the formula is
+# left as a well-formed LTLf string.
+DEFAULT_LOOP_BOUND = 10
+
 class FLTLSynthesizer:
     """
     Implicit Guard Resolution & FLTL Property Synthesis.
@@ -26,6 +36,13 @@ class FLTLSynthesizer:
         }
         self.xor_gateways: List[Dict[str, Any]] = []
         self.guard_coverage: float = 0.0
+        # Structured, out-of-band specification metadata. Numeric limits that
+        # downstream consumers need (loop bounds, etc.) live here as typed
+        # fields -- never encoded in-band inside an LTLf formula string, which
+        # is a formula the module's own evaluator has to be able to tokenize.
+        self.spec_metadata: Dict[str, Any] = {
+            "loop_bound_documented": DEFAULT_LOOP_BOUND,
+        }
 
     def run_pipeline(self) -> Dict[str, Any]:
         """Executes the Phase 2 synthesis pipeline."""
@@ -41,7 +58,8 @@ class FLTLSynthesizer:
         return {
             "phase_2_certificate": certificate,
             "ltlf_property_suite": self.ltlf_suite,
-            "inferred_implicit_guards": self.inferred_guards
+            "inferred_implicit_guards": self.inferred_guards,
+            "spec_metadata": self.spec_metadata
         }
 
     def _layer_v3_identify_decisions(self):
@@ -221,9 +239,13 @@ class FLTLSynthesizer:
                 if state.get("node_type") in ["task", "userTask", "serviceTask", "scriptTask", "manualTask"]:
                     self.ltlf_suite["P4_Task_Coverage"].append(f"F({done_prop})")
         
-        # Bounded Loop: Extractable and parseable template
+        # Bounded Loop: a well-formed LTLf formula. The associated numeric bound
+        # is published out-of-band on self.spec_metadata rather than embedded in
+        # the formula text, so the formula stays parseable by ltlf_eval and the
+        # bound stays machine-readable without regexing formula strings.
+        self.spec_metadata["loop_bound_documented"] = DEFAULT_LOOP_BOUND
         self.ltlf_suite["P2_Quality_Limits"].append(
-            "/* loop_bound=10 */ G(start -> F(done))"
+            "G(start -> F(done))"
         )
 
     def _layer_v1_certify(self) -> Dict[str, Any]:
