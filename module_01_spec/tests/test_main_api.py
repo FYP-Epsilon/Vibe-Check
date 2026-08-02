@@ -56,15 +56,8 @@ _HAPPY_XML = """<?xml version="1.0" encoding="UTF-8"?>
 
 _PHASE_1_GATE_FAIL_XML = """<?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                  xmlns:vendor="http://example.com/vendor"
                   targetNamespace="http://bpmn.io/schema/bpmn">
   <bpmn:process id="Process_1" isExecutable="true">
-    <bpmn:startEvent id="Start_1" name="Start" />
-    <bpmn:task id="Task_A" name="Approve" />
-    <bpmn:endEvent id="End_1" name="End" />
-    <bpmn:sequenceFlow id="F1" sourceRef="Start_1" targetRef="Task_A" />
-    <bpmn:sequenceFlow id="F2" sourceRef="Task_A" targetRef="End_1" />
-    <vendor:widget id="Vendor_1" />
   </bpmn:process>
 </bpmn:definitions>
 """
@@ -94,21 +87,28 @@ def test_empty_bpmn_xml_is_a_400():
     assert exc_info.value.status_code == 400
 
 
-def test_malformed_xml_is_a_500_unexpected_error():
+def test_malformed_xml_is_a_400_syntax_error():
     """SemanticExtractionEngine.__init__ raises a bare ValueError on
-    unparseable XML -- main.py has no specific handler for it, so it falls
-    through to the generic 500 branch. Documenting this as current
-    behavior (not necessarily ideal -- a 400 would arguably fit better),
-    matching item #10's note that M01's status-code vocabulary needs a
-    pass regardless."""
+    unparseable XML -- main.py now maps that to an explicit 400 SYNTAX_ERROR
+    (previously fell through to the generic 500 branch; item #10's status-code
+    vocabulary pass)."""
     main = _load_main()
     with pytest.raises(HTTPException) as exc_info:
         main.verify_spec(main.BPMNPayload(bpmn_xml="not xml at all"))
-    assert exc_info.value.status_code == 500
-    assert exc_info.value.detail["error_code"] == "UNEXPECTED_ERROR"
+    assert exc_info.value.status_code == 400
+    assert exc_info.value.detail["error_code"] == "SYNTAX_ERROR"
 
 
 def test_phase_1_gate_fail_is_a_422_with_the_certificate_attached():
+    """A process with zero executable nodes is a genuine, still-reachable FAIL
+    through real end-to-end XML. The vendor-namespaced-extension-element
+    fixture this test previously used no longer fails post-namespace-aware-scan
+    (see test_phase1_gate.py::test_unmappable_non_bpmn_extension_element_is_safely_ignored)
+    -- and no BPMN-namespaced substitute works either: _recovery_pass() sweeps
+    up any id-bearing BPMN-namespaced element not already mapped (its own
+    NON_NODE_TAGS is a strict subset of V3's), so an unmappable-but-namespaced
+    node self-heals to PASS just like the out-of-scope-node case does. Checked
+    empirically, not assumed."""
     main = _load_main()
     with pytest.raises(HTTPException) as exc_info:
         main.verify_spec(main.BPMNPayload(bpmn_xml=_PHASE_1_GATE_FAIL_XML))

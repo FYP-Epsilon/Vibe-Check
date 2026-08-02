@@ -41,7 +41,7 @@ class PBCTSAlignmentPipeline:
                 curr = sorted(steps[i])
                 nxt = sorted(steps[i + 1])
                 if curr and nxt:
-                    formula = f"!(F({curr[0]} & X({nxt[0]})))"
+                    formula = f"G({curr[0]} -> !F({nxt[0]}))"
                     if formula not in seen:
                         seen.add(formula)
                         corrections.append(formula)
@@ -149,7 +149,9 @@ class PBCTSAlignmentPipeline:
                 "k_converged": k_converged,
                 "k_max": k_max,
                 "epsilon": epsilon,
-                "eas_history": [round(e, 4) for e in eas_history]
+                "eas_history": [round(e, 4) for e in eas_history],
+                "binding_constraint": "k_max_reached" if not converged else "none",
+                "diagnostic": "Trace exploration truncated by k_max. Increase bound or relax alignment criterion." if not converged else "Converged"
             },
             "differential_analysis": {
                 "traces_spec_count": len(t_spec),
