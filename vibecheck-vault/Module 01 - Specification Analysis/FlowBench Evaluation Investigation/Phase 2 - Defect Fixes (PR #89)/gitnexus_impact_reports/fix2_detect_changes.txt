@@ -1,0 +1,17 @@
+{"level":40,"time":1785669909842,"name":"gitnexus","msg":"GitNexus: FTS extension unavailable; continuing without FTS features. load-only policy: extension not pre-installed"}
+Changes: 2 files, 7 symbols
+Affected processes: 2
+Risk level: medium
+
+Changed symbols:
+  Symbol main → module_01_spec/src/mutation_refiner.py
+  Symbol LTLfAuditor → module_01_spec/src/mutation_refiner.py
+  Symbol MutationValidator → module_01_spec/src/mutation_refiner.py
+  Symbol is_killed → module_01_spec/src/mutation_refiner.py
+  Symbol _generate_traces → module_01_spec/src/mutation_refiner.py
+  Symbol execute_validation_pipeline → module_01_spec/src/mutation_refiner.py
+  Symbol _synthesize_killer → module_01_spec/src/mutation_refiner.py
+
+Affected execution flows:
+  • Verify_spec → _get_node_props (4 steps) — changed: _synthesize_killer, execute_validation_pipeline
+  • Verify_spec → _certify (3 steps) — changed: execute_validation_pipeline

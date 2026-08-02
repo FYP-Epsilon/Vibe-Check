@@ -1,0 +1,10 @@
+== Phase 4 outcome over 148 diagrams (AFTER all three fixes) ==
+   NOTE: a successful phase_4_certificate has no 'status' key -- only the
+   error stub sets one. The pilot script's cert.get('status') therefore
+   read None for every success. Corrected here.
+   Phase 4 real v2.0 PBCTS certificate           90
+   aborted before Phase 4 (Phase 3 gate FAIL)    54
+   Phase 4 FAIL_WITH_ERRORS                      4
+== FAIL_WITH_ERRORS causes ==
+   Unexpected token at end of formula: ( in '!node(Event_1ycwwda) W node(   3
+   Unexpected token at end of formula: ( in '!node() W done(Amazon_SNS_To   1

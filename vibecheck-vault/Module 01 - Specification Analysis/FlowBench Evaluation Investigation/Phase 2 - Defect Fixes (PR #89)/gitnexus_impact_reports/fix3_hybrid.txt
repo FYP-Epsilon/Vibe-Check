@@ -1,0 +1,14 @@
+== soundness by candidate (post fix1+fix2 code) ==
+  current  branching sound  0/50  | non-branching sound 79/98  | TOTAL  79/148
+  A        branching sound 49/50  | non-branching sound 96/98  | TOTAL 145/148
+  B        branching sound 49/50  | non-branching sound 96/98  | TOTAL 145/148
+== P4 properties emitted corpus-wide ==
+  current  437
+  A        242
+  B        437
+HYBRID: branching sound 49/50 | non-branching sound 96/98 | TOTAL 145/148
+P4 emitted: 437 total (242 strong F(done), 195 conditional)
+residual unsound (3):
+    uid_67_output.bpmn | Property !start(Trello_Card__2_0_0__create_Card) W (done(Trello_Card__2_0_0__create_Card))
+    uid_8_output.bpmn | Property !start(Marketo_leads__3_0_0__create_leads) W (done(Marketo_leads__3_0_0__create_l
+    uid_92_context.bpmn | Property G(start(Amazon_S3_bucket__2_0_0__create_bucket) -> !start(Amazon_S3_bucket__2_0_0

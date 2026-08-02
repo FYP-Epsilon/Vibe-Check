@@ -1,0 +1,101 @@
+PR #89 (fix/mod1/flowbench-defects) — independent reproduction log
+Verified by: Claude (main session, not the Claude Science fix session)
+Generated: 2026-08-02
+Repo: /Users/kavindu/Projects/Vibe-Check @ f0cf778 (fix/mod1/flowbench-defects, base main-demo @ 9165513)
+PR: https://github.com/FYP-Epsilon/Vibe-Check/pull/89 (opened, not merged)
+
+== Test suite ==
+
+$ python3 -m pytest module_01_spec/tests/ -v
+56 passed in 33.30s
+-> matches PR's claimed "0 -> 56 passing (35 pre-existing + 21 added)" exactly.
+
+== Source-level diff review (all three fix commits read directly) ==
+
+a3acf0b (defect 1 + 1b): confirmed api.py now reads loop_bound_documented from
+phase_2.spec_metadata instead of regexing P2_Quality_Limits formula text;
+confirmed ltlf_synthesizer.py publishes spec_metadata with the bound as a typed
+field; confirmed ltlf_eval.py's TOKEN_SPEC gained a NODE_ATOM rule
+(r'\bnode\([^)]+\)') and the parser's atom-dispatch list was extended to
+include it. Matches the PR's description of both defects and the fix exactly.
+
+e9c426b (defect 2): confirmed is_killed()'s 2-tuple return signature is
+byte-for-byte unchanged (still `(bool, str)`), now implemented as a thin
+wrapper over a new classify_kill() returning a 3-tuple with an explicit
+mechanism (KILL_BY_PROPERTY / KILL_BY_DISCONNECTION). Confirmed the Phase 3
+certificate gained four new keys (mutants_killed_by_property,
+mutants_killed_by_disconnection, property_kill_ratio, kill_evidence_vacuous)
+additively -- mutants_killed_ratio and the PASS/FAIL gate threshold are
+untouched. Matches the PR's claim that this was kept append-only specifically
+because GitNexus rated execute_validation_pipeline HIGH risk.
+
+bff92f1 (defect 3): confirmed _mandatory_node_ids() computes the intersection
+of all simple start->end paths via iterative DFS over the same adjacency
+LTLfAuditor._generate_traces would enumerate, then _generate_sentinels emits
+an unconditional F(done(X)) only for mandatory tasks and a conditional
+G(start(X) -> F(done(X))) otherwise -- confirmed no task loses its obligation
+outright, matching the "hybrid, 437/437 kept" claim.
+
+== Independent re-run of the three original pilot scripts (pulled from the
+   vault's Phase-1 investigation folder, NOT from anything the fix session
+   wrote, and run against this branch's checkout) ==
+
+$ python3 crosstab.py
+  sound=True  connected->SURVIVED    1228
+  sound=True  disconnect->killed     1672
+  sound=False connected->SURVIVED       3
+  sound=False property-killed          17
+  sound=False disconnect->killed       40
+  on SOUND-suite diagrams: mutants 2900, survived 1228 (42.3%), property kills 0 (0.0%)
+-> matches the PR's quoted AFTER crosstab exactly, number for number.
+   2900/20 = 145 sound diagrams, matching the claimed 145/148.
+
+$ python3 invalidate.py
+  output/context node+edge F1 = 1.0000 on all four (682/576, 342/293, zero fp/fn)
+  -- IDENTICAL to the pre-fix numbers, confirming extraction was not perturbed.
+  sound-suite diagrams: 145, 0 with zero properties.
+-> matches PR's "structural F1 stays 1.0000" and "0/79 -> 0/145" claims exactly.
+
+$ python3 mutdiag.py
+  2960 mutants, 100% sequence_flow_deletion, 1712 without traces / 1248 with
+-> byte-identical to the pre-fix run, matching the PR's explicit claim that
+   this script's output is unchanged by design (it measures the mutation
+   engine, which this branch does not touch).
+
+== Disclosed test changes, reviewed directly ==
+
+test_status_code_consistency.py: confirmed both renamed tests and the literal
+change from PASS_PBCTS_UNCONVERGED to a same-status-either-path assertion plus
+an explicit "FAIL not in status" / "status == PASS" check. The invariant
+(api.py and main.py must never disagree, and neither may mislabel a non-fail
+outcome as FAIL) is still asserted; only the fixture's own reached status
+changed, exactly as disclosed.
+
+test_loop_bound_decoupling.py: confirmed the fixture uid changed from uid_100
+to uid_11, with the reason (uid_100 now aborts at the Phase 3 gate post-defect-3,
+so it has no phase_4 key to assert against) recorded in the docstring.
+
+== Corrected Phase 4 status breakdown, independently re-derived ==
+
+A from-scratch re-run over all 148 diagrams (real PBCTS/IDCD convergence, not
+the pilot script's buggy `cert.get('status')` check) gave:
+
+    FAIL_WITH_ERRORS: 4
+        flow-bench/data/output/uid_20_output.bpmn
+        flow-bench/data/output/uid_21_output.bpmn
+        flow-bench/data/output/uid_28_output.bpmn
+        flow-bench/data/output/uid_69_output.bpmn
+    real v2.0 certificate (no status key): 90
+    aborted before phase_4 (phase_4 is None): 54
+    total: 148
+
+-> matches the PR's "90 real v2.0 certificates, 54 aborted at the Phase 3 gate,
+   4 FAIL_WITH_ERRORS" exactly, including the exact 4 uids named as the 5th
+   (unfixed) defect.
+
+== Conclusion ==
+
+Every independently-checkable quantitative claim in this PR (test count,
+all three pilot scripts' before/after numbers, the corrected Phase 4 status
+breakdown including the exact 4 residual-failure uids, and the source diffs
+for all three fixes) reproduces exactly. No divergence found anywhere.

@@ -1,0 +1,10 @@
+== mutants generated per diagram (requested 20) ==
+  distribution: {20: 148}
+  total mutants: 2960 across 148 diagrams
+
+== operator that produced each surviving mutant ==
+  sequence_flow_deletion      2960  (100.0%)
+
+== does the mutant have ANY executable trace? ==
+  sequence_flow_deletion     has_traces=False  1712
+  sequence_flow_deletion     has_traces=True   1248
