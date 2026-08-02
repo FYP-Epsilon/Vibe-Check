@@ -48,28 +48,40 @@ _XML = """<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
-def test_api_and_main_agree_on_the_unconverged_status_string():
+def test_api_and_main_agree_on_the_status_string():
+    """UPDATED by the FlowBench defect fixes: this fixture used to reach the
+    non-convergence branch only because its P0/P1 properties were unparseable
+    (node(...) atoms had no tokenizer rule), so PBCTS never had a usable
+    property suite to converge on. With that fixed the fixture converges
+    honestly (SCov 1.0, 129/129 obligation nodes) and returns plain "PASS".
+
+    The invariant this test exists to protect is unchanged and is asserted
+    below: api.py's function path and main.py's route path must never label
+    the same outcome with two different, semantically-opposed strings. Only
+    the outcome this fixture happens to reach has changed."""
     api_result = run_module_01_pipeline(_XML, seed=1)
 
     main = _load_main()
     main_result = main.verify_spec(main.BPMNPayload(bpmn_xml=_XML, seed=1))
 
-    # Both paths hit the same real non-convergence outcome for this
-    # fixture (confirmed, not assumed -- see the module docstring).
-    assert api_result["status"] == "PASS_PBCTS_UNCONVERGED"
-    assert main_result["status"] == "PASS_PBCTS_UNCONVERGED"
+    # The actual bug guard: the two paths must agree, whatever the outcome.
     assert api_result["status"] == main_result["status"]
+    # And neither may label a non-failing outcome as a failure (the original
+    # defect was api.py saying FAIL_ALIGNMENT_UNPROVEN where main.py said PASS_*).
     assert "FAIL" not in api_result["status"]
+    assert api_result["status"] == "PASS"
 
 
-def test_unconverged_result_is_still_exportable_to_module_03():
+def test_non_failing_result_is_still_exportable_to_module_03():
     """The status rename must not change export_for_module_03's own
     behavior -- it never blocklisted either status string, so an
     unconverged result was always treated as valid output; this just
     makes the label agree with that existing behavior instead of
-    contradicting it."""
+    contradicting it. Asserted on whatever non-FAIL status the fixture
+    reaches, so the export contract stays pinned even though the fixture
+    now converges to plain PASS (see the sibling test's docstring)."""
     result = run_module_01_pipeline(_XML, seed=1)
-    assert result["status"] == "PASS_PBCTS_UNCONVERGED"
+    assert "FAIL" not in result["status"]
 
     import tempfile
     with tempfile.TemporaryDirectory() as tmpdir:

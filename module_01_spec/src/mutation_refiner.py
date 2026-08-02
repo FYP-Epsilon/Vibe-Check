@@ -117,24 +117,57 @@ class LTLfAuditor:
         for category in property_suite.values():
             self.properties.extend(category)
 
+    # Kill mechanisms. These are NOT interchangeable as evidence:
+    #  - KILL_BY_PROPERTY means a synthesised property rejected the mutant.
+    #    This is the only mechanism that measures property-suite strength.
+    #  - KILL_BY_DISCONNECTION means the mutation severed the graph so no
+    #    complete trace exists. The mutant is genuinely detected, but by the
+    #    trace generator, not by any property -- it would be detected just as
+    #    reliably by an EMPTY property suite.
+    # Conflating them made mutants_killed_ratio read 1.0 on every FLOW-BENCH
+    # diagram while 0 of 1580 mutants on sound-suite diagrams were killed by a
+    # property, i.e. the Phase 3 gate was passing on no property evidence at all.
+    KILL_BY_PROPERTY = "property_violation"
+    KILL_BY_DISCONNECTION = "graph_disconnected"
+    NOT_KILLED = None
+
+    def classify_kill(self, mutant: Dict[str, Any]) -> Tuple[bool, Optional[str], str]:
+        """
+        Determines whether a mutant is killed AND by which mechanism.
+        Returns (killed, mechanism, counterexample_or_reason).
+
+        This is the primary entry point; is_killed() is kept as a
+        two-tuple wrapper so existing callers are unaffected.
+        """
+        # Generate symbolic traces from mutant
+        traces = self._generate_traces(mutant, depth=10)
+
+        # No traces => the mutation disconnected the graph. Still a kill, but
+        # recorded as such so it is never mistaken for property evidence.
+        if not traces:
+            return (
+                True,
+                self.KILL_BY_DISCONNECTION,
+                "No complete execution traces generated (graph disconnected)",
+            )
+
+        for trace in traces:
+            for prop in self.properties:
+                if not self._evaluate(prop, trace):
+                    return True, self.KILL_BY_PROPERTY, f"Property {prop} failed on trace {trace}"
+        return False, self.NOT_KILLED, ""
+
     def is_killed(self, mutant: Dict[str, Any]) -> Tuple[bool, str]:
         """
         Determines if a mutant is killed by the current property suite.
         Returns (killed, counterexample_trace).
+
+        Mechanism-agnostic by design, for backward compatibility with existing
+        callers. Use classify_kill() when the distinction matters -- which it
+        does for any claim about suite strength.
         """
-        # Generate symbolic traces from mutant
-        traces = self._generate_traces(mutant, depth=10)
-        
-        # If no traces are generated, it means the mutant cannot reach any end event (disconnected)
-        # and is therefore killed.
-        if not traces:
-            return True, "No complete execution traces generated (graph disconnected)"
-        
-        for trace in traces:
-            for prop in self.properties:
-                if not self._evaluate(prop, trace):
-                    return True, f"Property {prop} failed on trace {trace}"
-        return False, ""
+        killed, _mechanism, detail = self.classify_kill(mutant)
+        return killed, detail
 
     def _generate_traces(self, graph: Dict[str, Any], depth: int, cutoff: Optional[int] = None) -> List[List[Set[str]]]:
         """Generates possible execution traces (sequences of sets of active propositions)."""
@@ -243,15 +276,24 @@ class MutationValidator:
         surviving_mutants = []
         for round_idx in range(max_rounds):
             self.mutants_killed = 0
+            # Kills are counted per mechanism, because only property kills are
+            # evidence that the synthesised suite is strong enough. See
+            # LTLfAuditor.classify_kill for why the two are not interchangeable.
+            self.mutants_killed_by_property = 0
+            self.mutants_killed_by_disconnection = 0
             surviving_mutants = []
             
             # Re-initialize auditor with current (potentially enriched) suite
             self.auditor = LTLfAuditor(copy.deepcopy(self.suite))
             
             for i, mutant in enumerate(mutants):
-                killed, cex = self.auditor.is_killed(mutant)
+                killed, mechanism, cex = self.auditor.classify_kill(mutant)
                 if killed:
                     self.mutants_killed += 1
+                    if mechanism == LTLfAuditor.KILL_BY_PROPERTY:
+                        self.mutants_killed_by_property += 1
+                    else:
+                        self.mutants_killed_by_disconnection += 1
                 else:
                     surviving_mutants.append(mutant)
                     # Survival detected! Recursive Refinement.
@@ -266,9 +308,13 @@ class MutationValidator:
                     # Immediately re-audit current mutant with new killer
                     temp_suite = copy.deepcopy(self.suite)
                     self.auditor = LTLfAuditor(temp_suite)
-                    killed_now, _ = self.auditor.is_killed(mutant)
+                    killed_now, mechanism_now, _ = self.auditor.classify_kill(mutant)
                     if killed_now:
                         self.mutants_killed += 1
+                        if mechanism_now == LTLfAuditor.KILL_BY_PROPERTY:
+                            self.mutants_killed_by_property += 1
+                        else:
+                            self.mutants_killed_by_disconnection += 1
 
             # 2.5 Adversarial Red-Teaming (Predictive Defense) - Run once
             if round_idx == 0:
@@ -357,7 +403,16 @@ class MutationValidator:
         
         actual_count = len(self.engine.mutants)
         killed_ratio = self.mutants_killed / actual_count if actual_count > 0 else 1.0
-        
+
+        # Decomposed kill accounting. mutants_killed_ratio is retained
+        # unchanged (existing consumers and the PASS gate depend on it), but it
+        # is no longer the only number reported, because on its own it is not
+        # evidence of anything: a mutation that disconnects the graph is killed
+        # by the trace generator regardless of what the property suite contains.
+        by_property = getattr(self, "mutants_killed_by_property", 0)
+        by_disconnection = getattr(self, "mutants_killed_by_disconnection", 0)
+        property_kill_ratio = by_property / actual_count if actual_count > 0 else 0.0
+
         status = "PASS" if c_struct >= 1.0 and killed_ratio >= 1.0 else "FAIL"
         
         cert = {
@@ -365,6 +420,13 @@ class MutationValidator:
             "C_struct_coefficient": round(c_struct, 4),
             "mutants_generated": actual_count,
             "mutants_killed_ratio": killed_ratio,
+            "mutants_killed_by_property": by_property,
+            "mutants_killed_by_disconnection": by_disconnection,
+            "property_kill_ratio": round(property_kill_ratio, 4),
+            # Explicit, machine-readable warning: the gate passed but no
+            # property contributed to it, so this certificate says nothing
+            # about the strength of the synthesised suite.
+            "kill_evidence_vacuous": bool(killed_ratio >= 1.0 and by_property == 0),
             "refinement_loops_executed": self.refinement_loops
         }
 
