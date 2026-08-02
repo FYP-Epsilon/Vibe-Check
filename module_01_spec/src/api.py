@@ -141,7 +141,6 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
         if match:
             loop_bound = int(match.group(1))
             break
-            
     m3_payload = {
         "semantic_graph": pipeline_result["phase_1"]["semantic_graph"],
         "ltlf_property_suite": pipeline_result["phase_3"]["refined_ltlf_property_suite"],
@@ -172,6 +171,11 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
                 "role": "conformance_check",
                 "conformance_check": True,
                 "note": "Quality/iteration-bound properties, genuinely falsifiable against code.",
+            },
+            "P4_Task_Coverage": {
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Task omission checks, ensures every task specified actually occurs in the trace.",
             },
             # Found while building the first real e2e demo: this dict only ever
             # covered 3 of the 5 tiers refined_ltlf_property_suite can actually

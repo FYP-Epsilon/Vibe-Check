@@ -80,7 +80,7 @@ class TestSCSLCorrections:
         pipeline = PBCTSAlignmentPipeline(suite, _GRAPH)
         frc = pipeline.run_idcd(k_max=20, epsilon=0.001)
 
-        assert frc["scsl_corrections"] == ["!(F(start(Approve) & X(done(Approve))))"]
+        assert frc["scsl_corrections"] == ["G(start(Approve) -> !F(done(Approve)))"]
         gap_types = {g["type"] for g in frc["differential_analysis"]["semantic_gaps"]}
         assert "over_specification" in gap_types
 

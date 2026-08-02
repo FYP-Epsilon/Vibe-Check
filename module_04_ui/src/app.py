@@ -314,6 +314,31 @@ elif st.session_state.active_page == "spec_engine":
                             mime="application/json",
                         )
 
+                    except requests.exceptions.HTTPError as exc:
+                        err_msg = str(exc)
+                        try:
+                            detail = exc.response.json().get("detail", {})
+                            if isinstance(detail, dict) and "message" in detail:
+                                err_msg = detail["message"]
+                        except Exception:
+                            pass
+                        st.error(f"❌ Pipeline Error: {err_msg}")
+                        
+                        import re
+                        match = re.search(r'line (\d+)', err_msg, re.IGNORECASE)
+                        if match:
+                            try:
+                                line_no = int(match.group(1))
+                                lines = bpmn_xml.splitlines()
+                                start = max(0, line_no - 4)
+                                end = min(len(lines), line_no + 3)
+                                snippet = []
+                                for i in range(start, end):
+                                    prefix = ">> " if i + 1 == line_no else "   "
+                                    snippet.append(f"{prefix}{i + 1:3d} | {lines[i]}")
+                                st.code("\n".join(snippet), language="xml")
+                            except Exception:
+                                pass
                     except Exception as e:
                         st.error(f"Module 01 Pipeline Error: {str(e)}")
 
