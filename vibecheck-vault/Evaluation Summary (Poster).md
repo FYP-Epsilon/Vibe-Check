@@ -1,5 +1,5 @@
 > [!info] Purpose
-> Poster-ready evaluation summary for Module 01, Module 02, Module 03, and the full project, all against the IBM FLOW-BENCH dataset. This page is the single source of truth for the numbers — link to it rather than re-typing figures on slides/posters, so a future correction only has to happen in one place. Figures below are dated **pre-PR #88** (2026-08-02) where noted; PR #88 (`feat/mod1/improve-reliability`) had not yet merged when this was written.
+> Poster-ready evaluation summary for Module 01, Module 02, Module 03, and the full project, all against the IBM FLOW-BENCH dataset. This page is the single source of truth for the numbers — link to it rather than re-typing figures on slides/posters, so a future correction only has to happen in one place. M02/M03/full-pipeline figures are dated pre-PR #88 (2026-08-02); PR #88 (`feat/mod1/improve-reliability`, merged) does not change those. M01's section was rewritten 2026-08-02 after a dedicated FlowBench evaluation session found 3 real defects (see that section) — those are diagnosed but **not yet fixed**; re-check this page once the follow-up fix session lands before citing M01's numbers as final.
 
 ## Why FlowBench has no "accuracy" number to just look up
 
@@ -13,15 +13,24 @@ One consequence: **the three modules are not evaluated the same way**, because t
 
 ## Module 01 — Specification Engine (BPMN → LTLf property suite)
 
-**Method**: unit/regression tests + quality-gate pass criteria, not yet a standalone FlowBench detection-rate figure.
+**Method**: a dedicated FlowBench evaluation design session (2026-08-02) closed the "no standalone number" gap identified earlier — and in doing so, found and independently re-verified **3 real defects in mainline**, not a clean detection-rate figure. This is a methodology-found-defects result, not a success metric — treat it that way on the poster: it demonstrates the evaluation methodology works (it caught real problems), not that Module 01 is currently sound end-to-end.
+
+**Why "detection rate" isn't the right shape of number here.** Unlike M02 (mutating code, checkable by execution) or M03 (agreement with an external oracle), M01 turns a *diagram* into a *property suite* — there is no "run it and compare" oracle. The chosen primary metric is **suite soundness**: does the synthesized property suite hold on traces of the very diagram it was derived from? A suite that rejects its own source diagram is definitely wrong; a suite that accepts it is necessary but not sufficient for correctness (see caveat below).
 
 | What | Result |
 |---|---|
-| Unit tests | **28/28 passing** (~0.3s), 6 test files — phase-1/phase-3 gates, PBCTS convergence, SCSL, status-code consistency, M03 export, main API (2026-07-29 snapshot) |
-| Quality-gate criteria (per spec, must all hold to certify) | Node coverage ≥ 1.0, guard-resolution coverage ≥ 1.0, mutation kill-ratio ≥ 1.0, IDCD (bidirectional alignment) convergence |
-| Standalone FlowBench corpus run | **Gap — no current number.** An earlier run over all 100 real FlowBench BPMN diagrams found only 3/100 passing end-to-end, but that predates several fixes (including PR #88's `G(A -> !F(B))` LTLf template correction). Not re-measured since. |
+| Unit tests | 35/35 passing (`module_01_spec/tests/`, re-derived baseline, 2026-08-02 — supersedes an earlier "28" figure from before 7 test files were added) |
+| **Suite soundness** (does the suite accept its own source diagram?) | **55/100** (`output/` corpus), **24/48** (`context/` corpus), 95% CI [45–65%] / [35–65%] |
+| Soundness, stratified by branching | **0/50** on diagrams containing a branch (95% CI [0–7%]) vs. **79/98** on non-branching diagrams (95% CI [71–88%]) — Fisher p = 2.5×10⁻¹⁵ |
+| Structural extraction fidelity (node/edge P/R/F1, independent gold labeler) | 1.0000 / 1.0000 / 1.0000 on both corpora — saturated, kept as a regression guard, not a headline (identical in shape to M02's own structural metric — would be borrowed framing as a headline) |
+| Discriminative mutation kill ratio (mutants killed by an actual property, not by graph disconnection) | **0/1580** (95% CI [0.00–0.23%]) on diagrams that pass the soundness gate — the existing kill-ratio gate currently measures graph connectivity, not property strength |
 
-**Honest caveat for the poster**: present M01 as tests-passing + quality-gate criteria + its contribution to the M01→M03 numbers below — don't claim a standalone FlowBench detection percentage for M01 alone, because that number doesn't currently exist post-fix. (Re-running the 100-diagram corpus to get a fresh number is possible future work, not done here.)
+**The three defects found** (diagnosed, not yet fixed — see [[Module 01 - Specification Analysis/FlowBench Evaluation Investigation/M01 FlowBench Evaluation Methodology|full memo]]):
+1. A hardcoded LTLf property contains a comment M01's own evaluator can't parse — Phase 4 fails on **100% of both FlowBench corpora (148/148 diagrams)**, invisible because the top-level status still reads `PASS_PBCTS_UNCONVERGED`.
+2. The mutation auditor scores "disconnected, no traces" as a kill without ever checking a property — this is *why* the kill-ratio figure above is 0/1580: every kill in the sound-suite population is disconnection, never a caught property.
+3. The `P4_Task_Coverage` tier asserts every task eventually completes, unconditionally — false by construction for any task on a branch's untaken path. This is the direct cause of the 0/50 branching-diagram figure above.
+
+**Honest caveat for the poster**: present this as *"a rigorous evaluation methodology applied to Module 01 found that its property-suite self-soundness is 55% overall and 0% on branching diagrams, tracing to 3 identified defects"* — not as a pass/fail grade on the module. All three defects are being fixed in a follow-up phase before any harness or headline number is finalized; this snapshot is honestly a mid-investigation state, not a concluded evaluation.
 
 ---
 
@@ -82,7 +91,7 @@ One consequence: **the three modules are not evaluated the same way**, because t
 
 | Module | One-line method | Headline number | What it actually measures |
 |---|---|---|---|
-| M01 | Unit tests + quality-gate criteria | 28/28 tests passing | Internal correctness, not FlowBench detection rate (gap, see above) |
+| M01 | Suite-soundness (does the LTLf suite accept its own source diagram?), 148-diagram corpus | 55/100 sound, 0/50 on branching diagrams | Diagnostic — found 3 real defects; not a bug-detection rate, and not yet post-fix (see above) |
 | M02 | Mutation testing, 101-program corpus + real multi-LLM bug corpus | 100% (164/164) real-bug detection | Detects behaviorally-divergent code vs. reference IR |
 | M03 | Oracle-agreement on real FlowBench property checks | 100% (35/35) agreement | Agrees with M01's own oracle — plumbing correctness, not bug-catch rate |
 | Full pipeline | Order-mutation E2E, 6 gold pairs | 35.7% [13–65%] detection, 46% abstention, 0% false alarms | Honest-abstention design; small n, wide CIs |
