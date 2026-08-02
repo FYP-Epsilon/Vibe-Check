@@ -1,5 +1,10 @@
 import pytest
-from src.bidirectional_alignment import run_pbcts_pipeline
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
+
+from bidirectional_alignment import run_pbcts_pipeline
 
 def test_bidirectional_alignment():
     property_suite = {"P1_Structural_Control_Flow": ["F(start)"]}

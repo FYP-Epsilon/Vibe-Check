@@ -1,5 +1,10 @@
 import pytest
-from src.adversarial_generator import AdversarialGenerator
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
+
+from adversarial_generator import AdversarialGenerator
 
 def test_adversarial_generator_traces():
     generator = AdversarialGenerator()

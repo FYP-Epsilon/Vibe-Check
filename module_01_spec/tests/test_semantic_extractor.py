@@ -1,5 +1,10 @@
 import pytest
-from src.semantic_extractor import SemanticExtractionEngine
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src"))
+
+from semantic_extractor import SemanticExtractionEngine
 
 def test_semantic_extractor_valid_xml():
     xml = """<?xml version="1.0" encoding="UTF-8"?>
