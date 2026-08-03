@@ -5,6 +5,8 @@ import streamlit as st
 import sys
 import os
 
+from e2e_orchestrator import run_e2e_check, E2EOrchestrationError
+
 # Module 01 integration is handled via the spec-engine HTTP API.
 
 st.set_page_config(
@@ -138,6 +140,18 @@ with st.sidebar:
         type="primary" if st.session_state.active_page == "equiv_engine" else "secondary",
     ):
         navigate("equiv_engine")
+        st.rerun()
+
+    st.markdown("---")
+
+    # --- E2E Pipeline button (chains all three engines over HTTP) ---
+    if st.button(
+        "🔄  E2E Pipeline  ·  M01→M02→M03",
+        key="btn_e2e",
+        use_container_width=True,
+        type="primary" if st.session_state.active_page == "e2e_pipeline" else "secondary",
+    ):
+        navigate("e2e_pipeline")
         st.rerun()
 
     st.markdown("---")
@@ -534,8 +548,10 @@ elif st.session_state.active_page == "equiv_engine":
         st.markdown(
             "`POST /lift` — WIR type-lifting + semantic action matching (this demo).  \n"
             "`POST /check` — full Phase A–D conformance check against a property suite. "
-            "Requires a call-order-lifted WIR (see `module_02_extract`'s `derive_call_order_wir`) — "
-            "not yet produced by extract-engine's own HTTP API, so this endpoint has no UI demo here yet."
+            "Requires a call-order-lifted WIR (see `module_02_extract`'s `derive_call_order_wir`) "
+            "and a real property suite from Module 01 — see the **🔄 E2E Pipeline** page, which "
+            "chains spec-engine → extract-engine → equiv-engine over live HTTP to drive this "
+            "endpoint end-to-end instead of demoing it in isolation."
         )
 
     with demo_tab:
@@ -596,3 +612,122 @@ elif st.session_state.active_page == "equiv_engine":
                 st.info("Check if equiv-engine is running at http://equiv-engine:8000")
             except Exception as e:
                 st.error(f"Equiv Engine Error: {str(e)}")
+
+
+# ══════════════════════════════════════════════════════════════════════════
+# PAGE: E2E PIPELINE (Module 01 → Module 02 → Module 03, chained over HTTP)
+# ══════════════════════════════════════════════════════════════════════════
+elif st.session_state.active_page == "e2e_pipeline":
+    st.subheader("🔄 E2E Pipeline — M01 → M02 → M03")
+
+    about_tab, run_tab = st.tabs(["📂 About", "▶️ Run Full Check"])
+
+    with about_tab:
+        st.markdown('<p class="section-header">What this does</p>', unsafe_allow_html=True)
+        st.markdown(
+            "Each engine page above demos its own module in isolation "
+            "(`/verify`, `/lift`). This page instead drives the real "
+            "conformance check end-to-end: it POSTs your BPMN spec to "
+            "**spec-engine** to get an LTLf property suite, POSTs your Python "
+            "source to **extract-engine** to get a call-order-lifted WIR, then "
+            "POSTs both to **equiv-engine**'s `/check` for the full Phase A–D "
+            "conformance verdict — three live HTTP calls to three separate "
+            "containers, not an in-process shortcut."
+        )
+        st.markdown(
+            "The measured E2E numbers reported elsewhere in this project "
+            "(`demo/eval_e2e/`) come from calling the same underlying Python "
+            "functions directly in-process, bypassing these services' HTTP "
+            "boundaries. This page is the deployed-system equivalent of that "
+            "same chain."
+        )
+
+        st.markdown('<p class="section-header">Orchestration</p>', unsafe_allow_html=True)
+        st.code("module_04_ui/src/e2e_orchestrator.py :: run_e2e_check()", language="text")
+        st.markdown(
+            "- `POST spec-engine:8000/verify` → `ltlf_property_suite`, BPMN task names  \n"
+            "- `POST extract-engine:8000/verify` → `call_order_wir`  \n"
+            "- `POST equiv-engine:8000/check` → `compliance_results` per property"
+        )
+
+    with run_tab:
+        st.markdown("### Run the full M01 → M02 → M03 chain")
+        st.markdown(
+            "Upload a real BPMN spec and a real Python workflow implementation "
+            "(e.g. from `flow-bench/data/context/` and "
+            "`module_02_extract/eval/variants/normalized/` for a matching `uid`). \n\n"
+            "For ready-made pairs covering COMPLIANT, VIOLATION, INCONCLUSIVE, and "
+            "both engine-rejection cases, see `demo/sample_inputs/` (with its own "
+            "`README.md`) in the repo."
+        )
+
+        bpmn_file = st.file_uploader("BPMN Spec (.bpmn / .xml)", type=["bpmn", "xml"], key="e2e_bpmn")
+        source_file = st.file_uploader("Python Workflow Source (.py)", type=["py"], key="e2e_source")
+
+        if st.button("Run Full E2E Check", type="primary"):
+            if not bpmn_file or not source_file:
+                st.warning("Please upload both a BPMN spec and a Python source file.")
+            else:
+                bpmn_xml = bpmn_file.read().decode("utf-8")
+                source_code = source_file.read().decode("utf-8")
+
+                with st.spinner(
+                    "Chaining spec-engine → extract-engine → equiv-engine... "
+                    "(spec-engine's mutation-based quality gate can take a few "
+                    "minutes on richer, multi-branch diagrams)"
+                ):
+                    try:
+                        result = run_e2e_check(bpmn_xml, source_code)
+                    except E2EOrchestrationError as exc:
+                        st.error(f"❌ **{exc.stage}** rejected this input: {exc}")
+                        st.stop()
+                    except requests.exceptions.RequestException as exc:
+                        st.error(f"Network error reaching an engine: {exc}")
+                        st.stop()
+                    except Exception as exc:
+                        st.error(f"Unexpected error: {exc}")
+                        st.stop()
+
+                cr = result["check_result"]
+                compliance_results = cr["compliance_results"]
+
+                st.divider()
+                st.subheader("Conformance Results")
+
+                verdict_counts = {"COMPLIANT": 0, "VIOLATION": 0, "INCONCLUSIVE": 0}
+                for r in compliance_results:
+                    verdict_counts[r["verdict"]] = verdict_counts.get(r["verdict"], 0) + 1
+                m1, m2, m3 = st.columns(3)
+                m1.metric("✅ Compliant", verdict_counts.get("COMPLIANT", 0))
+                m2.metric("❌ Violation", verdict_counts.get("VIOLATION", 0))
+                m3.metric("❓ Inconclusive", verdict_counts.get("INCONCLUSIVE", 0))
+
+                if verdict_counts.get("VIOLATION", 0) > 0:
+                    st.error("❌ VIOLATION — at least one property was violated by this implementation.")
+                elif verdict_counts.get("COMPLIANT", 0) > 0:
+                    st.success("✅ COMPLIANT — every checkable property that resolved was satisfied.")
+                else:
+                    st.warning("❓ INCONCLUSIVE — no property could be conclusively resolved against this trace.")
+
+                for r in compliance_results:
+                    badge = {"COMPLIANT": "✅", "VIOLATION": "❌", "INCONCLUSIVE": "❓"}.get(r["verdict"], "•")
+                    with st.expander(f"{badge} {r['verdict']} — `{r['origin_formula']}`"):
+                        st.code(r["origin_formula"], language="text")
+                        if r.get("counter_example_trace"):
+                            st.markdown("**Counterexample:**")
+                            st.code(r["counter_example_trace"], language="text")
+                        if r.get("unmatched_atoms"):
+                            st.caption(f"Unmatched atoms: {r['unmatched_atoms']}")
+
+                if cr.get("excluded_properties"):
+                    with st.expander(f"📋 Excluded properties ({len(cr['excluded_properties'])})"):
+                        st.json(cr["excluded_properties"])
+
+                st.divider()
+                with st.expander("📦 Intermediate artifacts (BPMN tasks, property suite, WIR)"):
+                    st.markdown("**BPMN task names:**")
+                    st.json(result["bpmn_tasks"])
+                    st.markdown("**LTLf property suite (from spec-engine):**")
+                    st.json(result["ltlf_property_suite"])
+                    st.markdown("**Call-order WIR (from extract-engine):**")
+                    st.json(result["call_order_wir"])
