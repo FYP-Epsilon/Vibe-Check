@@ -37,7 +37,7 @@ FastAPI `spec-engine`, `POST /verify` with BPMN XML. Four phases, each behind an
 3. **Mutation self-validation** (`mutation_refiner.py` + `adversarial_generator.py`) — 5 mutation operators against the synthesized suite, multi-round self-healing (≤ 3), adversarial red-team tier (simulated); gates: C_struct ≥ 1.0 and kill ratio δ ≥ 1.0.
 4. **PBCTS** (`ltlf_progression.py`, `trace_synthesizer.py`, `bidirectional_alignment.py`) — pure-Python LTLf **progression** constructs satisfying traces `T_spec`, bidirectional alignment vs model traces yields `EAS_BDA`, gated by IDCD convergence, with the SCSL self-correction loop → **Formal Reliability Certificate v2.0**. (Replaced an abandoned SPOT/HOA design; stdlib-only.)
 
-**Exports:** `module_02_input.json` (task_patterns — consumed by M02's randomized tracer) and `module_03_input.json` (LTLf property suite — consumed by M03's `property_ingest`). 28 tests, all passing; slim SPOT-free Dockerfile.
+**Exports:** `module_02_input.json` (task_patterns — consumed by M02's randomized tracer) and `module_03_input.json` (LTLf property suite — consumed by M03's `property_ingest`). 56/56 `tests/` passing post PR #89 (98 total incl. `eval/`); slim SPOT-free Dockerfile. FLOW-BENCH evaluation (`eval/`, 148 diagrams): suite soundness **145/148** (98.0%/97.9% by corpus, up from 79/148 pre-PR #89), structural fidelity F1 **1.0000**; discriminative mutation kills remain **0/2900** — an open, disclosed weak spot, see `vibecheck-vault/Final Evaluation Results/Module 01 Evaluation Results.md`.
 
 ## Module 02 — Verified IR Extraction (`module_02_extract/`, code track)
 
@@ -64,12 +64,13 @@ FastAPI `equiv-engine` (`/lift`, `/check`, `/health`). Canonical path: **`proces
 
 ## Module 04 — Verification Portal (`module_04_ui/`)
 
-573-line Streamlit app: dashboard + one page per engine, all three engines called over HTTP with live sidebar health checks. Explicitly disclaims research novelty (integration layer). Gaps: zero tests; no UI demo for `/check` yet.
+Streamlit app: dashboard + one page per engine, all three engines called over HTTP with live sidebar health checks, plus (added 2026-08-03) a "🔄 E2E Pipeline" page that chains all three engines live over HTTP for a real `/check` demo (`module_04_ui/src/e2e_orchestrator.py`). Explicitly disclaims research novelty (integration layer). Gaps: zero automated tests of its own.
 
 ## End-to-end demo and measurement
 
 - **`demo/e2e_demo.py`** (PR #76) — the full chain in one script (demo harness *outside* all modules; production stays containerized): BPMN → M01 property suite → M02 call-order WIR → M03 Phase A–D → verdict + readable counterexample, on real FLOW-BENCH LLM implementations. Building it surfaced and fixed two real bugs (M01's `tier_semantics` export gap; counterexample rendering).
-- **`demo/eval_e2e/`** (PR #77) — mutation-based E2E evaluation (methodology ported from M02, Clopper-Pearson CIs throughout): abstention **0.462** [0.27, 0.67] (n=26) — task-drop mutants often make the dropped atom unobservable, so the pipeline honestly abstains; detection **0.357** [0.13, 0.65] (n=14); false-alarm **0.000** [0.00, 0.84] (n=2); counterexample quality **0.800** [0.28, 0.99] (n=5). Small n, every rate carries its CI by design.
+- **`demo/eval_e2e/`** (PR #77, gold set expanded 2026-08-03 by P4_Task_Coverage ingestion) — mutation-based E2E evaluation (methodology ported from M02, Clopper-Pearson CIs throughout), 18 gold spec/implementation pairs: abstention **0.383** [0.26, 0.52] (n=60) — task-drop mutants often make the dropped atom unobservable, so the pipeline honestly abstains; detection **0.162** [0.06, 0.32] (n=37); false-alarm **0.000** [0.00, 0.34] (n=9); counterexample quality **0.833** [0.36, 1.00] (n=6). Small n, every rate carries its CI by design. See `vibecheck-vault/Final Evaluation Results/` for a full plain-English writeup of these numbers and how they're produced, per module and end-to-end.
+- **Live HTTP demo of the deployed services** (2026-08-03) — `module_04_ui/src/e2e_orchestrator.py` + the UI's "🔄 E2E Pipeline" page drives the three actually-running containers (not an in-process script) end-to-end; verified against a real caught order-swap violation with counterexample, shown in the browser.
 
 ## Repo layout
 
@@ -90,9 +91,9 @@ FastAPI `equiv-engine` (`/lift`, `/check`, `/health`). Canonical path: **`proces
 2. Loop-bound safety checking has no home in the canonical Phase D.
 3. Non-terminating traces vs termination-requiring properties: explicitly deferred design decision.
 4. V2 symbolic layer contributes ≈ nothing on the current corpus; the "multi-modal" certificate is V1-driven.
-5. E2E detection is 0.357 at small n — with abstention reported separately rather than averaged away.
+5. E2E detection is 0.162 at small n (18 gold specs) — with abstention (0.383) reported separately rather than averaged away.
 6. Numeric-boundary bugs and equivalent-mutant specificity (0.1111) are known M02 blind spots.
-7. M04 has zero tests.
+7. M04 has zero automated tests of its own (though `/check` now has a live UI demo, added 2026-08-03).
 
 ## Links
 
