@@ -32,6 +32,17 @@ the original 60s default made these two cases fail with a spurious
 | `08_s3_storage_workflow_compliant/` | Multi-task S3 storage workflow (`uid_88`: bucket lookup $\to$ object retrieve vs bucket creation). | `COMPLIANT` across branching state transitions. |
 | `09_custom_order_processing_compliant/` | **Custom E-Commerce Workflow**: Natural task names (`Receive_Customer_Order`, `Check_Inventory_Stock`, `Assess_Risk_Score`, `Process_Credit_Payment`, `Send_Fraud_Alert_Email`, `Fulfill_Standard_Shipping`). | `COMPLIANT` across risk assessment decision branches. |
 | `10_custom_order_processing_violation/` | **Custom E-Commerce Workflow Violation**: Order swap inside the high-risk branch (`Send_Fraud_Alert_Email` called before `Process_Credit_Payment`). | `VIOLATION` with counterexample trace isolating out-of-order execution. |
+| `11_z3_symbolic_loan_approval/` | **Purpose-built to exercise Module 02's V2 (Z3 symbolic) layer** — see below. | `spec-engine` `status: PASS`. `extract-engine`: `v2_confidence: 0.5`, `v1_confidence: 1.0`, `combined_confidence: 1.0`, `passed: true`. |
+
+### Why `11_z3_symbolic_loan_approval` is different
+
+The other 10 examples exercise Module 02's **V1** layer (dynamic differential tracing) almost exclusively — V1 does the real detection work on this project's corpus, and V2 (Z3) normally contributes close to nothing (see `Module 02 Evaluation Results.md` §4, "what's honestly not claimed"). This example is built specifically to make V2 do real, visible work, and it was verified directly against the live `extract-engine` container (not just a local script) on 2026-08-03.
+
+`workflow()`'s only interesting branch is `if referral_code == 77531:` — an exact-value gate on the function's own integer parameter. V1's random sampler (`dynamic_tracer/randomized.py`) draws inputs with `random.randint(-100, 100)` — so `77531` is **structurally outside the sampling range**, not just statistically unlikely. No number of V1 runs could ever land on it. Z3, by contrast, doesn't sample — it solves the guard directly and returns `referral_code = 77531` as a concrete witness in a single query.
+
+The measured V2 certificate confirms this: `branch_diversity_score: 1.0` and `covered_edges: 2` mean **both** sides of that gateway were reached — the `else` path (found by plain concrete execution) and the priority-loan path (found only because Z3 solved for it). `solver_success_rate: 1.0` shows the one Z3 query needed actually succeeded. (V2's confidence caps at `0.5` here, not higher, because of how the engine's iteration-count-vs-solved-path ratio is defined for a single gateway — not because anything failed; see `total_paths: 2` / `feasible_paths: 1` in the raw certificate.)
+
+Note the `combined_confidence: 1.0`: since the certificate formula is `1 − (1−v1)(1−v2)`, V1's already-perfect 1.0 score (on the branch it *did* see) masks V2's contribution in the final number — a live instance of the documented "V2-masking in self-mode" limitation (`Module 02 Knowledge.md`). To see V2's contribution on its own, look at `v2_details` directly rather than the top-level `combined_confidence`.
 
 ## Regenerating / extending these
 
