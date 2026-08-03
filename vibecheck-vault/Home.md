@@ -8,6 +8,11 @@
 - [[Project Overview]] — one-document tour of the whole system: problem, architecture, module-by-module implementation, contracts, evaluation numbers, limitations
 - [[Next Steps]] — the research roadmap that got us here (P0–P3); most items now ✅ done — kept as the audit trail of *how* the final state was reached
 
+## Final evaluation results (plain-English, current as of 2026-08-03)
+
+- [[Final Evaluation Results/Full Project Evaluation Results|Full Project Evaluation Results]] — what the whole system does, end-to-end numbers, how we evaluate it, system-wide novelty
+- [[Final Evaluation Results/Module 01 Evaluation Results|Module 01 Evaluation Results]] · [[Final Evaluation Results/Module 02 Evaluation Results|Module 02 Evaluation Results]] · [[Final Evaluation Results/Module 03 Evaluation Results|Module 03 Evaluation Results]]
+
 ## Novelty documents (research positioning)
 
 - [[Module 01 - Specification Analysis/Module 01 Novelty|Module 01 Novelty]] — PBCTS, mutation self-validation of generated specs, BPMN→LTLf with coverage gates vs prior art
@@ -25,10 +30,10 @@
 
 ## Module notes
 
-- [[Module 01 - Specification Analysis/Module 01 Knowledge|Module 01 — Specification Analysis]] 🟢 (final 4-phase PBCTS pipeline; startup fixed, **28 tests pass**, slim Dockerfile, status codes unified)
+- [[Module 01 - Specification Analysis/Module 01 Knowledge|Module 01 — Specification Analysis]] 🟢 (final 4-phase PBCTS pipeline; startup fixed, **56/56 tests pass** post PR #89 (98 total incl. eval/), slim Dockerfile, status codes unified)
 - [[Module 02 - Verified IR Extraction/Module 02 Knowledge|Module 02 — Verified IR Extraction]] 🟢 (most mature, measured; call-order WIR exposed from `/verify`, container fixed, **256 tests**)
-- [[Module 03 - Equivalence Engine/Module 03 Knowledge|Module 03 — Equivalence Engine]] 🟢 (C++/SPOT engine covers all phases A–D; **M01 ingestion wired** (`property_ingest.py`), alive-extension LTLf→LTL bridge, real FastAPI service, **142 test functions**)
-- [[Module 04 - Verification Portal/Module 04 Knowledge|Module 04 — Verification Portal]] 🟡 (all three engine pages now HTTP incl. the fixed equiv page; zero tests, `/check` has no UI demo yet)
+- [[Module 03 - Equivalence Engine/Module 03 Knowledge|Module 03 — Equivalence Engine]] 🟢 (C++/SPOT engine covers all phases A–D; **M01 ingestion wired** (`property_ingest.py`), alive-extension LTLf→LTL bridge, real FastAPI service, **142/145 test functions pass** (2 known-gap failures, unimplemented hash feature))
+- [[Module 04 - Verification Portal/Module 04 Knowledge|Module 04 — Verification Portal]] 🟢 (all three engine pages now HTTP incl. the fixed equiv page; **live E2E `/check` demo added** — see [[Final Evaluation Results/Full Project Evaluation Results|Full Project Evaluation Results]]; still zero automated tests of its own)
 
 ## Repo docs (vault copy)
 
@@ -60,18 +65,19 @@ The repo's entire `docs/` tree, imported @ `7089711`. **`docs/` has since been r
 | Calibration corpus | 427 mutants, 10 operators |
 | Natural-bug corpus | 3 LLM families, 20 admitted / 164 rejected |
 
-**End-to-end M01→M02→M03 eval** (`demo/eval_e2e/results/`, small n, CIs by design):
+**End-to-end M01→M02→M03 eval** (`demo/eval_e2e/results/`, updated 2026-08-03 after P4_Task_Coverage ingestion expanded the gold set; small n, CIs by design — see [[Final Evaluation Results/Full Project Evaluation Results|Full Project Evaluation Results]] for the full plain-English writeup):
 
 | Metric | Value |
 |---|---|
-| Abstention (honest INCONCLUSIVE) | 0.462 [0.27, 0.67] (n=26) |
-| Detection (decisive trials) | 0.357 [0.13, 0.65] (n=14) |
-| False-alarm rate | 0.000 [0.00, 0.84] (n=2) |
-| Counterexample quality | 0.800 [0.28, 0.99] (n=5) |
-| First real FLOW-BENCH run | 29 specs, 58 checks — 100% agreement with M01's `evaluate_ltlf` oracle on all 35 decisive verdicts |
+| Gold specs | 18 (up from 6 pre-P4_Task_Coverage) |
+| Abstention (honest INCONCLUSIVE) | 0.383 [0.26, 0.52] (n=60) |
+| Detection (decisive trials) | 0.162 [0.06, 0.32] (n=37) |
+| False-alarm rate | 0.000 [0.00, 0.34] (n=9) |
+| Counterexample quality | 0.833 [0.36, 1.00] (n=6) |
+| M03 oracle-agreement run (earlier, definition-order lifting — see [[Final Evaluation Results/Module 03 Evaluation Results|Module 03 Evaluation Results]] for the caveat) | 29 specs, 58 checks — 100% agreement with M01's `evaluate_ltlf` oracle on all 35 decisive verdicts |
 
 ## Current state
 
-The headline end-to-end claim is **wired and demonstrated**: BPMN spec → Module 01 (LTLf property suite) → Module 02 (call-order WIR) → Module 03 (Phase A–D conformance check) → PASS/FAIL + readable counterexample, run against real LLM-generated FLOW-BENCH implementations (`demo/e2e_demo.py`), with a measured evaluation harness on top (`demo/eval_e2e/`). CI runs per-module tests plus a real docker-compose startup check.
+The headline end-to-end claim is **wired and demonstrated**: BPMN spec → Module 01 (LTLf property suite) → Module 02 (call-order WIR) → Module 03 (Phase A–D conformance check) → PASS/FAIL + readable counterexample, run against real LLM-generated FLOW-BENCH implementations (`demo/e2e_demo.py`), with a measured evaluation harness on top (`demo/eval_e2e/`). As of 2026-08-03, this is also demonstrated **live against the actual deployed HTTP services** (`module_04_ui/src/e2e_orchestrator.py`, the "🔄 E2E Pipeline" UI page), not just the in-process harness — see [[Final Evaluation Results/Full Project Evaluation Results|Full Project Evaluation Results]]. CI runs per-module tests plus a real docker-compose startup check.
 
-**Remaining honest gaps** (tracked, not hidden): only the `node()`-free slice of P1 properties is conformance-checkable (17.6% of the tier); loop-bound safety checking has no home in the canonical path (`P2_Quality_Limits` excluded, legacy `run_pipeline` is its only implementation); non-terminating-trace semantics vs termination-requiring properties is an explicitly deferred design decision; E2E detection 0.357 at small n (task-drop mutants are often unobservable → honest abstention); M04 has zero tests and no UI demo for `/check`; V2 contributes ≈ nothing on the current corpus (certificate is V1-driven — stated in the prominent docs).
+**Remaining honest gaps** (tracked, not hidden): only the `node()`-free slice of P1 properties is conformance-checkable (17.6% of the tier); loop-bound safety checking has no home in the canonical path (`P2_Quality_Limits` excluded, legacy `run_pipeline` is its only implementation); non-terminating-trace semantics vs termination-requiring properties is an explicitly deferred design decision; E2E detection 0.162 at small n (task-drop mutants are often unobservable → honest abstention, currently 0.383); M04 still has zero automated tests of its own (though the `/check` endpoint now has a live UI demo); V2 contributes ≈ nothing on the current corpus (certificate is V1-driven — stated in the prominent docs).
