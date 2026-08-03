@@ -1,0 +1,10 @@
+== phase_4_certificate.status over 148 diagrams ==
+  FAIL_WITH_ERRORS   148
+== distinct phase_4 messages ==
+  Unexpected character '/' in formula '/* loop_bound=10 */ G   148
+== phase_3 mutants_killed_ratio distribution ==
+  ratio=1.0      148 diagrams
+== soundness by branch presence (malformed P2 excluded) ==
+  has_branch=True  sound=0   unsound=50  (n=50)
+  has_branch=False sound=79  unsound=19  (n=98)
+  TOTAL sound: 79/148

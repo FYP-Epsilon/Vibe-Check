@@ -1,0 +1,24 @@
+{"level":40,"time":1785668961948,"name":"gitnexus","msg":"GitNexus: FTS extension unavailable; continuing without FTS features. load-only policy: extension not pre-installed"}
+Changes: 5 files, 12 symbols
+Affected processes: 4
+Risk level: medium
+
+Changed symbols:
+  Symbol export_for_module_03 → module_01_spec/src/api.py
+  Symbol evaluate_ast → module_01_spec/src/ltlf_eval.py
+  Symbol ASTNode → module_01_spec/src/ltlf_eval.py
+  Symbol TOKEN_SPEC → module_01_spec/src/ltlf_eval.py
+  Symbol main → module_01_spec/src/ltlf_synthesizer.py
+  Symbol FLTLSynthesizer → module_01_spec/src/ltlf_synthesizer.py
+  Symbol __init__ → module_01_spec/src/ltlf_synthesizer.py
+  Symbol run_pipeline → module_01_spec/src/ltlf_synthesizer.py
+  Symbol _layer_v3_identify_decisions → module_01_spec/src/ltlf_synthesizer.py
+  Symbol _layer_v2_synthesize_logic → module_01_spec/src/ltlf_synthesizer.py
+  Symbol test_api_and_main_agree_on_the_unconverged_status_string → module_01_spec/tests/test_status_code_consistency.py
+  Symbol test_unconverged_result_is_still_exportable_to_module_03 → module_01_spec/tests/test_status_code_consistency.py
+
+Affected execution flows:
+  • Verify_spec → _resolve_implicit_guards (4 steps) — changed: _layer_v2_synthesize_logic, run_pipeline
+  • Verify_spec → _generate_sentinels (4 steps) — changed: _layer_v2_synthesize_logic, run_pipeline
+  • Verify_spec → _layer_v3_identify_decisions (3 steps) — changed: _layer_v3_identify_decisions, run_pipeline
+  • Verify_spec → _layer_v1_certify (3 steps) — changed: run_pipeline

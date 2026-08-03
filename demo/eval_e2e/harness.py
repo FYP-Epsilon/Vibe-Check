@@ -54,7 +54,7 @@ sys.path.insert(0, os.path.join(REPO_ROOT, "module_03_equiv", "src"))
 from api import run_module_01_pipeline, export_for_module_03  # module_01_spec
 from ast_extractor.call_order_view import derive_call_order_wir  # module_02_extract
 from src.property_ingest import load_property_suite  # module_03_equiv
-from src.pipeline import process_wir_batch  # module_03_equiv
+from src.pipeline import process_wir_batch, HAS_CPP_ENGINE  # module_03_equiv
 from src.counterexample import format_counterexample  # module_03_equiv
 
 from .mutate import generate_order_mutations, generate_constant_perturbation, call_sequence
@@ -171,6 +171,13 @@ def discover_gold_specs() -> list[SpecContext]:
                 export_path = os.path.join(tmpdir, "module_03_input.json")
                 export_for_module_03(pipeline_result, filepath=export_path)
                 m03_input = json.load(open(export_path))
+        except (ImportError, ModuleNotFoundError):
+            # Not a per-spec skip: the environment itself is broken (e.g. the
+            # Python-3.9-only compiled vibecheck_lifter unimportable under the
+            # active interpreter). Letting this masquerade as "M01-ineligible
+            # spec" is exactly what silently produced a 0-gold-spec report
+            # instead of a crash -- so it must propagate.
+            raise
         except Exception:
             continue  # M01-ineligible spec (not every BPMN file in this corpus survives M01's own pipeline)
 
@@ -186,6 +193,8 @@ def discover_gold_specs() -> list[SpecContext]:
             try:
                 wir = derive_call_order_wir(source)
                 result = process_wir_batch([json.dumps(wir)], bpmn_tasks=bpmn_tasks, property_suite=suite)
+            except (ImportError, ModuleNotFoundError):
+                raise  # environment-broken, not a per-variant skip -- see comment above
             except Exception:
                 continue
             cluster = next(iter(result["clusters"].values()))
@@ -316,7 +325,24 @@ def _rate(k: int, n: int) -> tuple[Optional[float], Optional[tuple[float, float]
 
 
 def run_harness() -> dict:
+    if not HAS_CPP_ENGINE:
+        raise RuntimeError(
+            "vibecheck_lifter C++ module not available under this interpreter "
+            f"({sys.executable}). It is a Python-3.9-only compiled extension "
+            "(module_03_equiv/src/vibecheck_lifter.cpython-39-darwin.so) -- "
+            "run this harness with a Python 3.9 interpreter that has it on "
+            "the path, or rebuild it for the interpreter you're using (see "
+            "module_03_equiv/CMakeLists.txt)."
+        )
     specs = discover_gold_specs()
+    if not specs:
+        raise RuntimeError(
+            "discover_gold_specs() found 0 usable specs -- refusing to write a "
+            "report that would look like a valid (if bleak) measurement. This "
+            "almost always means the environment is broken (e.g. running under "
+            "the wrong Python interpreter for the compiled vibecheck_lifter "
+            "extension), not that the corpus genuinely has no gold specs."
+        )
     all_trials: list[Trial] = []
     all_skipped: list[str] = []
     for ctx in specs:

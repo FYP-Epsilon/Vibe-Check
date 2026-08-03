@@ -1,0 +1,16 @@
+== suite soundness x kill mechanism (2960 mutants, 148 diagrams) ==
+  sound   mechanism                               n
+  True    connected->SURVIVED                  1228
+  True    disconnected->killed_by_fiat         1672
+  False   connected->SURVIVED                     3
+  False   connected->killed_by_property          17
+  False   disconnected->killed_by_fiat           40
+
+== on SOUND-suite diagrams (the only ones where a kill is interpretable) ==
+  mutants: 2900
+  killed by a property violation: 0 (0.0%)
+  killed only because the mutation disconnected the graph: 1672 (57.7%)
+  survived: 1228
+
+== property-driven kills by tier (unsound suites included, for contrast) ==
+  sound=False P1      17

@@ -129,18 +129,16 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
     if pipeline_result.get("status") in ["FAIL", "FAIL_WITH_ERRORS"]:
         raise ValueError("Cannot export to Module 03: Pipeline failed.")
 
-    import re
-    # PBCTS ignores loop bounds. We extract it directly from P2_Quality_Limits.
-    loop_bound = 0
-    p2_suite = pipeline_result["phase_3"]["refined_ltlf_property_suite"].get("P2_Quality_Limits", [])
-    for prop in p2_suite:
-        # e.g., looks like a comment or specifically encoded in a property string.
-        # The semantic extractor puts loop limits in comments sometimes, but 
-        # normally we can safely default to 3 if we can't parse it.
-        match = re.search(r'loop_bound\s*=\s*(\d+)', prop, re.IGNORECASE)
-        if match:
-            loop_bound = int(match.group(1))
-            break
+    # PBCTS ignores loop bounds, so the documented bound is forwarded to
+    # Module 03 separately. It is read from Phase 2's structured spec_metadata,
+    # NOT parsed back out of a formula string: the bound used to travel in-band
+    # as a "/* loop_bound=N */" comment prefixed to the P2 property, which made
+    # that property unparseable by this module's own LTLf evaluator. Removing
+    # the comment without moving the bound somewhere structured would have left
+    # this extraction silently returning 0 forever, so the two concerns are now
+    # decoupled: the formula is a formula, the bound is a typed field.
+    spec_metadata = (pipeline_result.get("phase_2") or {}).get("spec_metadata") or {}
+    loop_bound = spec_metadata.get("loop_bound_documented", 0)
     m3_payload = {
         "semantic_graph": pipeline_result["phase_1"]["semantic_graph"],
         "ltlf_property_suite": pipeline_result["phase_3"]["refined_ltlf_property_suite"],

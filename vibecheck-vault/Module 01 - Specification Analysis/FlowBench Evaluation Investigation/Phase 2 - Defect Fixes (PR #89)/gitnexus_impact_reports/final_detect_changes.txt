@@ -1,0 +1,2 @@
+{"level":40,"time":1785672501764,"name":"gitnexus","msg":"GitNexus: FTS extension unavailable; continuing without FTS features. load-only policy: extension not pre-installed"}
+No changes detected.

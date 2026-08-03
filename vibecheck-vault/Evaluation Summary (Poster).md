@@ -1,5 +1,5 @@
 > [!info] Purpose
-> Poster-ready evaluation summary for Module 01, Module 02, Module 03, and the full project, all against the IBM FLOW-BENCH dataset. This page is the single source of truth for the numbers — link to it rather than re-typing figures on slides/posters, so a future correction only has to happen in one place. Figures below are dated **pre-PR #88** (2026-08-02) where noted; PR #88 (`feat/mod1/improve-reliability`) had not yet merged when this was written.
+> Poster-ready evaluation summary for Module 01, Module 02, Module 03, and the full project, all against the IBM FLOW-BENCH dataset. This page is the single source of truth for the numbers — link to it rather than re-typing figures on slides/posters, so a future correction only has to happen in one place. M02/M03/full-pipeline figures are dated pre-PR #88 (2026-08-02); PR #88 (`feat/mod1/improve-reliability`, merged) does not change those. M01's section reflects a FlowBench evaluation session that found 3 real defects, and a follow-up fix session (PR #89, **merged into `demo/evaluation-finale`** 2026-08-02) that closed all three — both independently re-verified, reproduction logs in the vault alongside each. `demo/evaluation-finale` has not yet been merged into `main-demo`.
 
 ## Why FlowBench has no "accuracy" number to just look up
 
@@ -13,15 +13,26 @@ One consequence: **the three modules are not evaluated the same way**, because t
 
 ## Module 01 — Specification Engine (BPMN → LTLf property suite)
 
-**Method**: unit/regression tests + quality-gate pass criteria, not yet a standalone FlowBench detection-rate figure.
+**Method**: a dedicated FlowBench evaluation design session (2026-08-02) closed the "no standalone number" gap identified earlier, found **3 real defects in mainline** (plus a 4th uncovered while fixing #1), and a follow-up session fixed all three — [PR #89](https://github.com/FYP-Epsilon/Vibe-Check/pull/89), **merged into `demo/evaluation-finale`**, independently re-verified figure-for-figure both before and after merge. This is a diagnose-then-fix result, not a single clean detection-rate figure — present the before/after pair, not just the after.
 
-| What | Result |
-|---|---|
-| Unit tests | **28/28 passing** (~0.3s), 6 test files — phase-1/phase-3 gates, PBCTS convergence, SCSL, status-code consistency, M03 export, main API (2026-07-29 snapshot) |
-| Quality-gate criteria (per spec, must all hold to certify) | Node coverage ≥ 1.0, guard-resolution coverage ≥ 1.0, mutation kill-ratio ≥ 1.0, IDCD (bidirectional alignment) convergence |
-| Standalone FlowBench corpus run | **Gap — no current number.** An earlier run over all 100 real FlowBench BPMN diagrams found only 3/100 passing end-to-end, but that predates several fixes (including PR #88's `G(A -> !F(B))` LTLf template correction). Not re-measured since. |
+**Why "detection rate" isn't the right shape of number here.** Unlike M02 (mutating code, checkable by execution) or M03 (agreement with an external oracle), M01 turns a *diagram* into a *property suite* — there is no "run it and compare" oracle. The chosen primary metric is **suite soundness**: does the synthesized property suite hold on traces of the very diagram it was derived from? A suite that rejects its own source diagram is definitely wrong; a suite that accepts it is necessary but not sufficient for correctness (see caveat below).
 
-**Honest caveat for the poster**: present M01 as tests-passing + quality-gate criteria + its contribution to the M01→M03 numbers below — don't claim a standalone FlowBench detection percentage for M01 alone, because that number doesn't currently exist post-fix. (Re-running the 100-diagram corpus to get a fresh number is possible future work, not done here.)
+| What | Before | After (PR #89) |
+|---|---|---|
+| Unit tests | 35/35 passing | **56/56 passing** (21 new, corpus-driven not hand-fixture-only) |
+| **Suite soundness** (does the suite accept its own source diagram?) | 79/148 (55/100 `output`, 24/48 `context`) | **145/148** |
+| Soundness, branching diagrams only | **0/50** (Fisher p = 2.5×10⁻¹⁵ vs. non-branching) | **49/50** |
+| Phase 4 (`FAIL_WITH_ERRORS`, parse error) | 148/148 | **4/148** (residual — a distinct, unfixed 5th defect: empty `node()` proposition names on 4 specific diagrams) |
+| Phase 4 real v2.0 PBCTS certificate | 0/148 | **90/148** (54/148 now honestly abort at the Phase 3 gate instead of masking the failure downstream) |
+| Structural extraction fidelity (independent gold labeler, node/edge P/R/F1) | 1.0000 / 1.0000 / 1.0000 | **unchanged** — confirms the fixes didn't perturb extraction |
+| Property kills on sound-suite diagrams (discriminative kill ratio) | 0/1580 | **still 0** (now on a larger, honestly-sound population of 2900 connected+sound mutants) — see caveat |
+
+**The three defects, diagnosed then fixed** (see [[Module 01 - Specification Analysis/FlowBench Evaluation Investigation/M01 FlowBench Evaluation Methodology|diagnosis memo]] and [[Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/PR_fix_mod1_flowbench_defects|fix PR description]], both independently re-verified — reproduction logs alongside each):
+1. A hardcoded LTLf property contained a comment M01's own evaluator couldn't parse. **Fixed**: the loop bound is now a typed metadata field, not in-band text. Fixing this surfaced a 4th, previously-undiagnosed defect (the tokenizer had no rule for `node(...)` atoms at all) — fixed in the same commit.
+2. The mutation auditor scored "disconnected, no traces" as a kill without ever checking a property. **Not silently patched** — the gate threshold was deliberately left unchanged (property kills are still 0 on sound-suite diagrams), because tightening it is a scoring-policy decision on a GitNexus-flagged HIGH-risk path, not a defect fix. The distinction is now exposed via new fields instead of hidden.
+3. `P4_Task_Coverage` asserted every task eventually completes, unconditionally — false for any task on a branch's untaken path. **Fixed** with a hybrid (found by measuring, not arguing): unconditional completion kept only for tasks on every start→end path, conditional elsewhere — beats both originally-proposed candidates by keeping all 437 completion obligations instead of trading them away.
+
+**Honest caveat for the poster, still true post-fix**: property kills on sound-suite diagrams remain **0/1580 before and 0/2900 after** — the fixes make Module 01's self-certification *honest* (it no longer hides behind an unparseable property or an unsound obligation), they do not yet make the mutation suite *discriminative*. Present this as *"a rigorous evaluation methodology found real defects in Module 01, and a follow-up fix session closed them — suite soundness rose from 53% to 98% (0% to 98% on branching diagrams) — but the mutation-testing gate still needs a diversified operator set before its kill ratio is evidence of anything."* Merged into `demo/evaluation-finale`; not yet in `main-demo`.
 
 ---
 
@@ -82,7 +93,7 @@ One consequence: **the three modules are not evaluated the same way**, because t
 
 | Module | One-line method | Headline number | What it actually measures |
 |---|---|---|---|
-| M01 | Unit tests + quality-gate criteria | 28/28 tests passing | Internal correctness, not FlowBench detection rate (gap, see above) |
+| M01 | Suite-soundness (does the LTLf suite accept its own source diagram?), 148-diagram corpus | 79/148 → 145/148 (0/50 → 49/50 branching), PR #89 merged | Diagnose-then-fix — not a bug-detection rate; merged to `demo/evaluation-finale`, not yet `main-demo` (see above) |
 | M02 | Mutation testing, 101-program corpus + real multi-LLM bug corpus | 100% (164/164) real-bug detection | Detects behaviorally-divergent code vs. reference IR |
 | M03 | Oracle-agreement on real FlowBench property checks | 100% (35/35) agreement | Agrees with M01's own oracle — plumbing correctness, not bug-catch rate |
 | Full pipeline | Order-mutation E2E, 6 gold pairs | 35.7% [13–65%] detection, 46% abstention, 0% false alarms | Honest-abstention design; small n, wide CIs |
