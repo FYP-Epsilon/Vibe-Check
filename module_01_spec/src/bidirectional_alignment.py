@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Any, List, Set, Tuple
+from typing import Dict, Any, List, Set, Tuple, Optional
 
 try:
     from .trace_synthesizer import PBCTSEngine
@@ -47,8 +47,34 @@ class PBCTSAlignmentPipeline:
                         corrections.append(formula)
         return corrections
 
-    def run_idcd(self, k_max: int = 20, epsilon: float = 0.001) -> Dict[str, Any]:
+    def _auto_relax_rules(self, t_model_only: set, auditor) -> list:
+        """
+        Fixes Under-Specification by finding and removing rules that falsely forbid valid graph traces.
+        """
+        removed_rules = []
+        for trace in list(t_model_only):
+            # We must convert the tuple of frozensets back to a list of sets for the evaluator
+            eval_trace = [set(s) for s in trace]
+            for category, rules in self.property_suite.items():
+                rules_to_remove = []
+                for rule in rules:
+                    if not auditor._evaluate(rule, eval_trace):
+                        rules_to_remove.append(rule)
+                
+                for rule in rules_to_remove:
+                    self.property_suite[category].remove(rule)
+                    removed_rules.append({"category": category, "rule": rule, "blocked_trace": str(trace)})
+                    
+        return removed_rules
+
+    def run_idcd(self, k_max: Optional[int] = None, epsilon: float = 0.001, auto_relax: bool = False) -> Dict[str, Any]:
         """Iterative Deepening with Convergence Detection."""
+        
+        # Apply Pigeonhole Principle: max depth before guaranteed loop = total nodes + 1
+        num_nodes = len(self.semantic_graph.get("states", []))
+        if k_max is None:
+            k_max = num_nodes + 1 if num_nodes > 0 else 20
+            
         eas_prev = 0.0
         eas_history = []
         
@@ -57,6 +83,7 @@ class PBCTSAlignmentPipeline:
         converged = False
         k_converged = k_max
         final_stats = {}
+        total_relaxed_log = []
         
         for k in range(1, k_max + 1):
             # T_spec from PBCTS
@@ -67,6 +94,18 @@ class PBCTSAlignmentPipeline:
             # T_model from Graph Traversal
             t_model_raw = auditor._generate_traces(self.semantic_graph, depth=k)
             t_model = self._normalize_traces(t_model_raw)
+            
+            t_spec_only = t_spec - t_model
+            t_model_only = t_model - t_spec
+
+            # Auto-fix under-specification on the fly (opt-in)
+            if auto_relax and t_model_only:
+                relaxed_log = self._auto_relax_rules(t_model_only, auditor)
+                if relaxed_log:
+                    total_relaxed_log.extend(relaxed_log)
+                    # If rules were changed, we need to regenerate T_spec on the next loop, 
+                    # but we can calculate current metrics with the relaxed expectation
+                    t_agreed = t_spec & t_model
             
             # BDA Metrics
             t_agreed = t_spec & t_model
@@ -102,9 +141,9 @@ class PBCTSAlignmentPipeline:
                 
             eas_prev = eas_k
             
-        return self._generate_frc(final_stats, converged, k_converged, k_max, epsilon, eas_history)
+        return self._generate_frc(final_stats, converged, k_converged, k_max, epsilon, eas_history, total_relaxed_log)
 
-    def _generate_frc(self, stats: Dict[str, Any], converged: bool, k_converged: int, k_max: int, epsilon: float, eas_history: List[float]) -> Dict[str, Any]:
+    def _generate_frc(self, stats: Dict[str, Any], converged: bool, k_converged: int, k_max: int, epsilon: float, eas_history: List[float], relaxed_log: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Generates the Formal Reliability Certificate."""
         
         t_spec = stats["t_spec"]
@@ -129,7 +168,7 @@ class PBCTSAlignmentPipeline:
             semantic_gaps.append({
                 "type": "under_specification",
                 "trace": str(t),
-                "explanation": "BPMN permits this trace, but LTLf suite forbids it."
+                "explanation": "BPMN permits this trace, but LTLf suite forbids it. (Attempted Auto-Relaxation)"
             })
             
         confidence = (1.0 - epsilon) if converged else stats["scov"]["SCov"]
@@ -165,7 +204,8 @@ class PBCTSAlignmentPipeline:
                 "confidence": round(confidence, 4),
                 "completeness_statement": f"All traces of length <= {k_converged} fully enumerated." if converged else f"Exploration capped at length {k_max} without full convergence."
             },
-            "scsl_corrections": scsl_corrections
+            "scsl_corrections": scsl_corrections,
+            "auto_relaxed_rules": relaxed_log
         }
 
 def run_pbcts_pipeline(property_suite: Dict[str, List[str]], semantic_graph: Dict[str, Any]) -> Dict[str, Any]:
