@@ -1,0 +1,6 @@
+risk: LOW impacted: 5 direct: 1
+  d1 FLTLSynthesizer._layer_v2_synthesize_logic#0       module_01_spec/src/ltlf_synthesizer.py
+  d2 FLTLSynthesizer.run_pipeline#0                     module_01_spec/src/ltlf_synthesizer.py
+  d3 run_module_01_pipeline                             module_01_spec/src/api.py
+  d3 main                                               module_01_spec/src/ltlf_synthesizer.py
+  d3 verify_spec                                        module_01_spec/src/main.py

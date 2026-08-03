@@ -1,0 +1,5 @@
+target: Function:module_01_spec/src/ltlf_eval.py:evaluate_ltlf
+risk: LOW  impacted: 2  direct: 1
+processes: []
+modules: [('Cluster_13', 2, 'direct')]
+  d1 Method:module_01_spec/src/mutation_refiner.py:LTLfAuditor._evaluate#2

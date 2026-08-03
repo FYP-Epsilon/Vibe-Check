@@ -1,0 +1,92 @@
+M01 FlowBench Evaluation Methodology memo — independent reproduction log
+Verified by: Claude (main session, not the Claude Science memo-writing session)
+Generated: 2026-08-02
+Repo: /Users/kavindu/Projects/Vibe-Check @ 9165513 (demo/evaluation-finale, == main-demo)
+Purpose: re-run the memo's own pilot scripts against the live checkout, independently
+of the session that wrote them, before importing the memo's numbers anywhere durable.
+
+== Source-level checks (before running anything) ==
+
+module_01_spec/src/ltlf_synthesizer.py:224-226 — read directly, matches memo verbatim:
+    # Bounded Loop: Extractable and parseable template
+    self.ltlf_suite["P2_Quality_Limits"].append(
+        "/* loop_bound=10 */ G(start -> F(done))"
+    )
+
+module_01_spec/src/mutation_refiner.py:128-131 — read directly, matches memo verbatim:
+    # If no traces are generated, it means the mutant cannot reach any end event (disconnected)
+    if not traces:
+        return True, "No complete execution traces generated (graph disconnected)"
+
+== Live repro, hand-built branching diagram (not from the memo's scripts) ==
+
+Built a 5-node BPMN diagram (start -> XOR gateway -> {Approve, Reject} -> end) and ran
+run_module_01_pipeline() directly:
+
+    top-level status:     PASS_PBCTS_UNCONVERGED
+    phase_4_certificate:  {'status': 'FAIL_WITH_ERRORS',
+                            'message': "Unexpected character '/' in formula
+                            '/* loop_bound=10 */ G(start -> F(done))'"}
+    P4_Task_Coverage:     ['F(done(Approve))', 'F(done(Reject))']
+
+Confirms independently: (1) Phase 4 fails with the exact cited parse error while the
+top-level status stays PASS_PBCTS_UNCONVERGED — the failure is invisible at the top
+level, exactly as claimed; (2) P4_Task_Coverage emits F(done(X)) for every task
+regardless of branch membership — on a trace that takes the Approve branch,
+F(done(Reject)) is false, so the tier is unsound by construction on any branching
+diagram, exactly as claimed.
+
+== Re-ran the memo's own three pilot scripts against the live checkout, unmodified ==
+
+$ python3 crosstab.py
+== suite soundness x kill mechanism (2960 mutants, 148 diagrams) ==
+  sound   mechanism                               n
+  True    disconnected->killed_by_fiat         1580
+  False   connected->SURVIVED                    13
+  False   connected->killed_by_property        1235
+  False   disconnected->killed_by_fiat          132
+
+== on SOUND-suite diagrams (the only ones where a kill is interpretable) ==
+  mutants: 1580
+  killed by a property violation: 0 (0.0%)
+  killed only because the mutation disconnected the graph: 1580 (100.0%)
+  survived: 0
+-> matches memo's "0/1580, 95% CI [0.0000, 0.0023]" exactly.
+
+$ python3 invalidate.py
+== Q1: structural scoring vs SPEC-derived gold (independent vocabulary) ==
+  output   node  P=1.0000 R=1.0000 F1=1.0000  tp=682 fp=0 fn=0
+  output   edge  P=1.0000 R=1.0000 F1=1.0000  tp=576 fp=0 fn=0
+  context  node  P=1.0000 R=1.0000 F1=1.0000  tp=342 fp=0 fn=0
+  context  edge  P=1.0000 R=1.0000 F1=1.0000  tp=293 fp=0 fn=0
+== Q2: kill-cause decomposition (sound-suite diagrams only) ==
+  degenerate:no_traces_generated              1580  (100.0%)
+  TOTAL mutants scored: 1580
+-> matches memo's "682/0/0 and 342/0/0, F1 = 1.0000" and the 0/1580 figure exactly.
+   1580/20 = 79 sound diagrams, matching the memo's 79/148 total.
+
+$ python3 mutdiag.py
+== mutants generated per diagram (requested 20) ==
+  distribution: {20: 148}
+  total mutants: 2960 across 148 diagrams
+== operator that produced each surviving mutant ==
+  sequence_flow_deletion      2960  (100.0%)
+== does the mutant have ANY executable trace? ==
+  sequence_flow_deletion     has_traces=False  1712
+  sequence_flow_deletion     has_traces=True   1248
+-> matches memo's "all 2960 surviving mutants come from sequence-flow deletion" and
+   "1712/2960 of those deletions disconnect the graph outright" exactly.
+
+== Conclusion ==
+
+All four pilot figures independently reproduce bit-for-bit against the live checkout
+at 9165513, using an interpreter and dependency set separate from whatever the memo's
+own session used. No divergence found. The memo's central claims (Phase 4 dead on
+100% of both corpora; P2 property unparseable by M01's own evaluator; is_killed scores
+a disconnection as a kill without consulting any property; 0/1580 property-driven
+kills on sound-suite diagrams; 100% of surviving mutants are sequence-flow deletions)
+are corroborated, not just re-stated.
+
+Not independently re-verified in this pass: the Clopper-Pearson confidence intervals
+themselves (arithmetic on already-confirmed counts, not re-derived here) and the
+Fisher exact p-values in Section 4 of the memo.

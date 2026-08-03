@@ -29,6 +29,15 @@ Verification Findings for the corpus measurements this is based on):
     check), P2 (contains a "<=" comparison SPOT's LTL grammar cannot parse,
     and references code-side atoms that do not exist), and P3 (needs the
     LTLf->LTL "X"-operator bridge, not designed here) are all excluded.
+  - "P4_Task_Coverage" is checkable ONLY in its unconditional shape,
+    "F(done(X))" -> "F(X)". Its conditional shape, "G(start(X) -> F(done(X)))"
+    (emitted by Module 01 for tasks that are not on every start->end path --
+    see ltlf_synthesizer.py's _generate_sentinels), collapses under the same
+    Option-B atom merge to G("X" -> F("X")) -- verified (evaluate_ltlf over
+    all traces up to length 4) to be an unfalsifiable tautology, the exact
+    same failure mode ap_gap_memo.md already documented for P0's
+    "!done(T) W start(T)" -> "!T W T". Excluded with a reason, not silently
+    checked as if it meant something.
   - Exact intra-tier duplicate formulas are de-duplicated (measured at 34 of
     412 properties in the real corpus).
 """
@@ -87,6 +96,7 @@ _KNOWN_TIERS = {
     "P1_Structural_Control_Flow",
     "P2_Quality_Limits",
     "P3_Adversarial_Defenses",
+    "P4_Task_Coverage",
     "synthesized_mutant_killers",
 }
 
@@ -94,6 +104,16 @@ _LIFECYCLE_ATOM_RE = re.compile(r"(?:start|done)\(([^)]+)\)")
 _NODE_ATOM_RE = re.compile(r"\bnode\(")
 _QUOTED_RE = re.compile(r'"[^"]*"')
 _DISALLOWED_OPERATOR_RE = re.compile(r"<=|>=|==|!=|<|>")
+
+# P4_Task_Coverage's conditional shape: "G(start(X) -> F(done(X)))". Under
+# Option B's start/done merge this becomes G("X" -> F("X")), a tautology
+# (verified with evaluate_ltlf) -- excluded explicitly rather than checked
+# as if it carried meaning. The unconditional shape, "F(done(X))", has no
+# start(X) on the same task and is NOT matched by this pattern; it collapses
+# to a genuine, falsifiable "F(X)" omission check and is checked normally.
+_P4_VACUOUS_CONDITIONAL_RE = re.compile(
+    r"^G\(start\(([^)]+)\) -> F\(done\(\1\)\)\)$"
+)
 
 
 def _to_spot_option_b(formula: str) -> str:
@@ -187,6 +207,18 @@ def load_property_suite(source: str | dict) -> PropertySuite:
                 excluded.append(ExcludedProperty(
                     origin_formula=raw, tier=tier,
                     reason="references a spec-only node(...) atom with no code counterpart",
+                ))
+                continue
+
+            if tier == "P4_Task_Coverage" and _P4_VACUOUS_CONDITIONAL_RE.match(raw):
+                excluded.append(ExcludedProperty(
+                    origin_formula=raw, tier=tier,
+                    reason=(
+                        "conditional task-coverage obligation collapses to a "
+                        "tautology (G(\"X\" -> F(\"X\"))) under Option B's "
+                        "start/done atom merge -- unfalsifiable, same failure "
+                        "mode as P0's excluded sentinels"
+                    ),
                 ))
                 continue
 

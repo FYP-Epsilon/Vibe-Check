@@ -1,0 +1,7 @@
+pipeline status over 148 diagrams:
+   PASS                         90
+   FAIL                         54
+   PASS_PBCTS_UNCONVERGED       4
+mutants 1880 | property 168 | disconnection 1712 | property_ratio 0.0894
+kill ratio: min 1.000 mean 1.000 | ratio==1.0 on 94/94
+vacuous: 81
