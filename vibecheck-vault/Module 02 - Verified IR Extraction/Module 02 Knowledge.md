@@ -67,6 +67,7 @@ Full **Chapter 5 draft** (§5.1–5.8, 713 lines): [[module02_chapter_draft]], p
 
 - [[Home]]
 - [[Module 02 Novelty]] — research positioning vs prior art
+- [[WIR Structure and Confidence Methodology]] — WIR field-by-field with a worked example, how the confidence formula and its threshold were built
 - [[Module 02 Architecture]]
 - [[Module 02 Status]]
 - [[Module 02 Repo Docs Index]]

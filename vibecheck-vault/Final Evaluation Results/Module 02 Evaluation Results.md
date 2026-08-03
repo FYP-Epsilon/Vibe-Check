@@ -28,16 +28,16 @@ Because there's no dataset that comes with "this code is buggy / this code is co
 
 Breaking the detection rate down by the *type* of bug introduced (all held-out test data, not the data used to tune the module):
 
-| Bug type | How many tried | How many caught | Catch rate |
-|---|---|---|---|
-| Dropped a step | 51 | 51 | 100% |
-| Corrupted a container operation | 16 | 16 | 100% |
-| Wrong variable used | 18 | 18 | 100% |
-| Flipped a decision condition | 14 | 14 | 100% |
-| Swapped two branches | 4 | 4 | 100% |
-| Reordered steps | 49 | 49 | 100% |
-| Cut the code short early | 49 | 49 | 100% |
-| Changed a constant value | 9 | 8 | 88.9% |
+| Bug type                        | How many tried | How many caught | Catch rate |
+| ------------------------------- | -------------- | --------------- | ---------- |
+| Dropped a step                  | 51             | 51              | 100%       |
+| Corrupted a container operation | 16             | 16              | 100%       |
+| Wrong variable used             | 18             | 18              | 100%       |
+| Flipped a decision condition    | 14             | 14              | 100%       |
+| Swapped two branches            | 4              | 4               | 100%       |
+| Reordered steps                 | 49             | 49              | 100%       |
+| Cut the code short early        | 49             | 49              | 100%       |
+| Changed a constant value        | 9              | 8               | 88.9%      |
 
 ### 2.2 The one honest weak spot: telling "equivalent" bugs apart from real ones
 
@@ -95,4 +95,5 @@ This is the strongest evidence in the whole project: instead of planting fake bu
 ## Links
 
 - [[Full Project Evaluation Results]] · [[Module 01 Evaluation Results]] · [[Module 03 Evaluation Results]]
+- [[../Module 02 - Verified IR Extraction/WIR Structure and Confidence Methodology|WIR Structure and Confidence Methodology]] — deep dive on the WIR's structure, a worked example, and exactly how the confidence formula and its threshold were built
 - [[../Home|Home]] · [[../Project Overview|Project Overview]]
