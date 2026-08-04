@@ -1,0 +1,32 @@
+{
+  "gold_specs_count": 47,
+  "order_trials_total": 301,
+  "abstentions": 133,
+  "abstention_rate": 0.4419,
+  "abstention_ci_95": [
+    0.3849,
+    0.5
+  ],
+  "decisive_trials": 168,
+  "detections": 51,
+  "misses": 117,
+  "detection_rate": 0.3036,
+  "detection_ci_95": [
+    0.2351,
+    0.3791
+  ],
+  "perturbation_trials": 47,
+  "false_alarms": 0,
+  "false_alarm_rate": 0.0,
+  "false_alarm_ci_95": [
+    0.0,
+    0.0755
+  ],
+  "counterexample_trials": 51,
+  "counterexample_ok": 38,
+  "counterexample_quality": 0.7451,
+  "counterexample_ci_95": [
+    0.6037,
+    0.8567
+  ]
+}

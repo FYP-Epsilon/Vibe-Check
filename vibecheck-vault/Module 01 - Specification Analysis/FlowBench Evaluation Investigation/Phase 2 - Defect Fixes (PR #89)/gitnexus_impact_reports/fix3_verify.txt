@@ -1,0 +1,3 @@
+IN-SOURCE soundness: branching 49/50 | non-branching 96/98 | TOTAL 145/148
+P4 emitted: 437 (242 unconditional F(done), 195 conditional)
+residual unsound: ['uid_67_output.bpmn', 'uid_8_output.bpmn', 'uid_92_context.bpmn']

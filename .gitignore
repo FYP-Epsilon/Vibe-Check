@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 venv/
+venv39/
 .env
 
 # C++
@@ -14,5 +15,10 @@ build/
 .pytest_cache/
 **/.pytest_cache/
 
+#IDE
+.idea/
+.vscode/
+.DS_Store
 
-
+# Poster
+docs/poster/

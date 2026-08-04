@@ -1,0 +1,557 @@
+{
+  "n_gold_specs": 18,
+  "gold_uids": [
+    11,
+    45,
+    47,
+    48,
+    49,
+    50,
+    71,
+    72,
+    73,
+    75,
+    76,
+    77,
+    78,
+    81,
+    84,
+    85,
+    88,
+    100
+  ],
+  "skipped": [
+    "uid 50: no eligible literal for perturb_constant",
+    "uid 71: no eligible literal for perturb_constant",
+    "uid 72: no eligible literal for perturb_constant",
+    "uid 73: no eligible literal for perturb_constant",
+    "uid 75: no eligible literal for perturb_constant",
+    "uid 76: no eligible literal for perturb_constant",
+    "uid 78: no eligible literal for perturb_constant",
+    "uid 84: no eligible literal for perturb_constant",
+    "uid 85: no eligible literal for perturb_constant"
+  ],
+  "detection_rate": 0.16216216216216217,
+  "detection_ci": [
+    0.06192572133339633,
+    0.32013707586767126
+  ],
+  "n_decisive_trials": 37,
+  "abstention_rate": 0.38333333333333336,
+  "abstention_ci": [
+    0.26070705801599914,
+    0.5178850485688387
+  ],
+  "n_order_trials": 60,
+  "by_mutation_kind": {
+    "drop_step": {
+      "n": 38,
+      "detected": 0,
+      "missed": 15,
+      "abstained": 23
+    },
+    "swap_adjacent": {
+      "n": 22,
+      "detected": 6,
+      "missed": 16,
+      "abstained": 0
+    }
+  },
+  "false_alarm_rate": 0.0,
+  "false_alarm_ci": [
+    0.0,
+    0.3362671168799428
+  ],
+  "n_perturb_trials": 9,
+  "counterexample_quality_rate": 0.8333333333333334,
+  "counterexample_quality_ci": [
+    0.3587654210023251,
+    0.9957892554855106
+  ],
+  "n_detected": 6,
+  "trials": [
+    {
+      "uid": 11,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 45,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to GitHub_Comment__3_0_0__create_Comment)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 45,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to GitHub_Branch__3_0_0__retrievewithwhere_Branch)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 45,
+      "kind": "drop_step",
+      "label": "drop stmt 2 (call to GitHub_Pullrequest__3_0_0__create_Pullrequest)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 45,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (GitHub_Comment__3_0_0__create_Comment <-> GitHub_Branch__3_0_0__retrievewithwhere_Branch)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 45,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 1<->2 (GitHub_Branch__3_0_0__retrievewithwhere_Branch <-> GitHub_Pullrequest__3_0_0__create_Pullrequest)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": false
+    },
+    {
+      "uid": 45,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 47,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Jira_Issue__2_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 47,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Jira_Project__2_0_0__retrievewithwhere_Project)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 47,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Jira_Issue__2_0_0__retrievewithwhere_Issue <-> Jira_Project__2_0_0__retrievewithwhere_Project)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 47,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 48,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Jira_Issue__2_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 48,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Jira_Issue__2_0_0__create_Issue)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 48,
+      "kind": "drop_step",
+      "label": "drop stmt 3 (call to Slack_message__3_0_0__create_message)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 48,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Jira_Issue__2_0_0__retrievewithwhere_Issue <-> Jira_Issue__2_0_0__create_Issue)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 48,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 1<->3 (Jira_Issue__2_0_0__create_Issue <-> Slack_message__3_0_0__create_message)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 48,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 49,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to user_task)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 49,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Jira_Project__2_0_0__retrievewithwhere_Project)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 49,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (user_task <-> Jira_Project__2_0_0__retrievewithwhere_Project)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 49,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 50,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Zendesk_Service_person__3_0_0__create_person)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 50,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Zendesk_Service_asset__3_0_0__create_asset)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 50,
+      "kind": "drop_step",
+      "label": "drop stmt 2 (call to Zendesk_Service_Ticket__2_0_0__create_Ticket)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 50,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Zendesk_Service_person__3_0_0__create_person <-> Zendesk_Service_asset__3_0_0__create_asset)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 50,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 1<->2 (Zendesk_Service_asset__3_0_0__create_asset <-> Zendesk_Service_Ticket__2_0_0__create_Ticket)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 71,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Amazon_SQS_Messages__3_0_0__PUTMESSAGE_Messages)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 71,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Amazon_SNS_Topic__3_0_0__updatewithwhere_Topic)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 71,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Amazon_SQS_Messages__3_0_0__PUTMESSAGE_Messages <-> Amazon_SNS_Topic__3_0_0__updatewithwhere_Topic)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Coupa_invoices__4_0_0__retrievewithwhere_invoices)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Coupa_suppliers__4_0_0__create_suppliers)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "drop_step",
+      "label": "drop stmt 2 (call to Coupa_purchase_orders__4_0_0__retrievewithwhere_purchase_orders)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "drop_step",
+      "label": "drop stmt 3 (call to Coupa_users__4_0_0__retrievewithwhere_users)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Coupa_invoices__4_0_0__retrievewithwhere_invoices <-> Coupa_suppliers__4_0_0__create_suppliers)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 1<->2 (Coupa_suppliers__4_0_0__create_suppliers <-> Coupa_purchase_orders__4_0_0__retrievewithwhere_purchase_orders)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 72,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 2<->3 (Coupa_purchase_orders__4_0_0__retrievewithwhere_purchase_orders <-> Coupa_users__4_0_0__retrievewithwhere_users)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": true
+    },
+    {
+      "uid": 73,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Dropbox_files__3_0_0__create_files)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 73,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Box_File__3_0_0__updatewithwhere_File)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 73,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Dropbox_files__3_0_0__create_files <-> Box_File__3_0_0__updatewithwhere_File)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 75,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Marketo_leads__3_0_0__updatewithwhere_leads)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 75,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Marketo_leads__3_0_0__retrievewithwhere_leads)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 75,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Marketo_leads__3_0_0__updatewithwhere_leads <-> Marketo_leads__3_0_0__retrievewithwhere_leads)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 76,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to GitHub_Comment__3_0_0__create_Comment)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 76,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Jira_Issue__2_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 76,
+      "kind": "drop_step",
+      "label": "drop stmt 2 (call to Jira_Status__2_0_0__retrievewithwhere_Status)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 76,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (GitHub_Comment__3_0_0__create_Comment <-> Jira_Issue__2_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 76,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 1<->2 (Jira_Issue__2_0_0__retrievewithwhere_Issue <-> Jira_Status__2_0_0__retrievewithwhere_Status)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": true
+    },
+    {
+      "uid": 77,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 77,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Amazon_S3_object__2_0_0__create_object)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 77,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket <-> Amazon_S3_object__2_0_0__create_object)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": true
+    },
+    {
+      "uid": 77,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 81,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Dropbox_files__3_0_0__create_files)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 81,
+      "kind": "drop_step",
+      "label": "drop stmt 2 (call to ServiceNow_kb_knowledge__5_0_0__create_kb_knowledge)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 81,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->2 (Dropbox_files__3_0_0__create_files <-> ServiceNow_kb_knowledge__5_0_0__create_kb_knowledge)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 81,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 84,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to bambooHR_employees__2_0_0__retrievewithwhere_employees)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 84,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to bambooHR_dependents__2_0_0__retrievewithwhere_dependents)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 84,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (bambooHR_employees__2_0_0__retrievewithwhere_employees <-> bambooHR_dependents__2_0_0__retrievewithwhere_dependents)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": true
+    },
+    {
+      "uid": 85,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Trello_Board__2_0_0__create_Board)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 85,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to GitHub_Issue__3_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 85,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Trello_Board__2_0_0__create_Board <-> GitHub_Issue__3_0_0__retrievewithwhere_Issue)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 88,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 88,
+      "kind": "drop_step",
+      "label": "drop stmt 1 (call to Amazon_S3_object__2_0_0__retrievewithwhere_object)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 88,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->1 (Amazon_S3_bucket__2_0_0__retrievewithwhere_bucket <-> Amazon_S3_object__2_0_0__retrievewithwhere_object)",
+      "verdict_kind": "DETECTED",
+      "counterexample_ok": true
+    },
+    {
+      "uid": 88,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 100,
+      "kind": "drop_step",
+      "label": "drop stmt 0 (call to Microsoft_Dynamics_365_for_Sales_Task__7_0_0__retrievewithwhere_Task)",
+      "verdict_kind": "ABSTAINED_INCONCLUSIVE",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 100,
+      "kind": "drop_step",
+      "label": "drop stmt 2 (call to Microsoft_Dynamics_365_for_Sales_Task__7_0_0__deletewithwhere_Task)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 100,
+      "kind": "swap_adjacent",
+      "label": "swap stmts 0<->2 (Microsoft_Dynamics_365_for_Sales_Task__7_0_0__retrievewithwhere_Task <-> Microsoft_Dynamics_365_for_Sales_Task__7_0_0__deletewithwhere_Task)",
+      "verdict_kind": "MISSED_COMPLIANT",
+      "counterexample_ok": null
+    },
+    {
+      "uid": 100,
+      "kind": "perturb_constant",
+      "label": "perturb one non-driver-selecting literal",
+      "verdict_kind": "CORRECTLY_COMPLIANT",
+      "counterexample_ok": null
+    }
+  ]
+}

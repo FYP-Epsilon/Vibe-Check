@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.3.1">
+  <process id="Process_LoanApproval" isExecutable="false">
+    <startEvent id="startEvent_1" name="Start">
+      <outgoing>flow_start_task1</outgoing>
+    </startEvent>
+
+    <task id="task_1" name="Verify_Applicant_Identity">
+      <incoming>flow_start_task1</incoming>
+      <outgoing>flow_task1_task2</outgoing>
+    </task>
+    <sequenceFlow id="flow_start_task1" sourceRef="startEvent_1" targetRef="task_1" />
+
+    <task id="task_2" name="Run_Credit_Bureau_Check">
+      <incoming>flow_task1_task2</incoming>
+      <outgoing>flow_task2_gateway1</outgoing>
+    </task>
+    <sequenceFlow id="flow_task1_task2" sourceRef="task_1" targetRef="task_2" />
+
+    <exclusiveGateway id="gateway_1" name="Decision: referral_code == 77531">
+      <incoming>flow_task2_gateway1</incoming>
+      <outgoing>flow_gateway1_task3</outgoing>
+      <outgoing>flow_gateway1_task4</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="flow_task2_gateway1" sourceRef="task_2" targetRef="gateway_1" />
+
+    <!-- Priority referral branch: only reachable at one exact code value -->
+    <task id="task_3" name="Approve_Priority_Loan">
+      <incoming>flow_gateway1_task3</incoming>
+      <outgoing>flow_task3_gateway2</outgoing>
+    </task>
+    <sequenceFlow id="flow_gateway1_task3" name="Priority Referral" sourceRef="gateway_1" targetRef="task_3" />
+
+    <!-- Default branch: every other referral code -->
+    <task id="task_4" name="Flag_For_Manual_Review">
+      <incoming>flow_gateway1_task4</incoming>
+      <outgoing>flow_task4_gateway2</outgoing>
+    </task>
+    <sequenceFlow id="flow_gateway1_task4" name="Default" sourceRef="gateway_1" targetRef="task_4" />
+
+    <exclusiveGateway id="gateway_2" name="Merge">
+      <incoming>flow_task3_gateway2</incoming>
+      <incoming>flow_task4_gateway2</incoming>
+      <outgoing>flow_gateway2_end</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="flow_task3_gateway2" sourceRef="task_3" targetRef="gateway_2" />
+    <sequenceFlow id="flow_task4_gateway2" sourceRef="task_4" targetRef="gateway_2" />
+
+    <endEvent id="endEvent_1" name="End">
+      <incoming>flow_gateway2_end</incoming>
+    </endEvent>
+    <sequenceFlow id="flow_gateway2_end" sourceRef="gateway_2" targetRef="endEvent_1" />
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_LoanApproval">
+    <bpmndi:BPMNPlane id="BPMNPlane_LoanApproval" bpmnElement="Process_LoanApproval">
+      <bpmndi:BPMNShape id="shape_startEvent_1" bpmnElement="startEvent_1">
+        <dc:Bounds x="180" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="186" y="205" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="shape_task_1" bpmnElement="task_1">
+        <dc:Bounds x="260" y="140" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="shape_task_2" bpmnElement="task_2">
+        <dc:Bounds x="430" y="140" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="shape_gateway_1" bpmnElement="gateway_1" isMarkerVisible="true">
+        <dc:Bounds x="600" y="155" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="575" y="212" width="100" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="shape_task_3" bpmnElement="task_3">
+        <dc:Bounds x="710" y="60" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="shape_task_4" bpmnElement="task_4">
+        <dc:Bounds x="710" y="240" width="130" height="80" />
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="shape_gateway_2" bpmnElement="gateway_2" isMarkerVisible="true">
+        <dc:Bounds x="880" y="155" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="885" y="212" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="shape_endEvent_1" bpmnElement="endEvent_1">
+        <dc:Bounds x="980" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="988" y="205" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNEdge id="edge_flow_start_task1" bpmnElement="flow_start_task1">
+        <di:waypoint x="216" y="180" />
+        <di:waypoint x="260" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_task1_task2" bpmnElement="flow_task1_task2">
+        <di:waypoint x="390" y="180" />
+        <di:waypoint x="430" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_task2_gateway1" bpmnElement="flow_task2_gateway1">
+        <di:waypoint x="560" y="180" />
+        <di:waypoint x="600" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_gateway1_task3" bpmnElement="flow_gateway1_task3">
+        <di:waypoint x="625" y="155" />
+        <di:waypoint x="625" y="100" />
+        <di:waypoint x="710" y="100" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_gateway1_task4" bpmnElement="flow_gateway1_task4">
+        <di:waypoint x="625" y="205" />
+        <di:waypoint x="625" y="280" />
+        <di:waypoint x="710" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_task3_gateway2" bpmnElement="flow_task3_gateway2">
+        <di:waypoint x="840" y="100" />
+        <di:waypoint x="905" y="100" />
+        <di:waypoint x="905" y="155" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_task4_gateway2" bpmnElement="flow_task4_gateway2">
+        <di:waypoint x="840" y="280" />
+        <di:waypoint x="905" y="280" />
+        <di:waypoint x="905" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="edge_flow_gateway2_end" bpmnElement="flow_gateway2_end">
+        <di:waypoint x="930" y="180" />
+        <di:waypoint x="980" y="180" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

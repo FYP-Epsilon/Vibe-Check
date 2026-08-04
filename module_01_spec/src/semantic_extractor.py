@@ -93,6 +93,8 @@ class SemanticExtractionEngine:
         }
         self.executable_nodes_count = 0
         for elem in self.root.iter():
+            if not elem.tag.startswith(f"{{{self.NS['bpmn']}}}"):
+                continue
             tag_local = elem.tag.split('}')[-1]
             if elem.get('id') and tag_local not in NON_NODE_TAGS:
                 self.executable_nodes_count += 1

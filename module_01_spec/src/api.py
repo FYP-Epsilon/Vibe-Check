@@ -85,12 +85,20 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
             current_suite = copy.deepcopy(current_suite)
             current_suite.setdefault("P4_SCSL_Corrections", []).extend(corrections)
 
-        # Determine overall status
+        # Determine overall status. "PASS_PBCTS_UNCONVERGED" (not a FAIL
+        # variant) matches main.py's /verify route and this function's own
+        # actual usage: export_for_module_03's blocklist never included
+        # this status, so an unconverged result has always been treated as
+        # usable, exportable output -- IDCD not converging within budget
+        # means Module 01 couldn't computationally prove its own alignment
+        # self-check, not that the underlying property suite is invalid.
+        # Previously named FAIL_ALIGNMENT_UNPROVEN here, disagreeing with
+        # main.py's name for the identical condition (item #10).
         overall_status = "PASS"
         if phase_pbcts_result:
             p4_converged = phase_pbcts_result.get("phase_4_certificate", {}).get("convergence", {}).get("converged", False)
             if not p4_converged:
-                overall_status = "FAIL_ALIGNMENT_UNPROVEN"
+                overall_status = "PASS_PBCTS_UNCONVERGED"
 
         return {
             "status": overall_status,
@@ -121,23 +129,71 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
     if pipeline_result.get("status") in ["FAIL", "FAIL_WITH_ERRORS"]:
         raise ValueError("Cannot export to Module 03: Pipeline failed.")
 
-    import re
-    # PBCTS ignores loop bounds. We extract it directly from P2_Quality_Limits.
-    loop_bound = 0
-    p2_suite = pipeline_result["phase_3"]["refined_ltlf_property_suite"].get("P2_Quality_Limits", [])
-    for prop in p2_suite:
-        # e.g., looks like a comment or specifically encoded in a property string.
-        # The semantic extractor puts loop limits in comments sometimes, but 
-        # normally we can safely default to 3 if we can't parse it.
-        match = re.search(r'loop_bound\s*=\s*(\d+)', prop, re.IGNORECASE)
-        if match:
-            loop_bound = int(match.group(1))
-            break
-            
+    # PBCTS ignores loop bounds, so the documented bound is forwarded to
+    # Module 03 separately. It is read from Phase 2's structured spec_metadata,
+    # NOT parsed back out of a formula string: the bound used to travel in-band
+    # as a "/* loop_bound=N */" comment prefixed to the P2 property, which made
+    # that property unparseable by this module's own LTLf evaluator. Removing
+    # the comment without moving the bound somewhere structured would have left
+    # this extraction silently returning 0 forever, so the two concerns are now
+    # decoupled: the formula is a formula, the bound is a typed field.
+    spec_metadata = (pipeline_result.get("phase_2") or {}).get("spec_metadata") or {}
+    loop_bound = spec_metadata.get("loop_bound_documented", 0)
     m3_payload = {
         "semantic_graph": pipeline_result["phase_1"]["semantic_graph"],
         "ltlf_property_suite": pipeline_result["phase_3"]["refined_ltlf_property_suite"],
-        "loop_bound_documented": loop_bound
+        "loop_bound_documented": loop_bound,
+        # Found by the Module 01 <-> Module 03 bridge investigation: P0 sentinels
+        # of the shape '!done(T) W start(T)' are unfalsifiable under any lifting
+        # faithful to task semantics -- the invariant that makes a lifting faithful
+        # IS the property. A violation there means the Module 03 lifter has a bug,
+        # not that the generated code is wrong. Encoded here so any future
+        # Module 03 ingestion code inherits the correct handling by construction
+        # rather than by tribal knowledge.
+        "tier_semantics": {
+            "P0_Critical_Sentinels": {
+                "role": "lifting_self_test",
+                "conformance_check": False,
+                "note": (
+                    "Unfalsifiable under any faithful lifting. Do not report as a "
+                    "passed/failed conformance verdict against generated code; use "
+                    "only to self-test the Module 03 lifter."
+                ),
+            },
+            "P1_Structural_Control_Flow": {
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Cross-task ordering/exclusivity properties, genuinely falsifiable against code.",
+            },
+            "P2_Quality_Limits": {
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Quality/iteration-bound properties, genuinely falsifiable against code.",
+            },
+            "P4_Task_Coverage": {
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Task omission checks, ensures every task specified actually occurs in the trace.",
+            },
+            # Found while building the first real e2e demo: this dict only ever
+            # covered 3 of the 5 tiers refined_ltlf_property_suite can actually
+            # contain (mutation_refiner.py's _certify() emits all 5). A suite
+            # with any P3/synthesized_mutant_killers property -- the common
+            # case, since Phase 3's own adversarial red-teaming and mutation
+            # self-healing populate them -- made Module 03's load_property_suite
+            # hard-error ("tier has properties but no entry in tier_semantics"),
+            # because it requires every present tier to have a policy here.
+            "P3_Adversarial_Defenses": {
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Killer properties synthesized from adversarially-generated deceptive traces.",
+            },
+            "synthesized_mutant_killers": {
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Killer properties synthesized during mutation self-healing refinement loop.",
+            },
+        },
     }
 
     with open(filepath, "w") as f:

@@ -1,0 +1,109 @@
+> [!info] Purpose
+> Poster-ready evaluation summary for Module 01, Module 02, Module 03, and the full project, all against the IBM FLOW-BENCH dataset.
+>
+> **Updated 2026-08-03 — superseded as the single source of truth.** The plain-English `vibecheck-vault/Final Evaluation Results/` folder is now the current, up-to-date source for these numbers (it also explains each module and its evaluation methodology in non-technical language); this page is kept as a poster-formatted companion, updated to match. M01's PR #89 fixes and the E2E harness's expanded 18-gold-spec run are both now merged into `main-demo`.
+
+## Why FlowBench has no "accuracy" number to just look up
+
+[FLOW-BENCH](https://github.com/IBM/flow-bench) (Isahagian et al. 2025, arXiv:2505.11646) gives 101 natural-language→BPMN generation samples plus ~48 real BPMN diagrams — but it ships **no correctness labels** (buggy vs. correct implementation). It's a generation benchmark, not a bug-detection benchmark.
+
+So every module in this project builds its own ground truth **by mutation**: take a real FlowBench-derived program or spec, inject a defect with a known effect (or use a real, independently-confirmed-correct/incorrect implementation), and check whether the module's verdict flips the way the defect predicts. This is the one idea to put on the poster before any number — it's what makes "94% detection rate" a meaningful claim against an unlabeled dataset rather than a made-up figure.
+
+One consequence: **the three modules are not evaluated the same way**, because they sit at different points in the pipeline and have different amounts of mutation-eval infrastructure built out. A single "accuracy" row across all three would misstate what each number actually means. Treat each module's box below as its own claim, with its own caveat.
+
+---
+
+## Module 01 — Specification Engine (BPMN → LTLf property suite)
+
+**Method**: a dedicated FlowBench evaluation design session (2026-08-02) closed the "no standalone number" gap identified earlier, found **3 real defects in mainline** (plus a 4th uncovered while fixing #1), and a follow-up session fixed all three — [PR #89](https://github.com/FYP-Epsilon/Vibe-Check/pull/89), **merged into `main-demo`**, independently re-verified figure-for-figure both before and after merge, and re-verified again 2026-08-03 (byte-identical rerun). This is a diagnose-then-fix result, not a single clean detection-rate figure — present the before/after pair, not just the after.
+
+**Why "detection rate" isn't the right shape of number here.** Unlike M02 (mutating code, checkable by execution) or M03 (agreement with an external oracle), M01 turns a *diagram* into a *property suite* — there is no "run it and compare" oracle. The chosen primary metric is **suite soundness**: does the synthesized property suite hold on traces of the very diagram it was derived from? A suite that rejects its own source diagram is definitely wrong; a suite that accepts it is necessary but not sufficient for correctness (see caveat below).
+
+| What | Before | After (PR #89) |
+|---|---|---|
+| Unit tests | 35/35 passing | **56/56 passing** (21 new, corpus-driven not hand-fixture-only) |
+| **Suite soundness** (does the suite accept its own source diagram?) | 79/148 (55/100 `output`, 24/48 `context`) | **145/148** |
+| Soundness, branching diagrams only | **0/50** (Fisher p = 2.5×10⁻¹⁵ vs. non-branching) | **49/50** |
+| Phase 4 (`FAIL_WITH_ERRORS`, parse error) | 148/148 | **4/148** (residual — a distinct, unfixed 5th defect: empty `node()` proposition names on 4 specific diagrams) |
+| Phase 4 real v2.0 PBCTS certificate | 0/148 | **90/148** (54/148 now honestly abort at the Phase 3 gate instead of masking the failure downstream) |
+| Structural extraction fidelity (independent gold labeler, node/edge P/R/F1) | 1.0000 / 1.0000 / 1.0000 | **unchanged** — confirms the fixes didn't perturb extraction |
+| Property kills on sound-suite diagrams (discriminative kill ratio) | 0/1580 | **still 0** (now on a larger, honestly-sound population of 2900 connected+sound mutants) — see caveat |
+
+**The three defects, diagnosed then fixed** (see [[Module 01 - Specification Analysis/FlowBench Evaluation Investigation/M01 FlowBench Evaluation Methodology|diagnosis memo]] and [[Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/PR_fix_mod1_flowbench_defects|fix PR description]], both independently re-verified — reproduction logs alongside each):
+1. A hardcoded LTLf property contained a comment M01's own evaluator couldn't parse. **Fixed**: the loop bound is now a typed metadata field, not in-band text. Fixing this surfaced a 4th, previously-undiagnosed defect (the tokenizer had no rule for `node(...)` atoms at all) — fixed in the same commit.
+2. The mutation auditor scored "disconnected, no traces" as a kill without ever checking a property. **Not silently patched** — the gate threshold was deliberately left unchanged (property kills are still 0 on sound-suite diagrams), because tightening it is a scoring-policy decision on a GitNexus-flagged HIGH-risk path, not a defect fix. The distinction is now exposed via new fields instead of hidden.
+3. `P4_Task_Coverage` asserted every task eventually completes, unconditionally — false for any task on a branch's untaken path. **Fixed** with a hybrid (found by measuring, not arguing): unconditional completion kept only for tasks on every start→end path, conditional elsewhere — beats both originally-proposed candidates by keeping all 437 completion obligations instead of trading them away.
+
+**Honest caveat for the poster, still true post-fix**: property kills on sound-suite diagrams remain **0/1580 before and 0/2900 after** — the fixes make Module 01's self-certification *honest* (it no longer hides behind an unparseable property or an unsound obligation), they do not yet make the mutation suite *discriminative*. Present this as *"a rigorous evaluation methodology found real defects in Module 01, and a follow-up fix session closed them — suite soundness rose from 53% to 98% (0% to 98% on branching diagrams) — but the mutation-testing gate still needs a diversified operator set before its kill ratio is evidence of anything."*
+
+---
+
+## Module 02 — Verified IR Extraction (code ↔ IR equivalence checking)
+
+**Method**: mutation testing on a 101-program FlowBench-derived corpus, plus a second independent corpus of real bugs from 3 different LLMs' code generations. This is the most mature evaluation in the project — verified directly against the source reports below, not just summarized.
+
+| Metric | Result | n | Source |
+|---|---|---|---|
+| Genuine-bug detection (synthetic mutants, differential mode) | **99.52%** [95% CI 97.4–100%] | 210 | `calibration_report_differential.md` |
+| False-alarm rate (correct code wrongly flagged) | **5.88%** [1.2–16.2%] | 51 | same |
+| Natural-bug detection — real LLM-generated code, strict mode | **100.00%** (164/164) | 164 | `session_b_report.md` |
+| Natural-bug detection — task_only (cross-implementation) mode | 93.29% (153/164) | 164 | same |
+| WIR structural accuracy (node/edge precision, recall, F1) | 1.0000 / 1.0000 / 1.0000 | 101 programs | `e2_structural_report.md` |
+| Certificate-score ↔ real-code-correctness correlation | Pearson r=0.41, Spearman ρ=0.54 | 427 mutants | `e3_correlation_report.md` |
+
+**Corpus scale**: 101 FlowBench-derived base programs → 427 applicable mutants (8-9 operator types: drop-step, negate-guard, wrong-variable, early-return, etc.), 50/50 CALIB/EVAL split, seed 1234, frozen threshold τ=0.1. Separately, 3 LLMs (llama-3.1-8b, mixtral-8x7b, qwen3-next-80b) independently generated code against the same FlowBench tasks; 164 rejected (behaviorally divergent) generations became the natural-bug corpus.
+
+**Headline poster claim**: *100% detection of real bugs in independently-generated LLM code* (164/164, strict mode) is the strongest single number in the project — it's not a synthetic-mutant artifact, it's real generation failures from 3 different models.
+
+**Honest caveat**: equivalent-mutant specificity is weak and wide-CI (11.1%, 95% CI 0.3–48.2%, n=9 only) — the certificate doesn't reliably tell a behaviorally-equivalent mutant apart from a real one on this small a sample. Documented in the source report as investigated, not swept under the rug.
+
+---
+
+## Module 03 — Equivalence Engine (LTLf model checking against real code)
+
+**Method**: two layers — component tests, and a real end-to-end FlowBench run scored as **oracle agreement**, not (yet) a bug-detection rate.
+
+| What | Result |
+|---|---|
+| C++/SPOT engine tests | 142/145 passing, 2 pre-existing unrelated failures (unimplemented `compute_deterministic_hash`), 1 skip (re-verified 2026-08-03) |
+| First real FlowBench run (M01 suite → ingestion → compiled `check_compliance`) | 22/29 eligible specs had ≥1 checkable property → **29 variants, 58 checks**: `{VIOLATION: 18, COMPLIANT: 17, INCONCLUSIVE: 23}` |
+| Agreement with Module 01's own independent LTLf oracle, on checks that returned a real verdict | **100% (35/35)** |
+| Remaining 23 checks | Legitimate abstentions (`INCONCLUSIVE`) — the property referenced a task genuinely never called in that variant; correctly refusing, not a miss |
+
+**Precise caption — do not round this up**: "100%" here means *M03's compiled checker agrees with Module 01's independent reference interpreter on every check where either produced a real verdict*. It is a **plumbing-correctness proof for the M01→M03 bridge**, not a claim that M03 catches 100% of real bugs — that's a different, not-yet-measured number (see Full-Project section, which *is* a detection-rate measurement). This run also uses definition-order lifting (a documented, separate scoping decision, [[Module 03 - Equivalence Engine/Bridge Investigation/CP1 Lifting-Scope Decision|CP1]]) rather than the call-order fix already used elsewhere in the pipeline.
+
+---
+
+## Full Project — End-to-End (M01 → M02 → M03)
+
+**Method**: `demo/eval_e2e/harness.py` runs the complete pipeline against a gold set of FlowBench specs with confirmed-correct real implementations, then mutates the *order* of steps in the real implementation and checks whether the full pipeline catches the resulting violation.
+
+- **Gold set**: 18 FlowBench (spec, real implementation) pairs, independently confirmed COMPLIANT end-to-end — expanded 2026-08-03 from an earlier 6-pair run by P4_Task_Coverage ingestion (uids 11, 45, 47, 48, 49, 50, 71, 72, 73, 75, 76, 77, 78, 81, 84, 85, 88, 100)
+- **Abstention rate**: **38.3%** [95% CI 26–52%], n=60 — trials where the pipeline honestly returned `INCONCLUSIVE` rather than guessing
+- **Detection rate**: **16.2%** [95% CI 6–32%], n=37 — of trials where the pipeline *did* commit to a verdict, the fraction correctly flagged `VIOLATION`
+  - By mutation kind: `drop_step` 38 trials, 0 detected, 15 missed, 23 abstained — dropping a task often makes its own atom unobservable, so the pipeline correctly can't judge it, rather than silently guessing wrong; `swap_adjacent` 22 trials, 6 detected
+- **False-alarm rate**: **0.0%** [95% CI 0–34%], n=9 (small n — most gold specs had no literal eligible to perturb)
+- **Counterexample quality**: **83.3%** [95% CI 36–100%], n=6 — of correctly-detected violations, fraction whose counterexample named every task the violated property references
+
+**Poster framing — show the CIs, not bare percentages.** These are small-n figures by the harness's own design, and it deliberately reports Clopper-Pearson 95% CIs rather than point estimates. "16.2%" alone reads as a failing grade; "16.2% [6–32%] detection, 38% honest abstention, 0% false alarms" reads as what it actually is — a pipeline that mostly declines to guess rather than guessing wrong, which is the intended, designed-for behavior, not a bug — and a real, open gap in outright detection that shouldn't be hidden behind the abstention figure.
+
+**Product-claim caveat, updated 2026-08-03**: this evaluation itself still runs `demo/eval_e2e/harness.py`'s own in-process pipeline wiring, not the deployed HTTP services directly. That said, the underlying claim this caveat used to carry — that the production `/check` API endpoint "defaults to a placeholder" — was checked directly against `module_03_equiv/src/main.py` and found to be **false**: `/check`'s `CheckPayload` requires a real property suite and WIR in every request: there is no placeholder default reachable through it. The real, narrower gap was that nothing chained the three deployed services together automatically — that gap is now closed by a live orchestrator (`module_04_ui/src/e2e_orchestrator.py` + the UI's "🔄 E2E Pipeline" page), verified against a real caught violation through the actual running containers. See `vibecheck-vault/Final Evaluation Results/Full Project Evaluation Results.md` for the full writeup.
+
+---
+
+## Quick reference for poster captions
+
+| Module | One-line method | Headline number | What it actually measures |
+|---|---|---|---|
+| M01 | Suite-soundness (does the LTLf suite accept its own source diagram?), 148-diagram corpus | 79/148 → 145/148 (0/50 → 49/50 branching), PR #89 merged into `main-demo` | Diagnose-then-fix — not a bug-detection rate |
+| M02 | Mutation testing, 101-program corpus + real multi-LLM bug corpus | 100% (164/164) real-bug detection | Detects behaviorally-divergent code vs. reference IR |
+| M03 | Oracle-agreement on real FlowBench property checks | 100% (35/35) agreement | Agrees with M01's own oracle — plumbing correctness, not bug-catch rate; this run used definition-order lifting, see caveat above |
+| Full pipeline | Order-mutation E2E, 18 gold pairs | 16.2% [6–32%] detection, 38% abstention, 0% false alarms | Honest-abstention design; small n, wide CIs |
+
+## Source files (canonical — this page summarizes, does not replace)
+
+- M02: `module_02_extract/eval/results/calibration_report_differential.md`, `session_b_report.md`, `e2_structural_report.md`, `e3_correlation_report.md`
+- M03: [[Module 03 - Equivalence Engine/Module 03 Knowledge|Module 03 Knowledge]]
+- Full project: `demo/eval_e2e/results/e2e_eval_report.md`, `demo/eval_e2e/harness.py` (module docstring has full ground-truth-provenance caveats)
+- FlowBench ground-truth methodology: `.claude/memory/flowbench_groundtruth_finding.md`
+- Plain-English writeup + full methodology: `vibecheck-vault/Final Evaluation Results/`

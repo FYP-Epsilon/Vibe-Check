@@ -1,0 +1,17 @@
+{"level":40,"time":1785671969727,"name":"gitnexus","msg":"GitNexus: FTS extension unavailable; continuing without FTS features. load-only policy: extension not pre-installed"}
+Changes: 3 files, 5 symbols
+Affected processes: 4
+Risk level: medium
+
+Changed symbols:
+  Symbol main → module_01_spec/src/ltlf_synthesizer.py
+  Symbol __init__ → module_01_spec/src/ltlf_synthesizer.py
+  Symbol run_pipeline → module_01_spec/src/ltlf_synthesizer.py
+  Symbol _layer_v1_certify → module_01_spec/src/ltlf_synthesizer.py
+  Symbol FLTLSynthesizer → module_01_spec/src/ltlf_synthesizer.py
+
+Affected execution flows:
+  • Verify_spec → _resolve_implicit_guards (4 steps) — changed: run_pipeline
+  • Verify_spec → _generate_sentinels (4 steps) — changed: run_pipeline
+  • Verify_spec → _layer_v3_identify_decisions (3 steps) — changed: run_pipeline
+  • Verify_spec → _layer_v1_certify (3 steps) — changed: _layer_v1_certify, run_pipeline
