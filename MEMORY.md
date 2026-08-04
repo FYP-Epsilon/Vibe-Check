@@ -38,6 +38,7 @@ agreement, independent gold labelers).
   omission property; its conditional form (`G(start(X) -> F(done(X)))`) is
   excluded as a verified tautology under this layer's start/done atom
   collapsing (same failure mode already documented for P0).
+- **SpiffWorkflow Dataset Integration** (`demo/spiffworkflow/`): Created on branch `demo/improvement-spiffworkflow-ingestion` (2026-08-04). Ingests 47 gold executable (BPMN, Python) pairs from `spiff-example-cli` and `sample-process-models`, expanding VibeCheck's total gold evaluation corpus from 18 pairs (FLOW-BENCH) to **65 pairs total**. Harness (`demo/spiffworkflow/harness.py`) measured: Abstention rate 44.2% [38.5%, 50.0%] (n=301), Detection rate 28.6% [21.9%, 36.0%] (n=168), False-alarm rate 0.0% [0.0%, 7.5%] (n=47), Counterexample quality 75.0% [60.4%, 86.4%] (n=48).
 - **E2E harness** (`demo/eval_e2e/harness.py`): re-run 2026-08-02/03 against
   the post-fix pipeline. Fixing the P4 crash alone tripled the discoverable
   gold-spec set (6→18) and trial count (26→60) — the crash had been silently
