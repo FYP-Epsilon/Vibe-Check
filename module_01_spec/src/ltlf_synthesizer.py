@@ -150,19 +150,20 @@ class FLTLSynthesizer:
         for t_target in task_nodes:
             # find all tasks that can reach t_target without going through another task
             predecessors = set()
-            stack = [(p, [p]) for p in nx_graph.predecessors(t_target)] if t_target in nx_graph else []
+            direct_preds = list(nx_graph.predecessors(t_target)) if t_target in nx_graph else []
+            stack = [(p, [p]) for p in direct_preds]
             has_start_path = False
             visited = set()
-            
+
             while stack:
                 curr, path = stack.pop()
                 if curr in visited:
                     continue
                 visited.add(curr)
-                
+
                 is_task = any(s["node_id"] == curr and s.get("node_type") in ["task", "userTask", "serviceTask", "scriptTask", "manualTask"] for s in self.states)
                 is_start = any(s["node_id"] == curr and s.get("node_type") == "startEvent" for s in self.states)
-                
+
                 if is_task:
                     predecessors.add(curr)
                 elif is_start:
@@ -171,14 +172,33 @@ class FLTLSynthesizer:
                     if curr in nx_graph:
                         for p in nx_graph.predecessors(curr):
                             stack.append((p, path + [p]))
-            
+
             tgt_start = self._get_node_props(t_target)[0]
             if predecessors and not has_start_path:
-                pred_dones = [self._get_node_props(p)[-1] for p in predecessors]
-                condition = " | ".join(pred_dones)
-                self.ltlf_suite["P1_Structural_Control_Flow"].append(
-                    f"!{tgt_start} W ({condition})"
+                # An AND-join (a single parallelGateway feeding t_target) genuinely
+                # requires every incoming branch to finish, so a per-predecessor
+                # conjunction of "!start W done" formulas is correct there. Any
+                # other merge shape -- XOR/event-based/inclusive gateway, or
+                # multiple direct sequence flows into the task with no mediating
+                # gateway -- only guarantees that ONE branch ran; requiring all
+                # of them would flag every compliant single-branch execution
+                # (e.g. the untaken side of an exclusive gateway) as a violation.
+                is_and_join = len(direct_preds) == 1 and any(
+                    s["node_id"] == direct_preds[0] and s.get("node_type") == "parallelGateway"
+                    for s in self.states
                 )
+                if is_and_join:
+                    for p in predecessors:
+                        pred_done = self._get_node_props(p)[-1]
+                        self.ltlf_suite["P1_Structural_Control_Flow"].append(
+                            f"!{tgt_start} W {pred_done}"
+                        )
+                else:
+                    pred_dones = [self._get_node_props(p)[-1] for p in predecessors]
+                    condition = " | ".join(pred_dones)
+                    self.ltlf_suite["P1_Structural_Control_Flow"].append(
+                        f"!{tgt_start} W ({condition})"
+                    )
 
         # Global Invariants: Strict Start-to-Task bounds are removed because code side 
         # doesn't emit startEvent nodes, making them uncheckable.
