@@ -173,12 +173,12 @@ class FLTLSynthesizer:
                             stack.append((p, path + [p]))
             
             tgt_start = self._get_node_props(t_target)[0]
-            if predecessors and not has_start_path:
-                pred_dones = [self._get_node_props(p)[-1] for p in predecessors]
-                condition = " | ".join(pred_dones)
-                self.ltlf_suite["P1_Structural_Control_Flow"].append(
-                    f"!{tgt_start} W ({condition})"
-                )
+            if predecessors:
+                for p in predecessors:
+                    pred_done = self._get_node_props(p)[-1]
+                    self.ltlf_suite["P1_Structural_Control_Flow"].append(
+                        f"!{tgt_start} W {pred_done}"
+                    )
 
         # Global Invariants: Strict Start-to-Task bounds are removed because code side 
         # doesn't emit startEvent nodes, making them uncheckable.

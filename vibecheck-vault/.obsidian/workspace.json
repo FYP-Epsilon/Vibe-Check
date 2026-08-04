@@ -11,10 +11,14 @@
             "id": "ddb96c309e3f1b40",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "Final Evaluation Results/Full Project Evaluation Results.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "Full Project Evaluation Results"
             }
           }
         ]
@@ -181,16 +185,16 @@
       "bases:Create new base": false
     }
   },
-  "active": "c61b65fe6621a0c3",
+  "active": "ddb96c309e3f1b40",
   "lastOpenFiles": [
+    "Final Evaluation Results/Module 01 Evaluation Results.md",
+    "Final Evaluation Results/Full Project Evaluation Results.md",
     "Final Evaluation Results/SpiffWorkflow Benchmark Results.md",
     "Final Evaluation Results/Module 02 Evaluation Results.md",
     "Module 02 - Verified IR Extraction/WIR Structure and Confidence Methodology.md",
     "Final Evaluation Results/Module 03 Evaluation Results.md",
     "Home.md",
-    "Final Evaluation Results/Module 01 Evaluation Results.md",
     "Evaluation Summary (Poster).md",
-    "Final Evaluation Results/Full Project Evaluation Results.md",
     "Final Evaluation Results",
     "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/phase4_status_corrected_AFTER.txt",
     "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/phase4_sound_BEFORE.txt",

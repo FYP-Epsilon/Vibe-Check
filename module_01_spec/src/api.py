@@ -184,26 +184,14 @@ def export_for_module_03(pipeline_result: Dict[str, Any], filepath: str = "modul
             # hard-error ("tier has properties but no entry in tier_semantics"),
             # because it requires every present tier to have a policy here.
             "P3_Adversarial_Defenses": {
-                "role": "adversarial_self_test",
-                "conformance_check": False,
-                "note": (
-                    "Killer properties synthesized from adversarially-generated "
-                    "deceptive traces (Phase 3's own red-teaming) -- validates the "
-                    "property suite's own robustness, not generated code. Also "
-                    "commonly needs the LTLf->LTL X-operator bridge Module 03's "
-                    "current ingestion does not yet implement."
-                ),
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Killer properties synthesized from adversarially-generated deceptive traces.",
             },
             "synthesized_mutant_killers": {
-                "role": "audit_trail",
-                "conformance_check": False,
-                "note": (
-                    "Bookkeeping list of killer properties Phase 3's mutation "
-                    "self-healing synthesized during its own refinement loop -- "
-                    "each one is already duplicated into P1_Structural_Control_Flow "
-                    "when synthesized, so this tier is an audit trail, not an "
-                    "independent conformance check."
-                ),
+                "role": "conformance_check",
+                "conformance_check": True,
+                "note": "Killer properties synthesized during mutation self-healing refinement loop.",
             },
         },
     }
