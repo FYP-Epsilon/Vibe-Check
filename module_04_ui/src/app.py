@@ -5,7 +5,79 @@ import streamlit as st
 import sys
 import os
 
+from datetime import datetime
+
 from e2e_orchestrator import run_e2e_check, E2EOrchestrationError
+
+
+def build_e2e_export_payload(
+    bpmn_filename: str,
+    source_filename: str,
+    result: dict,
+    timestamp: str,
+) -> dict:
+    """Builds a structured dictionary containing all outputs ordered by module."""
+    return {
+        "1_source_files": {
+            "bpmn_file": bpmn_filename,
+            "python_source_file": source_filename,
+            "timestamp": timestamp,
+        },
+        "2_module_01_output": {
+            "bpmn_tasks": result.get("bpmn_tasks", []),
+            "ltlf_property_suite": result.get("ltlf_property_suite", {}),
+        },
+        "3_module_02_output": {
+            "call_order_wir": result.get("call_order_wir", {}),
+        },
+        "4_module_03_output": {
+            "check_result": result.get("check_result", {}),
+        },
+    }
+
+
+def generate_e2e_text_report(payload: dict) -> str:
+    """Formats the export payload as a clean human-readable text report."""
+    sources = payload.get("1_source_files", {})
+    m1 = payload.get("2_module_01_output", {})
+    m2 = payload.get("3_module_02_output", {})
+    m3 = payload.get("4_module_03_output", {})
+
+    lines = [
+        "=" * 80,
+        "VIBECHECK END-TO-END (E2E) VERIFICATION REPORT",
+        "=" * 80,
+        "",
+        "1. LOCATION & SOURCE FILES METADATA",
+        "-" * 80,
+        f"BPMN Spec File:        {sources.get('bpmn_file', 'N/A')}",
+        f"Python Source File:    {sources.get('python_source_file', 'N/A')}",
+        f"Execution Timestamp:   {sources.get('timestamp', 'N/A')}",
+        "",
+        "2. MODULE 01 OUTPUT (Spec Engine)",
+        "-" * 80,
+        "BPMN Tasks:",
+        json.dumps(m1.get("bpmn_tasks", []), indent=2),
+        "",
+        "LTLf Property Suite:",
+        json.dumps(m1.get("ltlf_property_suite", {}), indent=2),
+        "",
+        "3. MODULE 02 OUTPUT (Extract Engine)",
+        "-" * 80,
+        "Call-Order WIR (Workflow Intermediate Representation):",
+        json.dumps(m2.get("call_order_wir", {}), indent=2),
+        "",
+        "4. MODULE 03 OUTPUT (Equivalence Engine)",
+        "-" * 80,
+        "Equivalence Check Result:",
+        json.dumps(m3.get("check_result", {}), indent=2),
+        "",
+        "=" * 80,
+        "END OF VIBECHECK REPORT",
+        "=" * 80,
+    ]
+    return "\n".join(lines)
+
 
 # Module 01 integration is handled via the spec-engine HTTP API.
 
@@ -688,46 +760,95 @@ elif st.session_state.active_page == "e2e_pipeline":
                         st.error(f"Unexpected error: {exc}")
                         st.stop()
 
-                cr = result["check_result"]
-                compliance_results = cr["compliance_results"]
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                st.session_state["e2e_latest_run"] = build_e2e_export_payload(
+                    bpmn_file.name,
+                    source_file.name,
+                    result,
+                    timestamp,
+                )
 
-                st.divider()
-                st.subheader("Conformance Results")
+        if "e2e_latest_run" in st.session_state:
+            payload = st.session_state["e2e_latest_run"]
+            result = {
+                "bpmn_tasks": payload["2_module_01_output"]["bpmn_tasks"],
+                "ltlf_property_suite": payload["2_module_01_output"]["ltlf_property_suite"],
+                "call_order_wir": payload["3_module_02_output"]["call_order_wir"],
+                "check_result": payload["4_module_03_output"]["check_result"],
+            }
+            cr = result["check_result"]
+            compliance_results = cr["compliance_results"]
 
-                verdict_counts = {"COMPLIANT": 0, "VIOLATION": 0, "INCONCLUSIVE": 0}
-                for r in compliance_results:
-                    verdict_counts[r["verdict"]] = verdict_counts.get(r["verdict"], 0) + 1
-                m1, m2, m3 = st.columns(3)
-                m1.metric("✅ Compliant", verdict_counts.get("COMPLIANT", 0))
-                m2.metric("❌ Violation", verdict_counts.get("VIOLATION", 0))
-                m3.metric("❓ Inconclusive", verdict_counts.get("INCONCLUSIVE", 0))
+            st.divider()
+            st.subheader("Conformance Results")
 
-                if verdict_counts.get("VIOLATION", 0) > 0:
-                    st.error("❌ VIOLATION — at least one property was violated by this implementation.")
-                elif verdict_counts.get("COMPLIANT", 0) > 0:
-                    st.success("✅ COMPLIANT — every checkable property that resolved was satisfied.")
-                else:
-                    st.warning("❓ INCONCLUSIVE — no property could be conclusively resolved against this trace.")
+            verdict_counts = {"COMPLIANT": 0, "VIOLATION": 0, "INCONCLUSIVE": 0}
+            for r in compliance_results:
+                verdict_counts[r["verdict"]] = verdict_counts.get(r["verdict"], 0) + 1
+            m1, m2, m3 = st.columns(3)
+            m1.metric("✅ Compliant", verdict_counts.get("COMPLIANT", 0))
+            m2.metric("❌ Violation", verdict_counts.get("VIOLATION", 0))
+            m3.metric("❓ Inconclusive", verdict_counts.get("INCONCLUSIVE", 0))
 
-                for r in compliance_results:
-                    badge = {"COMPLIANT": "✅", "VIOLATION": "❌", "INCONCLUSIVE": "❓"}.get(r["verdict"], "•")
-                    with st.expander(f"{badge} {r['verdict']} — `{r['origin_formula']}`"):
-                        st.code(r["origin_formula"], language="text")
-                        if r.get("counter_example_trace"):
-                            st.markdown("**Counterexample:**")
-                            st.code(r["counter_example_trace"], language="text")
-                        if r.get("unmatched_atoms"):
-                            st.caption(f"Unmatched atoms: {r['unmatched_atoms']}")
+            if verdict_counts.get("VIOLATION", 0) > 0:
+                st.error("❌ VIOLATION — at least one property was violated by this implementation.")
+            elif verdict_counts.get("COMPLIANT", 0) > 0:
+                st.success("✅ COMPLIANT — every checkable property that resolved was satisfied.")
+            else:
+                st.warning("❓ INCONCLUSIVE — no property could be conclusively resolved against this trace.")
 
-                if cr.get("excluded_properties"):
-                    with st.expander(f"📋 Excluded properties ({len(cr['excluded_properties'])})"):
-                        st.json(cr["excluded_properties"])
+            for r in compliance_results:
+                badge = {"COMPLIANT": "✅", "VIOLATION": "❌", "INCONCLUSIVE": "❓"}.get(r["verdict"], "•")
+                with st.expander(f"{badge} {r['verdict']} — `{r['origin_formula']}`"):
+                    st.code(r["origin_formula"], language="text")
+                    if r.get("counter_example_trace"):
+                        st.markdown("**Counterexample:**")
+                        st.code(r["counter_example_trace"], language="text")
+                    if r.get("unmatched_atoms"):
+                        st.caption(f"Unmatched atoms: {r['unmatched_atoms']}")
 
-                st.divider()
-                with st.expander("📦 Intermediate artifacts (BPMN tasks, property suite, WIR)"):
-                    st.markdown("**BPMN task names:**")
-                    st.json(result["bpmn_tasks"])
-                    st.markdown("**LTLf property suite (from spec-engine):**")
-                    st.json(result["ltlf_property_suite"])
-                    st.markdown("**Call-order WIR (from extract-engine):**")
-                    st.json(result["call_order_wir"])
+            if cr.get("excluded_properties"):
+                with st.expander(f"📋 Excluded properties ({len(cr['excluded_properties'])})"):
+                    st.json(cr["excluded_properties"])
+
+            st.divider()
+            with st.expander("📦 Intermediate artifacts (BPMN tasks, property suite, WIR)"):
+                st.markdown("**BPMN task names:**")
+                st.json(result["bpmn_tasks"])
+                st.markdown("**LTLf property suite (from spec-engine):**")
+                st.json(result["ltlf_property_suite"])
+                st.markdown("**Call-order WIR (from extract-engine):**")
+                st.json(result["call_order_wir"])
+
+            st.divider()
+            st.markdown('<p class="section-header">📥 Export All Engine Outputs</p>', unsafe_allow_html=True)
+            st.markdown(
+                "Download all module outputs (1. Source Info, 2. Module 01 Spec, "
+                "3. Module 02 Extraction WIR, 4. Module 03 Equivalence Results) "
+                "in your preferred format:"
+            )
+
+            json_str = json.dumps(payload, indent=2)
+            txt_str = generate_e2e_text_report(payload)
+
+            safe_bpmn_name = payload["1_source_files"]["bpmn_file"].replace(".bpmn", "").replace(".xml", "")
+
+            col_dl1, col_dl2 = st.columns(2)
+            with col_dl1:
+                st.download_button(
+                    label="📄 Download All Outputs (.txt)",
+                    data=txt_str,
+                    file_name=f"vibecheck_e2e_outputs_{safe_bpmn_name}.txt",
+                    mime="text/plain",
+                    type="secondary",
+                    use_container_width=True,
+                )
+            with col_dl2:
+                st.download_button(
+                    label="📦 Download All Outputs (.json)",
+                    data=json_str,
+                    file_name=f"vibecheck_e2e_outputs_{safe_bpmn_name}.json",
+                    mime="application/json",
+                    type="primary",
+                    use_container_width=True,
+                )
