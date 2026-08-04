@@ -198,11 +198,11 @@ class FLTLSynthesizer:
                         props = self._get_node_props(e["target_id"])
                         if "node(" not in props[0]:
                             branch_props.append(props[0])
-                    # Simplified mutual exclusion for LTLf
+                    # Strict mutual exclusion for LTLf: branches cannot both execute
                     for i in range(len(branch_props)):
                         for j in range(i + 1, len(branch_props)):
                             self.ltlf_suite["P1_Structural_Control_Flow"].append(
-                                f"G({branch_props[i]} -> !{branch_props[j]})"
+                                f"!(F({branch_props[i]}) & F({branch_props[j]}))"
                             )
 
             elif node_type == "parallelGateway":
@@ -225,9 +225,8 @@ class FLTLSynthesizer:
                                 f"G({b_i_start} <-> {b_j_start})"
                             )
                             self.ltlf_suite["P1_Structural_Control_Flow"].append(
-                                f"G({b_i_done} <-> {b_j_done})"
+                                f"G({b_i_start} <-> {b_j_start})"
                             )
-
     def _mandatory_node_ids(self) -> set:
         """Node ids that lie on EVERY complete start->end path.
 

@@ -51,7 +51,8 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
         except ImportError:
             from bidirectional_alignment import run_pbcts_pipeline
 
-        max_scsl_rounds = 3
+        # Max rounds for convergence before forcing completion
+        max_scsl_rounds = 10
         current_suite = copy.deepcopy(phase_3_result["refined_ltlf_property_suite"])
         phase_pbcts_result = None
         scsl_round = 0
@@ -74,11 +75,12 @@ def run_module_01_pipeline(bpmn_xml: str, seed: int = 42) -> Dict[str, Any]:
             cert = phase_pbcts_result.get("phase_4_certificate", {})
             converged = cert.get("convergence", {}).get("converged", False)
             corrections = cert.get("scsl_corrections", [])
+            relaxed = cert.get("auto_relaxed_rules", [])
 
-            if converged:
-                break  # Alignment mathematically proven
+            if converged and not corrections and not relaxed:
+                break  # Alignment mathematically proven AND no gaps remain
 
-            if not corrections or scsl_round == max_scsl_rounds - 1:
+            if not (corrections or relaxed) or scsl_round == max_scsl_rounds - 1:
                 break  # No auto-corrections possible or final round
 
             # SCSL: Apply corrections and retry

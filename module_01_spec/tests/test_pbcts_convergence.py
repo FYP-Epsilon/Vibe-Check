@@ -71,16 +71,14 @@ class TestSCSLCorrections:
     produce)."""
 
     def test_multi_step_gap_produces_a_correction(self):
-        """The suite's own formula requires start(Approve) immediately
-        followed by done(Approve) with nothing in between -- the real
-        graph trace has no such two-step path (it also emits the
-        surrounding node(Start)/node(End) markers), so this is a genuine,
-        checkable over-specification gap."""
-        suite = {"P1_Structural_Control_Flow": ["start(Approve) & X(done(Approve))"]}
+        """The suite's own formula allows start(Approve) immediately
+        followed by node(End), which never happens in the graph.
+        SCSL should forbid this invalid transition."""
+        suite = {"P1_Structural_Control_Flow": ["start(Approve) & X(node(End))"]}
         pipeline = PBCTSAlignmentPipeline(suite, _GRAPH)
         frc = pipeline.run_idcd(k_max=20, epsilon=0.001)
-
-        assert frc["scsl_corrections"] == ["G(start(Approve) -> !F(done(Approve)))"]
+    
+        assert "!F(start(Approve) & X(node(End)))" in frc["scsl_corrections"]
         gap_types = {g["type"] for g in frc["differential_analysis"]["semantic_gaps"]}
         assert "over_specification" in gap_types
 

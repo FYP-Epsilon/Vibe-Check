@@ -111,6 +111,10 @@ class PBCTSEngine:
                     subset.add(free_list[j])
                     
             P = must_true | subset
+            # BPMN model assumes interleaving semantics (at most one proposition active at a time)
+            if len(P) > 1:
+                continue
+            
             P_frozen = frozenset(P)
             
             cache_key = (phi, P_frozen)

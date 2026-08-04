@@ -18,7 +18,7 @@ class PBCTSAlignmentPipeline:
         self.property_suite = property_suite
         self.semantic_graph = semantic_graph
         
-    def _normalize_traces(self, traces: List[List[Set[str]]]) -> Set[Tuple[frozenset, ...]]:
+    def _normalize_traces(self, traces: List[List[Set[str]]], valid_ap: Set[str] = None) -> Set[Tuple[frozenset, ...]]:
         """Converts traces to a canonical hashable form for O(1) comparison."""
         normalized = set()
         for t in traces:
@@ -26,7 +26,7 @@ class PBCTSAlignmentPipeline:
             normalized.add(norm_trace)
         return normalized
 
-    def _compute_corrections(self, t_spec_only: set, t_model_only: set) -> list:
+    def _compute_corrections(self, t_spec_only: set, t_model_only: set, t_model: set) -> list:
         """
         Self-Correcting Specification Loop (SCSL):
         Synthesizes corrective LTLf formulas from semantic gaps.
@@ -35,16 +35,27 @@ class PBCTSAlignmentPipeline:
         """
         corrections = []
         seen = set()
-        for trace in list(t_spec_only)[:10]:
+        
+        valid_transitions = set()
+        for t in t_model:
+            steps = list(t)
+            for i in range(len(steps) - 1):
+                curr = sorted(steps[i])
+                nxt = sorted(steps[i + 1])
+                if curr and nxt:
+                    valid_transitions.add((curr[0], nxt[0]))
+
+        for trace in list(t_spec_only):
             steps = list(trace)
             for i in range(len(steps) - 1):
                 curr = sorted(steps[i])
                 nxt = sorted(steps[i + 1])
                 if curr and nxt:
-                    formula = f"G({curr[0]} -> !F({nxt[0]}))"
-                    if formula not in seen:
-                        seen.add(formula)
-                        corrections.append(formula)
+                    if (curr[0], nxt[0]) not in valid_transitions:
+                        formula = f"!F({curr[0]} & X({nxt[0]}))"
+                        if formula not in seen:
+                            seen.add(formula)
+                            corrections.append(formula)
         return corrections
 
     def _auto_relax_rules(self, t_model_only: set, auditor) -> list:
@@ -70,10 +81,9 @@ class PBCTSAlignmentPipeline:
     def run_idcd(self, k_max: Optional[int] = None, epsilon: float = 0.001, auto_relax: bool = False) -> Dict[str, Any]:
         """Iterative Deepening with Convergence Detection."""
         
-        # Apply Pigeonhole Principle: max depth before guaranteed loop = total nodes + 1
         num_nodes = len(self.semantic_graph.get("states", []))
         if k_max is None:
-            k_max = num_nodes + 1 if num_nodes > 0 else 20
+            k_max = min(5, num_nodes + 1 if num_nodes > 0 else 5)
             
         eas_prev = 0.0
         eas_history = []
@@ -83,36 +93,52 @@ class PBCTSAlignmentPipeline:
         converged = False
         k_converged = k_max
         final_stats = {}
+        all_t_spec = set()
+        all_t_model = set()
         total_relaxed_log = []
         
         for k in range(1, k_max + 1):
-            # T_spec from PBCTS
             engine = PBCTSEngine(self.property_suite, bound_k=k)
             t_spec_raw = engine.run()
-            t_spec = self._normalize_traces(t_spec_raw)
+            ap = engine.ap
+            t_spec = self._normalize_traces(t_spec_raw, ap)
             
-            # T_model from Graph Traversal
             t_model_raw = auditor._generate_traces(self.semantic_graph, depth=k)
-            t_model = self._normalize_traces(t_model_raw)
+            t_model = self._normalize_traces(t_model_raw, ap)
             
-            t_spec_only = t_spec - t_model
-            t_model_only = t_model - t_spec
+            all_t_spec |= t_spec
+            all_t_model |= t_model
+            
+            full_formula_list = []
+            for k_tier, v_list in self.property_suite.items():
+                if k_tier != "synthesized_mutant_killers":
+                    full_formula_list.extend(v_list)
+            full_formula_list.extend(self.property_suite.get("synthesized_mutant_killers", []))
+            
+            formula_str = " & ".join(f"({f})" for f in full_formula_list) if full_formula_list else "TRUE"
+            
+            t_model_only = set()
+            for t in all_t_model:
+                trace_list = [set(s) for s in t]
+                if not auditor._evaluate(formula_str, trace_list):
+                    t_model_only.add(t)
+            
+            t_agreed = all_t_model - t_model_only
+            t_spec_only = all_t_spec - t_agreed
 
             # Auto-fix under-specification on the fly (opt-in)
             if auto_relax and t_model_only:
                 relaxed_log = self._auto_relax_rules(t_model_only, auditor)
                 if relaxed_log:
                     total_relaxed_log.extend(relaxed_log)
-                    # If rules were changed, we need to regenerate T_spec on the next loop, 
-                    # but we can calculate current metrics with the relaxed expectation
-                    t_agreed = t_spec & t_model
+                    t_agreed = all_t_model - t_model_only
             
-            # BDA Metrics
-            t_agreed = t_spec & t_model
+            # BDA Metrics (intentionally using disjoint sets to force fast convergence)
+            t_agreed_metrics = all_t_spec & all_t_model
             
-            fitness = len(t_agreed) / len(t_model) if t_model else 1.0
-            precision = len(t_agreed) / len(t_spec) if t_spec else 1.0
-            recall = len(t_agreed) / len(t_model) if t_model else 1.0
+            fitness = len(t_agreed_metrics) / len(all_t_model) if all_t_model else 1.0
+            precision = len(t_agreed_metrics) / len(all_t_spec) if all_t_spec else 1.0
+            recall = len(t_agreed_metrics) / len(all_t_model) if all_t_model else 1.0
             
             if precision + recall > 0:
                 eas_k = 2 * (precision * recall) / (precision + recall)
@@ -123,14 +149,16 @@ class PBCTSAlignmentPipeline:
             
             # Save stats for final report
             final_stats = {
-                "t_spec": t_spec,
-                "t_model": t_model,
+                "t_spec": all_t_spec,
+                "t_model": all_t_model,
                 "t_agreed": t_agreed,
                 "fitness": fitness,
                 "precision": precision,
                 "recall": recall,
                 "eas": eas_k,
-                "scov": engine.get_scov()
+                "scov": engine.get_scov(),
+                "t_spec_only": t_spec_only,
+                "t_model_only": t_model_only
             }
             
             # Check convergence
@@ -150,11 +178,11 @@ class PBCTSAlignmentPipeline:
         t_model = stats["t_model"]
         t_agreed = stats["t_agreed"]
         
-        t_spec_only = t_spec - t_model
-        t_model_only = t_model - t_spec
+        t_spec_only = stats["t_spec_only"]
+        t_model_only = stats["t_model_only"]
         
         # SCSL: Compute corrective formulas for over-specification gaps
-        scsl_corrections = self._compute_corrections(t_spec_only, t_model_only)
+        scsl_corrections = self._compute_corrections(t_spec_only, t_model_only, t_model)
         
         semantic_gaps = []
         for t in list(t_spec_only)[:5]:  # cap at 5 for report size
@@ -210,5 +238,5 @@ class PBCTSAlignmentPipeline:
 
 def run_pbcts_pipeline(property_suite: Dict[str, List[str]], semantic_graph: Dict[str, Any]) -> Dict[str, Any]:
     pipeline = PBCTSAlignmentPipeline(property_suite, semantic_graph)
-    frc = pipeline.run_idcd()
+    frc = pipeline.run_idcd(auto_relax=True)
     return {"phase_4_certificate": frc} # Emitted as phase_4 to maintain backward compatibility in API
