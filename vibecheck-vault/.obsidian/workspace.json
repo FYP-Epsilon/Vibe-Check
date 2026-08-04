@@ -4,21 +4,24 @@
     "type": "split",
     "children": [
       {
-        "id": "52fe13b2ac85c753",
+        "id": "f7d685f149a92c1a",
         "type": "tabs",
         "children": [
           {
-            "id": "ddb96c309e3f1b40",
+            "id": "30c9fa047d135221",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "Final Evaluation Results/Full Project Evaluation Results.md",
-                "mode": "source",
-                "source": false
+                "file": "Project Architecture.canvas",
+                "viewState": {
+                  "x": -542.4734957242623,
+                  "y": -232.0832950074258,
+                  "zoom": -1.1403867051265344
+                }
               },
-              "icon": "lucide-file",
-              "title": "Full Project Evaluation Results"
+              "icon": "lucide-layout-dashboard",
+              "title": "Project Architecture"
             }
           }
         ]
@@ -185,15 +188,17 @@
       "bases:Create new base": false
     }
   },
-  "active": "ddb96c309e3f1b40",
+  "active": "30c9fa047d135221",
   "lastOpenFiles": [
-    "Final Evaluation Results/Module 01 Evaluation Results.md",
+    "Next Steps.md",
+    "Home.md",
+    "Claude Science Plan.md",
+    "Final Evaluation Results/Module 02 Evaluation Results.md",
     "Final Evaluation Results/Full Project Evaluation Results.md",
     "Final Evaluation Results/SpiffWorkflow Benchmark Results.md",
-    "Final Evaluation Results/Module 02 Evaluation Results.md",
+    "Final Evaluation Results/Module 01 Evaluation Results.md",
     "Module 02 - Verified IR Extraction/WIR Structure and Confidence Methodology.md",
     "Final Evaluation Results/Module 03 Evaluation Results.md",
-    "Home.md",
     "Evaluation Summary (Poster).md",
     "Final Evaluation Results",
     "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/phase4_status_corrected_AFTER.txt",
@@ -224,14 +229,12 @@
     "Repo Docs/Thesis/module03_chapter_draft.md",
     "Repo Docs/Thesis/module01_chapter_outline.md",
     "Repo Docs/Thesis/module01_chapter_draft.md",
-    "Next Steps.md",
     "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
     "Module 02 - Verified IR Extraction/Module 02 Novelty.md",
     "Project Overview.md",
     "Module 03 - Equivalence Engine/Module 03 Architecture.canvas",
     "Module 03 - Equivalence Engine/Module 03 Novelty.md",
     "Module 01 - Specification Analysis/Module 01 Novelty.md",
-    "Claude Science Plan.md",
     "Module 03 - Equivalence Engine/Bridge Investigation/CP1 Lifting-Scope Decision.md",
     "Module 03 - Equivalence Engine/Bridge Investigation/E2E Integration Verification Findings.md",
     "Module 03 - Equivalence Engine/Bridge Investigation/E2E Session/D6 - Thesis Writing Parallelization Note.md",
