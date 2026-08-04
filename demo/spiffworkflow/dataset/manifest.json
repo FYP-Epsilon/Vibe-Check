@@ -4,24 +4,24 @@
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_cli_call_activity.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_cli_call_activity.py",
     "tasks_count": 5,
-    "checkable_properties": 7,
-    "applicable_properties": 7
+    "checkable_properties": 4,
+    "applicable_properties": 4
   },
   {
     "id": "spiff_cli_call_activity_multi",
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_cli_call_activity_multi.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_cli_call_activity_multi.py",
     "tasks_count": 6,
-    "checkable_properties": 12,
-    "applicable_properties": 12
+    "checkable_properties": 6,
+    "applicable_properties": 6
   },
   {
     "id": "spiff_cli_data_output",
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_cli_data_output.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_cli_data_output.py",
     "tasks_count": 5,
-    "checkable_properties": 7,
-    "applicable_properties": 7
+    "checkable_properties": 4,
+    "applicable_properties": 4
   },
   {
     "id": "spiff_cli_event_handler",
@@ -36,8 +36,8 @@
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_cli_gateway_types.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_cli_gateway_types.py",
     "tasks_count": 8,
-    "checkable_properties": 11,
-    "applicable_properties": 11
+    "checkable_properties": 10,
+    "applicable_properties": 10
   },
   {
     "id": "spiff_cli_task_types",
@@ -136,6 +136,14 @@
     "applicable_properties": 3
   },
   {
+    "id": "spiff_model_misc_category_number_one_loop_test_loop",
+    "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_category_number_one_loop_test_loop.bpmn",
+    "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_category_number_one_loop_test_loop.py",
+    "tasks_count": 2,
+    "checkable_properties": 1,
+    "applicable_properties": 1
+  },
+  {
     "id": "spiff_model_misc_category_number_one_validation_text_validation_text",
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_category_number_one_validation_text_validation_text.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_category_number_one_validation_text_validation_text.py",
@@ -168,12 +176,28 @@
     "applicable_properties": 3
   },
   {
+    "id": "spiff_model_misc_test_c403_loop_task_c_4_0_3",
+    "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_test_c403_loop_task_c_4_0_3.bpmn",
+    "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_test_c403_loop_task_c_4_0_3.py",
+    "tasks_count": 3,
+    "checkable_properties": 4,
+    "applicable_properties": 4
+  },
+  {
     "id": "spiff_model_misc_test_c30_c_3_0",
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_test_c30_c_3_0.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_test_c30_c_3_0.py",
     "tasks_count": 4,
     "checkable_properties": 4,
     "applicable_properties": 2
+  },
+  {
+    "id": "spiff_model_misc_test_from_discord_diagram_1",
+    "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_test_from_discord_diagram_1.bpmn",
+    "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_test_from_discord_diagram_1.py",
+    "tasks_count": 3,
+    "checkable_properties": 3,
+    "applicable_properties": 3
   },
   {
     "id": "spiff_model_misc_test_a102_a_1_0_2",
@@ -288,6 +312,14 @@
     "applicable_properties": 1
   },
   {
+    "id": "spiff_model_misc_test_c401_c_4_0_1",
+    "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_test_c401_c_4_0_1.bpmn",
+    "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_test_c401_c_4_0_1.py",
+    "tasks_count": 12,
+    "checkable_properties": 17,
+    "applicable_properties": 17
+  },
+  {
     "id": "spiff_model_misc_test_tc_70_tc_7_0",
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_test_tc_70_tc_7_0.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_test_tc_70_tc_7_0.py",
@@ -310,6 +342,14 @@
     "tasks_count": 3,
     "checkable_properties": 3,
     "applicable_properties": 3
+  },
+  {
+    "id": "spiff_model_misc_test_c20_c_2_0",
+    "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_test_c20_c_2_0.bpmn",
+    "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_test_c20_c_2_0.py",
+    "tasks_count": 11,
+    "checkable_properties": 6,
+    "applicable_properties": 6
   },
   {
     "id": "spiff_model_misc_test_a23_a_2_3",

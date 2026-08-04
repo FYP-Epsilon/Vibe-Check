@@ -1,18 +1,18 @@
 # SpiffWorkflow Evaluation Benchmark Report
 
-- SpiffWorkflow Gold Specs: **42**
-- Order-Mutation Trials: **244**
-- Perturbation Trials: **42**
+- SpiffWorkflow Gold Specs: **47**
+- Order-Mutation Trials: **301**
+- Perturbation Trials: **47**
 
 ## Performance Metrics
 
 | Metric | Value | 95% Confidence Interval | Sample Size |
 |---|---|---|---|
-| **Abstention Rate** | 43.0% | [36.7%, 49.5%] | n=244 |
-| **Detection Rate (Decisive)** | 31.6% | [24.0%, 40.1%] | n=139 |
-| **False-Alarm Rate** | 0.0% | [0.0%, 8.4%] | n=42 |
-| **Counterexample Quality** | 79.5% | [64.7%, 90.2%] | n=44 |
+| **Abstention Rate** | 44.2% | [38.5%, 50.0%] | n=301 |
+| **Detection Rate (Decisive)** | 30.4% | [23.5%, 37.9%] | n=168 |
+| **False-Alarm Rate** | 0.0% | [0.0%, 7.5%] | n=47 |
+| **Counterexample Quality** | 74.5% | [60.4%, 85.7%] | n=51 |
 
 ## Impact Summary
 
-Integrating SpiffWorkflow expands VibeCheck's gold baseline evaluation corpus from 18 pairs (FLOW-BENCH) to **60 pairs total**.
+Integrating SpiffWorkflow expands VibeCheck's gold baseline evaluation corpus from 18 pairs (FLOW-BENCH) to **65 pairs total**.

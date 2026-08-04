@@ -39,7 +39,11 @@ Verification Findings for the corpus measurements this is based on):
     "!done(T) W start(T)" -> "!T W T". Excluded with a reason, not silently
     checked as if it meant something.
   - Exact intra-tier duplicate formulas are de-duplicated (measured at 34 of
-    412 properties in the real corpus).
+    412 properties in the real corpus). Exact cross-tier duplicates (e.g.
+    "synthesized_mutant_killers" entries mutation_refiner.py already copied
+    into "P1_Structural_Control_Flow" at synthesis time) are also
+    de-duplicated by formula text -- checked once, under whichever tier is
+    processed first, not once per tier it happens to appear in.
 """
 
 from __future__ import annotations
@@ -178,6 +182,15 @@ def load_property_suite(source: str | dict) -> PropertySuite:
     properties: list[Property] = []
     excluded: list[ExcludedProperty] = []
     seen: set[tuple[str, str]] = set()
+    # Raw formula text -> tier it was first checked under. Some tiers are
+    # populated by copying formulas that already live in another
+    # conformance-checked tier verbatim (e.g. mutation_refiner.py appends
+    # every self-healing killer into both P1_Structural_Control_Flow and
+    # synthesized_mutant_killers at synthesis time). Checking the same
+    # formula twice under two tier names doesn't add detection power, it
+    # just double-counts one violation as two "properties" -- so dedupe by
+    # content across tiers, not just within one.
+    checked_formula_origin: dict[str, str] = {}
 
     for tier, formulas in suite.items():
         tier_info = tier_semantics.get(tier)
@@ -200,6 +213,18 @@ def load_property_suite(source: str | dict) -> PropertySuite:
                 excluded.append(ExcludedProperty(
                     origin_formula=raw, tier=tier,
                     reason=f"tier_semantics.{tier}.conformance_check is False",
+                ))
+                continue
+
+            if raw in checked_formula_origin:
+                excluded.append(ExcludedProperty(
+                    origin_formula=raw, tier=tier,
+                    reason=(
+                        f"exact duplicate of a property already checked "
+                        f"under tier '{checked_formula_origin[raw]}' -- "
+                        f"checking it again here would double-count one "
+                        f"violation as two, not add new detection power"
+                    ),
                 ))
                 continue
 
@@ -233,5 +258,6 @@ def load_property_suite(source: str | dict) -> PropertySuite:
             properties.append(Property(
                 formula=spot_formula, origin_formula=raw, tier=tier,
             ))
+            checked_formula_origin[raw] = tier
 
     return PropertySuite(properties, excluded)
