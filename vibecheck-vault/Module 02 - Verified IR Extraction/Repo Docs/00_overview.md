@@ -29,6 +29,9 @@ Module 02 operates through **three complementary validation modes**, each provid
 
 (An earlier V2 design also included QCE — Query Count Estimation — symbolic state merging. It was never wired into the concolic exploration loop above, only exercised by its own unit tests, and was deleted as dead code rather than kept as an unused capability; see `eval/results/session_b_report.md`'s B4 section.)
 
+> [!warning] The "multi-modal" certificate is empirically two-modal on the current corpus
+> V2's `confidence` measures 0.0 for essentially every FLOW-BENCH-derived base program in this corpus — container-shaped inputs make V2 bail to a V1 fallback — so `combined_confidence` in practice is driven almost entirely by V1, not a genuine three-way (or even two-way) combination. This is a real, checked fact from the calibration data, not a formal ablation result (none has been run as a controlled experiment). V3 still gates independently, so it isn't "two-modal" in the sense of only one layer mattering at all — but V1+V2's product is functionally V1 alone here. See `Module_02_Verified_IR_Extraction.md` §10.7 for the full finding and its source, and Next Steps.md item #12 for the standing instruction to keep this stated openly rather than let the architecture table above imply an even three-way split.
+
 ### Certificate Composition Formula
 
 ```

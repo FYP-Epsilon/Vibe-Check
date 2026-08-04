@@ -33,7 +33,9 @@
 #include <spot/twaalgos/product.hh>
 #include <spot/twaalgos/emptiness.hh>
 #include <spot/tl/parse.hh>
+#include <spot/tl/ltlf.hh>
 #include <spot/tl/formula.hh>
+#include <spot/tl/apcollect.hh>
 #include <spot/twa/bddprint.hh>
 #include <spot/misc/hash.hh>
 
@@ -1058,9 +1060,121 @@ std::unordered_map<unsigned, ClusterEntry> cluster_implementations(
     return clusters;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // Phase D — LTL Model Checking: check_compliance()
 // ═══════════════════════════════════════════════════════════════════════════
+//
+// LTLf→LTL bridge (De Giacomo & Vardi, IJCAI'13; spot::from_ltlf()).
+//
+// The lifter builds a code automaton whose every trace is FINITE: a straight
+// line of task actions ending at the WIR's exit node, which has no outgoing
+// edge (confirmed by inspecting the raw HOA of a built automaton — the
+// automaton's default acceptance condition is "t", accept-everything, but
+// that is moot when the terminal state has no successor at all, so there is
+// no infinite run for the accept-everything condition to apply to. The
+// automaton's omega-language is empty regardless of what phi says.)
+//
+// spot::from_ltlf() rewrites an LTLf formula phi into an LTL formula phi'
+// over a fresh atomic proposition "alive", such that a finite word w
+// satisfies phi (under LTLf semantics) iff its "alive-extension" — w played
+// out with alive=true at every original step, then continuing forever with
+// alive=false — satisfies phi' under ordinary LTL semantics. instrument()
+// below builds exactly that alive-extension of the code automaton: every
+// original edge is conjoined with alive=true, and every state that
+// originally had no outgoing edge gets a "!alive" self-loop so the
+// automaton has an infinite run to check phi' against. Negating phi' AFTER
+// the from_ltlf transform (not negating phi and then transforming) is
+// deliberate: from_ltlf's rewriting is not close under negation, since it
+// specifically constrains where phi's own eventualities may occur relative
+// to "alive" — applying it to phi and negating the result stays faithful to
+// phi's own LTLf semantics.
+
+// Builds the alive-extended automaton used to bridge LTLf model checking
+// onto an automaton whose real traces are finite. Returns a fresh graph
+// sharing code_aut's bdd_dict; code_aut itself is never mutated.
+//
+// Also closes every edge under mutual exclusion first. Phase A's edge
+// labels (resolve_task_label / resolve_edge_label, above) only ever AND in
+// the positive literal for whatever fired on that edge -- every other
+// registered atom is left completely unconstrained on that edge, including
+// atoms with their own dedicated edge elsewhere in the automaton. Left
+// unconstrained, the emptiness search below is free to pick a convenient
+// value for those atoms on ANY edge -- including the entry transition,
+// where nothing happens at all -- to manufacture an accepting run for a
+// negated property that no real execution produces. That is the same
+// failure class the atom-matching gate above exists to prevent (a
+// confident VIOLATION on code that never exhibits the flagged behavior),
+// just reached through a different atom (one that IS on the automaton
+// somewhere, just not on this edge) instead of through a wholly absent one.
+// Since every atom this lifter ever asserts is a single-action or
+// single-guard assertion, forcing every atom not already required true by
+// an edge's own condition to false on that edge is sound for this lifter's
+// automata.
+// Does code_aut have a genuine cycle (some state reachable from itself)?
+//
+// from_ltlf()'s transformation assumes the trace it bridges is FINITE --
+// its rewriting conjoins a "the alive-extension is well-formed" obligation
+// (alive holds, then permanently stops holding) onto every property,
+// including a bare tautology. A real cycle in code_aut (e.g. a genuine
+// retry loop, or a hallucinated `while True`) can run forever with alive
+// true throughout, which never satisfies that obligation -- not because
+// the user's property is violated, but because the bridge's own
+// well-formedness assumption does not hold for a trace that never
+// terminates. Applying the bridge there manufactures a violation that has
+// nothing to do with phi. So: bridge only the vacuous (finite, dead-ending)
+// case this fix targets; a code automaton with a genuine cycle already has
+// real infinite runs to check phi against directly, exactly as before this
+// fix (see LOOPING_WIR's tests in test_cpp_engine.py). Deciding what a
+// genuine non-terminating trace should report against an LTLf property
+// that DOES require termination (e.g. an F-obligation) is a separate,
+// still-open design question -- see Module 03 Knowledge's vacuity-vs-
+// divergence risk note -- and is deliberately not decided here.
+static bool has_genuine_cycle(const spot::twa_graph_ptr& aut) {
+    spot::scc_info si(aut);
+    for (unsigned s = 0; s < si.scc_count(); ++s) {
+        if (!si.is_trivial(s)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static spot::twa_graph_ptr instrument_alive_extension(
+        const spot::twa_graph_ptr& code_aut, const char* alive_name) {
+    auto aut = spot::make_twa_graph(code_aut, spot::twa::prop_set::all());
+
+    std::vector<int> ap_vars;
+    for (const auto& ap : aut->ap()) {
+        ap_vars.push_back(aut->register_ap(ap));
+    }
+    unsigned n_states = aut->num_states();
+    for (unsigned s = 0; s < n_states; ++s) {
+        for (auto& e : aut->out(s)) {
+            for (int v : ap_vars) {
+                bool requires_true = (bdd_restrict(e.cond, bdd_nithvar(v)) == bddfalse);
+                if (!requires_true) {
+                    e.cond &= bdd_nithvar(v);
+                }
+            }
+        }
+    }
+
+    int alive_var = aut->register_ap(alive_name);
+    bdd alive = bdd_ithvar(alive_var);
+    bdd not_alive = bdd_nithvar(alive_var);
+
+    unsigned n = aut->num_states();
+    for (unsigned s = 0; s < n; ++s) {
+        bool has_out = false;
+        for (auto& e : aut->out(s)) {
+            e.cond &= alive;
+            has_out = true;
+        }
+        if (!has_out) {
+            aut->new_edge(s, s, not_alive);
+        }
+    }
+    return aut;
+}
 
 ComplianceResult check_compliance(const spot::twa_graph_ptr& code_aut,
                                   const std::string& ltl_string) {
@@ -1076,27 +1190,70 @@ ComplianceResult check_compliance(const spot::twa_graph_ptr& code_aut,
     }
     spot::formula phi = parsed.f;
 
-    // ── 2. Negate the formula (violation property: ¬φ) ───────────────────
-    spot::formula neg_phi = spot::formula::Not(phi);
+    // ── 2. Atom-matching gate ─────────────────────────────────────────────
+    //    An atomic proposition the code automaton's edges never mention is
+    //    UNCONSTRAINED in the product computed below: nothing on the code
+    //    side rules out either value, so the emptiness search is free to
+    //    resolve it however proves a violation, regardless of what the code
+    //    under test actually does. That produces a confident-looking
+    //    VIOLATION verdict on code that never exhibits the flagged behavior.
+    //    Refuse to model-check when this can happen; report INCONCLUSIVE
+    //    with the offending atom names instead.
+    //    Runs against the ORIGINAL code_aut, before the alive-extension
+    //    below adds its own bridging AP — "alive" is never something a
+    //    property author writes, so it must never appear in this gate.
+    spot::atomic_prop_set formula_aps;
+    spot::atomic_prop_collect(phi, &formula_aps);
 
-    // ── 3. Translate ¬φ into a Büchi automaton ──────────────────────────
+    std::unordered_set<std::string> code_ap_names;
+    for (const auto& ap : code_aut->ap()) {
+        code_ap_names.insert(ap.ap_name());
+    }
+
+    for (const auto& ap : formula_aps) {
+        if (code_ap_names.find(ap.ap_name()) == code_ap_names.end()) {
+            result.unmatched_atoms.push_back(ap.ap_name());
+        }
+    }
+
+    if (!result.unmatched_atoms.empty()) {
+        result.verdict = "INCONCLUSIVE";
+        return result;
+    }
+
+    // ── 3. Bridge only the vacuous (finite/dead-ending) case ───────────────
+    //    A code automaton with a genuine cycle already has real infinite
+    //    runs; check phi against it directly, unbridged, as always. Only a
+    //    dead-ending automaton needs the LTLf->LTL bridge -- see
+    //    has_genuine_cycle()'s comment for why applying it unconditionally
+    //    is wrong for a real loop.
+    bool bridged = !has_genuine_cycle(code_aut);
+    spot::formula neg_phi = bridged
+        ? spot::formula::Not(spot::from_ltlf(phi, "alive"))
+        : spot::formula::Not(phi);
+
+    spot::twa_graph_ptr check_aut = bridged
+        ? instrument_alive_extension(code_aut, "alive")
+        : code_aut;
+
+    // ── 4. Translate ¬φ (or ¬φ', if bridged) into a Büchi automaton ───────
     //    CRITICAL: Use the SAME bdd_dict as the code automaton so that
     //    AP BDD variables are shared and the product is well-defined.
-    spot::translator trans(code_aut->get_dict());
+    spot::translator trans(check_aut->get_dict());
     trans.set_type(spot::postprocessor::Buchi);
     auto violation_aut = trans.run(neg_phi);
 
-    // ── 4. Synchronous product: code_aut ⊗ violation_aut ───────────────
-    auto prod = spot::product(code_aut, violation_aut);
+    // ── 5. Synchronous product: check_aut ⊗ violation_aut ─────────────────
+    auto prod = spot::product(check_aut, violation_aut);
 
-    // ── 5. Emptiness check ─────────────────────────────────────────────
+    // ── 6. Emptiness check ─────────────────────────────────────────────
     if (prod->is_empty()) {
         // Product is empty ⇒ no violation ⇒ code satisfies φ
-        result.is_compliant = true;
+        result.verdict = "COMPLIANT";
         result.counter_example_trace = "";
     } else {
         // Product is non-empty ⇒ violation exists
-        result.is_compliant = false;
+        result.verdict = "VIOLATION";
 
         // Extract counter-example trace from the accepting run
         auto run = prod->accepting_run();
@@ -1245,18 +1402,22 @@ PYBIND11_MODULE(vibecheck_lifter, m) {
     // -- ComplianceResult (Phase D) ----------------------------------------
     py::class_<vibecheck::ComplianceResult>(m, "ComplianceResult")
         .def(py::init<>())
-        .def_readonly("is_compliant",           &vibecheck::ComplianceResult::is_compliant)
+        .def_readonly("verdict",                &vibecheck::ComplianceResult::verdict)
         .def_readonly("counter_example_trace",  &vibecheck::ComplianceResult::counter_example_trace)
+        .def_readonly("unmatched_atoms",        &vibecheck::ComplianceResult::unmatched_atoms)
         .def("__repr__", [](const vibecheck::ComplianceResult& r) {
-            return "<ComplianceResult verdict=" + std::string(r.is_compliant ? "PASS" : "FAIL")
-                 + (r.counter_example_trace.empty() ? "" : " has_trace=true") + ">";
+            return "<ComplianceResult verdict=" + r.verdict
+                 + (r.counter_example_trace.empty() ? "" : " has_trace=true")
+                 + (r.unmatched_atoms.empty() ? "" : " unmatched_atoms=" + std::to_string(r.unmatched_atoms.size()))
+                 + ">";
         });
 
     // -- Phase D free function (model checking) ----------------------------
     m.def("check_compliance", &vibecheck::check_compliance,
           py::arg("code_aut"), py::arg("ltl_string"),
           "Model-check a code automaton against an LTL property.\n"
-          "Returns ComplianceResult with is_compliant and counter_example_trace.\n"
+          "Returns ComplianceResult with verdict (COMPLIANT/VIOLATION/INCONCLUSIVE),\n"
+          "counter_example_trace, and unmatched_atoms.\n"
           "CRITICAL: The translator uses the code_aut's bdd_dict.");
 
 }

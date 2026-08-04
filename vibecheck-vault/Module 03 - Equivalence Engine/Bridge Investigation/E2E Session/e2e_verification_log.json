@@ -1,0 +1,184 @@
+{
+  "corpus": {
+    "bpmn_specs": 48,
+    "variants_normalized": 184,
+    "variant_uids": 99,
+    "corpus_uids": 101,
+    "variant_uids_with_bpmn": 48,
+    "variant_files_with_bpmn": 82,
+    "bpmn_construct_specs": {
+      "task": 48,
+      "userTask": 2,
+      "exclusiveGateway": 19,
+      "parallelGateway": 0,
+      "subProcess": 21,
+      "multiInstanceLoopCharacteristics": 21
+    }
+  },
+  "m01_pipeline": {
+    "phase1_pass": 48,
+    "full_pipeline": {
+      "FAIL_ALIGNMENT_UNPROVEN": 29,
+      "FAIL": 19
+    },
+    "hardfail_uids": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      87,
+      88,
+      90,
+      92,
+      93,
+      94,
+      95,
+      96,
+      98,
+      99
+    ],
+    "hardfail_equals_gateway_set": true,
+    "export_succeeds": 29,
+    "export_refuses": 19,
+    "eligible_uids": [
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      53,
+      56,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      89,
+      91,
+      97,
+      100
+    ]
+  },
+  "property_suite": {
+    "total_props": 412,
+    "per_tier": {
+      "P0_Critical_Sentinels": 79,
+      "P1_Structural_Control_Flow": 256,
+      "P2_Quality_Limits": 29,
+      "P3_Adversarial_Defenses": 48,
+      "synthesized_mutant_killers": 0
+    },
+    "intra_tier_exact_duplicates": 34,
+    "tiers_missing_from_tier_semantics": [
+      "P3_Adversarial_Defenses",
+      "synthesized_mutant_killers"
+    ],
+    "p1_referencing_node": 211,
+    "p1_total": 256,
+    "p1_node_free": 45,
+    "p1_node_free_pct": 17.6,
+    "uids_with_node_free_p1": 22,
+    "props_with_non_atom_identifiers": {
+      "P2_Quality_Limits": 29
+    },
+    "props_using_X": {
+      "P3_Adversarial_Defenses": 48
+    },
+    "F_bearing_tiers": [
+      "P2_Quality_Limits",
+      "P3_Adversarial_Defenses"
+    ]
+  },
+  "lifting_scope": {
+    "orchestrators_ge2_calls": 165,
+    "defn_order_ne_call_order": 76,
+    "defn_order_ne_call_order_pct": 46.1,
+    "top_level_gateway_variants": 0,
+    "top_level_task_variants": 184,
+    "subcfg_gateway_variants": 62,
+    "subcfg_task_variants": 0
+  },
+  "ap_disjointness": {
+    "pairs": 29,
+    "pairs_with_any_overlap": 0,
+    "spec_atoms": 116,
+    "matched": 0
+  },
+  "oracle_experiment": {
+    "control_spec_order_pass": 45,
+    "control_total": 45,
+    "modelA_vs_modelB_disagree": 17,
+    "modelA_vs_modelB_total": 58,
+    "disagree_pct": 29.3,
+    "full_coverage_uids": 24,
+    "fullcov_modelB": {
+      "fp_rate": 0.0,
+      "detection_pct": 40.4,
+      "conformant_checks": 3,
+      "divergent_checks": 47
+    },
+    "fullcov_modelA": {
+      "fp_rate": 0.0,
+      "detection_pct": 53.2
+    },
+    "divergence_modes": {
+      "reordering only": 2,
+      "  (also has extra calls)": 38,
+      "exact conformant": 15,
+      "omission only": 23,
+      "omission + reorder": 3
+    },
+    "divergent_pairs_no_p1_failure": 7
+  },
+  "cross_side_name_match": {
+    "pairs": 43,
+    "mean_exact_match_pct": 86.0,
+    "pairs_100pct": 26
+  },
+  "m03_tests": {
+    "test_cpp_engine": 32,
+    "test_phase_b": 28,
+    "test_phase_c": 19,
+    "test_pipeline": 37,
+    "cpp_gated_total": 79,
+    "pure_python": 37,
+    "geometry_asserts": {
+      "test_cpp_engine": 7,
+      "test_phase_b": 15,
+      "test_phase_c": 3,
+      "test_pipeline": 3
+    },
+    "cpp_module_importable": false
+  },
+  "labeled_corpus": {
+    "total_mutants": 427,
+    "eligible_mutants": 96,
+    "conformance_ops_eligible": 85,
+    "static_observable": 43,
+    "static_not_observable": 53,
+    "early_return_invisible": 28,
+    "reorder_not_observable": 12,
+    "gateway_blocked_mutants": 131,
+    "eligible_base_programs": 29,
+    "conformant_variant_pairs": 15,
+    "divergent_variant_pairs": 28
+  }
+}

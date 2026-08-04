@@ -29,14 +29,14 @@ app = FastAPI(title="VibeCheck Extract Engine", version="2.0.0")
 VERIFY_TIMEOUT_S = float(os.getenv("VERIFY_TIMEOUT_S", "30"))
 
 try:
-    from .ast_extractor import CFGExtractor, run_v3_pipeline
+    from .ast_extractor import CFGExtractor, run_v3_pipeline, derive_call_order_wir
     from .z3_sym_engine import BoundedConcolicEngine, run_v2_pipeline
     from .dynamic_tracer import (
         run_v1_pipeline,
         MultiModalCertificateComposer,
     )
 except ImportError:
-    from ast_extractor import CFGExtractor, run_v3_pipeline
+    from ast_extractor import CFGExtractor, run_v3_pipeline, derive_call_order_wir
     from z3_sym_engine import BoundedConcolicEngine, run_v2_pipeline
     from dynamic_tracer import (
         run_v1_pipeline,
@@ -242,6 +242,7 @@ def _run_verification(source: str) -> dict:
         "v1": {"status": "SKIPPED", "reason": None},
     }
     wir: dict[str, Any] = {}
+    call_order_wir: dict[str, Any] = {}
     v3_cert: dict[str, Any] = {}
     v2_cert: dict[str, Any] = {}
     v1_cert: dict[str, Any] = {}
@@ -259,6 +260,7 @@ def _run_verification(source: str) -> dict:
             "v2_details": v2_cert,
             "v1_details": v1_cert,
             "wir": wir,
+            "call_order_wir": call_order_wir,
             "layers": layers,
         }
 
@@ -267,7 +269,16 @@ def _run_verification(source: str) -> dict:
     # pre-extraction source validation (a syntax error IS a V3 failure).
     # ------------------------------------------------------------------
     try:
-        source = source.replace('\\n', '\n').replace('\\t', '\t')
+        # No literal-escape normalization here: JSON already decodes
+        # source_code to the exact literal text the client's file contains.
+        # A blanket source.replace('\\n', '\n') (removed -- found via the
+        # first real HTTP-chain run, see Next Steps.md item #6) corrupted
+        # any source whose *own* string literals contain a genuine \n or \t
+        # escape sequence (an f-string like f"a\nb" is valid Python; the
+        # replace turned its literal backslash-n into a real newline
+        # character in the *source text*, breaking the string literal and
+        # making ast.parse fail) -- confirmed against 13/184 real FLOW-BENCH
+        # corpus variants.
         if len(source) > 50000:
             raise ValueError("Source code exceeds maximum length of 50,000 characters.")
         try:
@@ -287,6 +298,19 @@ def _run_verification(source: str) -> dict:
         func_wir = functions[function_name]
         v1_params = _derive_v1_params(func_wir)
         layers["v3"] = {"status": "OK", "reason": v3_cert.get("message")}
+
+        # Additive: a second, call-order-linearized view of the same source
+        # (see ast_extractor/call_order_view.py -- the D2 lifting-scope fix).
+        # `wir` above stays definition-order for every existing consumer;
+        # this is a new key, not a replacement, so it can't regress anything
+        # that already reads `wir`. Failing to derive it (e.g. no function
+        # calls another sibling function, or a genuinely pathological
+        # source) is not a V3 failure -- reported as an empty dict, same
+        # convention as the top-level error paths below.
+        try:
+            call_order_wir = derive_call_order_wir(source)
+        except Exception:
+            call_order_wir = {}
     except Exception as e:
         reason = str(e)
         layers["v3"] = {"status": "ERROR", "reason": reason}
@@ -398,6 +422,7 @@ def _run_verification(source: str) -> dict:
         "v2_details": v2_cert,
         "v1_details": v1_cert,
         "wir": wir,
+        "call_order_wir": call_order_wir,
         "layers": layers,
     }
 
@@ -415,6 +440,7 @@ def _timeout_result(timeout_s: float) -> dict:
         "v2_details": {},
         "v1_details": {},
         "wir": {},
+        "call_order_wir": {},
         "layers": {
             "v3": {"status": "ERROR", "reason": reason},
             "v2": {"status": "ERROR", "reason": reason},
@@ -503,6 +529,7 @@ def verify(payload: CodePayload) -> dict:
             "v2_details": {},
             "v1_details": {},
             "wir": {},
+            "call_order_wir": {},
             "layers": {
                 "v3": {"status": "ERROR", "reason": reason},
                 "v2": {"status": "ERROR", "reason": reason},

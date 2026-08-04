@@ -1,0 +1,14 @@
+== Q1: structural scoring vs SPEC-derived gold (independent vocabulary) ==
+  output   node  P=1.0000 R=1.0000 F1=1.0000  tp=682 fp=0 fn=0
+  output   edge  P=1.0000 R=1.0000 F1=1.0000  tp=576 fp=0 fn=0
+  context  node  P=1.0000 R=1.0000 F1=1.0000  tp=342 fp=0 fn=0
+  context  edge  P=1.0000 R=1.0000 F1=1.0000  tp=293 fp=0 fn=0
+
+== Q2: kill-cause decomposition (sound-suite diagrams only) ==
+  degenerate:no_traces_generated              1672  (57.7%)
+  survived                                    1228  (42.3%)
+  TOTAL mutants scored: 2900
+
+== Q3: property-suite size on sound diagrams ==
+  suites with 0 properties: 0 / 145
+  min=3 median=8 max=15

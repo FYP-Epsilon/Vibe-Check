@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches: [main, main-demo]
+  pull_request:
+    branches: [main, main-demo]
+
+jobs:
+  test-module-01:
+    name: Module 01 (Spec Engine) tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r module_01_spec/requirements.txt pytest
+      - run: pytest module_01_spec/tests/ -v
+
+  test-module-02:
+    name: Module 02 (Extract Engine) tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r module_02_extract/requirements.txt pytest
+      # test_monitoring_matches_settrace now self-skips on <3.12 (fixed in
+      # item #13a) rather than needing a workflow-level deselect here.
+      - run: pytest module_02_extract/tests/ -v
+
+  test-module-03:
+    name: Module 03 (Equivalence Engine) tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r module_03_equiv/requirements.txt pytest
+      # The compiled vibecheck_lifter C++ engine (CMake + SPOT) is not
+      # built in this job -- every C++-dependent test already skips itself
+      # via its own `skipif(not HAS_MODULE)` guard (see test_cpp_engine.py
+      # and friends), so this exercises the pure-Python tracks only.
+      - run: pytest module_03_equiv/tests/ -v
+
+  test-demo:
+    name: Cross-module demo + eval harness tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: |
+          pip install -r module_01_spec/requirements.txt
+          pip install -r module_02_extract/requirements.txt
+          pip install -r module_03_equiv/requirements.txt
+          pip install pytest
+      # Same as test-module-03: the C++-dependent demo/eval tests skip
+      # themselves without the compiled engine (test_e2e_demo.py,
+      # demo/eval_e2e/test_harness.py). test_mutate.py's pure AST-logic
+      # tests always run.
+      - run: pytest demo/ -v
+
+  docker-compose-smoke:
+    name: docker-compose build + startup smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose build
+      - run: docker compose up -d
+      - name: Wait for services to settle
+        run: sleep 15
+      - name: Fail if any container exited (the actual regression this job exists for)
+        run: |
+          # A build succeeding proves nothing about startup -- both real
+          # incidents this job is meant to catch (M01's deleted-import
+          # crash, extract-engine never starting at all) built cleanly and
+          # only crashed at `uvicorn` startup. `docker compose ps` is the
+          # one check that would have caught both, since a crashed
+          # container has no restart policy here and just stays Exited.
+          docker compose ps
+          if docker compose ps --format '{{.State}}' | grep -qv '^running$'; then
+            echo "One or more services are not in the 'running' state:"
+            docker compose ps
+            docker compose logs
+            exit 1
+          fi
+      - name: Smoke-test spec-engine, extract-engine, equiv-engine from inside the compose network
+        # docker-compose.yml only publishes ui-engine's port to the host --
+        # the other three are internal-only, so reach them the same way
+        # real inter-service traffic does: by container DNS name, from
+        # inside the network (docker compose exec), not from the runner.
+        run: |
+          set -e
+          docker compose exec -T spec-engine python3 -c "import urllib.request; urllib.request.urlopen('http://spec-engine:8000/')" \
+            || (echo "spec-engine did not respond" && docker compose logs spec-engine && exit 1)
+          docker compose exec -T spec-engine python3 -c "import urllib.request; urllib.request.urlopen('http://extract-engine:8000/docs')" \
+            || (echo "extract-engine did not respond" && docker compose logs extract-engine && exit 1)
+          docker compose exec -T spec-engine python3 -c "import urllib.request; urllib.request.urlopen('http://equiv-engine:8000/health')" \
+            || (echo "equiv-engine did not respond" && docker compose logs equiv-engine && exit 1)
+      - name: Smoke-test ui-engine (published on the host)
+        run: |
+          set -e
+          curl -sf http://localhost:8501/ || (echo "ui-engine did not respond" && docker compose logs ui-engine && exit 1)
+      - name: Dump logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

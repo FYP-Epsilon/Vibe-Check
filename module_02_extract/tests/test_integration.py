@@ -100,6 +100,62 @@ class TestTypedLayerStatuses:
         assert result["layers"]["v1"]["status"] == "SKIPPED"
 
 
+class TestLiteralEscapesInStringLiteralsNotCorrupted:
+    """Regression: _run_verification used to blanket-replace('\\n', '\n')
+    on the incoming source, which corrupts any source whose *own* string
+    literals contain a genuine \\n/\\t escape sequence -- found via the
+    first real HTTP-chain run against 13/184 real FLOW-BENCH corpus
+    variants (an f-string like f"a\\nb" is valid Python; the replace broke
+    it into invalid source text, failing ast.parse with a false "not valid
+    Python syntax" v3 error)."""
+
+    def test_fstring_with_newline_escape_parses_correctly(self):
+        source = (
+            "def workflow(x):\n"
+            "    msg = f'value: {x}\\nnext line'\n"
+            "    return msg\n"
+        )
+        result = _run_verification(source)
+        assert result["layers"]["v3"]["status"] == "OK"
+
+    def test_string_with_tab_escape_parses_correctly(self):
+        source = (
+            "def workflow(x):\n"
+            "    msg = 'a\\tb'\n"
+            "    return msg\n"
+        )
+        result = _run_verification(source)
+        assert result["layers"]["v3"]["status"] == "OK"
+
+
+class TestCallOrderWir:
+    """/verify additionally returns a call-order-linearized WIR alongside
+    the existing definition-order ``wir`` (see ast_extractor/call_order_view.py
+    -- the D2 lifting-scope fix). Additive: every existing consumer of
+    ``result["wir"]`` is untouched; this is a new key only."""
+
+    def test_call_order_wir_present_on_happy_path(self):
+        source = (
+            "def create_object():\n    return {}\n\n"
+            "def retrieve_bucket():\n    return {}\n\n"
+            "def workflow():\n    retrieve_bucket()\n    create_object()\n"
+        )
+        result = _run_verification(source)
+        assert result["layers"]["v3"]["status"] == "OK"
+        assert result["call_order_wir"]["driver"] == "workflow"
+        task_codes = [
+            n["code"] for n in result["call_order_wir"]["nodes"] if n["type"] == "task"
+        ]
+        assert any("retrieve_bucket" in c[0] for c in task_codes)
+        assert any("create_object" in c[0] for c in task_codes)
+        # Call order, not definition order (create_object is defined first).
+        assert "retrieve_bucket" in task_codes[0][0]
+
+    def test_call_order_wir_empty_on_v3_failure(self):
+        result = _run_verification("def broken(:\n    pass")
+        assert result["call_order_wir"] == {}
+
+
 def _make_event_hang(event: "threading.Event") -> "Callable[[str], int]":
     """Build a stand-in for a slow _run_verification call, used by
     TestWallClockTimeout via monkeypatch. Waits on *event* -- a

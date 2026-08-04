@@ -1,0 +1,8 @@
+== phase_4_certificate.status over 148 diagrams ==
+  None                   148
+== distinct messages ==
+                                                                 148
+== soundness stratified by branch presence (P2 comment excluded) ==
+  has_branch=True  sound=49   unsound=1     (n=50)
+  has_branch=False sound=96   unsound=2     (n=98)
+  TOTAL sound: 145/148

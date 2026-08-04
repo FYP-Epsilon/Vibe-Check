@@ -55,6 +55,26 @@ SIMPLE_LINEAR_WIR = {
     "data_variables": [],
 }
 
+TWO_TASK_LINEAR_WIR = {
+    "entry_node": "S0",
+    "exit_node": "S3",
+    "nodes": [
+        {"id": "S0", "type": "entry", "successors": ["T1"], "predecessors": [], "control_vars": [], "data_vars": []},
+        {"id": "T1", "type": "task",  "successors": ["T2"], "predecessors": ["S0"], "control_vars": [], "data_vars": [],
+         "code": ["A()"]},
+        {"id": "T2", "type": "task",  "successors": ["S3"], "predecessors": ["T1"], "control_vars": [], "data_vars": [],
+         "code": ["B()"]},
+        {"id": "S3", "type": "exit",  "successors": [],      "predecessors": ["T2"], "control_vars": [], "data_vars": []},
+    ],
+    "edges": [
+        {"source": "S0", "target": "T1", "guard": None, "exception_type": None},
+        {"source": "T1", "target": "T2", "guard": None, "exception_type": None},
+        {"source": "T2", "target": "S3", "guard": None, "exception_type": None},
+    ],
+    "control_variables": [],
+    "data_variables": [],
+}
+
 BRANCHING_WIR = {
     "entry_node": "E",
     "exit_node": "X",
@@ -366,14 +386,18 @@ LOOPING_WIR = {
 class TestPhaseD:
     """Tests for the Phase D LTL model checking engine (check_compliance).
 
-    Key semantic note: The code automata produced by the lifter are often
-    finite (terminate at exit nodes with no outgoing edges). Büchi acceptance
-    requires infinite (accepting) runs. A finite automaton with no cycles
-    vacuously satisfies ALL liveness/safety LTL properties because the
-    synchronous product has no accepting runs.
-
-    To test genuine FAIL verdicts, we use LOOPING_WIR which has a cycle
-    (the retry loop G→T2→G), enabling the product to find accepting runs.
+    Historical note: code automata produced by the lifter are usually finite
+    (terminate at exit nodes with no outgoing edges), and Büchi acceptance
+    requires infinite (accepting) runs -- so a naive product against the raw
+    automaton found no accepting runs and vacuously "passed" every property,
+    correct or not. check_compliance() now bridges this via the standard
+    LTLf->LTL construction (De Giacomo & Vardi, IJCAI'13; spot::from_ltlf()):
+    it checks phi' = from_ltlf(phi) against an "alive-extended" copy of the
+    code automaton (every real edge conjoined with alive=true, every
+    dead-end state given a "!alive" self-loop), so a terminating automaton
+    now has a genuine infinite run to check phi' against. See
+    instrument_alive_extension() in lifter.cpp. LOOPING_WIR (a real cycle)
+    still exercises the non-bridged, "genuinely infinite" case directly.
     """
 
     def test_tautology_passes(self):
@@ -381,27 +405,77 @@ class TestPhaseD:
         lifter = vibecheck_lifter.AdvancedLifter()
         graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
         result = vibecheck_lifter.check_compliance(graph, "1")
-        assert result.is_compliant is True
+        assert result.verdict == "COMPLIANT"
         assert result.counter_example_trace == ""
 
     def test_compliance_result_fields(self):
-        """ComplianceResult should expose is_compliant and counter_example_trace."""
+        """ComplianceResult should expose verdict, counter_example_trace, unmatched_atoms."""
         lifter = vibecheck_lifter.AdvancedLifter()
         graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
         result = vibecheck_lifter.check_compliance(graph, "1")
-        assert isinstance(result.is_compliant, bool)
+        assert result.verdict in ("COMPLIANT", "VIOLATION", "INCONCLUSIVE")
         assert isinstance(result.counter_example_trace, str)
+        assert len(list(result.unmatched_atoms)) == 0  # "1" has no atoms at all
 
-    def test_finite_automaton_passes_all_properties(self):
-        """A finite (non-looping) automaton vacuously satisfies all LTL properties.
+    def test_finite_automaton_no_longer_vacuously_passes(self):
+        """A finite (non-looping) automaton must be genuinely checked, not
+        vacuously pass every property.
 
-        This is correct Büchi semantics: no infinite runs → no accepting runs
-        in the product → product is empty → property holds.
+        BRANCHING_WIR's "not approved" branch (G -> T2) explicitly asserts
+        approved=false, so G("approved") is genuinely violated on that
+        branch. Before the LTLf->LTL bridge this returned COMPLIANT
+        ("vacuously true" -- no infinite run existed for the product to
+        find a violation in at all); it must now correctly report the
+        violation. "approved" is registered via the gateway's guard text,
+        so this does not trip the atom-matching gate.
         """
         lifter = vibecheck_lifter.AdvancedLifter()
         graph = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
         result = vibecheck_lifter.check_compliance(graph, 'G("approved")')
-        assert result.is_compliant is True  # vacuously true
+        assert result.verdict == "VIOLATION"
+        assert len(result.counter_example_trace) > 0
+
+    def test_terminating_automaton_detects_a_real_violation(self):
+        """The core vacuity-fix regression guard.
+
+        A 2-action, non-looping automaton (A() then B(), no cycle) where B
+        genuinely executes must report a real VIOLATION for G(!B), not the
+        vacuous COMPLIANT a terminating automaton with no acceptance-bridge
+        used to return unconditionally.
+        """
+        lifter = vibecheck_lifter.AdvancedLifter()
+        lifter.set_bpmn_tasks(["A", "B"])
+        graph = lifter.build_spot_automaton(json.dumps(TWO_TASK_LINEAR_WIR))
+        result = vibecheck_lifter.check_compliance(graph, "G(!B)")
+        assert result.verdict == "VIOLATION"
+        assert len(result.counter_example_trace) > 0
+
+    def test_unconstrained_sibling_atoms_do_not_cause_false_violation(self):
+        """The mutual-exclusion regression guard.
+
+        Phase A's edge labels only ever assert the ONE action that fired on
+        that edge (see resolve_task_label / resolve_edge_label); every other
+        registered atom is otherwise left completely free on that edge,
+        including the entry transition where no action fires at all. A
+        naive alive-extension alone would let the emptiness search set a
+        sibling atom to a convenient value on an unrelated edge (e.g. B=true
+        on the entry transition, before A ever runs) to manufacture a
+        violation of an ordering property that the code's real execution
+        (A then B, in that order) does not exhibit. instrument_alive_extension
+        must close every edge under mutual exclusion first so this can't
+        happen: '!B W A' (B does not start before A) must be COMPLIANT on
+        this automaton, where A genuinely precedes B.
+        """
+        lifter = vibecheck_lifter.AdvancedLifter()
+        lifter.set_bpmn_tasks(["A", "B"])
+        graph = lifter.build_spot_automaton(json.dumps(TWO_TASK_LINEAR_WIR))
+        result = vibecheck_lifter.check_compliance(graph, "!B W A")
+        assert result.verdict == "COMPLIANT"
+        # And the reverse ordering property is genuinely violated, since A
+        # really does precede B here -- confirms this isn't just vacuity
+        # again in disguise.
+        result2 = vibecheck_lifter.check_compliance(graph, "!A W B")
+        assert result2.verdict == "VIOLATION"
 
     def test_looping_wir_fails_global_approved(self):
         """G("approved") should FAIL on a looping WIR with a non-approved cycle.
@@ -413,7 +487,7 @@ class TestPhaseD:
         lifter = vibecheck_lifter.AdvancedLifter()
         graph = lifter.build_spot_automaton(json.dumps(LOOPING_WIR))
         result = vibecheck_lifter.check_compliance(graph, 'G("approved")')
-        assert result.is_compliant is False
+        assert result.verdict == "VIOLATION"
         assert len(result.counter_example_trace) > 0
 
     def test_looping_wir_passes_tautology(self):
@@ -421,14 +495,14 @@ class TestPhaseD:
         lifter = vibecheck_lifter.AdvancedLifter()
         graph = lifter.build_spot_automaton(json.dumps(LOOPING_WIR))
         result = vibecheck_lifter.check_compliance(graph, "1")
-        assert result.is_compliant is True
+        assert result.verdict == "COMPLIANT"
 
     def test_no_segfault_on_branching_wir(self):
         """check_compliance must not segfault on a multi-branch automaton."""
         lifter = vibecheck_lifter.AdvancedLifter()
         graph = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
         result = vibecheck_lifter.check_compliance(graph, "1")
-        assert result.is_compliant is True
+        assert result.verdict == "COMPLIANT"
 
     def test_repr_format(self):
         """ComplianceResult __repr__ should contain verdict string."""
@@ -436,7 +510,7 @@ class TestPhaseD:
         graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
         result = vibecheck_lifter.check_compliance(graph, "1")
         r = repr(result)
-        assert "PASS" in r or "FAIL" in r
+        assert "COMPLIANT" in r or "VIOLATION" in r or "INCONCLUSIVE" in r
 
     def test_minimized_quotient_compliance(self):
         """Phase D should work on a Phase B quotient (minimized automaton)."""
@@ -444,16 +518,55 @@ class TestPhaseD:
         graph = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
         quotient = lifter.minimize_stuttering(graph)
         result = vibecheck_lifter.check_compliance(quotient, "1")
-        assert result.is_compliant is True
+        assert result.verdict == "COMPLIANT"
 
     def test_counter_example_trace_content(self):
         """A FAIL verdict should produce a trace with prefix and cycle sections."""
         lifter = vibecheck_lifter.AdvancedLifter()
         graph = lifter.build_spot_automaton(json.dumps(LOOPING_WIR))
         result = vibecheck_lifter.check_compliance(graph, 'G("approved")')
-        assert result.is_compliant is False
+        assert result.verdict == "VIOLATION"
         assert "prefix" in result.counter_example_trace.lower()
         assert "cycle" in result.counter_example_trace.lower()
+
+    # -- Atom-matching gate (INCONCLUSIVE) --------------------------------
+    #
+    # Found by the Module 01 <-> Module 03 bridge investigation: an atom the
+    # code automaton never mentions is unconstrained in the product, so the
+    # emptiness search can resolve it however proves a violation -- reporting
+    # a confident VIOLATION on code that never exhibits the flagged behavior.
+    # See vibecheck-vault/Module 03 - Equivalence Engine/Bridge Investigation/.
+
+    def test_unmatched_atom_is_inconclusive_not_violation(self):
+        """A property mentioning an atom absent from the code automaton must
+        report INCONCLUSIVE, never VIOLATION -- the false-RED case."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(SIMPLE_LINEAR_WIR))
+        result = vibecheck_lifter.check_compliance(graph, 'G("totally_unmatched_atom")')
+        assert result.verdict == "INCONCLUSIVE"
+        assert "totally_unmatched_atom" in result.unmatched_atoms
+        assert result.counter_example_trace == ""
+
+    def test_unmatched_atom_inconclusive_even_when_other_atoms_are_registered(self):
+        """A property mixing a real (registered) atom with an unmatched one
+        must still be INCONCLUSIVE -- this is the mixed-atom shape ('!start(B)
+        W done(A)' with only one side lifted) the investigation flagged as
+        dangerous."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(BRANCHING_WIR))
+        # "approved" is registered via the gateway guard; "done_Approve" is not.
+        result = vibecheck_lifter.check_compliance(graph, '"approved" U "done_Approve"')
+        assert result.verdict == "INCONCLUSIVE"
+        assert result.unmatched_atoms == ["done_Approve"]
+
+    def test_fully_matched_atoms_are_never_inconclusive(self):
+        """A property whose atoms are all registered must proceed to a real
+        COMPLIANT/VIOLATION verdict, not INCONCLUSIVE."""
+        lifter = vibecheck_lifter.AdvancedLifter()
+        graph = lifter.build_spot_automaton(json.dumps(LOOPING_WIR))
+        result = vibecheck_lifter.check_compliance(graph, 'G("approved")')
+        assert result.verdict in ("COMPLIANT", "VIOLATION")
+        assert result.unmatched_atoms == []
 
 
 # ---------------------------------------------------------------------------
@@ -490,6 +603,6 @@ if __name__ == "__main__":
 
     print("\n--- Test: Phase D compliance (tautology) ---")
     cr = vibecheck_lifter.check_compliance(g, "1")
-    print(f"  Verdict: {'PASS' if cr.is_compliant else 'FAIL'}")
+    print(f"  Verdict: {cr.verdict}")
 
     print("\n All manual tests completed.")

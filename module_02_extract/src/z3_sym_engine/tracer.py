@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from typing import Any, Optional
 import z3
 try:
-    from .ast_extractor import CFGExtractor, _unparse
+    from ..ast_extractor import CFGExtractor, _unparse
 except ImportError:
     from ast_extractor import CFGExtractor, _unparse
 from .registry import Z3VariableRegistry

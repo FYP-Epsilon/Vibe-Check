@@ -1,0 +1,8 @@
+== soundness by candidate (post fix1+fix2 code) ==
+  current  branching sound  0/50  | non-branching sound 79/98  | TOTAL  79/148
+  A        branching sound 49/50  | non-branching sound 96/98  | TOTAL 145/148
+  B        branching sound 49/50  | non-branching sound 96/98  | TOTAL 145/148
+== P4 properties emitted corpus-wide ==
+  current  437
+  A        242
+  B        437

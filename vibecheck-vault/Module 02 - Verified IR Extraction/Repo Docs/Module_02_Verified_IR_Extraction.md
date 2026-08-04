@@ -299,6 +299,8 @@ The primary scientific contribution of Module 02 is the **systematic combination
 
 Module 02 occupies a unique position: it provides **quantified confidence for untrusted source code** by combining statistical and bounded-logical evidence from independent modalities. This is implemented and measured — see §10.6 for current calibration numbers.
 
+**Stated plainly here, not only in §10.7**: on the current corpus, the "combining" is empirically closer to two-modal than three-modal — V2's `confidence` measures 0.0 for essentially every FLOW-BENCH-derived base program (container-shaped inputs force a V1 fallback), so `combined_confidence` is driven almost entirely by V1 in practice. The *architecture* combines three independent modalities and V3 genuinely gates independently; the *measured contribution* on this corpus does not yet exercise V2's logical-feasibility evidence. Either expanding the corpus to exercise V2 or narrowing this claim's scope is open work (Next Steps.md item #12) — this document states the gap rather than let the architecture description imply otherwise.
+
 ### 5.2 The Workflow Intermediate Representation (WIR)
 
 The WIR is a JSON-structured labelled transition system designed specifically for **workflow code verification**. Unlike generic IRs (LLVM IR, Python bytecode), the WIR explicitly captures:
@@ -323,8 +325,8 @@ An earlier design proposed **self-consistency sampling** (Wang et al. [38]): gen
 | Dimension | Existing Approaches | Module 02 Contribution |
 |-----------|-------------------|----------------------|
 | **Source trust** | Trusted source assumed (CompCert) | Handles inherently untrusted LLM output |
-| **Confidence type** | Binary pass/fail or unimodal statistical | Multi-modal quantified confidence with composition formula (implemented, measured — §10.6) |
-| **Failure modes** | Single point of failure | Three independent failure surfaces (V3 gates, V1/V2 vote) |
+| **Confidence type** | Binary pass/fail or unimodal statistical | Multi-modal quantified confidence with composition formula (implemented; measured contribution is currently V1-dominated on this corpus, not an even three-way split — §5.1, §10.7) |
+| **Failure modes** | Single point of failure | Three independent failure surfaces (V3 gates, V1/V2 vote — V2's vote is measured near-vacuous on this corpus, §10.7) |
 | **IR design** | Generic (LLVM, bytecode) | Process-aware WIR with task/guard/dominator semantics |
 | **Multi-impl handling** | Not addressed | Cross-model natural-bug corpus + comparison-mode distinction (evaluation harness, not yet a production endpoint) |
 | **LLM integration** | LLM as generator or prover | Not used at verification time at all in the current implementation — the planned "diagnostic aid only" role (§5.3) was never built |

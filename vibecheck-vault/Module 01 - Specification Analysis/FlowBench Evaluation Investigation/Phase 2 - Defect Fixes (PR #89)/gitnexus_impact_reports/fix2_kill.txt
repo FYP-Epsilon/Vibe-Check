@@ -1,0 +1,16 @@
+############ is_killed ############
+target: Method:module_01_spec/src/mutation_refiner.py:LTLfAuditor.is_killed#1
+risk: LOW impacted: 0 direct: 0
+processes: []
+############ execute_validation_pipeline ############
+target: Method:module_01_spec/src/mutation_refiner.py:MutationValidator.execute_validation_pipeline#2
+risk: HIGH impacted: 15 direct: 3
+processes: ['verify_spec']
+  d1 run_module_01_pipeline                                     module_01_spec/src/api.py
+  d1 verify_spec                                                module_01_spec/src/main.py
+  d1 main                                                       module_01_spec/src/mutation_refiner.py
+  d2 check_variant                                              demo/e2e_demo.py
+  d2 discover_gold_specs                                        demo/eval_e2e/harness.py
+  d2 spec_task_names                                            vibecheck-vault/Module 03 - Equivalence Engine/Bridge Investigation/cp1_crosstab.py
+  d2 module_01_spec/src/mutation_refiner.py                     module_01_spec/src/mutation_refiner.py
+  d2 module_01_spec/src/api.py                                  module_01_spec/src/api.py

@@ -1,17 +1,33 @@
 """
 Module 03 — Equivalence Checking Engine: Main Pipeline Orchestrator
 =====================================================================
-Executes the full 4-phase pipeline:
+This file holds two independent implementations of the 4-phase pipeline.
+Only one is canonical:
 
-    Phase A → WIR Lifter (lifter.py / C++ vibecheck_lifter)
-    Phase B → Stuttering Bisimulation Engine
-    Phase C → Pairwise Behavioural Clustering
-    Phase D → LTL Model Checking via Synchronous Product (C++)
+    process_wir_batch()  — CANONICAL. SPOT/C++-backed (Phases A-D all via
+                            ``vibecheck_lifter``). This is what every real
+                            caller uses: module_03_equiv's own ``/check``
+                            HTTP endpoint (src/main.py), ``demo/e2e_demo.py``,
+                            and every corpus-scale run this project has done.
+
+    run_pipeline()        — LEGACY. Pure-Python reachability-BFS (lifter.py /
+                            stuttering_engine.py / clustering.py /
+                            model_checker.py). Has no real caller besides its
+                            own CLI (``main()``, below) and the direct
+                            component tests in test_pipeline.py. Kept for
+                            those tests and as the home of one capability
+                            ``process_wir_batch`` does NOT (yet) reproduce:
+                            loop-bound safety checking (see run_pipeline's
+                            own docstring for what that means and why it
+                            isn't just "the same but slower").
+
+Decided 2026-07-30 — see vibecheck-vault/Module 03 - Equivalence Engine/
+Module 03 Knowledge.md and Next Steps.md item #5 for the full writeup.
 
 Usage::
 
-    python -m src.pipeline              # default demo WIR
-    python -m src.pipeline input.json   # from file
+    python -m src.pipeline              # runs the LEGACY run_pipeline(),
+    python -m src.pipeline input.json   # not the canonical process_wir_batch
 """
 
 from __future__ import annotations
@@ -26,8 +42,13 @@ from .lifter import LTS, LifterConfig, QualityGateError, WIRLifter
 from .stuttering_engine import StutteringEngine, StutteringResult
 from .clustering import BehavioralClusterer, ClusterResult
 from .model_checker import ModelChecker, PropertyMonitor, VerificationVerdict
+from .property_ingest import PropertySuite
 
-# Optional C++ engine — gracefully degrade to pure-Python if not compiled
+# Optional C++ engine. NOTE: there is no pure-Python fallback for
+# process_wir_batch() itself — when this import fails, process_wir_batch()
+# raises RuntimeError (see below). The pure-Python path that actually exists
+# in this file is run_pipeline(), a separately-maintained legacy pipeline,
+# not a degraded mode of process_wir_batch().
 try:
     import vibecheck_lifter as _cpp
     HAS_CPP_ENGINE = True
@@ -55,6 +76,7 @@ def process_wir_batch(
     *,
     bpmn_tasks: list[str] | None = None,
     ltl_property: str = 'G("approved")',
+    property_suite: PropertySuite | None = None,
 ) -> dict:
     """
     Process a batch of WIR JSON strings through the C++ engine.
@@ -70,16 +92,29 @@ def process_wir_batch(
            ``minimize_stuttering()`` — producing the quotient automaton.
         3. Collect all quotients into a list.
         4. Pass the list to ``cluster_implementations()`` (C++).
+        5. Model-check each cluster representative. If ``property_suite`` is
+           given, check every one of its ``conformance_properties()`` and
+           record one result per property (``cluster_info["compliance_results"]``,
+           a list). Otherwise fall back to the single ``ltl_property`` string
+           (``cluster_info["compliance"]``, one dict) — kept for the existing
+           single-string callers/tests; a real property suite is Milestone-1's
+           actual ingestion path (see property_ingest.py).
 
     Args:
         wir_json_strings: List of WIR JSON strings (one per LLM implementation).
         bpmn_tasks: Optional list of BPMN task names for semantic matching.
+        ltl_property: Single-property fallback, used only when property_suite
+            is not given.
+        property_suite: A ``PropertySuite`` from ``property_ingest.load_property_suite()``.
+            When given, every one of its conformance-checkable properties is
+            checked against every cluster representative.
 
     Returns:
         A dict with keys:
             ``quotients``  — list of minimized TwaGraph objects.
             ``diagnostics`` — list of LifterDiagnostics (one per input).
-            ``clusters``   — dict[cluster_id] → {indices, representative, compliance}.
+            ``clusters``   — dict[cluster_id] → {indices, representative,
+                              compliance | compliance_results}.
 
         Raises:
             RuntimeError: If the C++ engine is not available.
@@ -138,36 +173,81 @@ def process_wir_batch(
     )
 
     # ── Step 5: Phase D — Model check each representative ───────────────
-    logger.info("Phase D: Model checking with LTL property: %s", ltl_property)
+    verdict_icon = {
+        "COMPLIANT": "✅",
+        "VIOLATION": "❌",
+        "INCONCLUSIVE": "❓",
+    }
 
-    for cid, cluster_info in clusters.items():
-        rep = cluster_info["representative"]
-        try:
-            compliance = _cpp.check_compliance(rep, ltl_property)
-            cluster_info["compliance"] = {
-                "ltl_property": ltl_property,
-                "is_compliant": compliance.is_compliant,
-                "verdict": "PASS" if compliance.is_compliant else "FAIL",
-                "counter_example_trace": compliance.counter_example_trace,
-            }
-            verdict_icon = "✅" if compliance.is_compliant else "❌"
+    if property_suite is not None:
+        properties = property_suite.conformance_properties()
+        logger.info(
+            "Phase D: Model checking %d conformance-eligible propert%s per cluster",
+            len(properties), "y" if len(properties) == 1 else "ies",
+        )
+        for cid, cluster_info in clusters.items():
+            rep = cluster_info["representative"]
+            results = []
+            for prop in properties:
+                try:
+                    compliance = _cpp.check_compliance(rep, prop.formula)
+                    results.append({
+                        "tier": prop.tier,
+                        "origin_formula": prop.origin_formula,
+                        "ltl_property": prop.formula,
+                        "verdict": compliance.verdict,
+                        "counter_example_trace": compliance.counter_example_trace,
+                        "unmatched_atoms": list(compliance.unmatched_atoms),
+                    })
+                except Exception as exc:
+                    logger.warning(
+                        "  Cluster %d, property %r: Phase D error: %s",
+                        cid, prop.origin_formula, exc,
+                    )
+                    results.append({
+                        "tier": prop.tier,
+                        "origin_formula": prop.origin_formula,
+                        "ltl_property": prop.formula,
+                        "verdict": "ERROR",
+                        "counter_example_trace": "",
+                        "unmatched_atoms": [],
+                        "error": str(exc),
+                    })
+            cluster_info["compliance_results"] = results
             logger.info(
-                "  Cluster %d: %s %s",
+                "  Cluster %d: %s",
                 cid,
-                verdict_icon,
-                "PASS" if compliance.is_compliant else "FAIL",
+                ", ".join(f"{verdict_icon.get(r['verdict'], '❓')}{r['verdict']}" for r in results) or "(no properties)",
             )
-        except Exception as exc:
-            logger.warning(
-                "  Cluster %d: Phase D error: %s", cid, exc
-            )
-            cluster_info["compliance"] = {
-                "ltl_property": ltl_property,
-                "is_compliant": None,
-                "verdict": "ERROR",
-                "counter_example_trace": "",
-                "error": str(exc),
-            }
+    else:
+        logger.info("Phase D: Model checking with LTL property: %s", ltl_property)
+        for cid, cluster_info in clusters.items():
+            rep = cluster_info["representative"]
+            try:
+                compliance = _cpp.check_compliance(rep, ltl_property)
+                cluster_info["compliance"] = {
+                    "ltl_property": ltl_property,
+                    "verdict": compliance.verdict,
+                    "counter_example_trace": compliance.counter_example_trace,
+                    "unmatched_atoms": list(compliance.unmatched_atoms),
+                }
+                logger.info(
+                    "  Cluster %d: %s %s",
+                    cid,
+                    verdict_icon.get(compliance.verdict, "❓"),
+                    compliance.verdict,
+                )
+            except Exception as exc:
+                logger.warning(
+                    "  Cluster %d: Phase D error: %s", cid, exc
+                )
+                cluster_info["compliance"] = {
+                    "ltl_property": ltl_property,
+                    "verdict": "ERROR",
+                    "counter_example_trace": "",
+                    "unmatched_atoms": [],
+                    "error": str(exc),
+                }
 
     return {
         "quotients": quotients,
@@ -241,7 +321,27 @@ DEMO_WIR: dict = {
 
 def run_pipeline(wir_json: dict) -> dict:
     """
-    Execute the full 4-phase equivalence-checking pipeline.
+    LEGACY — not the canonical Phase D. See process_wir_batch() for that.
+
+    This is the original pure-Python 4-phase pipeline (finite-trace
+    reachability-BFS model checking via ModelChecker/PropertyMonitor,
+    lifter.py's WIRLifter, stuttering_engine.py, clustering.py). Nothing in
+    this codebase calls it except this module's own CLI (``main()``) and
+    test_pipeline.py's direct component tests — those tests stay, since they
+    validate real bisimulation/clustering logic, but this function itself is
+    not part of any production request path.
+
+    Why it isn't simply redundant: its Phase D checks two things —
+    (1) reachability of forbidden labels ("error"/"abort"/"panic"), which
+    IS expressible as an LTL safety property and so is subsumed by
+    ``process_wir_batch``'s ``check_compliance``; and
+    (2) loop-bound safety (``PropertyMonitor.from_loop_bound_check()``),
+    which has no equivalent in the canonical path today — property_ingest.py
+    excludes P2_Quality_Limits from conformance checking, and there is no
+    LTL encoding of "this loop is bounded" in the current property suite.
+    Deprecating this function therefore leaves loop-bound checking with no
+    home anywhere in the pipeline; that gap is real and open, not silently
+    papered over by process_wir_batch.
 
     Returns a summary dict suitable for JSON serialisation.
     """
@@ -405,10 +505,16 @@ def run_pipeline(wir_json: dict) -> dict:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    """CLI entry point."""
+    """CLI entry point for the LEGACY pure-Python pipeline (run_pipeline).
+
+    The canonical pipeline (process_wir_batch) is only reachable via the
+    module_03_equiv HTTP service (src/main.py's /check endpoint) — it has
+    no standalone CLI of its own.
+    """
     print("═" * 62)
     print("  VibeCheck — Module 03: Equivalence Checking Engine")
-    print("  Pure Python 4-Phase Pipeline")
+    print("  LEGACY Pure Python 4-Phase Pipeline (not the canonical Phase D —")
+    print("  see process_wir_batch() / module_03_equiv/src/main.py's /check)")
     print("═" * 62)
 
     if len(sys.argv) > 1:

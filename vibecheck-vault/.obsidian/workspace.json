@@ -4,24 +4,24 @@
     "type": "split",
     "children": [
       {
-        "id": "ebdb8c1edfd18fc9",
+        "id": "f7d685f149a92c1a",
         "type": "tabs",
         "children": [
           {
-            "id": "7f4f400fa059d7dd",
+            "id": "30c9fa047d135221",
             "type": "leaf",
             "state": {
               "type": "canvas",
               "state": {
-                "file": "Module 03 - Equivalence Engine/Module 03 Status.canvas",
+                "file": "Project Architecture.canvas",
                 "viewState": {
-                  "x": 480,
-                  "y": 120,
-                  "zoom": -0.9319546125769012
+                  "x": -542.4734957242623,
+                  "y": -232.0832950074258,
+                  "zoom": -1.1403867051265344
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "Module 03 Status"
+              "title": "Project Architecture"
             }
           }
         ]
@@ -44,7 +44,9 @@
               "type": "file-explorer",
               "state": {
                 "sortOrder": "alphabetical",
-                "autoReveal": false
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -97,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
+                "file": "Repo Docs/Thesis/figures/fig_m01_tier_census.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -107,7 +109,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Module 02 Architecture"
+              "title": "Backlinks for fig_m01_tier_census"
             }
           },
           {
@@ -116,12 +118,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
+                "file": "Repo Docs/Thesis/figures/fig_m01_tier_census.pdf",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Module 02 Architecture"
+              "title": "Outgoing links from fig_m01_tier_census"
             }
           },
           {
@@ -159,13 +161,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
+                "file": "Repo Docs/Thesis/figures/fig_m01_tier_census.pdf",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Module 02 Architecture"
+              "title": "Outline of fig_m01_tier_census"
             }
           }
         ]
@@ -186,52 +188,61 @@
       "bases:Create new base": false
     }
   },
-  "active": "7f4f400fa059d7dd",
+  "active": "30c9fa047d135221",
   "lastOpenFiles": [
-    "Module 03 - Equivalence Engine/Module 03 Knowledge.md",
-    "Module 03 - Equivalence Engine/Module 03 Architecture.canvas",
-    "Module 03 - Equivalence Engine/Module 03 Changes Made.md",
-    "Module 03 - Equivalence Engine/Module 03 Status.canvas",
-    "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
-    "Module 01 - Specification Analysis/Module 01 Architecture.canvas",
-    "Module 01 - Specification Analysis/Module 01 Knowledge.md",
-    "Module 01 - Specification Analysis/Module 01 Status.canvas",
-    "Module 01 - Specification Analysis/Repo Docs/05_integration.md",
-    "Module 01 - Specification Analysis/Repo Docs/04_pbcts_trace_synthesis.md",
-    "Module 01 - Specification Analysis/Repo Docs/03_mutation_and_red_teaming.md",
-    "Module 01 - Specification Analysis/Repo Docs/02_ltlf_synthesis.md",
-    "Module 01 - Specification Analysis/Repo Docs/01_semantic_extraction.md",
-    "Module 01 - Specification Analysis/Repo Docs/00_overview.md",
+    "Next Steps.md",
+    "Home.md",
+    "Claude Science Plan.md",
+    "Final Evaluation Results/Module 02 Evaluation Results.md",
+    "Final Evaluation Results/Full Project Evaluation Results.md",
+    "Final Evaluation Results/SpiffWorkflow Benchmark Results.md",
+    "Final Evaluation Results/Module 01 Evaluation Results.md",
+    "Module 02 - Verified IR Extraction/WIR Structure and Confidence Methodology.md",
+    "Final Evaluation Results/Module 03 Evaluation Results.md",
+    "Evaluation Summary (Poster).md",
+    "Final Evaluation Results",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/phase4_status_corrected_AFTER.txt",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/phase4_sound_BEFORE.txt",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/phase4_sound_AFTER.txt",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/mutdiag_BEFORE.txt",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/mutdiag_AFTER.txt",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/invalidate_BEFORE.txt",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/invalidate_AFTER.txt",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/crosstab_BEFORE.txt",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/pilots_before_after/crosstab_AFTER.txt",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/Phase 2 - Defect Fixes (PR #89)/PR_fix_mod1_flowbench_defects.md",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/m01_pilot_diagnostic.png",
+    "Module 01 - Specification Analysis/FlowBench Evaluation Investigation/M01 FlowBench Evaluation Methodology.md",
+    "Repo Docs/Thesis/figures/fig_m01_tier_census.png",
+    "Repo Docs/Thesis/figures/fig_m01_pipeline.png",
+    "Repo Docs/Thesis/figures/fig_m01_checkability_funnel.png",
     "Project Architecture.canvas",
-    "Module 03 - Equivalence Engine/Repo Docs/Module 03 Repo Docs Index.md",
-    "Module 02 - Verified IR Extraction/Repo Docs/Module 02 Repo Docs Index.md",
-    "Module 01 - Specification Analysis/Repo Docs/Module 01 Repo Docs Index.md",
-    "Repo Docs/Project Repo Docs Index.md",
-    "Repo Docs/Thesis/figures/fig_e3_scatter.png",
-    "Repo Docs/Thesis/figures/fig_e3_scatter.pdf",
-    "Repo Docs/Thesis/figures/fig_detection_climb.png",
-    "Repo Docs/Thesis/figures/fig_detection_climb.pdf",
-    "Repo Docs/Thesis/module02_chapter_outline.md",
-    "Repo Docs/Thesis/module02_chapter_draft.md",
-    "Repo Docs/Thesis/figures",
-    "Repo Docs/Architecture/module_03_execution_plan.md",
-    "Repo Docs/Architecture/module_02_execution_plan.md",
-    "Repo Docs/Architecture/module_01_execution_plan.md",
-    "Repo Docs/Architecture/Interim Report.pdf",
-    "Repo Docs/API and Schemas/wir_schema_docs.md",
-    "Repo Docs/Thesis",
-    "Repo Docs/README.md",
-    "Repo Docs/Architecture",
-    "Repo Docs/API and Schemas",
-    "Repo Docs",
-    "Module 03 - Equivalence Engine/Repo Docs/phase3_equivalence_engine.md",
-    "Module 03 - Equivalence Engine/Repo Docs/Module_03_Equivalence_Engine.md",
-    "Module 03 - Equivalence Engine/Repo Docs",
-    "Module 02 - Verified IR Extraction/Repo Docs/Module_02_Verified_IR_Extraction.md",
-    "Module 02 - Verified IR Extraction/Repo Docs/12_wir_and_certificate_contract.md",
-    "Module 02 - Verified IR Extraction/Repo Docs/11_multi_impl_corpus_contract.md",
-    "Module 02 - Verified IR Extraction/Repo Docs",
     "Project Status.canvas",
+    "Repo Docs/Thesis/figures/fig_m03_verdict_shift.png",
+    "Repo Docs/Thesis/figures/fig_m03_two_vacuity_channels.png",
+    "Repo Docs/Thesis/figures/fig_m03_pipeline.png",
+    "Repo Docs/Thesis/figures/fig_m03_forest_ci.png",
+    "Repo Docs/Thesis/figures/fig_m03_detection_by_kind.png",
+    "Repo Docs/Thesis/figures/fig_m03_alive_extension_example.png",
+    "Repo Docs/Thesis/thesis_parity_note.md",
+    "Repo Docs/Thesis/module03_chapter_outline.md",
+    "Repo Docs/Thesis/module03_chapter_draft.md",
+    "Repo Docs/Thesis/module01_chapter_outline.md",
+    "Repo Docs/Thesis/module01_chapter_draft.md",
+    "Module 02 - Verified IR Extraction/Module 02 Architecture.canvas",
+    "Module 02 - Verified IR Extraction/Module 02 Novelty.md",
+    "Project Overview.md",
+    "Module 03 - Equivalence Engine/Module 03 Architecture.canvas",
+    "Module 03 - Equivalence Engine/Module 03 Novelty.md",
+    "Module 01 - Specification Analysis/Module 01 Novelty.md",
+    "Module 03 - Equivalence Engine/Bridge Investigation/CP1 Lifting-Scope Decision.md",
+    "Module 03 - Equivalence Engine/Bridge Investigation/E2E Integration Verification Findings.md",
+    "Module 03 - Equivalence Engine/Bridge Investigation/E2E Session/D6 - Thesis Writing Parallelization Note.md",
+    "Module 03 - Equivalence Engine/Bridge Investigation/E2E Session/D5 - Real-World Demo Design.md",
+    "Module 03 - Equivalence Engine/Bridge Investigation/E2E Session/D4 - Phased Implementation Plan.md",
+    "Module 03 - Equivalence Engine/Module 03 Status.canvas",
+    "Module 01 - Specification Analysis/Module 01 Architecture.canvas",
+    "Module 01 - Specification Analysis/Module 01 Status.canvas",
     "Module 02 - Verified IR Extraction/Module 02 Status.canvas",
     "Module 04 - Verification Portal/Module 04 Status.canvas",
     "Module 04 - Verification Portal/Module 04 Architecture.canvas"

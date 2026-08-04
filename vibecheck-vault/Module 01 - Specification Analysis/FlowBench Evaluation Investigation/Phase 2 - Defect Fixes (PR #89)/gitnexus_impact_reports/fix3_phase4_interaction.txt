@@ -1,0 +1,6 @@
+  reached Phase 4, real v2.0 certificate                  90
+  aborted at Phase 3 gate (suite too weak to kill mutants) 54
+  reached Phase 4, FAIL_WITH_ERRORS                       4
+-- FAIL_WITH_ERRORS messages --
+   Unexpected token at end of formula: ( in '!node(Event_1ycwwd   3
+   Unexpected token at end of formula: ( in '!node() W done(Ama   1
