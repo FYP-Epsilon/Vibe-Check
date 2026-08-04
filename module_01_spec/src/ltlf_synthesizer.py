@@ -277,6 +277,29 @@ class FLTLSynthesizer:
         """Generates P0 Critical Sentinels and P2 Quality Limits."""
         # Sentinel Guard: !forbidden_state W prerequisite_met
         # For every task/event, cannot be 'done' until it 'starts' (or reached)
+        
+        # Enforce that all traces must eventually reach an End Event
+        end_props = []
+        for state in self.states:
+            if state.get("node_type") == "endEvent":
+                props = state.get("atomic_propositions", [])
+                if props:
+                    end_props.append(props[0])
+        if end_props:
+            end_formula = " | ".join(end_props)
+            self.ltlf_suite["P0_Critical_Sentinels"].append(f"F({end_formula})")
+
+        # Enforce that all traces must start with a Start Event
+        start_props = []
+        for state in self.states:
+            if state.get("node_type") == "startEvent":
+                props = state.get("atomic_propositions", [])
+                if props:
+                    start_props.append(props[0])
+        if start_props:
+            start_formula = " | ".join(start_props)
+            self.ltlf_suite["P0_Critical_Sentinels"].append(f"{start_formula}")
+
         for state in self.states:
             props = state.get("atomic_propositions", [])
             if len(props) >= 2: # Likely a task with start and done

@@ -47,8 +47,11 @@ class BPMNMutationEngine:
                 mutant_traces = auditor._generate_traces(mutant, depth=10)
                 canonical_mutant = {tuple(frozenset(s) for s in t) for t in mutant_traces}
                 
-                # Exclude behaviorally equivalent mutants
-                if canonical_mutant == canonical_original:
+                # Exclude behaviorally equivalent or strictly under-approximate mutants.
+                # If a mutant's traces are a subset of the original's, it only removed 
+                # optional valid behaviors. It is mathematically impossible for any sound LTLf
+                # suite to kill such a mutant without also rejecting valid original traces.
+                if canonical_mutant.issubset(canonical_original):
                     continue
                     
                 self.mutants.append(mutant)
@@ -339,6 +342,55 @@ class MutationValidator:
 
     def _synthesize_killer(self, mutant: Dict[str, Any]) -> str:
         """Isolates topological anomaly and creates a constraint."""
+        original_traces = self.auditor._generate_traces(self.graph, depth=10)
+        t_model = {tuple(frozenset(s) for s in t) for t in original_traces}
+        
+        mutant_traces = self.auditor._generate_traces(mutant, depth=10)
+        t_mutant = {tuple(frozenset(s) for s in t) for t in mutant_traces}
+        
+        t_mutant_only = t_mutant - t_model
+        if not t_mutant_only:
+            return "no killer found"
+            
+        def build_seq(steps_list):
+            if not steps_list: return ""
+            curr_s = sorted(steps_list[0])
+            if not curr_s: return build_seq(steps_list[1:])
+            rest = build_seq(steps_list[1:])
+            if not rest: return curr_s[0]
+            return f"{curr_s[0]} & X({rest})"
+            
+        t_model_list = [list(t) for t in t_model]
+        
+        for trace in t_mutant_only:
+            steps = list(trace)
+            n = len(steps)
+            shortest_invalid = None
+            
+            for length in range(1, n + 1):
+                for i in range(n - length + 1):
+                    subseq = steps[i:i+length]
+                    
+                    appears = False
+                    for gt in t_model_list:
+                        for j in range(len(gt) - length + 1):
+                            if gt[j:j+length] == subseq:
+                                appears = True
+                                break
+                        if appears:
+                            break
+                            
+                    if not appears:
+                        shortest_invalid = subseq
+                        break
+                if shortest_invalid:
+                    break
+                    
+            if shortest_invalid:
+                seq = build_seq(shortest_invalid)
+                if seq:
+                    return f"!F({seq})"
+                    
         return "no killer found"
 
     def _get_node_props(self, node_id: str) -> List[str]:
@@ -369,7 +421,7 @@ class MutationValidator:
         by_disconnection = getattr(self, "mutants_killed_by_disconnection", 0)
         property_kill_ratio = by_property / actual_count if actual_count > 0 else 0.0
 
-        status = "PASS" if c_struct >= 1.0 and killed_ratio >= 1.0 else "WARN"
+        status = "PASS" if c_struct >= 1.0 and killed_ratio >= 1.0 else "FAIL"
         
         cert = {
             "status": status,
@@ -386,7 +438,7 @@ class MutationValidator:
             "refinement_loops_executed": self.refinement_loops
         }
 
-        if status == "WARN" and surviving_mutants:
+        if status == "FAIL" and surviving_mutants:
             # Output detailed diagnostics so the human operator can manually fix it
             cert["unresolved_vulnerabilities"] = []
             for m in surviving_mutants[:3]: # Show up to 3 worst surviving mutants

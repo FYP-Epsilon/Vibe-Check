@@ -35,27 +35,50 @@ class PBCTSAlignmentPipeline:
         """
         corrections = []
         seen = set()
-        
-        valid_transitions = set()
-        for t in t_model:
-            steps = list(t)
-            for i in range(len(steps) - 1):
-                curr = sorted(steps[i])
-                nxt = sorted(steps[i + 1])
-                if curr and nxt:
-                    valid_transitions.add((curr[0], nxt[0]))
+
+        def build_seq(steps_list):
+            if not steps_list: return ""
+            curr_s = sorted(steps_list[0])
+            if not curr_s: return build_seq(steps_list[1:])
+            rest = build_seq(steps_list[1:])
+            if not rest: return curr_s[0]
+            return f"{curr_s[0]} & X({rest})"
+
+        t_model_list = [list(t) for t in t_model]
 
         for trace in list(t_spec_only):
             steps = list(trace)
-            for i in range(len(steps) - 1):
-                curr = sorted(steps[i])
-                nxt = sorted(steps[i + 1])
-                if curr and nxt:
-                    if (curr[0], nxt[0]) not in valid_transitions:
-                        formula = f"!F({curr[0]} & X({nxt[0]}))"
-                        if formula not in seen:
-                            seen.add(formula)
-                            corrections.append(formula)
+            n = len(steps)
+            shortest_invalid = None
+            
+            for length in range(1, n + 1):
+                for i in range(n - length + 1):
+                    subseq = steps[i:i+length]
+                    
+                    # Check if subseq appears in ANY graph trace
+                    appears = False
+                    for gt in t_model_list:
+                        for j in range(len(gt) - length + 1):
+                            if gt[j:j+length] == subseq:
+                                appears = True
+                                break
+                        if appears:
+                            break
+                            
+                    if not appears:
+                        shortest_invalid = subseq
+                        break
+                if shortest_invalid:
+                    break
+            
+            if shortest_invalid:
+                seq = build_seq(shortest_invalid)
+                if seq:
+                    c = f"!F({seq})"
+                    if c not in seen:
+                        seen.add(c)
+                        corrections.append(c)
+
         return corrections
 
     def _auto_relax_rules(self, t_model_only: set, auditor) -> list:

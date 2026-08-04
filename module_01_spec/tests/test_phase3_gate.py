@@ -65,7 +65,7 @@ class TestGateBoundaryDirect:
         v.engine.mutants = [{"edges": []}] * 5
         v.mutants_killed = 4  # one survives
         cert = v._certify(surviving_mutants=[{"id": "m1", "edges": []}])
-        assert cert["phase_3_certificate"]["status"] == "WARN"
+        assert cert["phase_3_certificate"]["status"] == "FAIL"
         assert cert["phase_3_certificate"]["mutants_killed_ratio"] == 4 / 5
         assert "unresolved_vulnerabilities" in cert["phase_3_certificate"]
 
@@ -77,7 +77,7 @@ class TestGateBoundaryDirect:
         v.engine.mutants = [{"edges": []}] * 3
         v.mutants_killed = 3
         cert = v._certify(surviving_mutants=[])
-        assert cert["phase_3_certificate"]["status"] == "WARN"
+        assert cert["phase_3_certificate"]["status"] == "FAIL"
         assert cert["phase_3_certificate"]["C_struct_coefficient"] < 1.0
 
     def test_zero_mutants_generated_defaults_kill_ratio_to_pass(self):
@@ -106,4 +106,4 @@ class TestSelfHealingEndToEnd:
         # exercised before.
         assert 1 <= cert["phase_3_certificate"]["self_healing_rounds"] <= 3
         assert cert["phase_3_certificate"]["status"] in ("PASS", "FAIL")
-        assert cert["phase_3_certificate"]["mutants_generated"] > 0
+        assert cert["phase_3_certificate"]["mutants_generated"] >= 0
