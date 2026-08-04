@@ -31,7 +31,7 @@ def _minimal_pipeline_result():
         "phase_3": {
             "refined_ltlf_property_suite": {
                 "P0_Critical_Sentinels": ["!done(Approve) W start(Approve)"],
-                "P1_Structural_Control_Flow": ["G(start(Approve) -> !start(Reject))"],
+                "P1_Structural_Control_Flow": ["!start(Reject) W done(Approve)"],
                 "P2_Quality_Limits": ["G(iteration_count <= 10 -> F(process_complete))"],
             }
         },
@@ -42,7 +42,16 @@ def _pipeline_result_with_all_five_tiers():
     """mutation_refiner.py's _certify() always emits all 5 tiers (P3 and
     synthesized_mutant_killers included, even if empty) -- this is the shape
     real Module 01 runs actually produce, not the 3-tier minimal fixture
-    above."""
+    above.
+
+    The synthesized_mutant_killers entry deliberately repeats the P1 formula
+    verbatim, in mutation_refiner.py's own "!v W u" shape -- that's what
+    mutation_refiner.py actually does (every killer it synthesizes is
+    appended to both P1_Structural_Control_Flow and synthesized_mutant_killers
+    at synthesis time, see mutation_refiner.py's refinement loop), so the
+    fixture exercises that real invariant rather than a formula that never
+    collides with anything. P3's formula uses adversarial_generator.py's own
+    "G(a -> !F(b))" shape."""
     result = _minimal_pipeline_result()
     result["phase_3"]["refined_ltlf_property_suite"]["P3_Adversarial_Defenses"] = [
         "G(start(Approve) -> F(done(Approve)))"
@@ -88,8 +97,18 @@ def test_tier_semantics_present_and_correct():
         # refined_ltlf_property_suite can contain, so a suite with any real
         # P3/synthesized_mutant_killers property made Module 03's
         # load_property_suite hard-error (see test_real_export_is_ingestible_by_module_03).
-        assert tiers["P3_Adversarial_Defenses"]["conformance_check"] is False
-        assert tiers["synthesized_mutant_killers"]["conformance_check"] is False
+        # Both tiers now flag as conformance-checkable in tier_semantics. In
+        # practice property_ingest still excludes every property either
+        # produces today -- P3 because its "G(a -> !F(b))" shape trips
+        # property_ingest's SPOT-grammar filter, synthesized_mutant_killers
+        # because mutation_refiner.py always duplicates its formulas into
+        # P1_Structural_Control_Flow first -- see
+        # test_real_export_is_ingestible_by_module_03 for the exact reasons.
+        # The flag flip is still correct to keep: it's what makes those
+        # exclusions legible (reported with a reason) instead of a blanket,
+        # unexplained tier ban.
+        assert tiers["P3_Adversarial_Defenses"]["conformance_check"] is True
+        assert tiers["synthesized_mutant_killers"]["conformance_check"] is True
 
 
 def test_real_export_is_ingestible_by_module_03():
@@ -97,7 +116,29 @@ def test_real_export_is_ingestible_by_module_03():
     populated, as mutation_refiner.py's _certify() really produces) straight
     into property_ingest.load_property_suite() -- this used to raise
     ValueError("tier 'P3_Adversarial_Defenses' has properties but no entry
-    in tier_semantics") because tier_semantics only ever covered 3 tiers."""
+    in tier_semantics") because tier_semantics only ever covered 3 tiers.
+
+    P3_Adversarial_Defenses and synthesized_mutant_killers now have
+    conformance_check=True in tier_semantics. synthesized_mutant_killers'
+    formula here is a byte-for-byte duplicate of the P1_Structural_Control_Flow
+    formula (the real relationship mutation_refiner.py produces), so it must
+    be excluded as a cross-tier duplicate -- checking the identical formula
+    twice under two tier names would double-count one violation as two, not
+    add new detection power.
+
+    P3_Adversarial_Defenses's own formula ends up excluded too, but for an
+    unrelated, pre-existing reason worth naming explicitly rather than
+    asserting blind: adversarial_generator.py's killer template is
+    "G(a -> !F(b))", and property_ingest's _rejects_spot_grammar flags any
+    bare "->" as a disallowed comparison operator (its regex matches the
+    literal ">" inside "->", not just standalone "<"/">"/"<="/">=" numeric
+    comparisons). So turning P3's tier flag on does not yet make it
+    checkable in practice -- every formula the current P3 synthesis
+    produces uses "->" and is filtered out downstream of the flag, before
+    it reaches SPOT. Fixing the grammar-rejection regex to stop matching
+    "->" is a separate, pre-existing bug -- out of scope here, but worth
+    flagging: enabling P3.conformance_check today adds no real detection
+    power until that filter is fixed too."""
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "module_03_equiv", "src"))
     from property_ingest import load_property_suite
 
@@ -110,8 +151,13 @@ def test_real_export_is_ingestible_by_module_03():
 
         suite = load_property_suite(payload)  # must not raise
         checkable_tiers = {p.tier for p in suite.conformance_properties()}
+        assert "P1_Structural_Control_Flow" in checkable_tiers
         assert "P3_Adversarial_Defenses" not in checkable_tiers
         assert "synthesized_mutant_killers" not in checkable_tiers
+
+        excluded_reasons = {e.tier: e.reason for e in suite.excluded_properties()}
+        assert "comparison operator" in excluded_reasons["P3_Adversarial_Defenses"]
+        assert "duplicate" in excluded_reasons["synthesized_mutant_killers"]
 
 
 def test_ltlf_property_suite_unchanged_by_the_new_field():

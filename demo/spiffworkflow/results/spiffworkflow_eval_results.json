@@ -8,12 +8,12 @@
     0.5
   ],
   "decisive_trials": 168,
-  "detections": 48,
-  "misses": 120,
-  "detection_rate": 0.2857,
+  "detections": 51,
+  "misses": 117,
+  "detection_rate": 0.3036,
   "detection_ci_95": [
-    0.2188,
-    0.3604
+    0.2351,
+    0.3791
   ],
   "perturbation_trials": 47,
   "false_alarms": 0,
@@ -22,11 +22,11 @@
     0.0,
     0.0755
   ],
-  "counterexample_trials": 48,
-  "counterexample_ok": 36,
-  "counterexample_quality": 0.75,
+  "counterexample_trials": 51,
+  "counterexample_ok": 38,
+  "counterexample_quality": 0.7451,
   "counterexample_ci_95": [
-    0.604,
-    0.8636
+    0.6037,
+    0.8567
   ]
 }

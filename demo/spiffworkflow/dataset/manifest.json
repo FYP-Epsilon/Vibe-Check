@@ -36,8 +36,8 @@
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_cli_gateway_types.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_cli_gateway_types.py",
     "tasks_count": 8,
-    "checkable_properties": 8,
-    "applicable_properties": 8
+    "checkable_properties": 10,
+    "applicable_properties": 10
   },
   {
     "id": "spiff_cli_task_types",
@@ -52,8 +52,8 @@
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_demo_admin_demo_1_submit_invoice.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_demo_admin_demo_1_submit_invoice.py",
     "tasks_count": 10,
-    "checkable_properties": 7,
-    "applicable_properties": 7
+    "checkable_properties": 8,
+    "applicable_properties": 8
   },
   {
     "id": "spiff_model_misc_demo_demo_preload_preload_data",
@@ -356,8 +356,8 @@
     "bpmn_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/bpmn/spiff_model_misc_test_a23_a_2_3.bpmn",
     "code_file": "/Users/kavindu/Projects/Vibe-Check/demo/spiffworkflow/dataset/code/spiff_model_misc_test_a23_a_2_3.py",
     "tasks_count": 4,
-    "checkable_properties": 4,
-    "applicable_properties": 4
+    "checkable_properties": 5,
+    "applicable_properties": 5
   },
   {
     "id": "spiff_model_misc_service_tests_xero_xero_service_task_test",
