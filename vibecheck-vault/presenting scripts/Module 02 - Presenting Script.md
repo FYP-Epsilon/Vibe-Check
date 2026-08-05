@@ -65,7 +65,7 @@ $$\text{Untrusted Code} \longrightarrow \underbrace{\text{V3 Static Gate}}_{\tex
 #### Layer 1: V3 Static AST Structural Gate (`ast_extractor/`)
 * **Submodules**: `cfg_extractor.py`, `dominators.py`, `guards.py`, `helpers.py`, `certificate.py`
 * **Functionality**: Performs syntax analysis, constructs statement coverage maps, computes immediate dominators (`idom`) and dominance frontiers, splits control versus data variables, and flattens conditional guards into Conjunctive Normal Form (CNF).
-* **Structural Gate Rule**: Operates as a **hard gate**. If statement coverage falls below 95% ($V_3 < 0.95$), the pipeline triggers an immediate abort (`v3_abort = True`), forcing `combined_confidence = 0.0` and `passed = False`. V3 does not participate as a numerical weight in the confidence composition formula to prevent structural coverage of trivial boilerplate code from artificially inflating behavioral confidence.
+* **Structural Gate Rule**: Operates as a **hard gate on acceptance, not on execution**. If statement coverage falls below 95% ($V_3 < 0.95$), `v3_abort = True` forces `passed = False` regardless of the V1/V2 scores. This does not short-circuit the pipeline: V1 and V2 continue to run and `combined_confidence` is still computed and returned as `1 - (1-V_1)(1-V_2)`, since a low-fidelity WIR is diagnostic information the caller may still want. V3 does not participate as a numerical weight in the confidence composition formula to prevent structural coverage of trivial boilerplate code from artificially inflating behavioral confidence.
 
 #### Layer 2: V2 Symbolic Z3 Concolic Engine (`z3_sym_engine/`)
 * **Submodules**: `concolic.py`, `tracer.py`, `evaluator.py`, `registry.py`, `safe_exec.py`
@@ -85,14 +85,16 @@ $$\text{Untrusted Code} \longrightarrow \underbrace{\text{V3 Static Gate}}_{\tex
 ### 1.4 Mathematical Confidence Composition Formulas
 
 #### 1. Self-Verification Mode (Production Live Gating)
-In live production mode (`/verify`), Module 02 calculates the combined multi-modal confidence score $C$ using independent evidence combination, strictly gated by the V3 structural check:
+In live production mode (`/verify`), Module 02 calculates the combined multi-modal confidence score $C$ using independent evidence combination, and separately gates acceptance on the V3 structural check:
 
-$$C = \begin{cases} 0.0, & \text{if } V_3 \text{ Coverage} < 0.95 \text{ (Structural Abort Gate)} \\ 1 - (1 - V_1)(1 - V_2), & \text{if } V_3 \text{ Coverage} \ge 0.95 \end{cases}$$
+$$C = 1 - (1 - V_1)(1 - V_2) \qquad \text{always computed, independent of } V_3$$
+
+$$\text{passed} = \begin{cases} \text{False}, & \text{if } V_3 \text{ Coverage} < 0.95 \text{ (Structural Abort Gate)} \\ C \ge 0.95, & \text{if } V_3 \text{ Coverage} \ge 0.95 \end{cases}$$
 
 Where:
 * $V_1 \in [0.0, 1.0]$ is the dynamic differential execution trace match ratio.
 * $V_2 \in [0.0, 1.0]$ is the symbolic concolic path feasibility score.
-* **Production Acceptance Rule**: Code is accepted as verified if $C \ge 0.95$.
+* **Production Acceptance Rule**: Code is accepted as verified only if `passed = True`, i.e. $V_3 \ge 0.95$ **and** $C \ge 0.95$. Note that $C$ itself is never zeroed by a V3 failure — it reflects the real V1/V2 evidence even when the V3 gate rejects the code, so the returned `combined_confidence` field is diagnostic, not the acceptance verdict.
 
 #### 2. Differential Evaluation Mode (Benchmark Calibration)
 In evaluation mode (comparing generated code against a reference specification implementation), the confidence score $C_{\text{diff}}$ evaluates pure dynamic differential fidelity:
@@ -109,14 +111,14 @@ Module 02 addresses **three fundamental research gaps** at the intersection of L
 
 | Research Gap | Focus Area | Measured Impact / Deficit |
 |---|---|---|
-| **Gap 1: Order Misalignment** | Definition vs. Execution Order | ~46.2% Structural Defect Rate in Naive ASTs |
+| **Gap 1: Order Misalignment** | Definition vs. Execution Order | Structural Defect Rate in Naive ASTs (demonstrated failure mode; not separately quantified corpus-wide in this evaluation) |
 | **Gap 2: Threshold Calibration** | Formal Verification Decision Boundaries | Absence of Signal Detection Theory (ROC / Youden's J) |
 | **Gap 3: Post-Hoc Validation** | Zero-Cooperation Code Verification | Deficit of Non-Cooperative Dynamic Verification |
 
-### 2.1 Gap 1: Definition vs. Execution Order Misalignment in Python LLM Codegen (~46% Defect Rate)
+### 2.1 Gap 1: Definition vs. Execution Order Misalignment in Python LLM Codegen
 
 * **The Problem**: When Large Language Models generate Python code implementing multi-step workflow processes, they routinely define modular helper functions at the top of the file and invoke them inside an execution driver function (e.g., `run_workflow()`) at the bottom. Standard Abstract Syntax Tree (AST) Control Flow Graph (CFG) extractors walk source code top-to-bottom in file definition order.
-* **Empirical Measured Impact**: Empirical evaluation across enterprise workflow code generated by state-of-the-art LLMs (Llama-3.1-8B, Mixtral-8x7B, Qwen3-80B) revealed that definition order disagreed with actual runtime call sequence in **46.2% of generated programs**.
+* **Demonstrated Impact**: This pattern is directly observable in the project's own multi-model natural-generation corpus (`eval/variants/`, spanning Llama-3.1-8B, Mixtral-8x7B, and Qwen3-Next-80B generations) and in the worked `spiff_cli_call_activity.py` example walked through in Section 6, where the five task functions are defined before `run_workflow()` and only executed in the order it calls them. **Note**: this evaluation suite does not separately report a corpus-wide percentage of programs where definition order disagrees with call order — the number should not be cited as a measured statistic; the qualitative failure mode itself is real and is what D2 lifting is built to resolve.
 * **Failure Mode in Downstream Verification**: Naive definition-order IR extractors generate CFG nodes representing function definition sites rather than call sites. When fed to formal model checkers, these graphs represent non-existent execution paths, causing tools to report false compliance or miss catastrophic temporal ordering violations.
 * **Module 02 Resolution**: Module 02 introduces **D2 Call-Order Driver Lifting** (`ast_extractor/call_order_view.py`), which parses the execution driver, lifts sibling function calls to formal task execution boundaries, and produces an execution-accurate `call_order_wir`.
 
@@ -202,13 +204,13 @@ Module 02 makes **four distinct contributions** to the state of the art in progr
 
 ### Novelty 2: Dual-Perspective WIR Schema with D2 Call-Order Driver Lifting
 * **Description**: Module 02 specifies a standardized 12-node-type JSON CFG schema (`shared_schemas/wir_schema.json`) featuring **D2 Call-Order Driver Lifting** (`ast_extractor/call_order_view.py`).
-* **Significance**: D2 lifting inspects the execution driver function, isolates sibling function call sites, and reconstructs the CFG in true operational execution order. This completely eliminates the **46.2% definition-vs-execution order defect** inherent in standard AST parsers.
+* **Significance**: D2 lifting inspects the execution driver function, isolates sibling function call sites, and reconstructs the CFG in true operational execution order. This eliminates the definition-vs-execution order defect inherent in standard AST parsers (see Section 2.1's caveat: the defect is demonstrated qualitatively on this project's corpus, not quantified as a corpus-wide percentage).
 
 ---
 
 ### Novelty 3: PEP 669 Differential Dynamic Tracing with Reference Interpreter & Return-Value Events
 * **Description**: Module 02 leverages CPython 3.12 native event tracing (`sys.monitoring`) to execute code side-by-side against a WIR Reference Interpreter (`interpreter.py`), elevating return values to first-class trace events (`PY_RETURN`).
-* **Significance**: Incorporating return values into LCS trace alignment resolved unobservable internal state corruption, boosting logic-bug detection from 91.2% to **100.0%** on same-lineage code and reducing cross-implementation false alarms from 25.0% to **10.0%**.
+* **Significance**: Incorporating return values into LCS trace alignment resolved unobservable internal state corruption, boosting natural-bug logic-class detection from 91.2% to **100.0%** (164/164 overall detection). This is a distinct contribution from the module's separate `task_only` comparison mode (`comparator.py`'s `comparison_mode` parameter), which is what reduces cross-implementation false alarms from 25.0% to **10.0%** by excluding branch-decision divergence — appropriate when comparing independently-written implementations that legitimately differ in control-flow shape, rather than same-lineage mutants.
 
 ---
 
@@ -470,7 +472,7 @@ To justify Module 02's architectural design, we evaluate it against four alterna
 | Dimension | LLM Self-Reflection | Pure AST Static Analysis | Heavy Formal Proof (Dafny/ACSL) | Module 02 (Dual-View WIR + 3-Layer Certificate) |
 |---|---|---|---|---|
 | **LLM Cooperation Requirement** | High (Requires prompt re-reading) | Zero | Extreme (Requires proof generation) | **Zero (Post-hoc on raw unannotated Python)** |
-| **Execution Order Fidelity** | Poor (Fails on complex logic) | Fails in ~46% of workflows | Poor (Fails on unrolled calls) | **100% Accurate via D2 Driver Lifting** |
+| **Execution Order Fidelity** | Poor (Fails on complex logic) | Fails whenever a driver calls siblings out of definition order | Poor (Fails on unrolled calls) | **Accurate via D2 Driver Lifting (verified on the project's worked example; not corpus-wide quantified)** |
 | **Dynamic State Observability** | Blind to runtime state mutations | Completely blind | Limited to static preconditions | **Captured via PEP 669 `PY_RETURN` events** |
 | **Verdict Calibration** | Uncalibrated text output | Binary pass/fail heuristics | Binary proof success/fail | **Statistically Calibrated (Youden's J, $\tau=0.10$)** |
 | **Anti-Circularity Guarantee** | Fails (Severe confirmation bias) | Passes (Independent static parser) | Passes (Independent SMT solver) | **Passes (Strict Dual-Track Independence)** |
@@ -483,7 +485,7 @@ To justify Module 02's architectural design, we evaluate it against four alterna
 
 #### 2. Pure AST Static Analysis
 * **Mechanism**: Parsing Python AST syntax trees top-to-bottom without dynamic execution or symbolic solving.
-* **Fatal Flaw**: Pure AST parsers are completely blind to dynamic runtime branch choices and fail in **46.2% of workflow scripts** due to definition-vs-execution order misalignment.
+* **Fatal Flaw**: Pure AST parsers are completely blind to dynamic runtime branch choices and produce structurally wrong CFGs whenever definition order diverges from call order (Section 2.1) — a pattern this project's own generated-code corpus and worked example both exhibit.
 
 #### 3. Heavy Formal Proof (Coq / Dafny / ACSL Vericoding)
 * **Mechanism**: Forcing the LLM to co-generate formal mathematical contracts and invariants alongside executable code, verified by SMT solvers (Frama-C, Dafny).
@@ -506,13 +508,15 @@ To rigorously evaluate Module 02, we vendored **101 enterprise business workflow
 
 ```mermaid
 flowchart TD
-    M["427 SYNTHETIC MUTANTS"] --> CALIB["CALIB Dataset (50% Split, n=213)<br/>• Threshold Calibration<br/>• Youden's J Optimization<br/>• Fixed Tau = 0.10 (J = 0.96)"]
-    M --> EVAL["EVAL Dataset (50% Split, n=214)<br/>• Held-Out Metric Evaluation<br/>• Clopper-Pearson 95% CIs<br/>• 99.5% Detection / 5.9% False Alarm"]
+    B["101 BASE WORKFLOWS"] --> CALIB["CALIB Base Programs (~50)<br/>• Threshold Calibration<br/>• Youden's J Optimization<br/>• Fixed Tau = 0.10 (J = 0.96)"]
+    B --> EVAL["EVAL Base Programs (~51)<br/>• Held-Out Metric Evaluation<br/>• Clopper-Pearson 95% CIs<br/>• 99.5% Detection / 5.9% False Alarm"]
+    M["427 SYNTHETIC MUTANTS<br/>(inherit their base program's split)"] -.-> CALIB
+    M -.-> EVAL
 ```
 
 * **Total Synthetic Mutants Generated**: $n = 427$ applicable mutants across 101 base workflows.
-* **Dataset Partitioning**: 50/50 stratified **CALIB / EVAL split** (fixed random seed `1234`).
-* **Calibration Protocol**: Youden's J optimization on the CALIB set derived an optimal decision boundary $\tau = 0.10$, yielding Youden's $J = \text{TPR} - \text{FPR} = 0.995 - 0.035 = 0.96$. This threshold was frozen and evaluated on the held-out EVAL dataset.
+* **Dataset Partitioning**: 50/50 stratified **CALIB / EVAL split**, applied at the **base-program level** (fixed random seed `1234`) — the 101 FLOW-BENCH programs are stratified by tag into ~50 CALIB / ~51 EVAL programs, and every mutant inherits its own base program's split assignment. This is not a direct 50/50 split of the 427 mutants: the held-out EVAL side used for the headline metrics below contains 219 mutants (210 genuine + 9 equivalent) plus the 51 held-out base programs themselves (used for the false-alarm figure).
+* **Calibration Protocol**: Youden's J optimization on the CALIB set derived an optimal decision boundary $\tau = 0.10$ ($J = 0.96$). This threshold was frozen and evaluated on the held-out EVAL dataset.
 
 ---
 
@@ -520,7 +524,7 @@ flowchart TD
 
 | Metric Description | Measured Value | Sample Size ($n$) | 95% Confidence Interval (CP) |
 |---|---|---|---|
-| **Synthetic Bug Detection Rate** | **99.5%** ($210/211$) | $n = 211$ | [97.4%, 100.0%] |
+| **Synthetic Bug Detection Rate** | **99.5%** ($209/210$) | $n = 210$ | [97.4%, 100.0%] |
 | **False-Alarm Rate (Clean Code)** | **5.9%** ($3/51$) | $n = 51$ | [1.2%, 16.2%] |
 | **WIR Structural F1 Score** | **1.0000** ($100.0\%$) | $n = 101$ | Exact Ground Truth |
 | **Natural LLM Bug Detection (Strict)** | **100.0%** ($164/164$) | $n = 164$ | [97.8%, 100.0%] |
@@ -543,7 +547,7 @@ The performance of Module 02 across individual mutation operators on the EVAL da
 | **Step Reorder** | 49 | 49 | **100.0%** | Caught by LCS sequence alignment mismatch. |
 | **Early Cutoff** | 49 | 49 | **100.0%** | Caught by truncated execution trace relative to WIR. |
 | **Constant Value Change** | 9 | 8 | **88.9%** | 1 uncaught mutant was an **equivalent mutant** (value change did not alter control branch outcome). |
-| **TOTAL SYNTHETIC** | **211** | **210** | **99.5%** | **Overall Synthetic Detection Rate** |
+| **TOTAL SYNTHETIC** | **210** | **209** | **99.5%** | **Overall Synthetic Detection Rate** |
 
 ---
 
@@ -562,7 +566,7 @@ To prepare presenters for thesis defense and academic review, we provide six hig
 | Question ID | Defense Subject / Focus Area |
 |---|---|
 | **Q1** | Justification of V2 Symbolic Engine Retention |
-| **Q2** | Explanation of the 46.2% Call-Order Misalignment Defect |
+| **Q2** | Explanation of the Definition-vs-Execution Call-Order Misalignment Defect |
 | **Q3** | CPython Thread Timeouts & GIL Monopolization Handling |
 | **Q4** | Distinction Between 0.95 Acceptance and $\tau=0.10$ Calibration Thresholds |
 | **Q5** | Rationale for Converting V3 from a Voting Weight to a Hard Abort Gate |
@@ -576,9 +580,9 @@ To prepare presenters for thesis defense and academic review, we provide six hig
 
 ---
 
-### Q2: What is the root cause of the ~46% definition-vs-execution order misalignment defect, and how does D2 Call-Order Driver Lifting eliminate it?
+### Q2: What is the root cause of the definition-vs-execution order misalignment defect, and how does D2 Call-Order Driver Lifting eliminate it?
 
-**Answer**: Standard Python AST parsers iterate through top-level AST nodes in file definition order. When LLMs generate code, they frequently define helper task functions at the top of the file and invoke them sequentially inside a driver function (e.g., `run_workflow()`) at the bottom. In **46.2% of generated scripts**, definition order misaligns with true call sequence. Naive AST extractors build WIR nodes representing definition sites, causing downstream formal model checkers to verify false execution sequences. D2 Call-Order Driver Lifting (`call_order_view.py`) inspects the driver function, extracts its internal CFG, and lifts sibling function call sites into sequential `task` nodes, producing a WIR that reflects true runtime execution order.
+**Answer**: Standard Python AST parsers iterate through top-level AST nodes in file definition order. When LLMs generate code, they frequently define helper task functions at the top of the file and invoke them sequentially inside a driver function (e.g., `run_workflow()`) at the bottom — the pattern seen directly in this project's own `spiff_cli_call_activity.py` example (Section 6) and reproducible across the multi-model generation corpus. Naive AST extractors build WIR nodes representing definition sites, causing downstream formal model checkers to verify false execution sequences. D2 Call-Order Driver Lifting (`call_order_view.py`) inspects the driver function, extracts its internal CFG, and lifts sibling function call sites into sequential `task` nodes, producing a WIR that reflects true runtime execution order. (This evaluation suite does not report a corpus-wide percentage of affected programs — if asked for one, say so rather than citing an unverified figure.)
 
 ---
 
@@ -592,7 +596,7 @@ To prepare presenters for thesis defense and academic review, we provide six hig
 
 **Answer**: 
 * The **0.95 live production acceptance threshold** is an operational quality gate enforced during live `/verify` API calls. Code yielding a combined confidence score $C < 0.95$ is rejected (`passed = False`) before reaching the Module 03 Equivalence Engine.
-* The **$\tau = 0.10$ calibration threshold** is a statistical decision boundary derived via Youden's J optimization ($J = 0.96$) on a 50/50 held-out CALIB dataset ($n=213$). It is used exclusively inside the evaluation harness to classify differential dynamic trace scores as buggy versus clean with optimal sensitivity (99.5%) and specificity (94.1%).
+* The **$\tau = 0.10$ calibration threshold** is a statistical decision boundary derived via Youden's J optimization ($J = 0.96$) on the CALIB split (~50 of the 101 base programs, stratified by tag) and then evaluated on the held-out EVAL split. It is used exclusively inside the evaluation harness to classify differential dynamic trace scores as buggy versus clean, achieving on held-out EVAL a sensitivity of 99.5% (genuine-bug detection) and specificity of 94.1% (1 − 5.9% false-alarm rate).
 
 ---
 
@@ -617,7 +621,7 @@ Module 02 provides a mathematically sound, empirically calibrated IR extraction 
 
 ### Summary Checklist for Presentation Delivery
 - [x] Emphasize dual-track independence and zero-cooperation post-hoc design.
-- [x] Illustrate the 46% definition-vs-execution defect and how D2 lifting resolves it.
+- [x] Illustrate the definition-vs-execution order defect and how D2 lifting resolves it (cite the worked example, not an unverified corpus-wide percentage).
 - [x] Explain the 3-layer certificate architecture ($V_3$ hard gate, $V_2$ concolic, $V_1$ PEP 669 tracer).
 - [x] Walk through the `spiff_cli_call_activity` trace nodes (`node_1` to `node_8`) and explain the `INCONCLUSIVE` atom mismatch.
 - [x] Highlight empirical performance: 99.5% synthetic detection, 5.9% false alarms, $\tau = 0.10$ calibration ($J = 0.96$).
