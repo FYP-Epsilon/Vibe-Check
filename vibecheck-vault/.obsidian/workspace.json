@@ -11,17 +11,14 @@
             "id": "30c9fa047d135221",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "Project Architecture.canvas",
-                "viewState": {
-                  "x": -542.4734957242623,
-                  "y": -232.0832950074258,
-                  "zoom": -1.1403867051265344
-                }
+                "file": "presenting scripts/Module 03 - Presenting Script.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-layout-dashboard",
-              "title": "Project Architecture"
+              "icon": "lucide-file",
+              "title": "Module 03 - Presenting Script"
             }
           }
         ]
@@ -190,6 +187,10 @@
   },
   "active": "30c9fa047d135221",
   "lastOpenFiles": [
+    "presenting scripts/Module 01 - Presenting Script.md",
+    "presenting scripts/Module 02 - Presenting Script.md",
+    "presenting scripts/Module 03 - Presenting Script.md",
+    "Project Architecture.canvas",
     "Next Steps.md",
     "Home.md",
     "Claude Science Plan.md",
@@ -216,7 +217,6 @@
     "Repo Docs/Thesis/figures/fig_m01_tier_census.png",
     "Repo Docs/Thesis/figures/fig_m01_pipeline.png",
     "Repo Docs/Thesis/figures/fig_m01_checkability_funnel.png",
-    "Project Architecture.canvas",
     "Project Status.canvas",
     "Repo Docs/Thesis/figures/fig_m03_verdict_shift.png",
     "Repo Docs/Thesis/figures/fig_m03_two_vacuity_channels.png",
@@ -237,9 +237,6 @@
     "Module 01 - Specification Analysis/Module 01 Novelty.md",
     "Module 03 - Equivalence Engine/Bridge Investigation/CP1 Lifting-Scope Decision.md",
     "Module 03 - Equivalence Engine/Bridge Investigation/E2E Integration Verification Findings.md",
-    "Module 03 - Equivalence Engine/Bridge Investigation/E2E Session/D6 - Thesis Writing Parallelization Note.md",
-    "Module 03 - Equivalence Engine/Bridge Investigation/E2E Session/D5 - Real-World Demo Design.md",
-    "Module 03 - Equivalence Engine/Bridge Investigation/E2E Session/D4 - Phased Implementation Plan.md",
     "Module 03 - Equivalence Engine/Module 03 Status.canvas",
     "Module 01 - Specification Analysis/Module 01 Architecture.canvas",
     "Module 01 - Specification Analysis/Module 01 Status.canvas",
