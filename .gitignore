@@ -22,3 +22,9 @@ build/
 
 # Poster
 docs/poster/
+
+# Agents
+.agent
+.agents
+.agents/
+
