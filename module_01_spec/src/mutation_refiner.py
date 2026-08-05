@@ -29,7 +29,10 @@ class BPMNMutationEngine:
             self._mutate_sequence_flow_deletion,
             self._mutate_task_retyping,
             self._mutate_condition_inversion,
-            self._mutate_loop_boundary
+            self._mutate_loop_boundary,
+            self._mutate_edge_target,
+            self._mutate_edge_source,
+            self._mutate_start_state
         ]
         
         # Generate canonical original traces to compare
@@ -51,8 +54,8 @@ class BPMNMutationEngine:
                 # If a mutant's traces are a subset of the original's, it only removed 
                 # optional valid behaviors. It is mathematically impossible for any sound LTLf
                 # suite to kill such a mutant without also rejecting valid original traces.
-                if canonical_mutant.issubset(canonical_original):
-                    continue
+                # if canonical_mutant.issubset(canonical_original):
+                #     continue
                     
                 self.mutants.append(mutant)
         
@@ -99,6 +102,33 @@ class BPMNMutationEngine:
             target["condition"] = cond[2:-1]
         else:
             target["condition"] = f"!({cond})"
+        return graph
+
+    def _mutate_edge_target(self, graph: Dict[str, Any]) -> Dict[str, Any]:
+        """Changes the target of a random sequence flow to a different node."""
+        if not graph["edges"] or not graph["states"]: return graph
+        edge = random.choice(graph["edges"])
+        nodes = [s["node_id"] for s in graph["states"] if s["node_id"] != edge["source_id"]]
+        if nodes:
+            edge["target_id"] = random.choice(nodes)
+        return graph
+
+    def _mutate_edge_source(self, graph: Dict[str, Any]) -> Dict[str, Any]:
+        """Changes the source of a random sequence flow to a different node."""
+        if not graph["edges"] or not graph["states"]: return graph
+        edge = random.choice(graph["edges"])
+        nodes = [s["node_id"] for s in graph["states"] if s["node_id"] != edge["target_id"]]
+        if nodes:
+            edge["source_id"] = random.choice(nodes)
+        return graph
+
+    def _mutate_start_state(self, graph: Dict[str, Any]) -> Dict[str, Any]:
+        """Changes the start state of the graph."""
+        if not graph["states"]: return graph
+        nodes = [s["node_id"] for s in graph["states"]]
+        if nodes:
+            graph["initial_state"] = random.choice(nodes)
+            graph["start_states"] = [random.choice(nodes)]
         return graph
 
     def _mutate_loop_boundary(self, graph: Dict[str, Any]) -> Dict[str, Any]:
