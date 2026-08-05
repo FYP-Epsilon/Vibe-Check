@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "presenting scripts/Module 03 - Presenting Script.md",
+                "file": "presenting scripts/Module 02 - Presenting Script.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Module 03 - Presenting Script"
+              "title": "Module 02 - Presenting Script"
             }
           }
         ]
@@ -187,9 +187,9 @@
   },
   "active": "30c9fa047d135221",
   "lastOpenFiles": [
+    "presenting scripts/Module 03 - Presenting Script.md",
     "presenting scripts/Module 01 - Presenting Script.md",
     "presenting scripts/Module 02 - Presenting Script.md",
-    "presenting scripts/Module 03 - Presenting Script.md",
     "Project Architecture.canvas",
     "Next Steps.md",
     "Home.md",
